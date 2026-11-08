@@ -108,7 +108,23 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     await emit(3, "file", "begin");
     await emit(2, "page", "end");
     await visible("file");
-    await emit(3, "file", "fail");
+    // The fading cover is visual only: the pointer already reaches the canvas, so a move made while it fades is
+    // the editor's (collaborator cursors, hover). Checked in the same task as the event that starts the fade.
+    const fading = await page.evaluate(() => {
+      window.dispatchEvent(
+        new CustomEvent("switch-loading-change", {
+          detail: { token: 3, kind: "file", phase: "fail" },
+        }),
+      );
+      const area = document.getElementById("workspace").getBoundingClientRect();
+      const hit = document.elementFromPoint(area.x + area.width / 2, area.y + area.height / 2);
+      return {
+        leaving: document.body.dataset.switchLeaving ?? null,
+        shown: getComputedStyle(document.getElementById("switch-loading-logo")).display,
+        inWorkspace: !!hit?.closest("#workspace"),
+      };
+    });
+    assert.deepEqual(fading, { leaving: "true", shown: "flex", inWorkspace: true });
     await clean();
     assert.equal(await page.locator("#canvas").evaluate((el) => !!el.closest("[inert]")), false);
     await page.evaluate(() => {
