@@ -828,7 +828,7 @@ const INLINE_TEXT = new Set([
 /**
  * Import HTML into a Verynize document.
  * @param {string} html
- * @param {object} options
+ * @param {Record<string, any>} options
  *   baseUrl     URL or local path the page came from (resolves <link>, @import, <img>)
  *   root        folder local files must stay inside (default: the page's folder)
  *   allowRemote fetch http(s) stylesheets and images (default false)
@@ -837,6 +837,7 @@ const INLINE_TEXT = new Set([
  *   document, pageId  import into an existing document (default: a new one)
  *   tailwind    pass classes that compile as Tailwind v4 utilities through (default true)
  *   fetch, timeoutMs, maxBytes, totalBytes, maxSheets, maxDepth   resource limits
+ *   pruneCss    drop rules no element can match (default true); pruneCssBudgetMs bounds that pass (default 50)
  * @returns {Promise<{document, pageId, roots, jsx, warnings, stats}>}
  */
 export async function importHtml(html, options = {}) {
@@ -1052,7 +1053,7 @@ export async function importHtml(html, options = {}) {
     }
   const beforePruning = rules.length;
   if (options.pruneCss !== false)
-    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
+    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)], options.pruneCssBudgetMs);
   stats.prunedRules = beforePruning - rules.length;
   if (!preflightRules)
     preflightRules = parseStylesheet(PREFLIGHT_CSS)

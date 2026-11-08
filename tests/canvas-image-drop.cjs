@@ -427,11 +427,15 @@ const os = require("node:os");
     assert.equal(await page.locator(`#canvas [data-id="${photo.id}"] img`).count(), 1);
 
     // 5. An image on the real system clipboard pastes as an image layer (⌘V on the canvas).
-    await app.evaluate(({ clipboard, nativeImage }) => {
+    await app.evaluate(async ({ clipboard, ClipboardItem }) => {
       const png =
         "iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAAK0lEQVR4nO3NMQ0AAAgDsHnCE/4dgAw4mvRvpvpExGKxWCwWi8VisVj8N15JsXjqNugkJgAAAABJRU5ErkJggg==";
       clipboard.clear();
-      clipboard.writeImage(nativeImage.createFromBuffer(Buffer.from(png, "base64")));
+      await clipboard.write([
+        new ClipboardItem({
+          "image/png": new Blob([Buffer.from(png, "base64")], { type: "image/png" }),
+        }),
+      ]);
     });
     await page.evaluate(() => window.design.setSelection([]));
     await page.locator("#workspace").click({ position: { x: 40, y: 300 } });

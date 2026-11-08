@@ -17,19 +17,20 @@ function sealedStorage() {
   const key = crypto.randomBytes(32);
   return {
     available: true,
-    isEncryptionAvailable() {
+    async isAsyncEncryptionAvailable() {
       return this.available;
     },
-    encryptString(text) {
+    async encryptStringAsync(text) {
       const iv = crypto.randomBytes(12),
         c = crypto.createCipheriv("aes-256-gcm", key, iv),
         body = Buffer.concat([c.update(text, "utf8"), c.final()]);
       return Buffer.concat([iv, c.getAuthTag(), body]);
     },
-    decryptString(buf) {
+    async decryptStringAsync(buf) {
       const d = crypto.createDecipheriv("aes-256-gcm", key, buf.subarray(0, 12));
       d.setAuthTag(buf.subarray(12, 28));
-      return Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString("utf8");
+      const result = Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString("utf8");
+      return { result, shouldReEncrypt: false };
     },
   };
 }

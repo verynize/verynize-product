@@ -385,7 +385,11 @@ const fs = require("node:fs/promises"),
     const footerText = await page.evaluate(
       () => document.querySelector("#workspace footer, footer").textContent,
     );
-    const image = await app.evaluate(({ clipboard }) => clipboard.readImage().getSize());
+    const image = await app.evaluate(async ({ clipboard, nativeImage }) => {
+      const item = (await clipboard.read()).find((entry) => entry.types.includes("image/png"));
+      const blob = await item.getType("image/png");
+      return nativeImage.createFromBuffer(Buffer.from(await blob.arrayBuffer())).getSize();
+    });
     assert.match(footerText, /Copied 200 × 160 PNG$/);
     assert.deepEqual(image, { width: 200, height: 160 }, "copy as PNG writes a native 2× bitmap");
     await assert.rejects(

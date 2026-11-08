@@ -523,6 +523,10 @@ async function checkLinks(engine, origin, { session, me, viewport, mode, label }
   await page.waitForFunction((id) => window.cloudWorkspace?.room()?.id === id, owned.id, {
     timeout: 30000,
   });
+  // Let the router settle on the editor address first: its history update would abort the next goto.
+  await page.waitForFunction(
+    () => location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId),
+  );
 
   // No access: the screen, then Back to files.
   await page.goto(`${origin}/#room=${stranger.id}`);

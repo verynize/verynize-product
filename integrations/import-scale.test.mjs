@@ -72,14 +72,6 @@ test("parser guards permit 20K elements and reject excess and deep nesting", () 
 test("CSS pruning preserves matching selectors, inheritance and cascade", async () => {
   const css = Array.from({ length: 10000 }, (_, n) => `.unused-${n}{color:red}`).join("");
   const html = `<style>${css}.parent .child{color:blue}.child:hover{color:red}:is(.child,.missing){padding:7px}[data-name="Child"]{border-radius:8px}</style><div class="parent"><div data-name="Child" class="child">Hi</div></div>`;
-  const start = performance.now();
-  const baseline = await importHtml(html, { pruneCss: false });
-  const middle = performance.now();
-  const pruned = await importHtml(html);
-  console.log(
-    `CSS 10K rules: unpruned ${(middle - start).toFixed(0)}ms, pruned ${(performance.now() - middle).toFixed(0)}ms, removed ${pruned.stats.prunedRules}`,
-  );
-  assert.ok(pruned.stats.prunedRules >= 9000);
   const props = (r) =>
     r.document.pages[0].nodes.map(({ name, color, textColor, radius, padding }) => ({
       name,
@@ -88,6 +80,17 @@ test("CSS pruning preserves matching selectors, inheritance and cascade", async 
       radius,
       padding,
     }));
+  const start = performance.now();
+  const baseline = await importHtml(html, { pruneCss: false });
+  const middle = performance.now();
+  const pruned = await importHtml(html);
+  console.log(
+    `CSS 10K rules: unpruned ${(middle - start).toFixed(0)}ms, pruned ${(performance.now() - middle).toFixed(0)}ms, removed ${pruned.stats.prunedRules}`,
+  );
+  // The default 50ms deadline keeps the rest under load, so count removals without one.
+  const unbounded = await importHtml(html, { pruneCssBudgetMs: Infinity });
+  assert.equal(unbounded.stats.prunedRules, 10000);
+  assert.deepEqual(props(unbounded), props(baseline));
   assert.deepEqual(props(pruned), props(baseline));
 });
 test("20K-node HTML and JSX imports run end-to-end through file backend", async () => {

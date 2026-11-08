@@ -58,8 +58,8 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
       null,
     );
     await page.evaluate(() => window.appSettings.close());
-    await page.locator(".app-menu-trigger:visible").first().click();
-    await page.locator("#figma-import").click();
+    // The app opens on Home, where the editor's app menu is hidden; click the menu command directly.
+    await page.evaluate(() => document.getElementById("figma-import").click());
     await page.locator("#figma-dialog").waitFor({ state: "visible" });
     await page.evaluate(() => window.desktop.figmaOAuth.status());
     const saved = await page.evaluate(() =>

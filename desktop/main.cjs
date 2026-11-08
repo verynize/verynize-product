@@ -18,6 +18,7 @@ const {
   protocol,
   net,
   clipboard,
+  ClipboardItem,
   nativeImage,
 } = require("electron");
 const path = require("node:path");
@@ -82,14 +83,15 @@ require("./secure-storage.cjs");
 // safeStorage reports encryption unavailable at once (generate.cjs keeps keys in memory, figma-oauth.cjs refuses to persist).
 if (process.platform === "linux" && process.env.CI && !app.commandLine.hasSwitch("password-store"))
   app.commandLine.appendSwitch("password-store", "basic");
-// Linux CI renders like the macOS dev machines the tests were measured on: a 2x display (Retina) and overlay scrollbars
-// (no gutter eating panel width). xvfb has no GPU: compositing stays in software (--disable-gpu, as Chromium falls back
+// Linux CI renders like the macOS dev machines the tests were measured on: a 2x display (Retina) and scrollbars that take
+// no panel width, like macOS overlay scrollbars. Chromium 156 (Electron 45) ignores the OverlayScrollbar feature, so
+// --hide-scrollbars removes the 15px gutter instead. xvfb has no GPU: compositing stays in software (--disable-gpu, as Chromium falls back
 // to anyway) and WebGL gets its SwiftShader fallback, or shaders never become ready. Compositing through SwiftShader GL
 // (use-angle=swiftshader) instead loses clicks into out-of-process iframes and delays frames (preview, mask pixels).
 if (process.platform === "linux" && process.env.CI) {
   const sw = app.commandLine;
   if (!sw.hasSwitch("force-device-scale-factor")) sw.appendSwitch("force-device-scale-factor", "2");
-  sw.appendSwitch("enable-features", "OverlayScrollbar");
+  sw.appendSwitch("hide-scrollbars");
   sw.appendSwitch("disable-gpu");
   sw.appendSwitch("enable-unsafe-swiftshader");
 }
@@ -207,7 +209,7 @@ void app.whenReady().then(async () => {
         if (!appProtocol.isTrustedSender(event, win)) throw Error("Untrusted IPC sender");
         return fn.apply(undefined, args);
       });
-    handle("writeClipboardImage", (dataURL) => {
+    handle("writeClipboardImage", async (dataURL) => {
       if (
         typeof dataURL !== "string" ||
         !dataURL.startsWith("data:image/png;base64,") ||
@@ -216,7 +218,9 @@ void app.whenReady().then(async () => {
         throw Error("Invalid clipboard PNG");
       const image = nativeImage.createFromDataURL(dataURL);
       if (image.isEmpty()) throw Error("Invalid clipboard PNG");
-      clipboard.writeImage(image);
+      await clipboard.write([
+        new ClipboardItem({ "image/png": new Blob([image.toPNG()], { type: "image/png" }) }),
+      ]);
     });
     registerPreview(handle, win);
     const designFiles = registerDesignFiles(handle, win);
