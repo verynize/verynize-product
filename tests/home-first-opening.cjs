@@ -31,6 +31,56 @@ const { checkHomeOpening } = require("./helpers/home-first-opening.cjs");
     const id = await checkHomeOpening(page);
     await page.waitForFunction(() => !document.body.dataset.switchLoading);
     await shot(page, "home-opened-document");
+
+    // Settings opened during a tab switch keeps the view, so it must not cancel that load.
+    const switched = await page.evaluate(async () => {
+      const other = window.fileLibrary.summaries().find((file) => file.name === "Other fixture");
+      const opening = window.fileLibrary.open(other.id);
+      window.appSettings.open();
+      await opening;
+      return { name: window.design.getDocument().name };
+    });
+    assert.equal(switched.name, "Other fixture", "settings did not cancel the tab switch");
+    await page.evaluate(() => window.appSettings.close());
+    await page.waitForFunction(() => !document.body.classList.contains("settings-open"));
+
+    // A failed open from Home returns to Home (replacing the failed editor entry) and clears the cover.
+    const failing = await page.evaluate(async () => {
+      const doc = structuredClone(window.design.getDocument());
+      doc.name = "Unreachable fixture";
+      // No token and no session: the room open fails before any network request.
+      const cloud = { server: "http://127.0.0.1:9", roomId: crypto.randomUUID() };
+      await window.fileLibrary.createFromDocument(doc, { cloud }).catch(() => {});
+      window.fileLibrary.showHome();
+      return window.fileLibrary.summaries().find((file) => file.name === "Unreachable fixture")?.id;
+    });
+    assert.ok(failing, "the failing cloud file is listed");
+    const before = await page.evaluate(() => ({
+      length: history.length,
+      name: window.design.getDocument().name,
+    }));
+    await page.locator(`#library-files [data-file-id="${failing}"] .file-open`).click();
+    for (let i = 0; ; i++) {
+      const state = await page.evaluate(() => ({
+        path: location.pathname,
+        home: document.body.classList.contains("files-view"),
+        loading: !!document.body.dataset.switchLoading,
+        phase: window.switchCoordinator.getState()?.phase,
+      }));
+      if (state.phase === "fail" && state.home && !state.loading) {
+        assert.equal(state.path, "/");
+        break;
+      }
+      assert.ok(i < 100, `failed open returns to Home: ${JSON.stringify(state)}`);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const after = await page.evaluate(() => ({
+      length: history.length,
+      name: window.design.getDocument().name,
+    }));
+    assert.equal(after.name, before.name, "the failed open keeps the previous document");
+    assert.equal(after.length, before.length + 1, "the failed editor entry was replaced");
+    assert.equal(await page.locator("#file-home").isVisible(), true);
     await app.close();
     page = await launch();
     assert.equal(

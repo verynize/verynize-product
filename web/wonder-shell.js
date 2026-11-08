@@ -112,7 +112,11 @@
         coordinator.getState()?.phase !== "cancel" &&
         (!options.isCurrent || options.isCurrent());
       coordinator.fail(token, error);
-      if (own && active && fromHome) showHome();
+      // Replace the failed /editor/<id> entry: Back must not retry the failed open.
+      if (own && active && fromHome) {
+        if (window.shellNavigation) window.shellNavigation.request({ view: "/" }, { replace: true });
+        else showHome();
+      }
       throw error;
     } finally {
       if (own) coordinator.finish(token);
