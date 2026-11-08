@@ -332,8 +332,8 @@ export function request(target: ShellRequest, { replace = false }: { replace?: b
     return true;
   const from = logical();
   const next = resolve(from, target);
-  // Only a view change departs: settings opened during a tab switch keeps the view (and its load).
-  if (next.view !== from.view) cancelDepartedFile(next.view);
+  // Settings requests keep the view underneath, so they never cancel a file load (a tab switch in progress).
+  if ("view" in target) cancelDepartedFile(next.view);
   applyShell(next);
   if (same(from, next)) return true;
   if (closing) closing.desired = next;
