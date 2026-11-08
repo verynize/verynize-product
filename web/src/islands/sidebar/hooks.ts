@@ -1,7 +1,15 @@
 // Narrow subscriptions to the legacy design store. The store notifies after *every* legacy render
 // (including each pointer move while dragging on the canvas); the sidebar only re-renders when the
 // slice it shows actually changes.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { activePage, design, type DesignDocument, type LayerNode } from "@/lib/bridge";
 import { layerRole, type LayerRole } from "@/lib/components";
 

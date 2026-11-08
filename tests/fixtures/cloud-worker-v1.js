@@ -222,6 +222,7 @@ export default {
         );
         return json({ id, ...(await response.json()) }, response.status);
       }
+      // As shipped in v1: the "." between id and nonce is unescaped, so it matches any character.
       const publicMatch = url.pathname.match(
         new RegExp(`^/api/public/(${uuidPattern}).([0-9a-f]{64})$`),
       );

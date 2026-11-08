@@ -104,9 +104,7 @@
       }
     return [...byFamily.values()].slice(0, 40).map((e) => ({
       family: e.family,
-      weights: [...e.weights].sort((a, b) =>
-        String(a) < String(b) ? -1 : String(a) > String(b) ? 1 : 0,
-      ),
+      weights: [...e.weights].sort((a, b) => Number(a) - Number(b)),
       styles: [...e.styles],
     }));
   };
