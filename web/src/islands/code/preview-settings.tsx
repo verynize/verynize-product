@@ -51,8 +51,10 @@ export function PreviewSettingsHost({ state }: { state: ChatState }) {
   return root ? <PreviewSettingsDialog key={root} root={root} state={state} onClose={() => setOpenRoot(null)} /> : null;
 }
 
-type Row = { name: string; command: string; url: string };
-const emptyRow = (index: number): Row => ({ name: index ? "" : "App", command: "", url: "" });
+/** `key`: a stable React key, so removing a row does not reuse another row's inputs. Never saved. */
+type Row = { key: number; name: string; command: string; url: string };
+let rowKeys = 0;
+const emptyRow = (index: number): Row => ({ key: ++rowKeys, name: index ? "" : "App", command: "", url: "" });
 
 /** Opens at: blank = the address the command prints; a port, host:port or a localhost URL. */
 function opensAt(value: string): string | undefined {
@@ -144,7 +146,7 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
             : [];
         setRows(
           commands.length
-            ? commands.map((c) => ({ name: c.name, command: formatCommand(c.command), url: shownURL(c.url) }))
+            ? commands.map((c) => ({ key: ++rowKeys, name: c.name, command: formatCommand(c.command), url: shownURL(c.url) }))
             : [{ ...emptyRow(0), command: formatCommand(status.detected?.command) }],
         );
         setSetup(formatSteps(config?.setupSteps || (config?.setup ? [config.setup] : null)));
@@ -246,7 +248,7 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
                     {rows.length > 1 && <span className="w-7.25 shrink-0" />}
                   </div>
                   {rows.map((row, index) => (
-                    <div role="row" key={index} data-preview-command={index} className="flex items-center gap-2">
+                    <div role="row" key={row.key} data-preview-command={index} className="flex items-center gap-2">
                       <input
                         aria-label={index ? `Name ${index + 1}` : "Name"}
                         value={row.name}

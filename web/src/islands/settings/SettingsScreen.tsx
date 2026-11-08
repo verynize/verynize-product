@@ -80,6 +80,8 @@ export function SettingsScreenContent({ section }: { section?: SectionId } = {})
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
   }, [state.section]);
+  const { account, organizations } = useOrganizations();
+  const activeId = useActiveOrganization();
 
   if (!api) return null;
   const sections = SECTIONS.filter((s) => AVAILABLE[s.id]?.() ?? true);
@@ -89,8 +91,6 @@ export function SettingsScreenContent({ section }: { section?: SectionId } = {})
   const current =
     sections.find((s) => s.id === (REDIRECT[state.section] ?? state.section)) ?? SECTIONS[1];
   const Page = current.page;
-  const { account, organizations } = useOrganizations();
-  const activeId = useActiveOrganization();
   const activeOrg = organizations.find((org) => org.id === activeId) ?? organizations[0] ?? null;
   const name = activeOrg
     ? isPersonal(activeOrg)

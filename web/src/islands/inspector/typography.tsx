@@ -123,13 +123,14 @@ export function FontFamilyPicker({
     ? []
     : Object.entries(variablesOf(doc)).filter(([, v]) => v.type === "fontFamily");
   const bound = bindingsOf(node).fontFamily;
-  const used = [
+  // Joined so the memo below only recomputes when the set of families on the page changes.
+  const usedKey = [
     ...new Set(
       pageNodes(doc)
         .map((n) => n.fontFamily)
         .filter(Boolean),
     ),
-  ];
+  ].join("\u0000");
   const matches = useMemo(() => {
     const seen = new Set<string>();
     const out: FontEntry[] = [];
@@ -145,7 +146,7 @@ export function FontFamilyPicker({
       out.push(f);
     };
     if (source === "all")
-      for (const family of [value, ...used])
+      for (const family of [value, ...(usedKey ? usedKey.split("\u0000") : [])])
         add(
           fonts.find((f) => f.family.toLowerCase() === family.toLowerCase()) ?? {
             family,
@@ -162,7 +163,7 @@ export function FontFamilyPicker({
             Number(!b.family.toLowerCase().startsWith(q)),
         )
       : out;
-  }, [fonts, q, source, value, used.join("\u0000")]);
+  }, [fonts, q, source, value, usedKey]);
   const varMatches = familyVars.filter(
     ([name, v]) =>
       !q || name.toLowerCase().includes(q) || String(v.value).toLowerCase().includes(q),
@@ -181,7 +182,9 @@ export function FontFamilyPicker({
   // A new search or tab starts again at the first page, with its previews loaded.
   const pageKey = `${open}\u0000${source}\u0000${q}`;
   const pageKeyRef = useRef(pageKey);
-  pageKeyRef.current = pageKey;
+  useLayoutEffect(() => {
+    pageKeyRef.current = pageKey;
+  });
   useEffect(() => {
     setLimit(PAGE);
     setLoading(false);

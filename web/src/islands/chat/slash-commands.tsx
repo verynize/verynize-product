@@ -5,7 +5,7 @@
 // commands and skills stay in the text as "/name", drawn as a badge (sending passes "/name …" to the agent, which runs
 // it); Verynize's own
 // commands run right away. Keys are read on the adopted #project-prompt in the capture phase, like the @ popover.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { MessageSquareIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { Command, CommandEmpty, CommandItem, CommandList } from "@/components/ui/command";
@@ -94,7 +94,9 @@ export function SlashCommands({ state }: { state: ChatState }) {
   }, [query, agentCommands]);
 
   const live = useRef({ entries, selected, open });
-  live.current = { entries, selected, open };
+  useLayoutEffect(() => {
+    live.current = { entries, selected, open };
+  });
 
   // Keep the highlighted row valid as the list filters.
   useEffect(() => {
@@ -186,7 +188,11 @@ export function SlashCommands({ state }: { state: ChatState }) {
       prompt.focus();
       prompt.setAttribute("aria-expanded", "true");
     };
-    const onBlur = () => window.setTimeout(() => document.activeElement !== prompt && close(), 120);
+    let blurTimer = 0;
+    const onBlur = () => {
+      window.clearTimeout(blurTimer);
+      blurTimer = window.setTimeout(() => document.activeElement !== prompt && close(), 120);
+    };
     prompt.setAttribute("aria-haspopup", "listbox");
     prompt.addEventListener("input", update);
     prompt.addEventListener("click", update);
@@ -196,6 +202,7 @@ export function SlashCommands({ state }: { state: ChatState }) {
     window.addEventListener(OPEN_COMMANDS_EVENT, onOpen);
     update();
     return () => {
+      window.clearTimeout(blurTimer);
       prompt.removeEventListener("input", update);
       prompt.removeEventListener("click", update);
       prompt.removeEventListener("keydown", onKey, true);

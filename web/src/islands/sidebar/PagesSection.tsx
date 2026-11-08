@@ -3,6 +3,7 @@
 // list is visible); rows reorder by drag (page-drag.ts).
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -134,7 +135,9 @@ export function PagesSection({ open, onToggle }: { open: boolean; onToggle: () =
   // The legacy `#rename-page` command (app menu, row context menu) renames the active page inline while the list is
   // on screen; otherwise (sidebar or section collapsed) it keeps the legacy name prompt.
   const listVisible = useRef(false);
-  listVisible.current = open;
+  useLayoutEffect(() => {
+    listVisible.current = open;
+  }, [open]);
   useEffect(() => {
     const el = legacy("rename-page");
     if (!el) return;

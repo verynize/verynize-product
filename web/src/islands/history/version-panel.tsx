@@ -64,7 +64,7 @@ export function VersionPanel() {
   const [versions, setVersions] = useState<VersionMeta[] | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [previewing, setPreviewing] = useState(history()?.previewing() ?? null);
+  const [previewing, setPreviewing] = useState(() => history()?.previewing() ?? null);
   const doc = useDesign();
   const selection = useSelection();
   const nodes = (activePage(doc)?.nodes ?? []) as DesignNode[];

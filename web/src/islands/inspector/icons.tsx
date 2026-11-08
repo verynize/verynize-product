@@ -255,9 +255,13 @@ export function IconsSection({
   className?: string;
 }) {
   const icons = (doc.icons as DesignIcon[] | undefined) ?? [];
-  const [view, setView] = useState<View>(() =>
-    localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid",
-  );
+  const [view, setView] = useState<View>(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "grid";
+    } catch {
+      return "grid"; // storage blocked: fall back to the default view
+    }
+  });
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [pasting, setPasting] = useState(false);

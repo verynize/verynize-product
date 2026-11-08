@@ -19,6 +19,15 @@ import { Breadcrumb, Toolbar } from "./topbar";
 const PANEL_KEY = "verynize-code-panel";
 const SPLIT_KEY = "verynize-code-split";
 
+/** localStorage may be unavailable (blocked site data); fall back to the defaults. */
+function readStored(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
 function useTitlebarSlot(active: boolean) {
   const [slot, setSlot] = useState<HTMLElement | null>(null);
   useEffect(() => {
@@ -38,7 +47,7 @@ function useTitlebarSlot(active: boolean) {
 /** Files / terminal split: the tree height in px, stored; dragged or moved with the arrow keys. */
 function useSplit() {
   const panel = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(() => Number(localStorage.getItem(SPLIT_KEY)) || 0);
+  const [height, setHeight] = useState(() => Number(readStored(SPLIT_KEY)) || 0);
   useEffect(() => {
     const el = panel.current;
     if (!el) return;
@@ -87,7 +96,7 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
   const bodyCodeMode = useBodyClass("code-mode");
   const codeMode = routed || bodyCodeMode;
   const sidebarCollapsed = useBodyClass("code-sidebar-collapsed");
-  const [panelOpen, setPanelOpen] = useState(() => localStorage.getItem(PANEL_KEY) !== "0");
+  const [panelOpen, setPanelOpen] = useState(() => readStored(PANEL_KEY) !== "0");
   const slot = useTitlebarSlot(codeMode);
   const file = useOpenFile();
   const split = useSplit();
@@ -120,15 +129,14 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
     return () => window.removeEventListener("keydown", onKey, true);
   }, []);
 
-  const togglePanel = () =>
-    setPanelOpen((open) => {
-      try {
-        localStorage.setItem(PANEL_KEY, open ? "0" : "1");
-      } catch {
-        /* ignore */
-      }
-      return !open;
-    });
+  useEffect(() => {
+    try {
+      localStorage.setItem(PANEL_KEY, panelOpen ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, [panelOpen]);
+  const togglePanel = () => setPanelOpen((open) => !open);
 
   return (
     <div id="code-workspace" aria-label="Code workspace" data-route-owner={routed ? "start" : undefined} className={cn("fixed inset-0 z-30 flex bg-settings text-foreground-2", !codeMode && "hidden")}>

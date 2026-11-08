@@ -1,6 +1,6 @@
 // Bridge between React islands and the legacy vanilla renderer (web/*.js).
 // Legacy modules expose their APIs on `window`; their DOM controls keep the original handlers.
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useEffectEvent, useState, useSyncExternalStore } from "react";
 
 /* ---------- Legacy window APIs (subset used by islands) ---------- */
 export type LayerNode = {
@@ -140,10 +140,13 @@ export function useBodyClass(name: string): boolean {
 
 /** Subscribe to a window event (e.g. "app-preferences-changed"). */
 export function useWindowEvent(name: string, fn: (event: Event) => void) {
+  // Always calls the latest `fn` without re-adding the listener when an inline handler changes identity.
+  const onEvent = useEffectEvent(fn);
   useEffect(() => {
-    window.addEventListener(name, fn);
-    return () => window.removeEventListener(name, fn);
-  }, [name, fn]);
+    const listener = (event: Event) => onEvent(event);
+    window.addEventListener(name, listener);
+    return () => window.removeEventListener(name, listener);
+  }, [name]);
 }
 
 /* ---------- Legacy controls ---------- */

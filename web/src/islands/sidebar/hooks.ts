@@ -1,14 +1,17 @@
 // Narrow subscriptions to the legacy design store. The store notifies after *every* legacy render
 // (including each pointer move while dragging on the canvas); the sidebar only re-renders when the
 // slice it shows actually changes.
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { activePage, design, type DesignDocument, type LayerNode } from "@/lib/bridge";
 import { layerRole, type LayerRole } from "@/lib/components";
 
 /** Subscribe to a JSON-serialisable slice of the document; re-renders only when the slice changes. */
 export function useDesignSlice<T>(select: (doc: DesignDocument) => T): T {
   const selectRef = useRef(select);
-  selectRef.current = select;
+  // The store notifies after commit, so the selector only needs to be current once this render commits.
+  useLayoutEffect(() => {
+    selectRef.current = select;
+  });
   const keyRef = useRef<string | null>(null);
   const subscribe = useCallback((notify: () => void) => {
     const api = design();

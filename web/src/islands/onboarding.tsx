@@ -60,11 +60,13 @@ function Frame({
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-6 pb-chrome">
         {children}
       </div>
-      <div className="flex justify-center gap-1.5 pb-6" role="list" aria-label="Setup steps">
+      <ul
+        className="m-0 flex list-none justify-center gap-1.5 px-0 pt-0 pb-6"
+        aria-label="Setup steps"
+      >
         {steps.map((id) => (
-          <span
+          <li
             key={id}
-            role="listitem"
             aria-current={id === step ? "step" : undefined}
             className={
               id === step
@@ -73,7 +75,7 @@ function Frame({
             }
           />
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
