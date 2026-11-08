@@ -11,7 +11,7 @@ npm start
 
 ## Vite+ toolchain
 
-Requires Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`. Vite+ is installed locally and pinned alongside its Vite core alias in `package.json`; `npm install` installs the toolchain without requiring a global CLI.
+Requires Node.js 24.11 or newer (`.nvmrc` pins 24). Vite+ is installed locally and pinned alongside its Vite core alias in `package.json`; `npm install` installs the toolchain without requiring a global CLI.
 
 `npm start` opens the Electron app. For the Cloudflare web development server and code tools:
 

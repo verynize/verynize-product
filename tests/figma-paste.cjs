@@ -34,9 +34,9 @@ const path = require("node:path");
     });
     // Paste from the real system clipboard (Figma only writes text/html).
     await app.evaluate(
-      ({ clipboard }, html) => {
+      async ({ clipboard, ClipboardItem }, html) => {
         clipboard.clear();
-        clipboard.write({ html });
+        await clipboard.write([new ClipboardItem({ "text/html": html })]);
       },
       clipboardHtml({ compression: "zstd" }),
     );
@@ -99,9 +99,11 @@ const path = require("node:path");
       return d.pages.find((x) => x.id === d.activePage).nodes.length === n;
     }, before);
     // Corrupt Figma clipboard data reports an error and pastes nothing.
-    await app.evaluate(({ clipboard }) => {
+    await app.evaluate(async ({ clipboard, ClipboardItem }) => {
       clipboard.clear();
-      clipboard.write({ html: "<span>(figma)AAAA(/figma)</span>" });
+      await clipboard.write([
+        new ClipboardItem({ "text/html": "<span>(figma)AAAA(/figma)</span>" }),
+      ]);
     });
     await p.locator("#workspace").click({ position: { x: 40, y: 300 } });
     await p.keyboard.press(mod("V"));

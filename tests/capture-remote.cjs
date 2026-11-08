@@ -254,7 +254,8 @@ s.__reactFiber$fixture={_debugSource:{fileName:'/repo/src/components/Fiber.jsx',
       await page.locator("#capture-web-stage .capture-picker-highlight span").textContent(),
       "button#cta",
     );
-    await page.mouse.move(shot.x + 0, shot.y + 0);
+    // Start one pixel inside: Chromium 158 hit-tests the image's exact top-left pixel to the dialog.
+    await page.mouse.move(shot.x + 1, shot.y + 1);
     await page.mouse.down();
     await page.mouse.move(shot.x + 300 * scale, shot.y + 90 * scale, { steps: 5 });
     assert.equal(await page.locator("#capture-web-stage .capture-picker-rect").isVisible(), true);

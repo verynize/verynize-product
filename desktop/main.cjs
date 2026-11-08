@@ -18,6 +18,7 @@ const {
   protocol,
   net,
   clipboard,
+  ClipboardItem,
   nativeImage,
 } = require("electron");
 const path = require("node:path");
@@ -207,7 +208,7 @@ void app.whenReady().then(async () => {
         if (!appProtocol.isTrustedSender(event, win)) throw Error("Untrusted IPC sender");
         return fn.apply(undefined, args);
       });
-    handle("writeClipboardImage", (dataURL) => {
+    handle("writeClipboardImage", async (dataURL) => {
       if (
         typeof dataURL !== "string" ||
         !dataURL.startsWith("data:image/png;base64,") ||
@@ -216,7 +217,9 @@ void app.whenReady().then(async () => {
         throw Error("Invalid clipboard PNG");
       const image = nativeImage.createFromDataURL(dataURL);
       if (image.isEmpty()) throw Error("Invalid clipboard PNG");
-      clipboard.writeImage(image);
+      await clipboard.write([
+        new ClipboardItem({ "image/png": new Blob([image.toPNG()], { type: "image/png" }) }),
+      ]);
     });
     registerPreview(handle, win);
     const designFiles = registerDesignFiles(handle, win);

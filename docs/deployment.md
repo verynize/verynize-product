@@ -22,7 +22,7 @@ The browser app is a TanStack Start app in `web-start/` (see `web-start/README.m
 
 ## Commands
 
-Use Node.js 22.18 or newer and the lockfile's project-local `cf`:
+Use Node.js 24.11 or newer and the lockfile's project-local `cf`:
 
 ```sh
 npm install
