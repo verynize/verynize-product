@@ -382,6 +382,10 @@ const canvas = [
 ];
 
 const desktop = [
+  unit("tests/desktop-release.mjs", "desktop", [
+    "scripts/desktop-release.mjs",
+    ".github/workflows/desktop-alpha.yml",
+  ]),
   unit("tests/identity-check.mjs", "integrations", [
     "scripts/check-identity.mjs",
     ".identity-allow",
