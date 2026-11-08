@@ -59,7 +59,16 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: node scripts/desktop-release.mjs --validate-tag "$RELEASE_TAG"
       - run: npm ci
-      - run: node node_modules/electron/install.js
+      - name: Download Electron
+        # GitHub release downloads sometimes answer 504; retry with a growing pause.
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            node node_modules/electron/install.js && exit 0
+            echo "Electron download failed (attempt $attempt), retrying in $((attempt * 20))s"
+            sleep $((attempt * 20))
+          done
+          exit 1
       - run: node --test tests/desktop-release.mjs
       - name: Build app from source
         run: npm run package:mac
