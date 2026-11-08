@@ -55,7 +55,7 @@ function RepositoryRow({
 }: {
   repo: Repository;
   repos: Repository[];
-  onChanged(): void;
+  onChanged: () => void;
 }) {
   const api = desktopApi()?.repositoryMoves;
   const [mode, setMode] = useState<"" | "rename" | "inside" | "across">("");

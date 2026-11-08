@@ -46,7 +46,7 @@
     "test:agents:live": "BD_LIVE_AGENTS=1 node --test tests/agent-runtime-live.cjs",
     "test:package": "node scripts/run-tests.mjs --all --group package",
     "dev": "node scripts/build-ui.cjs && vp dev",
-    "lint": "node scripts/check-css-has.cjs && vp lint",
+    "lint": "node scripts/check-css-has.cjs && vp lint --deny-warnings",
     "format": "vp fmt",
     "format:check": "vp fmt --check",
     "test:ux": "node scripts/run-tests.mjs --all --group ux",

@@ -156,7 +156,10 @@ try {
       ...ctx.getImageData(Math.floor(image.width / 2), Math.floor(image.height / 2), 1, 1).data,
     ];
   });
-  assert.ok(pixel[0] > 200 && pixel[1] < 50 && pixel[2] < 50 && pixel[3] > 200, `pixel ${pixel}`);
+  assert.ok(
+    pixel[0] > 200 && pixel[1] < 50 && pixel[2] < 50 && pixel[3] > 200,
+    `pixel ${pixel.join(",")}`,
+  );
   assert.equal((await a.evaluate(() => window.cloudAssets.status())).failed, 0);
 
   // ---- Creating a room from a local file with embedded binaries uploads them first. ----

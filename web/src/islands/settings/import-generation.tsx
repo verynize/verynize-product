@@ -20,7 +20,7 @@ function KeyRow({
   vendor: Vendor;
   state: KeyState;
   busy: boolean;
-  save(vendor: Vendor, key: string, remove: boolean): Promise<void>;
+  save: (vendor: Vendor, key: string, remove: boolean) => Promise<void>;
 }) {
   const [key, setKey] = useState("");
   const label = vendor === "google" ? "Google" : vendor === "openai" ? "OpenAI" : "Custom endpoint";

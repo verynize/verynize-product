@@ -19,7 +19,6 @@
       dpr,
       cam,
       grid,
-      nodeGrid,
       dirty = true;
     const cache = new Map(); // key → {canvas, level, tx, ty, used}
     let lifted = null,
@@ -180,7 +179,6 @@
         vh = host.clientHeight;
         dpr = devicePixelRatio;
         grid = C.rootGrid(s);
-        void nodeGrid;
         canvas = document.createElement("canvas");
         canvas.width = vw * dpr;
         canvas.height = vh * dpr;

@@ -27,19 +27,43 @@ export type ChangesSummary = {
   totals: { files: number; added: number; removed: number };
   truncated: boolean;
 };
-export type FileDiff = { file: string; status: string; diff: string; truncated: boolean; binary: boolean };
-export type PullRequest = { number: number; url: string; state: string; title: string; isDraft: boolean; base: string; head: string };
-export type PullRequestStatus = { gh: "ready" | "missing" | "unauthenticated" | "unsupported"; pr: PullRequest | null; message?: string };
+export type FileDiff = {
+  file: string;
+  status: string;
+  diff: string;
+  truncated: boolean;
+  binary: boolean;
+};
+export type PullRequest = {
+  number: number;
+  url: string;
+  state: string;
+  title: string;
+  isDraft: boolean;
+  base: string;
+  head: string;
+};
+export type PullRequestStatus = {
+  gh: "ready" | "missing" | "unauthenticated" | "unsupported";
+  pr: PullRequest | null;
+  message?: string;
+};
 
 export type Root = { root?: string };
 export type GitApi = {
   gitChanges(options: Root): Promise<ChangesSummary>;
   gitDiff(options: Root & { file: string }): Promise<FileDiff>;
-  gitCommit(options: Root & { message: string }): Promise<{ commit: string; branch: string | null; message: string; files: number }>;
+  gitCommit(
+    options: Root & { message: string },
+  ): Promise<{ commit: string; branch: string | null; message: string; files: number }>;
   gitDiscard(options: Root & { file: string }): Promise<{ file: string }>;
-  gitPush(options: Root): Promise<{ branch: string; remote: string; upstream: string; summary: ChangesSummary }>;
+  gitPush(
+    options: Root,
+  ): Promise<{ branch: string; remote: string; upstream: string; summary: ChangesSummary }>;
   gitPullRequest(options: Root): Promise<PullRequestStatus>;
-  gitCreatePullRequest(options: Root & { title?: string; body?: string; base?: string; draft?: boolean }): Promise<{ url: string | null; pr: PullRequest | null; existed: boolean }>;
+  gitCreatePullRequest(
+    options: Root & { title?: string; body?: string; base?: string; draft?: boolean },
+  ): Promise<{ url: string | null; pr: PullRequest | null; existed: boolean }>;
   openExternal(url: string): Promise<unknown>;
   onAgentEvent(callback: (event: { type: string; chatId?: string }) => void): () => void;
 };
@@ -131,6 +155,7 @@ export function presetImplementPrompt() {
 export function suggestMessage(messages: { role: string; text: string }[]): string {
   const last = [...messages].reverse().find((m) => m.role === "user" && m.text.trim());
   const line = last?.text.trim().split("\n")[0] ?? "";
-  if (!line || line === IMPLEMENT_PROMPT.split("\n")[0]) return line ? "Implement canvas design" : "";
+  if (!line || line === IMPLEMENT_PROMPT.split("\n")[0])
+    return line ? "Implement canvas design" : "";
   return line.length > 72 ? line.slice(0, 71).trimEnd() + "…" : line;
 }

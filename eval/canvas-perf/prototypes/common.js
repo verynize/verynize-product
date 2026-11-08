@@ -210,7 +210,7 @@
     constructor(scene, images) {
       this.scene = scene;
       this.images = images;
-      this.els = new Array(scene.nodes.length);
+      this.els = Array.from({ length: scene.nodes.length });
       this.built = new Set();
       this.el = document.createElement("div");
       this.el.style.cssText =

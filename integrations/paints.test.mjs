@@ -422,7 +422,11 @@ test("code export: Tailwind component without editor bookkeeping, CSS classes fr
   );
   assert.doesNotMatch(jsx, /data-node-id|data-component-x/);
   assert.match(jsx, /data-fills=/);
-  assert.doesNotMatch(jsx, /Made with Verynize|box-sizing/, "the plain export has no clipboard header");
+  assert.doesNotMatch(
+    jsx,
+    /Made with Verynize|box-sizing/,
+    "the plain export has no clipboard header",
+  );
   // The clipboard form (Copy as code / Copy prompt, Wonder P1-copy-code.txt): header comment, then the reset.
   const snippet = tailwindCode(d, "p", ["label"], "Label", {
     snippet: { links: ["verynize://node/doc/p/abc"], date: "Oct 31, 2026" },
@@ -490,7 +494,10 @@ test("text Background Fill: validated on text only, drawn under the glyphs, boun
   );
   assert.equal(both.color, "transparent");
   assert.equal(both["background-clip"], "text, border-box");
-  assert.match(both["background-image"], /^linear-gradient\(90deg[^)]*\)[^,]*, linear-gradient\(#00ff00/);
+  assert.match(
+    both["background-image"],
+    /^linear-gradient\(90deg[^)]*\)[^,]*, linear-gradient\(#00ff00/,
+  );
   // Colour variables are followed (rename, unbind) like any other paint.
   renameTokenRefs(d, "brand", "ink");
   assert.equal(d.pages[0].nodes[0].backgroundFills[0].token, "ink");

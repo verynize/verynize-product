@@ -2,11 +2,11 @@
 
 Validasi terhadap [wonder-design-workflow-2026-10-30.md](../wonder-design-workflow-2026-10-30.md) dikerjakan oleh tiga agent paralel. Hanya agent computer use yang mengontrol desktop.
 
-| Agent | Metode | Laporan |
-|---|---|---|
-| Source | Membaca renderer Wonder 0.2.190. `app.asar` hanya berisi shell Electron; editor dimuat dari app.wonder.so, sehingga source diambil dari cache browser lokal terbaru | [validation-source-agent](2026-10-30-validation-source-agent.md) |
-| Computer use | Mengoperasikan Wonder yang sedang berjalan dan mengambil 32 screenshot (v01–v32). Semua perubahan percobaan di-undo | [validation-computer-use-agent](2026-10-30-validation-computer-use-agent.md) · [screenshot](../../design/wonder/2026-10-30/validation/) |
-| Bukti | Mencocokkan setiap klaim dengan screenshot 00–42, ukuran export dan link | [validation-evidence-agent](2026-10-30-validation-evidence-agent.md) |
+| Agent        | Metode                                                                                                                                                              | Laporan                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Source       | Membaca renderer Wonder 0.2.190. `app.asar` hanya berisi shell Electron; editor dimuat dari app.wonder.so, sehingga source diambil dari cache browser lokal terbaru | [validation-source-agent](2026-10-30-validation-source-agent.md)                                                                        |
+| Computer use | Mengoperasikan Wonder yang sedang berjalan dan mengambil 32 screenshot (v01–v32). Semua perubahan percobaan di-undo                                                 | [validation-computer-use-agent](2026-10-30-validation-computer-use-agent.md) · [screenshot](../../design/wonder/2026-10-30/validation/) |
+| Bukti        | Mencocokkan setiap klaim dengan screenshot 00–42, ukuran export dan link                                                                                            | [validation-evidence-agent](2026-10-30-validation-evidence-agent.md)                                                                    |
 
 ## Terkonfirmasi
 
@@ -20,12 +20,12 @@ Validasi terhadap [wonder-design-workflow-2026-10-30.md](../wonder-design-workfl
 
 Klaim-klaim berikut berbeda dari hasil validasi:
 
-1. **Duplicate variable:** tidak ada di menu (Rename, Reference variable, Delete), sehingga statusnya *Tidak tersedia*, bukan *Belum*. Temuan ini dikonfirmasi oleh source dan UI.
+1. **Duplicate variable:** tidak ada di menu (Rename, Reference variable, Delete), sehingga statusnya _Tidak tersedia_, bukan _Belum_. Temuan ini dikonfirmasi oleh source dan UI.
 2. **Blend:** ada 18 mode. Difference, Exclusion, Hue, Saturation, Color dan Luminosity perlu ditambahkan.
 3. **Drop shadow:** tidak ada di menu filter. Fitur ini adalah tipe "Drop" pada Shadow.
 4. **Export SVG:** hanya muncul jika seluruh seleksi berupa node SVG, jadi bukan fitur yang hilang.
 5. **Anchor:** hanya Left/Right dan Top/Bottom, tanpa Center. **Image fill:** Fill/Cover/Contain/None.
-6. **List view Icons:** tersedia dan sedang aktif, sehingga tidak tepat lagi disebut *Belum*.
+6. **List view Icons:** tersedia dan sedang aktif, sehingga tidak tepat lagi disebut _Belum_.
 7. **Rujukan gambar yang salah:**
    - V13/V14 dan baris 317 merujuk 32. Bukti yang benar ada di 35–36.
    - Rename Spark merujuk 33. Bukti yang benar ada di 39–40.

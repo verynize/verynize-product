@@ -16,24 +16,64 @@
     "Sort indicator on ETA",
     "Pagination 1-25 of 318"
   ],
-  "constraints": ["Single screen 1440x900", "Light theme", "English copy", "Realistic, varied data (no repeated identical rows)"],
-  "assetsAllowed": { "icons": true, "photos": false, "generatedImages": false, "avatars": false, "customFonts": true },
+  "constraints": [
+    "Single screen 1440x900",
+    "Light theme",
+    "English copy",
+    "Realistic, varied data (no repeated identical rows)"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": false,
+    "generatedImages": false,
+    "avatars": false,
+    "customFonts": true
+  },
   "inputs": [],
   "budget": { "maxMinutes": 20, "followUpTurns": 0 },
   "checklist": [
     { "id": "c01", "text": "At least 14 table rows are visible within the viewport." },
-    { "id": "c02", "text": "All nine columns are present in the stated order (checkbox through Value)." },
-    { "id": "c03", "text": "Numeric columns (Weight, Value) are right-aligned or use tabular figures so digits line up." },
-    { "id": "c04", "text": "Status values are badges with distinct colors per status, and Delayed is the most alarming color." },
-    { "id": "c05", "text": "Exactly two rows are visibly selected (checked) and a bulk bar shows \"2 selected\"." },
-    { "id": "c06", "text": "The In transit chip is active and chip counts match the prompt (42, 318, 17, 907)." },
+    {
+      "id": "c02",
+      "text": "All nine columns are present in the stated order (checkbox through Value)."
+    },
+    {
+      "id": "c03",
+      "text": "Numeric columns (Weight, Value) are right-aligned or use tabular figures so digits line up."
+    },
+    {
+      "id": "c04",
+      "text": "Status values are badges with distinct colors per status, and Delayed is the most alarming color."
+    },
+    {
+      "id": "c05",
+      "text": "Exactly two rows are visibly selected (checked) and a bulk bar shows \"2 selected\"."
+    },
+    {
+      "id": "c06",
+      "text": "The In transit chip is active and chip counts match the prompt (42, 318, 17, 907)."
+    },
     { "id": "c07", "text": "ETA header shows a sort indicator." },
     { "id": "c08", "text": "Pagination reads \"1-25 of 318\" (dash style may vary)." },
-    { "id": "c09", "text": "Row data is varied and realistic: order IDs, customers, routes and values differ row to row." },
-    { "id": "c10", "text": "Row height and cell padding are uniform; column text aligns to consistent left edges." },
+    {
+      "id": "c09",
+      "text": "Row data is varied and realistic: order IDs, customers, routes and values differ row to row."
+    },
+    {
+      "id": "c10",
+      "text": "Row height and cell padding are uniform; column text aligns to consistent left edges."
+    },
     { "id": "c11", "text": "\"New order\" is the only primary-styled button." },
-    { "id": "c12", "text": "No cell text overlaps or overflows into neighboring cells; long values are truncated with an ellipsis if needed.", "critical": true },
-    { "id": "c13", "text": "Table text is at least 12px with sufficient contrast.", "critical": true },
+    {
+      "id": "c12",
+      "text": "No cell text overlaps or overflows into neighboring cells; long values are truncated with an ellipsis if needed.",
+      "critical": true
+    },
+    {
+      "id": "c13",
+      "text": "Table text is at least 12px with sufficient contrast.",
+      "critical": true
+    },
     { "id": "c14", "text": "No placeholder text remains.", "critical": true }
   ]
 }

@@ -103,7 +103,10 @@ test("create_component, set_slot, create_instance and list_components on the fil
     main.slots.map((s) => [s.id, s.name]),
     [[contentId, "Content"]],
   );
-  assert.deepEqual(main.instances.map((i) => i.id).sort(), [home.id, byName.id].sort());
+  assert.deepEqual(
+    main.instances.map((i) => i.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [home.id, byName.id].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+  );
   assert.equal(
     main.instances.find((i) => i.id === home.id).name,
     "Home",

@@ -152,7 +152,7 @@ function liveStream() {
   });
   return {
     stream,
-    send(event) {
+    send: (event) => {
       if (!open) return;
       try {
         controller.enqueue(frame(event));

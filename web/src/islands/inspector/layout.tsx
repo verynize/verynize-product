@@ -61,7 +61,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { cn, textOf } from "@/lib/utils";
 import { BindableField } from "./bind";
 import { GridHeaderTools, GridPreview } from "./grid-settings";
 import { Tip } from "../chrome/tip";
@@ -325,9 +325,15 @@ function commitSize(
     return;
   }
   if ((plain && choice === "relative") || (percent && choice !== "calc")) {
-    if (!parentOf(doc, node)) return void notify("A percentage needs a parent layer.");
+    if (!parentOf(doc, node)) {
+      notify("A percentage needs a parent layer.");
+      return;
+    }
     const v = parseFloat(text);
-    if (!(v > 0)) return void notify("Enter a percentage above 0.");
+    if (!(v > 0)) {
+      notify("Enter a percentage above 0.");
+      return;
+    }
     patchNodes(selection, (n) => ({
       [k.mode]: "fixed",
       [k.pct]: r2(v),
@@ -337,9 +343,14 @@ function commitSize(
     return;
   }
   const parsed = calcApi().parseCalc(plain ? text + "px" : text);
-  if (!parsed)
-    return void notify("Enter a number, a percentage or an expression such as 100% - 24px.");
-  if (parsed.pct && !parentOf(doc, node)) return void notify("A percentage needs a parent layer.");
+  if (!parsed) {
+    notify("Enter a number, a percentage or an expression such as 100% - 24px.");
+    return;
+  }
+  if (parsed.pct && !parentOf(doc, node)) {
+    notify("A percentage needs a parent layer.");
+    return;
+  }
   patchNodes(selection, (n) => ({
     [k.mode]: "calc",
     [k.calc]: parsed.text,
@@ -392,7 +403,7 @@ function SizeField({
     choice === "relative"
       ? fmt(node[k.pct])
       : choice === "calc"
-        ? String(node[k.calc] ?? "")
+        ? textOf(node[k.calc] ?? "")
         : fmt(node[axis]);
   const limits = LIMITS.filter(
     (l) => l.axis === axis && !hasLimit(node, l.key) && !pending.includes(l.key),
@@ -407,7 +418,12 @@ function SizeField({
         .filter((n) => wanted.has(n.id))
         .map((n) => {
           const c = choiceOf(n, axis, parentOf(doc, n));
-          const v = c === "relative" ? fmt(n[k.pct]) : c === "calc" ? String(n[k.calc] ?? "") : fmt(n[axis]);
+          const v =
+            c === "relative"
+              ? fmt(n[k.pct])
+              : c === "calc"
+                ? textOf(n[k.calc] ?? "")
+                : fmt(n[axis]);
           return c + ":" + v;
         }),
     ).size > 1;
@@ -1025,14 +1041,14 @@ function GridChild({ node, selection }: Props) {
           name="colSpan"
           label="Column span"
           icon={ColumnsIcon}
-          value={node.colSpan === "full" ? "Full" : String(node.colSpan ?? 1)}
+          value={node.colSpan === "full" ? "Full" : textOf(node.colSpan ?? 1)}
           onCommit={span("colSpan")}
         />
         <NumberField
           name="rowSpan"
           label="Row span"
           icon={RowsIcon}
-          value={String(node.rowSpan ?? 1)}
+          value={textOf(node.rowSpan ?? 1)}
           onCommit={span("rowSpan")}
         />
       </Row>

@@ -180,7 +180,8 @@ function makeElement(tag, attrs, parent) {
 
 /** Parse HTML into a tree of {tag, attrs, children, parent} elements and {text} nodes. */
 export function parseHtml(source) {
-  if (String(source).length > 5_000_000) throw new Error("HTML parse stage exceeds 5000000 characters");
+  if (String(source).length > 5_000_000)
+    throw new Error("HTML parse stage exceeds 5000000 characters");
   const s = String(source || "").replace(/^﻿/, "");
   const root = makeElement("#document", {}, null);
   const stack = [root];
@@ -283,7 +284,8 @@ export function parseHtml(source) {
             if (["ul", "ol", "table", "dl", "select", "div"].includes(stack[k].tag)) break;
           }
         }
-        if (++elementTotal > NODE_LIMITS.perDocument + 256) throw new Error("HTML parse stage exceeds document element budget");
+        if (++elementTotal > NODE_LIMITS.perDocument + 256)
+          throw new Error("HTML parse stage exceeds document element budget");
         const el = makeElement(tag, attrs, top());
         top().children.push(el);
         i = j;
@@ -353,15 +355,13 @@ export function parseHtml(source) {
   return root;
 }
 function findSvgEnd(s, from) {
-  let depth = 1,
-    i = from;
+  let depth = 1;
   const re = /<\/?svg\b[^>]*?(\/?)>/gi;
   re.lastIndex = from;
   for (let m; (m = re.exec(s));) {
     if (m[0][1] === "/") {
       if (--depth === 0) return m.index;
     } else if (!m[1]) depth++;
-    i = re.lastIndex;
   }
   return s.length;
 }
@@ -508,17 +508,6 @@ button,input,select,textarea{font:inherit;color:inherit;background-color:transpa
 `;
 let uaRules = null,
   preflightRules = null;
-const BLOCK_DISPLAY = new Set([
-  "block",
-  "flex",
-  "grid",
-  "flow-root",
-  "list-item",
-  "table",
-  "inline-block",
-  "inline-flex",
-  "inline-grid",
-]);
 
 // ---------------------------------------------------------------------------------------------
 // Values
@@ -553,9 +542,9 @@ function absolutize(value, { fs, rootFs, vw, vh }) {
                 ? x * fs * 1.2
                 : u === "rlh"
                   ? x * rootFs * 1.2
-                  : /w$/.test(u)
+                  : u.endsWith("w")
                     ? (x * vw) / 100
-                    : /h$/.test(u)
+                    : u.endsWith("h")
                       ? (x * vh) / 100
                       : u === "vmin"
                         ? (x * Math.min(vw, vh)) / 100
@@ -851,7 +840,7 @@ const INLINE_TEXT = new Set([
  * @returns {Promise<{document, pageId, roots, jsx, warnings, stats}>}
  */
 export async function importHtml(html, options = {}) {
-  const view = { ...MEDIA_DEFAULTS, ...(options.viewport || {}) };
+  const view = { ...MEDIA_DEFAULTS, ...options.viewport };
   const warnings = [];
   const stats = {
     elements: 0,
@@ -1030,7 +1019,7 @@ export async function importHtml(html, options = {}) {
     if (classes.length >= 10 && known / classes.length >= 0.6) tailwindPage = true;
   }
 
-  const expandImport = declaration => {
+  const expandImport = (declaration) => {
     if (declaration.property === "border-radius" && declaration.value.includes("/"))
       warnings.push("elliptical border radius is approximated by horizontal radii");
     return expand(declaration);
@@ -1062,7 +1051,8 @@ export async function importHtml(html, options = {}) {
       stats.rules++;
     }
   const beforePruning = rules.length;
-  if (options.pruneCss !== false) rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
+  if (options.pruneCss !== false)
+    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
   stats.prunedRules = beforePruning - rules.length;
   if (!preflightRules)
     preflightRules = parseStylesheet(PREFLIGHT_CSS)
@@ -1130,11 +1120,13 @@ export async function importHtml(html, options = {}) {
     whiteSpace: "normal",
   };
   const computedOf = new Map();
-  const usedVars = new Map(); // name -> {type, value}
   const rootFsBox = { value: 16 };
   const cascadeDeadline = performance.now() + 60_000;
   const computeElement = (el, parent) => {
-    if (performance.now() > cascadeDeadline) throw new Error("HTML cascade exceeds 60000ms budget; simplify the stylesheet or import fewer boards");
+    if (performance.now() > cascadeDeadline)
+      throw new Error(
+        "HTML cascade exceeds 60000ms budget; simplify the stylesheet or import fewer boards",
+      );
     const entries = [];
     const sigEntries = [];
     for (const rule of uaRules)
@@ -1305,7 +1297,7 @@ export async function importHtml(html, options = {}) {
         );
         continue;
       }
-      if (property === "line-height" && /%$/.test(value.trim()))
+      if (property === "line-height" && value.trim().endsWith("%"))
         value = `${r2((parseFloat(value) / 100) * fs)}px`;
       value = absolutize(value, units);
       if (/currentcolor/i.test(value) && property !== "color")
@@ -1348,8 +1340,8 @@ export async function importHtml(html, options = {}) {
   // --- JSX generation
   const lines = [];
   const doc = options.document ? structuredClone(options.document) : null;
-  const tokens = { ...(meta?.tokens || {}), ...(doc?.tokens || {}) };
-  const variables = { ...(meta?.variables || {}), ...(doc?.variables || {}) };
+  const tokens = { ...meta?.tokens, ...doc?.tokens };
+  const variables = { ...meta?.variables, ...doc?.variables };
   const tokenName = (varName) => {
     const name = varName.slice(2);
     if (meta?.tokens) {
@@ -1429,12 +1421,18 @@ export async function importHtml(html, options = {}) {
         if (v === "contents") continue;
         if (text && !/flex|grid/.test(v)) continue;
         if (v === "list-item" || v === "table" || v === "flow-root") v = "block";
-        if (/^table-/.test(v)) v = "block";
+        if (v.startsWith("table-")) v = "block";
         if (text && (v === "inline" || v === "inline-block")) continue;
       }
       if (property === "background-image" && /url\(/i.test(v)) {
         for (const p of ["background-position", "background-repeat"])
-          if (info.style.has(p) && !((p === "background-position" && /^(center|50% 50%)$/.test(info.style.get(p))) || (p === "background-repeat" && info.style.get(p) === "no-repeat")))
+          if (
+            info.style.has(p) &&
+            !(
+              (p === "background-position" && /^(center|50% 50%)$/.test(info.style.get(p))) ||
+              (p === "background-repeat" && info.style.get(p) === "no-repeat")
+            )
+          )
             warnings.push(
               `${p}:${info.style.get(p)} is approximated by a centered cover/contain image fill`,
             );
@@ -1456,7 +1454,11 @@ export async function importHtml(html, options = {}) {
                 ? "cover"
                 : /contain/.test(info.style.get("background-size") || "")
                   ? "contain"
-                  : info.style.get("background-size") === "100% 100%" ? "fill" : info.style.get("background-size") === "auto" ? "none" : "cover",
+                  : info.style.get("background-size") === "100% 100%"
+                    ? "fill"
+                    : info.style.get("background-size") === "auto"
+                      ? "none"
+                      : "cover",
             });
         }
         v =
@@ -1604,10 +1606,11 @@ export async function importHtml(html, options = {}) {
   // Inline content of a text element as JSX (whitespace collapsed like CSS white-space: normal).
   const inlineJsx = async (el, info) => {
     const parts = [];
-    const pre = /^pre/.test(info.whiteSpace);
+    const pre = info.whiteSpace.startsWith("pre");
     const visit = async (node, parentInfo) => {
       if (node.text !== undefined) {
-        if (!node.raw) parts.push({ text: node.text, pre: /^pre/.test(parentInfo.whiteSpace) });
+        if (!node.raw)
+          parts.push({ text: node.text, pre: parentInfo.whiteSpace.startsWith("pre") });
         return;
       }
       if (SKIP.has(node.tag)) return;
@@ -1951,7 +1954,6 @@ export async function importHtml(html, options = {}) {
     const textOnly =
       !root &&
       designType !== "frame" &&
-      kids.length > 0 &&
       kids.some(hasText) &&
       (itemized
         ? kids.every((c) => c.text !== undefined)
@@ -2019,7 +2021,10 @@ export async function importHtml(html, options = {}) {
         el.parent && el.parent !== bodyEl ? computeElement(el.parent, bodyInfo) : bodyInfo;
       await emit(el, parentInfo, "", { root: true });
     }
-  } else if ((options.fragment ?? !/<(?:html|head|body)[\s>]/i.test(String(html))) || (options.split !== "none" && all(bodyEl, () => true).length > NODE_LIMITS.perPage)) {
+  } else if (
+    (options.fragment ?? !/<(?:html|head|body)[\s>]/i.test(String(html))) ||
+    (options.split !== "none" && all(bodyEl, () => true).length > NODE_LIMITS.perPage)
+  ) {
     // A fragment (pasted markup without <html>/<body>): each top-level element is an artboard, styled
     // with the page's own <style> rules and inheriting from the implied <html>/<body>.
     const bodyInfo = computeElement(bodyEl, htmlComputed);
@@ -2098,13 +2103,15 @@ export async function importHtml(html, options = {}) {
         if (meta.page[key] !== undefined) target.pages[0][key] = meta.page[key];
   }
   target.tokens = { ...target.tokens, ...tokens };
-  if (Object.keys(variables).length)
-    target.variables = { ...(target.variables || {}), ...variables };
-  if (meta?.aliases) target.aliases = { ...(target.aliases || {}), ...meta.aliases };
+  if (Object.keys(variables).length) target.variables = { ...target.variables, ...variables };
+  if (meta?.aliases) target.aliases = { ...target.aliases, ...meta.aliases };
   validateDocument(target);
   const pageId = options.pageId || target.activePage || target.pages[0].id;
   if (!lines.length) throw new Error("No importable elements were found in the HTML");
-  const result = createArtboards(target, pageId, jsx, { viewport: view, split: options.split || "pages" });
+  const result = createArtboards(target, pageId, jsx, {
+    viewport: view,
+    split: options.split || "pages",
+  });
   const unsupported = [...stats.unsupported].sort((a, b) => b[1] - a[1]);
   if (unsupported.length)
     warnings.push(

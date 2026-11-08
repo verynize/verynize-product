@@ -94,7 +94,7 @@ if (process.platform === "linux" && process.env.CI) {
   sw.appendSwitch("enable-unsafe-swiftshader");
 }
 require("./app-preferences.cjs").attachDeepLinks(app); // verynize:// design links (Settings › Preferences › Advanced)
-app.whenReady().then(async () => {
+void app.whenReady().then(async () => {
   appProtocol.registerHandler(protocol, net);
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) =>
     callback(false),
@@ -447,7 +447,7 @@ app.whenReady().then(async () => {
     const editorFirst =
       require("./app-preferences.cjs").hasPendingLinks() ||
       process.env.VERYNIZE_LAUNCH_EDITOR === "1";
-    win.loadURL(editorFirst ? `${appProtocol.ORIGIN}/editor` : appProtocol.ENTRY_URL);
+    void win.loadURL(editorFirst ? `${appProtocol.ORIGIN}/editor` : appProtocol.ENTRY_URL);
     editorWindows.add(win);
     editorOpened = true;
     win.on("closed", () => editorWindows.delete(win));

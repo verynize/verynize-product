@@ -12,4 +12,8 @@ quarantineLegacyPanel(root);
 // Nothing legacy looks `#add-page` up after load, so it can be freed now; the island button claims the id on commit.
 takeOver("add-page");
 
-mountIsland("sidebar", () => root, () => <Sidebar />);
+mountIsland(
+  "sidebar",
+  () => root,
+  () => <Sidebar />,
+);

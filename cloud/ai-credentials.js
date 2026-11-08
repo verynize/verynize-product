@@ -180,7 +180,7 @@ export function safeReturnPath(value, origin) {
   if (typeof value !== "string" || value.length > 512 || !/^\/(?![/\\])/.test(value))
     return DEFAULT_RETURN;
   // No backslashes or control characters (browsers treat some as path separators or drop them).
-  if (value.includes("\\") || [...value].some((c) => c.charCodeAt(0) < 0x20 || c === "\x7f"))
+  if (value.includes("\\") || value.split("").some((c) => c.charCodeAt(0) < 0x20 || c === "\x7f"))
     return DEFAULT_RETURN;
   try {
     const url = new URL(value, origin);
@@ -259,6 +259,10 @@ export async function claimOAuth(env, { state, browser }, now = Date.now()) {
   return { accountId: row.accountId, verifier, returnTo: row.returnTo };
 }
 
+/** The URL of a fetch() input (string, URL or Request). */
+const urlOf = (input) =>
+  typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+
 /**
  * Exchange an authorization code for the user's key at <base>/auth/keys (POST {code,
  * code_verifier, code_challenge_method}) with @tanstack/ai-openrouter's PKCE helper; its fixed
@@ -270,6 +274,6 @@ export function exchangeOAuthCode(env, { code, verifier }) {
     code,
     codeVerifier: verifier,
     codeChallengeMethod: "S256",
-    fetchImpl: (input, init) => fetch(String(input).replace(DEFAULT_OPENROUTER_BASE, base), init),
+    fetchImpl: (input, init) => fetch(urlOf(input).replace(DEFAULT_OPENROUTER_BASE, base), init),
   });
 }

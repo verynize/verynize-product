@@ -31,7 +31,8 @@ export function openAppLink(href: string): boolean {
   }
 }
 
-const LINK = "text-primary-text underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-hidden";
+const LINK =
+  "text-primary-text underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-hidden";
 
 function Link({ href, children }: { href: string; children: ReactNode }) {
   const kind = linkKind(href);
@@ -81,7 +82,8 @@ function splitText(value: string): PhrasingContent[] {
 function walk(node: Parent) {
   const next: Parent["children"] = [];
   for (const child of node.children) {
-    if (child.type === "text" && /\n|verynize:\/\//.test(child.value)) next.push(...splitText(child.value));
+    if (child.type === "text" && /\n|verynize:\/\//.test(child.value))
+      next.push(...splitText(child.value));
     else {
       if ("children" in child && !SKIP.has(child.type)) walk(child);
       next.push(child);
@@ -103,7 +105,11 @@ function textOf(node: Element | ElementContent | undefined): string {
 const CELL = "border-b border-border px-3 py-1.5 align-top first:pl-0 last:pr-0";
 // Column alignment from the GFM delimiter row (utilities are !important here, so an inline text-align would lose).
 const alignClass = (style: CSSProperties | undefined) =>
-  style?.textAlign === "center" ? "text-center" : style?.textAlign === "right" ? "text-right" : "text-left";
+  style?.textAlign === "center"
+    ? "text-center"
+    : style?.textAlign === "right"
+      ? "text-right"
+      : "text-left";
 
 const COMPONENTS: Components = {
   p: ({ children }) => <p>{children}</p>,
@@ -118,30 +124,55 @@ const COMPONENTS: Components = {
   strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
   em: ({ children }) => <em>{children}</em>,
   del: ({ children }) => <del className="text-muted-foreground">{children}</del>,
-  code: ({ children }) => <code className="rounded-sm border border-card-border bg-card px-1 font-mono text-sm">{children}</code>,
+  code: ({ children }) => (
+    <code className="rounded-sm border border-card-border bg-card px-1 font-mono text-sm">
+      {children}
+    </code>
+  ),
   // Fenced code: the text is taken from the tree so the inline `code` style above never applies inside it.
   pre: ({ node }) => (
     <pre className="overflow-x-auto rounded-lg border border-card-border bg-card px-3 py-2 font-mono text-xs whitespace-pre text-foreground-2">
       {textOf(node).replace(/\n$/, "")}
     </pre>
   ),
-  blockquote: ({ children }) => <blockquote className="space-y-2.5 border-l-2 border-border pl-3.5 text-foreground-3">{children}</blockquote>,
+  blockquote: ({ children }) => (
+    <blockquote className="space-y-2.5 border-l-2 border-border pl-3.5 text-foreground-3">
+      {children}
+    </blockquote>
+  ),
   hr: () => <Separator decorative={false} />,
   ul: ({ children, className }) => (
-    <ul className={className ? "space-y-0.5 pl-1" : "list-disc space-y-0.5 pl-5 marker:text-subtle-foreground"}>{children}</ul>
+    <ul
+      className={
+        className ? "space-y-0.5 pl-1" : "list-disc space-y-0.5 pl-5 marker:text-subtle-foreground"
+      }
+    >
+      {children}
+    </ul>
   ),
   ol: ({ children, start }) => (
     <ol start={start} className="list-decimal space-y-0.5 pl-5 marker:text-subtle-foreground">
       {children}
     </ol>
   ),
-  li: ({ children, className }) => <li className={className ? "flex list-none items-start gap-1.5" : "space-y-1"}>{children}</li>,
+  li: ({ children, className }) => (
+    <li className={className ? "flex list-none items-start gap-1.5" : "space-y-1"}>{children}</li>
+  ),
   // Task list boxes: read-only, drawn as icons (legacy CSS restyles every <input>).
   input: ({ checked }) => {
     const Icon = checked ? SquareCheckIcon : SquareIcon;
     return (
-      <span role="checkbox" aria-checked={!!checked} aria-disabled="true" aria-label={checked ? "Done" : "To do"} className="flex h-5.25 shrink-0 items-center">
-        <Icon className={checked ? "size-3.5 text-primary-text" : "size-3.5 text-muted-foreground"} aria-hidden="true" />
+      <span
+        role="checkbox"
+        aria-checked={!!checked}
+        aria-disabled="true"
+        aria-label={checked ? "Done" : "To do"}
+        className="flex h-5.25 shrink-0 items-center"
+      >
+        <Icon
+          className={checked ? "size-3.5 text-primary-text" : "size-3.5 text-muted-foreground"}
+          aria-hidden="true"
+        />
       </span>
     );
   },
@@ -151,8 +182,12 @@ const COMPONENTS: Components = {
       <table className="w-full border-collapse text-sm">{children}</table>
     </div>
   ),
-  th: ({ children, style }) => <th className={cn(CELL, alignClass(style), "font-semibold text-foreground")}>{children}</th>,
-  td: ({ children, style }) => <td className={cn(CELL, alignClass(style), "max-w-96")}>{children}</td>,
+  th: ({ children, style }) => (
+    <th className={cn(CELL, alignClass(style), "font-semibold text-foreground")}>{children}</th>
+  ),
+  td: ({ children, style }) => (
+    <td className={cn(CELL, alignClass(style), "max-w-96")}>{children}</td>
+  ),
 };
 
 function Heading({ children }: ComponentProps<"h1">) {
@@ -163,7 +198,12 @@ function Heading({ children }: ComponentProps<"h1">) {
 export const Markdown = memo(function Markdown({ text }: { text: string }): ReactNode {
   return (
     <div data-chat-markdown="" className="space-y-2.5 break-words">
-      <ReactMarkdown remarkPlugins={REMARK_PLUGINS} components={COMPONENTS} urlTransform={urlTransform} skipHtml>
+      <ReactMarkdown
+        remarkPlugins={REMARK_PLUGINS}
+        components={COMPONENTS}
+        urlTransform={urlTransform}
+        skipHtml
+      >
         {text}
       </ReactMarkdown>
     </div>

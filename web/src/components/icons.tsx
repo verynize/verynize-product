@@ -34,7 +34,10 @@ function Glyph({ children, ...props }: IconProps) {
 export function LogoIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
-      <path transform="matrix(1.2 0 0 1.2 -2.4 -2.4)" d="M5 4.5h7.2c3 0 5 1.6 5 4 0 1.4-.7 2.5-1.9 3.1 1.7.5 2.7 1.8 2.7 3.6 0 2.7-2.2 4.3-5.4 4.3H5V4.5Zm4.2 6h2.4c1.1 0 1.7-.5 1.7-1.3s-.6-1.3-1.7-1.3H9.2v2.6Zm0 6h3c1.2 0 1.9-.6 1.9-1.5s-.7-1.5-1.9-1.5h-3v3Z" />
+      <path
+        transform="matrix(1.2 0 0 1.2 -2.4 -2.4)"
+        d="M5 4.5h7.2c3 0 5 1.6 5 4 0 1.4-.7 2.5-1.9 3.1 1.7.5 2.7 1.8 2.7 3.6 0 2.7-2.2 4.3-5.4 4.3H5V4.5Zm4.2 6h2.4c1.1 0 1.7-.5 1.7-1.3s-.6-1.3-1.7-1.3H9.2v2.6Zm0 6h3c1.2 0 1.9-.6 1.9-1.5s-.7-1.5-1.9-1.5h-3v3Z"
+      />
     </svg>
   );
 }
@@ -264,7 +267,11 @@ const DISTRIBUTE_AT: Record<Distribution, [number, number]> = {
   evenly: [9.5, 14.5],
 };
 /** A container with two items spread along its main axis (Wonder's distribution row). */
-function Distribute({ along, spread, ...props }: IconProps & { along: "x" | "y"; spread: Distribution }) {
+function Distribute({
+  along,
+  spread,
+  ...props
+}: IconProps & { along: "x" | "y"; spread: Distribution }) {
   const [a, b] = DISTRIBUTE_AT[spread];
   return (
     <Glyph {...props}>
@@ -282,12 +289,24 @@ function Distribute({ along, spread, ...props }: IconProps & { along: "x" | "y";
     </Glyph>
   );
 }
-export const DistributeAroundXIcon = (p: IconProps) => <Distribute along="x" spread="around" {...p} />;
-export const DistributeBetweenXIcon = (p: IconProps) => <Distribute along="x" spread="between" {...p} />;
-export const DistributeEvenlyXIcon = (p: IconProps) => <Distribute along="x" spread="evenly" {...p} />;
-export const DistributeAroundYIcon = (p: IconProps) => <Distribute along="y" spread="around" {...p} />;
-export const DistributeBetweenYIcon = (p: IconProps) => <Distribute along="y" spread="between" {...p} />;
-export const DistributeEvenlyYIcon = (p: IconProps) => <Distribute along="y" spread="evenly" {...p} />;
+export const DistributeAroundXIcon = (p: IconProps) => (
+  <Distribute along="x" spread="around" {...p} />
+);
+export const DistributeBetweenXIcon = (p: IconProps) => (
+  <Distribute along="x" spread="between" {...p} />
+);
+export const DistributeEvenlyXIcon = (p: IconProps) => (
+  <Distribute along="x" spread="evenly" {...p} />
+);
+export const DistributeAroundYIcon = (p: IconProps) => (
+  <Distribute along="y" spread="around" {...p} />
+);
+export const DistributeBetweenYIcon = (p: IconProps) => (
+  <Distribute along="y" spread="between" {...p} />
+);
+export const DistributeEvenlyYIcon = (p: IconProps) => (
+  <Distribute along="y" spread="evenly" {...p} />
+);
 
 /** Flex wrap: a line that runs right, turns down and comes back left. */
 export function WrapIcon(props: IconProps) {
@@ -355,7 +374,11 @@ export const CornerBottomLeftIcon = (p: IconProps) => <Corner turn={270} {...p} 
 /** Claude agent mark (chat model chip, settings Agents). */
 export function ClaudeMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className={cn("size-3.5 shrink-0 text-chat-claude", className)}>
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className={cn("size-3.5 shrink-0 text-chat-claude", className)}
+    >
       <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
         {[0, 22.5, 45, 67.5, 90, 112.5, 135, 157.5].map((angle) => (
           <line key={angle} x1="8" y1="1.5" x2="8" y2="14.5" transform={`rotate(${angle} 8 8)`} />
@@ -368,12 +391,22 @@ export function ClaudeMark({ className }: { className?: string }) {
 /** Codex agent mark (chat model chip, settings Agents). */
 export function CodexMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className={cn("size-3.5 shrink-0 text-chat-codex", className)}>
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className={cn("size-3.5 shrink-0 text-chat-codex", className)}
+    >
       <path
         fill="currentColor"
         d="M8 1.2c1.5 0 2.4.9 3 1.7 1 .1 2.2.6 2.7 1.9.5 1.3 0 2.4-.5 3.2.4.9.6 2.2-.3 3.3-.9 1-2.1 1.2-3 1.1-.6.8-1.6 1.4-2.9 1.4s-2.3-.6-2.9-1.4c-.9.1-2.1-.1-3-1.1-.9-1.1-.7-2.4-.3-3.3-.5-.8-1-1.9-.5-3.2.5-1.3 1.7-1.8 2.7-1.9.6-.8 1.5-1.7 3-1.7Z"
       />
-      <path d="m5.6 6.4 1.6 1.6-1.6 1.6M8.6 9.8h2" stroke="var(--background)" strokeWidth="1.1" fill="none" strokeLinecap="round" />
+      <path
+        d="m5.6 6.4 1.6 1.6-1.6 1.6M8.6 9.8h2"
+        stroke="var(--background)"
+        strokeWidth="1.1"
+        fill="none"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -381,7 +414,11 @@ export function CodexMark({ className }: { className?: string }) {
 /** Cursor agent placeholder mark: a shaded cube (onboarding, coming soon). */
 export function CursorMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden="true" className={cn("size-3.5 shrink-0 text-muted-foreground", className)}>
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className={cn("size-3.5 shrink-0 text-muted-foreground", className)}
+    >
       <path fill="currentColor" opacity="0.35" d="M8 1.5 14 5v6l-6 3.5L2 11V5l6-3.5Z" />
       <path fill="currentColor" d="M8 8 14 5v6l-6 3.5V8Z" />
       <path d="M2 5l6 3 6-3M8 8v6.5" stroke="var(--background)" strokeWidth="0.8" fill="none" />
@@ -477,7 +514,12 @@ export function SlidersIcon(props: IconProps) {
 
 /** Border "individual sides" tool (Wonder A2): two nested rounded squares. */
 /** Edges [top, right, bottom, left] of the Sides glyph's outer square, then the corner after each edge. */
-const SIDE_EDGES = ["M7.25 3.75H16.75", "M20.25 7.25V16.75", "M16.75 20.25H7.25", "M3.75 16.75V7.25"];
+const SIDE_EDGES = [
+  "M7.25 3.75H16.75",
+  "M20.25 7.25V16.75",
+  "M16.75 20.25H7.25",
+  "M3.75 16.75V7.25",
+];
 const SIDE_CORNERS = [
   "M16.75 3.75A3.5 3.5 0 0 1 20.25 7.25",
   "M20.25 16.75A3.5 3.5 0 0 1 16.75 20.25",
@@ -495,7 +537,9 @@ export function BorderSidesIcon({ sides, ...props }: IconProps & { sides?: boole
     const dotted: string[] = [];
     SIDE_EDGES.forEach((edge, i) => (sides[i] ? solid : dotted).push(edge));
     // A corner belongs to the solid stroke when either side meeting there is drawn.
-    SIDE_CORNERS.forEach((corner, i) => (sides[i] || sides[(i + 1) % 4] ? solid : dotted).push(corner));
+    SIDE_CORNERS.forEach((corner, i) =>
+      (sides[i] || sides[(i + 1) % 4] ? solid : dotted).push(corner),
+    );
     return (
       <Glyph {...props} data-sides={sides.map(Number).join("")}>
         {dotted.length ? <path d={dotted.join("")} strokeDasharray="1 2.5" /> : null}
@@ -533,7 +577,11 @@ export function OutlineOffsetIcon(props: IconProps) {
 
 /* ---------- Position tools (properties-audit C1): Wonder's filled-pill align glyphs, rotate, flip, absolute ---------- */
 /** One align glyph: a guide line with a short and a long pill. Drawn as "align left", mirrored / turned for the rest. */
-function AlignBars({ at, vertical, ...props }: IconProps & { at: "start" | "center" | "end"; vertical?: boolean }) {
+function AlignBars({
+  at,
+  vertical,
+  ...props
+}: IconProps & { at: "start" | "center" | "end"; vertical?: boolean }) {
   const mirror = at === "end" ? "matrix(-1 0 0 1 24 0)" : "";
   return (
     <Glyph {...props}>

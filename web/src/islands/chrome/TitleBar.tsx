@@ -1,13 +1,26 @@
 // Window chrome (03/11/22/29): 40px bar, traffic-light inset, sidebar + chat toggles, Files tab, document tab,
 // new file, search and the design/code mode switch. The bar drags the window; controls opt out (no-drag).
-import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type DragEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { Braces, File, LayoutGrid, MessageSquare, Palette, Search, X } from "lucide-react";
 import { PanelLeftIcon, PlusIcon } from "@/components/icons";
 import { legacy, legacySet, useBodyClass, useDesign } from "@/lib/bridge";
 import { can } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { Menu, MenuContent, MenuItem, MenuSeparator } from "../context-menu/parts";
-import { closeFileTab, closeOtherFileTabs, moveFileTab, openFileTab, useFileTabs } from "./file-tabs";
+import {
+  closeFileTab,
+  closeOtherFileTabs,
+  moveFileTab,
+  openFileTab,
+  useFileTabs,
+} from "./file-tabs";
 import { openFileSwitcher } from "./FileSwitcher";
 import { run } from "./legacy";
 import { PreviewTabs } from "./preview-tab/PreviewTabs";
@@ -163,7 +176,8 @@ export function TitleBar() {
       )}
       onClick={() => {
         showPreviewTab(null);
-        if (filesView) (window.fileLibrary as { showEditor?: () => void } | undefined)?.showEditor?.();
+        if (filesView)
+          (window.fileLibrary as { showEditor?: () => void } | undefined)?.showEditor?.();
       }}
       onDoubleClick={() => setRenaming(true)}
     >

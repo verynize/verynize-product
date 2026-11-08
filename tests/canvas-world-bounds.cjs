@@ -139,8 +139,10 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     const scans = await p.evaluate(() => {
       let count = 0;
       const api = window.VerynizeDocument;
-      const check = api.validateWorldBoundsChange,
-        bounds = api.pageWorldBounds;
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
+      const check = api.validateWorldBoundsChange;
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
+      const bounds = api.pageWorldBounds;
       api.validateWorldBoundsChange = (...args) => {
         count++;
         return check(...args);
@@ -178,6 +180,7 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
       window.design.setSelection(["drag"]);
       window.design.setCamera(-999700, 100, 1);
       window.boundsChecks = 0;
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
       const check = window.VerynizeDocument.validateWorldBoundsChange;
       window.VerynizeDocument.validateWorldBoundsChange = (...args) => {
         window.boundsChecks++;

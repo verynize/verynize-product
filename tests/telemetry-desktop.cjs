@@ -104,7 +104,8 @@ async function raiseErrors(app, page, home, tag) {
   }, text);
   await app.evaluate((_electron, message) => {
     setTimeout(() => {
-      Promise.reject(new Error(`main ${message}`));
+      // Deliberately unhandled: the test checks how the main process reports it.
+      void Promise.reject(new Error(`main ${message}`));
     });
   }, text);
 }

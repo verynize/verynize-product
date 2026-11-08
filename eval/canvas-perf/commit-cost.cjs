@@ -8,7 +8,7 @@ const root = require("node:path").resolve(__dirname, "../.."),
   sizes = (process.argv[2] || "1000,5000").split(",").map(Number);
 const { synthetic } = require(path.join(root, "eval/canvas-perf/bench-verynize.cjs"));
 const { waitForUiReady } = require(path.join(root, "tests/helpers/ui-ready.cjs"));
-(async () => {
+void (async () => {
   for (const n of sizes) {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "cost-")),
       env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
@@ -30,7 +30,7 @@ const { waitForUiReady } = require(path.join(root, "tests/helpers/ui-ready.cjs")
         }
         return +med(t).toFixed(2);
       };
-      let str, parsed, clone;
+      let str, parsed;
       const r = {};
       r.stringify = time(() => {
         str = JSON.stringify(design);
@@ -39,14 +39,14 @@ const { waitForUiReady } = require(path.join(root, "tests/helpers/ui-ready.cjs")
         parsed = JSON.parse(str);
       });
       r.structuredClone = time(() => {
-        clone = structuredClone(design);
+        structuredClone(design);
       });
       r.validateClone = time(() => validate(structuredClone(design)));
       r.preflightChange = time(() => window.imageUpload.preflightChange(design, parsed));
       r.save = time(() => save());
       r.subscribers = subscribers.size;
       r.subscriberClones = time(() => {
-        for (const fn of subscribers) structuredClone(design);
+        for (const _fn of subscribers) structuredClone(design);
       });
       r.zeroArity = [...subscribers].filter((fn) => fn.length === 0).length;
       if (typeof validationCopy === "function") {

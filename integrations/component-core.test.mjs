@@ -652,7 +652,7 @@ function canonical(d) {
       nodes: [...p.nodes].sort((a, b) => (a.id < b.id ? -1 : 1)),
       order: Object.fromEntries(
         [...new Set(p.nodes.map((n) => n.parentId || ""))]
-          .sort()
+          .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
           .map((parent) => [
             parent,
             p.nodes.filter((n) => (n.parentId || "") === parent).map((n) => n.id),
@@ -786,10 +786,10 @@ test("validation checks only types; repairs never reject a stored document over 
   normalizeDocument(stored, {}, repairs);
   validateDocument(stored);
   assert.equal(stored.pages[0].nodes[0].instanceOf, "card", "valid link fields are kept");
-  assert.deepEqual(repairs.map((r) => r.path).sort(), [
-    "pages[0].nodes[0].overrides",
-    "pages[0].nodes[0].slot",
-  ]);
+  assert.deepEqual(
+    repairs.map((r) => r.path).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    ["pages[0].nodes[0].overrides", "pages[0].nodes[0].slot"],
+  );
 });
 
 test("headless operations run the sync", () => {
@@ -831,5 +831,10 @@ test("the canvas loads the engine after the schema and before the editor scripts
     order,
   );
   const app = readFileSync(new URL("../web/app.js", import.meta.url), "utf8");
-  assert.match(app, /function render\(\)\{[^\n]*?componentSync\.sync\(design\);[^\n]*?canvasRender\.render\(\)/, "render() syncs components before drawing the canvas");
+  const render = /\nfunction render\(\) \{\n([\s\S]*?)\n\}\n/.exec(app)?.[1] ?? "";
+  assert.match(
+    render,
+    /componentSync\.sync\(design\);[\s\S]*?canvasRender\.render\(\)/,
+    "render() syncs components before drawing the canvas",
+  );
 });

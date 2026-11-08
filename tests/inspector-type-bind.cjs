@@ -13,7 +13,8 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-type-bind-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
@@ -33,13 +34,13 @@ const path = require("node:path");
       const trigger = page.locator('[data-size-menu="w"]');
       // Radix keeps closing menu items mounted during their exit animation. Finish
       // that lifecycle before reopening, and never target an exiting menu item.
-      await page.locator('[role=menu][data-state=closed]').waitFor({ state: "detached" });
+      await page.locator("[role=menu][data-state=closed]").waitFor({ state: "detached" });
       await trigger.click();
-      const menu = page.locator('[role=menu][data-state=open]').filter({
+      const menu = page.locator("[role=menu][data-state=open]").filter({
         has: page.locator(`[data-limit="${field}"]`),
       });
       await menu.locator(`[data-limit="${field}"]`).click();
-      await page.locator('[role=menu]').waitFor({ state: "detached" });
+      await page.locator("[role=menu]").waitFor({ state: "detached" });
       await list(field).waitFor();
     };
     const typeInto = async (name, text) => {
@@ -95,18 +96,30 @@ const path = require("node:path");
         .closest("[data-field-shell]")
         .getBoundingClientRect();
       const box = document.querySelector('[data-type-bind="w"]').getBoundingClientRect();
-      const row = document.querySelector('[data-type-bind="w"] [role=option]').getBoundingClientRect();
+      const row = document
+        .querySelector('[data-type-bind="w"] [role=option]')
+        .getBoundingClientRect();
       return { shell, box, row };
     });
-    assert.ok(Math.abs(geometry.box.left - geometry.shell.left) <= 0.5, "list aligned to the field x");
-    assert.ok(Math.abs(geometry.box.width - geometry.shell.width) <= 0.5, "list as wide as the field");
+    assert.ok(
+      Math.abs(geometry.box.left - geometry.shell.left) <= 0.5,
+      "list aligned to the field x",
+    );
+    assert.ok(
+      Math.abs(geometry.box.width - geometry.shell.width) <= 0.5,
+      "list as wide as the field",
+    );
     assert.ok(
       Math.abs(geometry.box.top - geometry.shell.bottom - 4) <= 0.5,
       `list 4px under the field (${geometry.box.top - geometry.shell.bottom})`,
     );
     assert.equal(geometry.box.height, 32, "one suggestion → 32px list");
     assert.equal(geometry.row.height, 24, "24px rows");
-    assert.equal(await list("w").locator("[data-active]").count(), 0, "nothing highlighted before ↓");
+    assert.equal(
+      await list("w").locator("[data-active]").count(),
+      0,
+      "nothing highlighted before ↓",
+    );
     assert.ok(await w.evaluate((e) => e === document.activeElement), "the field keeps focus");
 
     // Variable types follow BINDABLE: W takes dimensions only, the gap also numbers. Plain numbers open nothing.
@@ -117,15 +130,16 @@ const path = require("node:path");
     await page.waitForTimeout(100);
     assert.equal(await list("w").count(), 0, "a plain number opens no list");
     await page.keyboard.press("Enter");
-    await page.waitForFunction(
-      () => window.design.getDocument().pages[0].nodes[0].w === 300,
-    );
+    await page.waitForFunction(() => window.design.getDocument().pages[0].nodes[0].w === 300);
 
     // 2. ↓ highlights, Enter binds through the same path as the diamond menu: the field becomes the chip.
     await typeInto("w", "dimen");
     await list("w").waitFor();
     await page.keyboard.press("ArrowDown");
-    assert.equal(await list("w").locator("[data-active]").getAttribute("data-variable"), "dimension-1");
+    assert.equal(
+      await list("w").locator("[data-active]").getAttribute("data-variable"),
+      "dimension-1",
+    );
     await page.keyboard.press("Enter");
     await page.locator('[data-bound="w"]').waitFor();
     let box = await node();
@@ -136,7 +150,11 @@ const path = require("node:path");
       "dimension-1",
     );
     assert.equal(await list("w").count(), 0, "list closed after binding");
-    assert.equal(await page.locator("#properties [name=w]").count(), 0, "no editable W input while bound");
+    assert.equal(
+      await page.locator("#properties [name=w]").count(),
+      0,
+      "no editable W input while bound",
+    );
     await page.evaluate(() => window.design.runCommand("edit.undo"));
     await page.locator("#properties [name=w]").waitFor();
     assert.equal((await node()).bindings?.w, undefined, "undo restores the unbound width");
@@ -175,7 +193,10 @@ const path = require("node:path");
       const box = document.querySelector('[data-type-bind="minW"]').getBoundingClientRect();
       return { shell: shell.width, box: box.width, left: box.left - shell.left };
     });
-    assert.ok(Math.abs(limit.box - limit.shell) <= 0.5, `limit list as wide as the row (${limit.box})`);
+    assert.ok(
+      Math.abs(limit.box - limit.shell) <= 0.5,
+      `limit list as wide as the row (${limit.box})`,
+    );
     assert.ok(Math.abs(limit.left) <= 0.5, "limit list aligned to the row");
     await page.keyboard.press("Escape");
     await list("minW").waitFor({ state: "detached" });

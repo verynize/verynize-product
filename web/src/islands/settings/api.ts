@@ -2,7 +2,19 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 
-export type SectionId = "account" | "preferences" | "agents" | "accounts" | "tools" | "projects" | "usage" | "models" | "connections" | "memory" | "permissions" | "members";
+export type SectionId =
+  | "account"
+  | "preferences"
+  | "agents"
+  | "accounts"
+  | "tools"
+  | "projects"
+  | "usage"
+  | "models"
+  | "connections"
+  | "memory"
+  | "permissions"
+  | "members";
 
 export type Preferences = {
   theme: "system" | "light" | "dark";
@@ -26,7 +38,12 @@ export type Preferences = {
 export type AgentInfo = { id: string; available: boolean };
 export type AuthKind = "check" | "login" | "logout" | "cancel";
 
-type SettingsState = { open: boolean; section: SectionId; status: string; accounts: Record<string, string> };
+type SettingsState = {
+  open: boolean;
+  section: SectionId;
+  status: string;
+  accounts: Record<string, string>;
+};
 
 export type SettingsApi = {
   open(section?: string): void;
@@ -38,11 +55,11 @@ export type SettingsApi = {
   actions: {
     saveModels(values: AgentDefaults): void;
     saveMemory(text: string): void;
-    openMemory(): void;
+    openMemory: () => void;
     saveCloud(value: string): boolean;
-    openFigma(): void;
+    openFigma: () => void;
     copyMcp(): Promise<void>;
-    openAgent(): void;
+    openAgent: () => void;
     share(): void;
     discoverAgents(): Promise<AgentInfo[] | null>;
     auth(kind: AuthKind, agent: string): Promise<void>;
@@ -64,7 +81,9 @@ type AgentWorkspace = {
 
 export const settingsApi = () => window.appSettings as unknown as SettingsApi | undefined;
 export const preferencesApi = () =>
-  window.appPreferences as unknown as { get(): Preferences; set(changes: Partial<Preferences>): void } | undefined;
+  window.appPreferences as unknown as
+    | { get(): Preferences; set(changes: Partial<Preferences>): void }
+    | undefined;
 export const agentWorkspace = () => window.agentWorkspace as unknown as AgentWorkspace | undefined;
 
 /* ---------- Change notifications ---------- */
@@ -98,8 +117,16 @@ export function attachSettings() {
 export function useSettings() {
   useSyncExternalStore(subscribe, () => version);
   const api = settingsApi();
-  const state = api?.getState() ?? { open: false, section: "preferences" as SectionId, status: "", accounts: {} };
+  const state = api?.getState() ?? {
+    open: false,
+    section: "preferences" as SectionId,
+    status: "",
+    accounts: {},
+  };
   const preferences = preferencesApi()?.get() ?? ({} as Preferences);
-  const setPreference = useCallback((changes: Partial<Preferences>) => preferencesApi()?.set(changes), []);
+  const setPreference = useCallback(
+    (changes: Partial<Preferences>) => preferencesApi()?.set(changes),
+    [],
+  );
   return { api, state, preferences, setPreference };
 }

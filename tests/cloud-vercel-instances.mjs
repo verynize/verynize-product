@@ -102,7 +102,7 @@ class Client {
     this.connections.push(connection);
     ws.on("open", () => (connection.open = true));
     ws.on("message", (data) => {
-      const message = JSON.parse(data.toString());
+      const message = JSON.parse(/** @type {Buffer} */ (data).toString());
       connection.messages.push(message);
       if (message.type === "snapshot") {
         this.pending = this.pending.filter((b) => b.n > (message.acked || 0));

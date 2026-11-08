@@ -179,7 +179,11 @@ export function OptionalSection({
       {/* Wonder's optional body: first row 36px below the section top (31px header + 5), 12px bottom padding. */}
       <div
         hidden={!present}
-        className={cn(present ? "flex" : "hidden", "flex-col gap-2 px-3 pt-1.25 pb-3", bodyClassName)}
+        className={cn(
+          present ? "flex" : "hidden",
+          "flex-col gap-2 px-3 pt-1.25 pb-3",
+          bodyClassName,
+        )}
       >
         {children}
       </div>
@@ -539,7 +543,8 @@ export function Swatch({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
-    if (ref.current) ref.current.style.background = checker ? SWATCH_CHECKER : swatchBackground(color);
+    if (ref.current)
+      ref.current.style.background = checker ? SWATCH_CHECKER : swatchBackground(color);
   }, [color, checker]);
   return (
     <span

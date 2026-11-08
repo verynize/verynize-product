@@ -263,8 +263,7 @@
       }
       function buildBoard(r) {
         if (hybrid) words = host.measure(r).words;
-        const a = scene.abs[r],
-          c = new P.Container();
+        const c = new P.Container();
         c.x = 0;
         c.y = 0;
         addNode(c, r, 0, 0);

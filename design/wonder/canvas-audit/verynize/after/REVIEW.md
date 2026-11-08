@@ -3,18 +3,21 @@
 Every PNG and `P1-*.txt` in this folder was captured in one run of [`../capture-after.cjs`](../capture-after.cjs) against the merged build (`npm run build:ui` first). The run uses a full window of 1440×870 at 2×. The fixture rebuilds Wonder's "Sunbird" scratch file at the stage each Wonder shot was taken, at 100 % with Wonder's camera placement. Pairs are in [`../../pairs-after/`](../../pairs-after/) (Wonder left, Verynize right).
 
 Each line below says whether the two halves match and what differs. W = Wonder, V = Verynize.
+
 - **Match**: same state, same strings, same geometry within a few px.
 - **Close**: the behaviour matches but a visible detail differs.
 - **Differs**: the behaviour or strings differ.
 - **n/c**: not comparable, because the Wonder file does not show the state its name claims (see `../../wonder/notes*.md`).
 
 Fixture-only differences hold for every shot and are not repeated below:
+
 - shader artwork: Verynize's parametric presets versus Wonder's Pixel Party;
 - layer-row glyphs: `#` frame icon versus Wonder's dashed-corner icon;
 - no "Pages 3" count in V's Pages header;
 - Wonder's extra Thrush/Porto tabs.
 
 ## Context menus
+
 - **CM1-empty**: Match. Select all ⌘A | Paste here | Hide left sidebar, Hide right sidebar, at the same point (±2 px).
 - **CM2-frame**: Match. The 14 rows, separators and shortcuts are identical; Add context is highlighted; the menu sits at the same place.
 - **CM2-copy-as**: Match. Copy as code ⌘⇧C, Copy as PNG, Copy prompt ⌘⇧⌥C, Copy styles ⌘⌥C.
@@ -37,6 +40,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **CM10-empty-clipboard**: n/c. V is a true empty clipboard, so Paste, Paste to replace and Paste over selection are disabled. W's internal clipboard was not empty and its target differs (row at 323 %).
 
 ## Keyboard and clipboard
+
 - **K1-shortcuts**: Close. The drawer has the same title, Search shortcuts… field, pinned Command palette ⌘K and sections in order.
   - W dims the whole window behind the drawer; V does not.
   - V's TOOLS section adds "Rectangle tool R" and "Ellipse tool O".
@@ -50,6 +54,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **K3-unframe**: n/c. W's ⌘⇧G had a child selected and did nothing. V's ⌘⇧G restored the four top-level layers (4 nodes selected).
 
 ## Layers and pages
+
 - **L1-hover**: Match. A "Lock layer" tooltip over the row's lock button, with T / lock / eye on the row. W's row is the selected "Auit SAMPLE" row at 323 %.
 - **L2-rename**: Close. Page row menu Rename F2 | Delete (red). V's menu opens ≈10 px higher and covers the "Page 3" label.
 - **L2-rename-field**: Differs. The purple inline field with "Page 3" selected matches. Choosing Rename makes Page 3 the **active page** in V (tab "Sunbird - Page 3", empty canvas, "No layers on this page"); Page 1 stays active in W.
@@ -59,8 +64,9 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **L2-reorder-during**: n/c. W's file is the eyedropper accident (its real drag is L2-drag-confirmed). V shows the drag with the insertion line.
 
 ## Palette, paste, thumbnail, mask (pass b)
-- **P1-*.txt**: Close in structure, with different payloads.
-  - **Same structure**: "Implement this … design." / "Design to implement (each link ends in the … page id and the element id: …)", one link per node, MCP instructions and an install hint / "Inline snapshot (fallback, captured at <ISO>):" with a ```tsx``` block per node / "How to implement it:" and the guidance.
+
+- **P1-\*.txt**: Close in structure, with different payloads.
+  - **Same structure**: "Implement this … design." / "Design to implement (each link ends in the … page id and the element id: …)", one link per node, MCP instructions and an install hint / "Inline snapshot (fallback, captured at <ISO>):" with a `tsx` block per node / "How to implement it:" and the guidance.
   - **Links**: V writes `verynize://node/Sunbird/p1/<short id>`; W writes `wonder://node/<org>/<page uuid>/<element uuid>`. The snapshot header link is the same `verynize://` URI, where W uses an `https://app.wonder.so/...?nodeId=` URL. P1-copy-link.txt is the `verynize://` URI, not an https URL.
   - **Snapshot**: V's uses Tailwind classes plus `data-node-label` / `data-canvas-x` / `data-vn` attributes, a `/* @verynize {...} */` comment and `export default function Frame()`. W's prompt snapshot uses inline `style={{…}}` objects in `export default function ()`. Text has `leading-[1.15]` in V and `lineHeight: "normal"` in W.
   - **Copy code**: W adds a `:root` variables `<style>` and `wrap-anywhere … [line-height:normal]`; V has neither.
@@ -100,6 +106,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **P5-remove-result**: Match. The Mask section is empty and the source is not restored.
 
 ## Selection
+
 - **S1-hover**: Close. Purple outline, no handles, inspector stays on Page.
   - V also draws dashed outlines on the hovered frame's children.
   - V's name label stays grey where W's turns purple.
@@ -113,6 +120,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **S4-frame**: Match. `300 x 270` with no Fixed suffix, purple name, ⊕ chip, X65 Y−153. V's corner handles are ≈4 px dots against W's 8 px white squares (also in the TR1 shots).
 
 ## Toolbar and tools
+
 - **T1-move / scale / hand / frame / shader / text / view-a / view-b / plus**: Close. The 6 tools, Details / Design and + match.
   - V tooltips: Move V, Scale K, Hand H, Frame F, Shader S, Text T, Details ⌥1, Design ⌥2, Save or choose a view. W shows readable tooltips only for the + button (its verified retakes have none).
   - In W the Design toggle is drawn active (purple) while the view is "Design · edited". V draws neither toggle active, in every toolbar shot.
@@ -126,6 +134,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **T6-zoom**: Match. Zoom to 50%, Zoom to 100% ⇧0, Zoom to 200% | Zoom in ⌘+, Zoom out ⌘−, Zoom to fit ⇧1. W also tints the zoom label purple while the menu is open.
 
 ## Transform
+
 - **TR1-corner**: Match. 340 x 350 at X76 Y−153.
 - **TR1-shift**: Match. 380 x 391.18 (ratio kept).
 - **TR1-alt**: Match. 420 x 391.18 with X76 → 56 (centred horizontal resize).
@@ -150,6 +159,7 @@ Fixture-only differences hold for every shot and are not repeated below:
   - V outlines the hovered child's children.
 
 ## Text
+
 - **TX1-click**: Close. Empty text, Hug × Hug, Inter Regular 12, Auto line height, 0 letter spacing, fill 000000, nested at X59 Y160.
   - V shows W "1 Hug" where W shows "0 Hug".
   - V's caret is purple; W's is black.
@@ -157,6 +167,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **TX1-drag**: Close. A fixed 150×60 box, fill FFFFFF, at X515 Y47. V draws the selection box, the "Text" label and the 150 x 60 badge with no visible caret; W shows only the caret.
 
 ## Camera
+
 - **V1-100**: Match. ⇧0 gives 100 %.
 - **V1-in**: n/c. W's ⌘+ stayed at 100 % (key injection); V's ⌘+ steps 100 → 200 %.
 - **V1-out**: Match. 50 % after ⌘− from 200 %.
@@ -166,6 +177,7 @@ Fixture-only differences hold for every shot and are not repeated below:
 - **V4-high-zoom**: Close. No rulers or pixel grid in either; ⇧2 on 150×105 gives 532 % in V and 548 % in W.
 
 ## Remaining visible differences worth fixing (summary)
+
 1. **P2-select**: the palette list keeps a stale scroll offset while typing, so the active row is off-screen.
 2. **CM5-multi**: Use as mask is missing for 3+ layers (W offers it for 4).
 3. **CM9-label**: the label menu still lists Select layer.
@@ -190,20 +202,21 @@ Fixture-only differences hold for every shot and are not repeated below:
 
 Three more slices fixed most of the summary above. These shots were retaken from the merged build: `capture-after.cjs CM3 CM5 CM6 CM9 L2 P3 P4 P5 S1 S2 S4 T1 T2 T3 T4 T5 TR1 TR2 TR5 TR7 TR8 TX1 V3 V4`.
 
-| Summary item | Now |
-|---|---|
-| 1. P2-select stale scroll | **Fixed earlier** (the active row stays in view while typing). |
-| 2. CM5 Use as mask for 3+ | **Fixed**: offered for 2 or more siblings. Assumption: the bottom-most selected sibling masks each of the others. |
-| 3. CM9 Select layer in the label menu | **Fixed**: Copy link is followed directly by Paste, as in Wonder. |
-| 4. L2 Rename switches the page | **Fixed**: Rename from the page menu renames by id and keeps the current page. |
-| 5. T4 Scale section | **Fixed**: the Scale section (✕, W, H, %) replaces the inspector while the Scale tool is on. The % preset menu is an assumption. |
-| 6. TR7 drop column | **Close**: the child stays in its slot under a purple translucent column. The column's sizing rule is an approximation (Wonder's spans downward from the slot). |
-| 7. CM6 / S2 marks | **Fixed**: a selected hidden layer gets an outline; a selected nested child gets dashed parent guides with no labels. Nested layers and text no longer show a name label. |
-| 8. Toolbar toggle | **Fixed per pixels**: the active view's toggle is highlighted while the views menu is closed. Wonder's T2-plus shows `+` highlighted only because its menu is open. |
-| 9. Small items | Fixed: the rotation field shows `-47.19`; Alt chips show whole numbers; zoom to selection gives 538 %; What's new has a placeholder entry; the caret is black on white; there is no chrome while typing; hover outlines only the frame; a detached mask shape has Clip content on. CM3's 1.15 came from the capture fixture (new text already stores Auto). |
-| Not changed | **CM8**: Delete stays disabled on a single page, because Wonder never exercised it. **Paste styles**: listed after Paste only once styles have been copied, matching Wonder's pass-b menus. |
+| Summary item                          | Now                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. P2-select stale scroll             | **Fixed earlier** (the active row stays in view while typing).                                                                                                                                                                                                                                                                                              |
+| 2. CM5 Use as mask for 3+             | **Fixed**: offered for 2 or more siblings. Assumption: the bottom-most selected sibling masks each of the others.                                                                                                                                                                                                                                           |
+| 3. CM9 Select layer in the label menu | **Fixed**: Copy link is followed directly by Paste, as in Wonder.                                                                                                                                                                                                                                                                                           |
+| 4. L2 Rename switches the page        | **Fixed**: Rename from the page menu renames by id and keeps the current page.                                                                                                                                                                                                                                                                              |
+| 5. T4 Scale section                   | **Fixed**: the Scale section (✕, W, H, %) replaces the inspector while the Scale tool is on. The % preset menu is an assumption.                                                                                                                                                                                                                            |
+| 6. TR7 drop column                    | **Close**: the child stays in its slot under a purple translucent column. The column's sizing rule is an approximation (Wonder's spans downward from the slot).                                                                                                                                                                                             |
+| 7. CM6 / S2 marks                     | **Fixed**: a selected hidden layer gets an outline; a selected nested child gets dashed parent guides with no labels. Nested layers and text no longer show a name label.                                                                                                                                                                                   |
+| 8. Toolbar toggle                     | **Fixed per pixels**: the active view's toggle is highlighted while the views menu is closed. Wonder's T2-plus shows `+` highlighted only because its menu is open.                                                                                                                                                                                         |
+| 9. Small items                        | Fixed: the rotation field shows `-47.19`; Alt chips show whole numbers; zoom to selection gives 538 %; What's new has a placeholder entry; the caret is black on white; there is no chrome while typing; hover outlines only the frame; a detached mask shape has Clip content on. CM3's 1.15 came from the capture fixture (new text already stores Auto). |
+| Not changed                           | **CM8**: Delete stays disabled on a single page, because Wonder never exercised it. **Paste styles**: listed after Paste only once styles have been copied, matching Wonder's pass-b menus.                                                                                                                                                                 |
 
 Still open:
+
 - Wonder's caret is 1.5 px wide, but Chromium's caret can't be widened.
 - The hover outline is axis-aligned on rotated frames.
 - The existing selection purple (#b93cdb) differs from Wonder's #c468f7. Only the new marks use Wonder's colour.
@@ -214,17 +227,18 @@ Still open:
 
 New Wonder evidence is R1–R7 in `wonder/notes-2026-10-31-c.md`. **All 103 after-shots were retaken from the final build.**
 
-| Open item | Result |
-|---|---|
-| TR7 drop column | **Resolved: there is no drop column in Wonder.** R1 shows the dragged child following the pointer. The "column" in TR7-out-during is a marquee rectangle: it starts in the gap, the inspector shows Z Auto, and the shot next to it reads "2 nodes selected". Verynize now matches R1: the child follows the pointer, the slot stays empty and siblings stay put. The drag hides the child's chrome; its name label shows only over the page. The target parent gets a 1px outline. The Layers panel previews the new hierarchy live, and the order changes on release (one undo step). A top-level frame can be dropped into a stack (R1-row-return-during). The stack drop line is 3px #c468f7. |
-| 1.5 px caret | **Fixed** with a custom caret (`web/text-caret.js`). It is a constant 1.5 px wide at every zoom; its height follows the line (14.5 → 58 px at 100 → 400 %, R7). It is black or white by background, blinks, and hides for a range or during IME composition. |
-| Rotated hover outline | **Fixed**: it turns with the frame and is 1px RGB(196,104,247) (R4). |
-| Selection purple | **Fixed**: all canvas selection chrome uses #c468f7. The outline is 1px across the edge, handles are 9×9 white with a 1px border, and the badge is #a245d3 (R5). Handles on a Clip content frame were cut to a quarter by the frame's own clip; they are now drawn over it whole (regression test in `canvas-selection-marks.cjs`). |
-| Help truncation | **Fixed**: the menu is 180px; labels stop at 112/128px ("Discord commu…", "Export diagnostic l…"). What's new uses Wonder's row sizes and the label grey #969696. The placeholder entry is "Verynize 0.16". |
-| Scale on a multi-selection | **Fixed**: the union scales about the opposite corner (240×120 → 360×180). The inspector reads the primary layer (150×90, 150 %). The % menu has Wonder's nine presets (0.25×–10×) (R2). |
-| CM8 Delete on a single page | **Matches**: disabled in Wonder too. The row now uses Wonder's muted red RGB(132,69,68) (R3). |
+| Open item                   | Result                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TR7 drop column             | **Resolved: there is no drop column in Wonder.** R1 shows the dragged child following the pointer. The "column" in TR7-out-during is a marquee rectangle: it starts in the gap, the inspector shows Z Auto, and the shot next to it reads "2 nodes selected". Verynize now matches R1: the child follows the pointer, the slot stays empty and siblings stay put. The drag hides the child's chrome; its name label shows only over the page. The target parent gets a 1px outline. The Layers panel previews the new hierarchy live, and the order changes on release (one undo step). A top-level frame can be dropped into a stack (R1-row-return-during). The stack drop line is 3px #c468f7. |
+| 1.5 px caret                | **Fixed** with a custom caret (`web/text-caret.js`). It is a constant 1.5 px wide at every zoom; its height follows the line (14.5 → 58 px at 100 → 400 %, R7). It is black or white by background, blinks, and hides for a range or during IME composition.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Rotated hover outline       | **Fixed**: it turns with the frame and is 1px RGB(196,104,247) (R4).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Selection purple            | **Fixed**: all canvas selection chrome uses #c468f7. The outline is 1px across the edge, handles are 9×9 white with a 1px border, and the badge is #a245d3 (R5). Handles on a Clip content frame were cut to a quarter by the frame's own clip; they are now drawn over it whole (regression test in `canvas-selection-marks.cjs`).                                                                                                                                                                                                                                                                                                                                                               |
+| Help truncation             | **Fixed**: the menu is 180px; labels stop at 112/128px ("Discord commu…", "Export diagnostic l…"). What's new uses Wonder's row sizes and the label grey #969696. The placeholder entry is "Verynize 0.16".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Scale on a multi-selection  | **Fixed**: the union scales about the opposite corner (240×120 → 360×180). The inspector reads the primary layer (150×90, 150 %). The % menu has Wonder's nine presets (0.25×–10×) (R2).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| CM8 Delete on a single page | **Matches**: disabled in Wonder too. The row now uses Wonder's muted red RGB(132,69,68) (R3).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 Still not proven in Wonder, left as is:
+
 - Escape-cancel of a stack drag (added; Wonder not captured).
 - Multi-selection resize with the Move tool.
 - The Layers row position of an entering layer differs by one slot from R1-row-return-during; Verynize uses the slot release will use.

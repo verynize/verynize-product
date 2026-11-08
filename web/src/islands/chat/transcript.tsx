@@ -29,16 +29,30 @@ import {
 } from "lucide-react";
 import { LogoIcon } from "@/components/icons";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Spinner } from "@/components/ui/spinner";
 import { legacySet } from "@/lib/bridge";
 import { platform } from "@/lib/platform";
-import { cn } from "@/lib/utils";
+import { cn, textOf } from "@/lib/utils";
 import { AuthCard } from "./auth-card";
 import { ChatActionButton, ChatIconButton, ChatPillButton, ChatSuggestionButton } from "./controls";
 import { Markdown, openAppLink } from "./markdown";
-import { ChatMenu, ChatMenuContent, ChatMenuItem, ChatMenuNote, ChatMenuSeparator, ChatMenuTrigger } from "./menu";
+import {
+  ChatMenu,
+  ChatMenuContent,
+  ChatMenuItem,
+  ChatMenuNote,
+  ChatMenuSeparator,
+  ChatMenuTrigger,
+} from "./menu";
 import { MentionIcon } from "./mention-popover";
 import { PREVIEW_SETUP_REQUEST, PreviewSavedCard, savedPreview } from "./preview-setup";
 import { QuestionCard } from "./question-card";
@@ -57,12 +71,17 @@ const pretty = (value: unknown) => {
     return String(value);
   }
 };
-const seconds = (from?: number, to?: number) => Math.max(1, Math.round(((to ?? from ?? 0) - (from ?? 0)) / 1000));
+const seconds = (from?: number, to?: number) =>
+  Math.max(1, Math.round(((to ?? from ?? 0) - (from ?? 0)) / 1000));
 
 /** Wonder's 3×3 dot grid: "Wondering…" marker while a turn runs (37, 39). */
 function DotGrid({ live, className }: { live?: boolean; className?: string }) {
   return (
-    <svg viewBox="0 0 12 12" aria-hidden="true" className={cn(hook.dots, "size-3 shrink-0", className)}>
+    <svg
+      viewBox="0 0 12 12"
+      aria-hidden="true"
+      className={cn(hook.dots, "size-3 shrink-0", className)}
+    >
       {[0, 1, 2].flatMap((row) =>
         [0, 1, 2].map((col) => (
           <rect
@@ -82,7 +101,15 @@ function DotGrid({ live, className }: { live?: boolean; className?: string }) {
 }
 
 /** "Wondered for 18s ›" — the turn header: collapsible, with a divider under it (29, 37, 51). */
-function TurnHeader({ label, live, children }: { label: string; live?: boolean; children?: ReactNode }) {
+function TurnHeader({
+  label,
+  live,
+  children,
+}: {
+  label: string;
+  live?: boolean;
+  children?: ReactNode;
+}) {
   const { expandWork } = useChatBehavior();
   const body = (
     <>
@@ -90,7 +117,8 @@ function TurnHeader({ label, live, children }: { label: string; live?: boolean; 
       <span>{label}</span>
     </>
   );
-  const row = "flex list-none items-center gap-2 border-b border-border p-0 pb-2 text-base leading-5.25 text-muted-foreground";
+  const row =
+    "flex list-none items-center gap-2 border-b border-border p-0 pb-2 text-base leading-5.25 text-muted-foreground";
   if (!children)
     return (
       <div className={cn(hook.thinking, "mb-0.5")}>
@@ -100,7 +128,10 @@ function TurnHeader({ label, live, children }: { label: string; live?: boolean; 
   return (
     <details
       open={expandWork || undefined}
-      className={cn(hook.thinking, "group/think m-0 mb-0.5 rounded-none border-0 bg-transparent p-0 text-base leading-5.25")}
+      className={cn(
+        hook.thinking,
+        "group/think m-0 mb-0.5 rounded-none border-0 bg-transparent p-0 text-base leading-5.25",
+      )}
     >
       <summary className={cn(row, "hover:text-foreground-3")}>
         {body}
@@ -114,7 +145,11 @@ function TurnHeader({ label, live, children }: { label: string; live?: boolean; 
 /** Reasoning text inside the turn header. */
 function ThinkingText({ text }: { text?: string }) {
   if (!text?.trim()) return null;
-  return <p className="py-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground">{text.trim()}</p>;
+  return (
+    <p className="py-1 text-sm leading-5 whitespace-pre-wrap text-muted-foreground">
+      {text.trim()}
+    </p>
+  );
 }
 
 /**
@@ -131,14 +166,20 @@ function useForcedOpen(force: boolean) {
   return [open, setOpen] as const;
 }
 
-const DISCLOSURE = "flex items-center gap-2 rounded-sm p-0 outline-hidden focus-visible:ring-1 focus-visible:ring-ring";
+const DISCLOSURE =
+  "flex items-center gap-2 rounded-sm p-0 outline-hidden focus-visible:ring-1 focus-visible:ring-ring";
 
 /* ---------- Tool calls: Wonder shows "Ran 5 commands ›" and the live step ("Editing the canvas", 39). ---------- */
 
 const CANVAS = /^mcp__verynize__/;
 const SHELL = /^(shell|bash|exec_command|local_shell)$/i;
-const input = (part: ChatPart) => (part.input && typeof part.input === "object" ? (part.input as Record<string, unknown>) : {});
-const base = (value: unknown) => String(value ?? "").split(/[\\/]/).filter(Boolean).at(-1) ?? "";
+const input = (part: ChatPart) =>
+  part.input && typeof part.input === "object" ? (part.input as Record<string, unknown>) : {};
+const base = (value: unknown) =>
+  textOf(value ?? "")
+    .split(/[\\/]/)
+    .filter(Boolean)
+    .at(-1) ?? "";
 const humanize = (name: string) => {
   const text = name.replace(/[_-]+/g, " ").trim();
   return text ? text[0].toUpperCase() + text.slice(1) : name;
@@ -161,16 +202,30 @@ function describeTool(part: ChatPart) {
     return { Icon: SquareTerminalIcon, label: humanize(tool), mono: false, live };
   }
   if (SHELL.test(name)) {
-    const command = String(args.command ?? title.replace(/^\S+\s/, ""));
+    const command = textOf(args.command ?? title.replace(/^\S+\s/, ""));
     return { Icon: SquareTerminalIcon, label: command, mono: true, live: `Running ${command}` };
   }
-  const file = base(args.file_path ?? args.path ?? (Array.isArray(args.files) ? args.files[0] : ""));
-  if (/^(read|view_image|notebookread)$/i.test(name)) return { Icon: FileTextIcon, label: `Read ${file}`, mono: false, live: `Reading ${file}` };
+  const file = base(
+    args.file_path ?? args.path ?? (Array.isArray(args.files) ? args.files[0] : ""),
+  );
+  if (/^(read|view_image|notebookread)$/i.test(name))
+    return { Icon: FileTextIcon, label: `Read ${file}`, mono: false, live: `Reading ${file}` };
   if (/^(edit|write|multiedit|notebookedit|apply_patch)$/i.test(name))
-    return { Icon: FilePenIcon, label: `Edited ${file || "files"}`, mono: false, live: `Editing ${file || "files"}` };
+    return {
+      Icon: FilePenIcon,
+      label: `Edited ${file || "files"}`,
+      mono: false,
+      live: `Editing ${file || "files"}`,
+    };
   if (/^(grep|glob|ls)$/i.test(name))
-    return { Icon: SearchIcon, label: title, mono: false, live: `Searching ${String(args.pattern ?? args.path ?? "")}`.trim() };
-  if (/web_?search|webfetch/i.test(name)) return { Icon: GlobeIcon, label: title, mono: false, live: "Searching the web" };
+    return {
+      Icon: SearchIcon,
+      label: title,
+      mono: false,
+      live: `Searching ${textOf(args.pattern ?? args.path ?? "")}`.trim(),
+    };
+  if (/web_?search|webfetch/i.test(name))
+    return { Icon: GlobeIcon, label: title, mono: false, live: "Searching the web" };
   return { Icon: SquareTerminalIcon, label: title, mono: false, live: title };
 }
 
@@ -195,15 +250,28 @@ function nestTools(parts: ChatPart[]): Nesting {
 }
 
 /** Collapsible list of a tool call's subagent steps, indented under it. */
-function SubSteps({ items, nesting, onToggle }: { items: Indexed[]; nesting: Nesting; onToggle: (index: number, open: boolean) => void }) {
-  const live = items.some(({ part }) => part.kind === "tool" && (part.state ?? "running") === "running");
+function SubSteps({
+  items,
+  nesting,
+  onToggle,
+}: {
+  items: Indexed[];
+  nesting: Nesting;
+  onToggle: (index: number, open: boolean) => void;
+}) {
+  const live = items.some(
+    ({ part }) => part.kind === "tool" && (part.state ?? "running") === "running",
+  );
   const { expandWork } = useChatBehavior();
   const [open, setOpen] = useForcedOpen(live || expandWork);
   return (
     <Collapsible asChild open={open} onOpenChange={setOpen}>
       <div className="group/sub m-0 ml-1.5 border-l border-border pl-3.5">
         <CollapsibleTrigger asChild>
-          <button type="button" className={cn(DISCLOSURE, "h-6 text-sm text-subtle-foreground hover:text-foreground-3")}>
+          <button
+            type="button"
+            className={cn(DISCLOSURE, "h-6 text-sm text-subtle-foreground hover:text-foreground-3")}
+          >
             {items.length} {items.length === 1 ? "step" : "steps"}
             <ChevronRightIcon className="size-3 transition-transform group-data-[state=open]/sub:rotate-90 motion-reduce:transition-none" />
           </button>
@@ -211,7 +279,13 @@ function SubSteps({ items, nesting, onToggle }: { items: Indexed[]; nesting: Nes
         <CollapsibleContent className="flex flex-col">
           {items.map(({ part, index }) =>
             part.kind === "tool" ? (
-              <ToolRow key={index} part={part} nesting={nesting} onToggle={(open) => onToggle(index, open)} onToggleChild={onToggle} />
+              <ToolRow
+                key={index}
+                part={part}
+                nesting={nesting}
+                onToggle={(open) => onToggle(index, open)}
+                onToggleChild={onToggle}
+              />
             ) : part.kind === "permission" ? (
               <PermissionRow key={index} part={part} />
             ) : null,
@@ -239,11 +313,21 @@ function ToolRow({
   const { Icon, label, mono } = describeTool(part);
   const args = input(part);
   const shell = SHELL.test(part.name ?? "");
-  const body = !part.hasInput && part.partialInput ? part.partialInput : shell && args.command ? String(args.command) : pretty(part.input ?? {});
-  const block = "m-0 max-h-55 overflow-auto font-mono text-xs leading-4.5 break-words whitespace-pre-wrap";
+  const body =
+    !part.hasInput && part.partialInput
+      ? part.partialInput
+      : shell && args.command
+        ? textOf(args.command)
+        : pretty(part.input ?? {});
+  const block =
+    "m-0 max-h-55 overflow-auto font-mono text-xs leading-4.5 break-words whitespace-pre-wrap";
   const row = (
     <details
-      className={cn(hook.tool, "group/tool m-0 rounded-none border-0 bg-transparent p-0", stateHook(state))}
+      className={cn(
+        hook.tool,
+        "group/tool m-0 rounded-none border-0 bg-transparent p-0",
+        stateHook(state),
+      )}
       open={part.open ?? expandWork}
       onToggle={(event) => onToggle(event.currentTarget.open)}
     >
@@ -252,7 +336,9 @@ function ToolRow({
         className="flex h-6 list-none items-center gap-2 p-0 text-sm text-muted-foreground hover:text-foreground-3"
       >
         <Icon className="size-3.5 shrink-0" />
-        <span className={cn(hook.toolTitle, "min-w-0 truncate", mono && "font-mono text-xs")}>{label}</span>
+        <span className={cn(hook.toolTitle, "min-w-0 truncate", mono && "font-mono text-xs")}>
+          {label}
+        </span>
         {state === "running" && (
           <span className={cn(hook.toolState, "flex shrink-0")}>
             <Spinner role="img" aria-label="running" className="size-3.5" />
@@ -261,14 +347,21 @@ function ToolRow({
         {(state === "error" || state === "interrupted") && (
           <CircleAlertIcon
             aria-label={state}
-            className={cn(hook.toolState, "size-3.5 shrink-0", state === "error" ? "text-destructive" : "text-subtle-foreground")}
+            className={cn(
+              hook.toolState,
+              "size-3.5 shrink-0",
+              state === "error" ? "text-destructive" : "text-subtle-foreground",
+            )}
           />
         )}
-        <ChevronRightIcon
-          className="size-3 shrink-0 opacity-0 transition-transform group-open/tool:rotate-90 group-open/tool:opacity-100 group-hover/tool:opacity-100"
-        />
+        <ChevronRightIcon className="size-3 shrink-0 opacity-0 transition-transform group-open/tool:rotate-90 group-open/tool:opacity-100 group-hover/tool:opacity-100" />
       </summary>
-      <div className={cn(hook.toolBody, "mt-1 mb-1.5 ml-5.5 overflow-hidden rounded-lg border border-card-border bg-card")}>
+      <div
+        className={cn(
+          hook.toolBody,
+          "mt-1 mb-1.5 ml-5.5 overflow-hidden rounded-lg border border-card-border bg-card",
+        )}
+      >
         <pre className={cn(block, "px-2.5 py-2 text-foreground-3")}>{body}</pre>
         {part.result !== undefined && (
           <pre
@@ -294,14 +387,28 @@ function ToolRow({
 }
 
 /** Completed tool calls of a running turn, collapsed to "Ran N commands ›" (39). */
-function ToolGroup({ tools, nesting, onToggle }: { tools: Indexed[]; nesting: Nesting; onToggle: (index: number, open: boolean) => void }) {
+function ToolGroup({
+  tools,
+  nesting,
+  onToggle,
+}: {
+  tools: Indexed[];
+  nesting: Nesting;
+  onToggle: (index: number, open: boolean) => void;
+}) {
   const { expandWork } = useChatBehavior();
   const [open, setOpen] = useForcedOpen(expandWork);
   return (
     <Collapsible asChild open={open} onOpenChange={setOpen}>
       <div className="group/tools m-0">
         <CollapsibleTrigger asChild>
-          <button type="button" className={cn(DISCLOSURE, "text-base leading-5.25 text-muted-foreground hover:text-foreground-3")}>
+          <button
+            type="button"
+            className={cn(
+              DISCLOSURE,
+              "text-base leading-5.25 text-muted-foreground hover:text-foreground-3",
+            )}
+          >
             {toolCount(tools.length)}
             <ChevronRightIcon className="size-3 transition-transform group-data-[state=open]/tools:rotate-90" />
           </button>
@@ -309,7 +416,13 @@ function ToolGroup({ tools, nesting, onToggle }: { tools: Indexed[]; nesting: Ne
         <CollapsibleContent asChild>
           <div className="flex flex-col pt-1.5">
             {tools.map(({ part, index }) => (
-              <ToolRow key={index} part={part} nesting={nesting} onToggle={(next) => onToggle(index, next)} onToggleChild={onToggle} />
+              <ToolRow
+                key={index}
+                part={part}
+                nesting={nesting}
+                onToggle={(next) => onToggle(index, next)}
+                onToggleChild={onToggle}
+              />
             ))}
           </div>
         </CollapsibleContent>
@@ -320,19 +433,34 @@ function ToolGroup({ tools, nesting, onToggle }: { tools: Indexed[]; nesting: Ne
 
 /** The step a running turn is on: "Editing the canvas" with a shimmer-free pulse (39). */
 function LiveStep({ part, nesting }: { part: ChatPart; nesting: Nesting }) {
-  const child = (part.id && nesting.children.get(part.id)?.findLast(({ part: p }) => p.kind === "tool" && (p.state ?? "running") === "running")?.part) || null;
+  const child =
+    (part.id &&
+      nesting.children
+        .get(part.id)
+        ?.findLast(({ part: p }) => p.kind === "tool" && (p.state ?? "running") === "running")
+        ?.part) ||
+    null;
   const { Icon, live } = describeTool(child ?? part);
   return (
-    <p className={cn("flex min-w-0 items-center gap-2 text-base leading-5.25 text-muted-foreground")}>
+    <p
+      className={cn("flex min-w-0 items-center gap-2 text-base leading-5.25 text-muted-foreground")}
+    >
       <Icon className="size-3.5 shrink-0" />
       <span className="min-w-0 animate-pulse truncate">{live}</span>
     </p>
   );
 }
 
-function PermissionCard({ part, onAnswer }: { part: ChatPart; onAnswer: (allow: boolean, always?: boolean) => void }) {
+function PermissionCard({
+  part,
+  onAnswer,
+}: {
+  part: ChatPart;
+  onAnswer: (allow: boolean, always?: boolean) => void;
+}) {
   const args = input(part);
-  const detail = typeof args.command === "string" ? args.command : pretty(part.input).slice(0, 2000);
+  const detail =
+    typeof args.command === "string" ? args.command : pretty(part.input).slice(0, 2000);
   return (
     <div className={cn(hook.permission, stateHook(part.state))}>
       <Card>
@@ -344,7 +472,9 @@ function PermissionCard({ part, onAnswer }: { part: ChatPart; onAnswer: (allow: 
             </span>
           </CardDescription>
           <CardTitle>
-            <span className="block text-base leading-5.25 font-normal break-words">Allow {part.title || part.toolName}?</span>
+            <span className="block text-base leading-5.25 font-normal break-words">
+              Allow {part.title || part.toolName}?
+            </span>
           </CardTitle>
         </CardHeader>
         {detail && detail !== "{}" && (
@@ -381,9 +511,16 @@ function PermissionCard({ part, onAnswer }: { part: ChatPart; onAnswer: (allow: 
 function PermissionRow({ part }: { part: ChatPart }) {
   const allowed = part.state === "allowed";
   const Icon = allowed ? ShieldCheckIcon : ShieldXIcon;
-  const verb = { allowed: "Allowed", denied: "Denied", expired: "Expired" }[part.state ?? ""] ?? part.state;
+  const verb =
+    { allowed: "Allowed", denied: "Denied", expired: "Expired" }[part.state ?? ""] ?? part.state;
   return (
-    <p className={cn(hook.permission, stateHook(part.state), "flex h-6 min-w-0 items-center gap-2 text-sm text-muted-foreground")}>
+    <p
+      className={cn(
+        hook.permission,
+        stateHook(part.state),
+        "flex h-6 min-w-0 items-center gap-2 text-sm text-muted-foreground",
+      )}
+    >
       <Icon className="size-3.5 shrink-0" />
       <span className="min-w-0 truncate">
         {verb}: {part.title || part.toolName}
@@ -395,7 +532,12 @@ function PermissionRow({ part }: { part: ChatPart }) {
 /** Autonomy summary of a run and the runtime's automatic decisions (desktop/agent-autonomy.cjs). */
 function NoticeRow({ part }: { part: ChatPart }) {
   const decision = (part as ChatPart & { decision?: string }).decision;
-  const Icon = part.kind === "autonomy" || decision === "limit" ? GaugeIcon : decision === "allow" ? ShieldCheckIcon : ShieldOffIcon;
+  const Icon =
+    part.kind === "autonomy" || decision === "limit"
+      ? GaugeIcon
+      : decision === "allow"
+        ? ShieldCheckIcon
+        : ShieldOffIcon;
   return (
     <div
       data-chat-notice={part.kind}
@@ -406,7 +548,9 @@ function NoticeRow({ part }: { part: ChatPart }) {
       )}
     >
       <Icon className="mt-px size-3.5 shrink-0" />
-      <span className="min-w-0 break-words">{part.kind === "autonomy" ? `Autonomy: ${part.text}` : part.text}</span>
+      <span className="min-w-0 break-words">
+        {part.kind === "autonomy" ? `Autonomy: ${part.text}` : part.text}
+      </span>
     </div>
   );
 }
@@ -434,7 +578,15 @@ const STATE_NOTE: Record<string, string> = {
 
 /* ---------- Per-message actions (hover / focus-within; absolutely placed, so no layout shift) ---------- */
 
-function ActionButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
+function ActionButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
     <ChatTip label={label} side="bottom">
       <ChatIconButton size="xs" aria-label={label} onClick={onClick}>
@@ -446,7 +598,9 @@ function ActionButton({ label, onClick, children }: { label: string; onClick: ()
 
 /** Text of a message for the clipboard: the visible reply, not tool output. */
 function messageText(message: ChatMessage) {
-  const parts = (message.parts ?? []).filter((p) => p.kind === "text" && p.text?.trim()).map((p) => p.text!.trim());
+  const parts = (message.parts ?? [])
+    .filter((p) => p.kind === "text" && p.text?.trim())
+    .map((p) => p.text!.trim());
   return parts.length ? parts.join("\n\n") : message.text;
 }
 
@@ -518,16 +672,28 @@ function ActionBar({ className, children }: { className?: string; children: Reac
 
 function ForkButton({ index }: { index: number }) {
   return (
-    <ActionButton label="Continue from here (forks the transcript; files are not reverted)" onClick={() => workspace()?.forkAt(index)}>
+    <ActionButton
+      label="Continue from here (forks the transcript; files are not reverted)"
+      onClick={() => workspace()?.forkAt(index)}
+    >
       <GitBranchIcon className="size-3.5" />
     </ActionButton>
   );
 }
 
 // Context chip inside a user bubble (37): bordered, on the bubble's fill.
-const USER_CHIP = "flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border px-2 text-foreground-2";
+const USER_CHIP =
+  "flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border px-2 text-foreground-2";
 
-function EditBox({ initial, onCancel, onSave }: { initial: string; onCancel: () => void; onSave: (text: string) => void }) {
+function EditBox({
+  initial,
+  onCancel,
+  onSave,
+}: {
+  initial: string;
+  onCancel: () => void;
+  onSave: (text: string) => void;
+}) {
   const [value, setValue] = useState(initial);
   const ref = useRef<HTMLTextAreaElement>(null);
   useEffect(() => {
@@ -571,7 +737,15 @@ function EditBox({ initial, onCancel, onSave }: { initial: string; onCancel: () 
   );
 }
 
-function UserMessage({ message, index, busy }: { message: ChatMessage; index: number; busy: boolean }) {
+function UserMessage({
+  message,
+  index,
+  busy,
+}: {
+  message: ChatMessage;
+  index: number;
+  busy: boolean;
+}) {
   const ws = workspace();
   const [editing, setEditing] = useState(false);
   const editButton = useRef<HTMLSpanElement>(null);
@@ -583,10 +757,20 @@ function UserMessage({ message, index, busy }: { message: ChatMessage; index: nu
   // The Preview's setup request is an app action, not typed text: logo + purple label, no context chips (PS2).
   const setupRequest = message.text === PREVIEW_SETUP_REQUEST && !editing;
   return (
-    <article className={cn(hook.userMessage, "group/msg relative m-0 flex w-full max-w-none flex-col items-end rounded-none border-0 bg-transparent p-0 text-base leading-5.25 text-foreground")}>
-      <div className={cn("relative max-w-full rounded-2xl bg-input px-3 py-2", editing && "w-full")}>
+    <article
+      className={cn(
+        hook.userMessage,
+        "group/msg relative m-0 flex w-full max-w-none flex-col items-end rounded-none border-0 bg-transparent p-0 text-base leading-5.25 text-foreground",
+      )}
+    >
+      <div
+        className={cn("relative max-w-full rounded-2xl bg-input px-3 py-2", editing && "w-full")}
+      >
         {setupRequest ? (
-          <div data-preview-request className={cn(hook.messageContent, "flex items-center gap-1.5 text-preview-request")}>
+          <div
+            data-preview-request
+            className={cn(hook.messageContent, "flex items-center gap-1.5 text-preview-request")}
+          >
             <LogoIcon className="size-3.5 shrink-0" />
             {message.text}
           </div>
@@ -600,8 +784,16 @@ function UserMessage({ message, index, busy }: { message: ChatMessage; index: nu
               </span>
             )}
             {mentions.map((mention) => (
-              <span key={mention.id} className={cn(hook.mention, USER_CHIP)} title={mention.type ? `${mention.label} (${mention.type})` : mention.label}>
-                {mention.type ? <MentionIcon type={mention.type} /> : <CircleDotIcon className="size-3.5 shrink-0 text-muted-foreground" />}
+              <span
+                key={mention.id}
+                className={cn(hook.mention, USER_CHIP)}
+                title={mention.type ? `${mention.label} (${mention.type})` : mention.label}
+              >
+                {mention.type ? (
+                  <MentionIcon type={mention.type} />
+                ) : (
+                  <CircleDotIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                )}
                 <span className="truncate">{mention.label}</span>
               </span>
             ))}
@@ -623,7 +815,9 @@ function UserMessage({ message, index, busy }: { message: ChatMessage; index: nu
             }}
           />
         ) : (
-          <div className={cn(hook.messageContent, "break-words whitespace-pre-wrap")}>{message.text}</div>
+          <div className={cn(hook.messageContent, "break-words whitespace-pre-wrap")}>
+            {message.text}
+          </div>
         )}
         {!busy && !editing && (
           // Fork stays the first button of a user message (tests/agent-chat.cjs clicks `.chat-message.user button`).
@@ -661,7 +855,8 @@ function runningBlocks(parts: ChatPart[], nesting: Nesting): Block[] {
   parts.forEach((part, index) => {
     if (nesting.nested.has(index)) return;
     const key = `${index}-${part.kind}`;
-    if (part.kind === "text" && part.text?.trim()) blocks.push({ type: "text", key, text: part.text });
+    if (part.kind === "text" && part.text?.trim())
+      blocks.push({ type: "text", key, text: part.text });
     else if (part.kind === "tool") {
       let last = blocks.at(-1);
       if (last?.type !== "tools") {
@@ -671,11 +866,14 @@ function runningBlocks(parts: ChatPart[], nesting: Nesting): Block[] {
       if (part.state === "running") last.live = { part, index };
       else last.done.push({ part, index });
       if (savedPreview(part)) blocks.push({ type: "preview", key: `${key}-preview`, part });
-    } else if (part.kind === "permission") blocks.push({ type: "permission", key, item: { part, index } });
-    else if (part.kind === "question") blocks.push({ type: "question", key, item: { part, index } });
+    } else if (part.kind === "permission")
+      blocks.push({ type: "permission", key, item: { part, index } });
+    else if (part.kind === "question")
+      blocks.push({ type: "question", key, item: { part, index } });
     else if (part.kind === "error") blocks.push({ type: "error", key, text: part.text });
     else if (part.kind === "auth") blocks.push({ type: "auth", key, item: { part, index } });
-    else if ((part.kind === "autonomy" && part.text) || part.kind === "policy") blocks.push({ type: "notice", key, part });
+    else if ((part.kind === "autonomy" && part.text) || part.kind === "policy")
+      blocks.push({ type: "notice", key, part });
   });
   return blocks;
 }
@@ -689,18 +887,25 @@ function artboardLinks(parts: ChatPart[]): { url: string; name?: string }[] {
     try {
       const parsed = JSON.parse(part.result) as Record<string, unknown>;
       if (typeof parsed.name === "string") name = parsed.name;
-      if (typeof parsed.designLink === "string" && /^verynize:\/\//i.test(parsed.designLink)) out.set(parsed.designLink, name);
+      if (typeof parsed.designLink === "string" && /^verynize:\/\//i.test(parsed.designLink))
+        out.set(parsed.designLink, name);
     } catch {
       // Plain-text result: fall through to the URL scan.
     }
-    for (const match of part.result.matchAll(/verynize:\/\/[^\s"'<>()`\]]+/gi)) if (!out.has(match[0])) out.set(match[0], name);
+    for (const match of part.result.matchAll(/verynize:\/\/[^\s"'<>()`\]]+/gi))
+      if (!out.has(match[0])) out.set(match[0], name);
   }
   return [...out].map(([url, name]) => ({ url, name }));
 }
 
 function ArtboardPill({ url, name }: { url: string; name?: string }) {
   return (
-    <ChatPillButton hook={hook.artboardLink} title={url} onClick={() => openAppLink(url)} className="max-w-full self-start">
+    <ChatPillButton
+      hook={hook.artboardLink}
+      title={url}
+      onClick={() => openAppLink(url)}
+      className="max-w-full self-start"
+    >
       <FrameIcon className="size-3.5 shrink-0 text-primary-text" />
       <span className="truncate">{name ? `Open ${name}` : "Open artboard"}</span>
     </ChatPillButton>
@@ -726,8 +931,13 @@ function AssistantMessage({
   const nesting = nestTools(parts);
   const toggle = (partIndex: number, open: boolean) => ws?.setPartOpen(index, partIndex, open);
   const answer = (partIndex: number, allow: boolean, always?: boolean) =>
-    always ? ws?.answerPermission(index, partIndex, allow, true) : ws?.answerPermission(index, partIndex, allow);
-  const answerQuestion = ws?.answerQuestion ? (partIndex: number) => (answers: Record<string, string>) => ws.answerQuestion?.(index, partIndex, answers) : null;
+    always
+      ? ws?.answerPermission(index, partIndex, allow, true)
+      : ws?.answerPermission(index, partIndex, allow);
+  const answerQuestion = ws?.answerQuestion
+    ? (partIndex: number) => (answers: Record<string, string>) =>
+        ws.answerQuestion?.(index, partIndex, answers)
+    : null;
   const question = (part: ChatPart, partIndex: number, key: string | number) => (
     <QuestionCard key={key} part={part} onSubmit={answerQuestion?.(partIndex)} />
   );
@@ -739,16 +949,21 @@ function AssistantMessage({
     content = (
       <>
         <TurnHeader live label={`Wondering for ${seconds(message.at, now)}s`}>
-          {thinking.length ? thinking.map((part, i) => <ThinkingText key={i} text={part.text} />) : undefined}
+          {thinking.length
+            ? thinking.map((part, i) => <ThinkingText key={i} text={part.text} />)
+            : undefined}
         </TurnHeader>
         {blocks.length === 0 && <p className="text-muted-foreground">Thinking</p>}
         {blocks.map((block) => {
           if (block.type === "text") return <Markdown key={block.key} text={block.text} />;
           if (block.type === "error") return <ErrorRow key={block.key} text={block.text} />;
-          if (block.type === "auth") return <AuthCard key={block.key} part={block.item.part} index={index} busy={busy} />;
+          if (block.type === "auth")
+            return <AuthCard key={block.key} part={block.item.part} index={index} busy={busy} />;
           if (block.type === "notice") return <NoticeRow key={block.key} part={block.part} />;
-          if (block.type === "preview") return <PreviewSavedCard key={block.key} part={block.part} />;
-          if (block.type === "question") return question(block.item.part, block.item.index, block.key);
+          if (block.type === "preview")
+            return <PreviewSavedCard key={block.key} part={block.part} />;
+          if (block.type === "question")
+            return question(block.item.part, block.item.index, block.key);
           if (block.type === "permission")
             return block.item.part.state === "pending" ? (
               <PermissionCard
@@ -761,7 +976,9 @@ function AssistantMessage({
             );
           return (
             <div key={block.key} className="flex flex-col gap-3">
-              {block.done.length > 0 && <ToolGroup tools={block.done} nesting={nesting} onToggle={toggle} />}
+              {block.done.length > 0 && (
+                <ToolGroup tools={block.done} nesting={nesting} onToggle={toggle} />
+              )}
               {block.live && <LiveStep part={block.live.part} nesting={nesting} />}
             </div>
           );
@@ -775,7 +992,13 @@ function AssistantMessage({
       if (part.kind === "thinking") return [<ThinkingText key={partIndex} text={part.text} />];
       if (part.kind === "tool")
         return [
-          <ToolRow key={partIndex} part={part} nesting={nesting} onToggle={(open) => toggle(partIndex, open)} onToggleChild={toggle} />,
+          <ToolRow
+            key={partIndex}
+            part={part}
+            nesting={nesting}
+            onToggle={(open) => toggle(partIndex, open)}
+            onToggleChild={toggle}
+          />,
         ];
       if (part.kind === "permission") return [<PermissionRow key={partIndex} part={part} />];
       if (part.kind === "policy" && (part as ChatPart & { decision?: string }).decision !== "limit")
@@ -784,7 +1007,11 @@ function AssistantMessage({
     });
     const tools = parts.filter((p) => p.kind === "tool").length;
     const timed = message.at && message.end;
-    const label = timed ? `Wondered for ${seconds(message.at, message.end)}s` : tools ? toolCount(tools) : "Thought";
+    const label = timed
+      ? `Wondered for ${seconds(message.at, message.end)}s`
+      : tools
+        ? toolCount(tools)
+        : "Thought";
     const answerParts = parts
       .map((part, partIndex) => ({ part, index: partIndex }))
       .filter(
@@ -799,10 +1026,16 @@ function AssistantMessage({
       );
     content = (
       <>
-        {(work.length > 0 || (timed && parts.some((p) => p.kind !== "auth"))) && <TurnHeader label={label}>{work.length ? work : undefined}</TurnHeader>}
+        {(work.length > 0 || (timed && parts.some((p) => p.kind !== "auth"))) && (
+          <TurnHeader label={label}>{work.length ? work : undefined}</TurnHeader>
+        )}
         {parts.length === 0 &&
           message.text &&
-          (message.state === "error" ? <ErrorRow text={message.text} /> : <Markdown text={message.text} />)}
+          (message.state === "error" ? (
+            <ErrorRow text={message.text} />
+          ) : (
+            <Markdown text={message.text} />
+          ))}
         {answerParts.map(({ part, index: partIndex }) =>
           part.kind === "error" ? (
             <ErrorRow key={partIndex} text={part.text} />
@@ -845,8 +1078,14 @@ function AssistantMessage({
           ))}
         </div>
       )}
-      {message.state && STATE_NOTE[message.state] && !parts.some((p) => p.kind === "auth") && <p className="text-sm text-subtle-foreground">{STATE_NOTE[message.state]}</p>}
-      {usage && <p className={cn(hook.usage, "self-end text-xs text-subtle-foreground tabular-nums")}>{usage}</p>}
+      {message.state && STATE_NOTE[message.state] && !parts.some((p) => p.kind === "auth") && (
+        <p className="text-sm text-subtle-foreground">{STATE_NOTE[message.state]}</p>
+      )}
+      {usage && (
+        <p className={cn(hook.usage, "self-end text-xs text-subtle-foreground tabular-nums")}>
+          {usage}
+        </p>
+      )}
       {!busy && (
         <ActionBar className="left-0">
           <ForkButton index={index} />
@@ -878,7 +1117,10 @@ function pickSuggestions(suggestions: Suggestion[], seed: string | null): Sugges
   let hash = 0;
   for (const char of seed ?? "") hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   const start = hash % suggestions.length;
-  return Array.from({ length: SHOWN_SUGGESTIONS }, (_, i) => suggestions[(start + i) % suggestions.length]);
+  return Array.from(
+    { length: SHOWN_SUGGESTIONS },
+    (_, i) => suggestions[(start + i) % suggestions.length],
+  );
 }
 
 /** Empty chat (34, 35): logo + prompt, with a few of the workspace's starter briefs as cards that fill the composer. */
@@ -895,14 +1137,26 @@ function EmptyState({ suggestions, seed }: { suggestions: Suggestion[]; seed: st
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 pt-42 text-center">
       <LogoIcon className="size-7 text-muted-foreground" />
-      <p className="text-base leading-5.25 font-medium text-foreground">What would you like to work on?</p>
+      <p className="text-base leading-5.25 font-medium text-foreground">
+        What would you like to work on?
+      </p>
       {suggestions.length > 0 && (
-        <ul aria-label="Suggestions" className="m-0 mt-3 grid w-full max-w-100 list-none grid-cols-2 gap-1.5 p-0">
+        <ul
+          aria-label="Suggestions"
+          className="m-0 mt-3 grid w-full max-w-100 list-none grid-cols-2 gap-1.5 p-0"
+        >
           {pickSuggestions(suggestions, seed).map((item) => (
             <li key={item.title} data-suggestion={item.title} className="flex">
-              <ChatSuggestionButton hook={hook.suggestion} title={item.prompt} onClick={() => fill(item)} className="w-full">
+              <ChatSuggestionButton
+                hook={hook.suggestion}
+                title={item.prompt}
+                onClick={() => fill(item)}
+                className="w-full"
+              >
                 <span className="w-full truncate text-sm text-foreground-2">{item.title}</span>
-                <span className="line-clamp-2 text-xs leading-4 text-muted-foreground">{item.prompt}</span>
+                <span className="line-clamp-2 text-xs leading-4 text-muted-foreground">
+                  {item.prompt}
+                </span>
               </ChatSuggestionButton>
             </li>
           ))}
@@ -954,7 +1208,8 @@ export function Transcript({ state }: { state: ChatState }) {
       ref={scroller}
       onClick={(event) => {
         // Expanding a row is reading, not following: keep the row where it is instead of jumping to the bottom.
-        if ((event.target as HTMLElement).closest("summary, [data-slot=collapsible-trigger]")) pinned.current = false;
+        if ((event.target as HTMLElement).closest("summary, [data-slot=collapsible-trigger]"))
+          pinned.current = false;
       }}
       onScroll={(event) => {
         const el = event.currentTarget;
@@ -963,7 +1218,10 @@ export function Transcript({ state }: { state: ChatState }) {
         else if (el.scrollTop < lastTop.current - 1) pinned.current = false;
         lastTop.current = el.scrollTop;
       }}
-      className={cn(hook.scroll, "flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 pr-4 pb-6 pl-6")}
+      className={cn(
+        hook.scroll,
+        "flex min-h-0 flex-1 flex-col overflow-y-auto pt-4 pr-4 pb-6 pl-6",
+      )}
     >
       <div ref={sessionSlot} className="contents" />
       {/* `--chat-column` is set by hosts with a centered column (Code workspace, 770px); unset in the dock. */}

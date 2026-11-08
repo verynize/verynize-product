@@ -15,27 +15,96 @@ const { createWebServer } = await import("../../../../web-start/node/server.mjs"
 const out = path.dirname(fileURLToPath(import.meta.url));
 const temp = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-url-proof-"));
 const backend = new NodeCloud(await cloudOptions(path.join(temp, "state")));
-const web = await createWebServer({ dist: path.resolve("dist/web-node"), backend: (await backend.ready).origin });
+const web = await createWebServer({
+  dist: path.resolve("dist/web-node"),
+  backend: (await backend.ready).origin,
+});
 await new Promise((resolve) => web.listen(0, "127.0.0.1", resolve));
 const origin = `http://127.0.0.1:${web.address().port}`;
 const token = await passwordUser(origin, "demo@example.test", "Demo");
-const me = await (await fetch(origin + "/api/me", { headers: { "x-verynize-session": token } })).json();
+const me = await (
+  await fetch(origin + "/api/me", { headers: { "x-verynize-session": token } })
+).json();
 const browser = await launchBrowser();
 const urls = {};
 try {
-  const context = await signedInContext(browser, origin, { session: token, ...me }, { viewport: { width: 1440, height: 870 }, deviceScaleFactor: 2 });
+  const context = await signedInContext(
+    browser,
+    origin,
+    { session: token, ...me },
+    { viewport: { width: 1440, height: 870 }, deviceScaleFactor: 2 },
+  );
   const page = await context.newPage();
-  const ready = () => page.waitForFunction(() => document.documentElement.dataset.uiReady === "true" && window.shellRouter?.state.status === "idle", null, { timeout: 30000 });
+  const ready = () =>
+    page.waitForFunction(
+      () =>
+        document.documentElement.dataset.uiReady === "true" &&
+        window.shellRouter?.state.status === "idle",
+      null,
+      { timeout: 30000 },
+    );
   page.on("pageerror", (e) => console.log("pageerror", e.message));
   await page.goto(origin + "/editor");
-  try { await ready(); } catch (e) { console.log(await page.evaluate(() => JSON.stringify({ ds: document.documentElement.dataset, path: location.pathname, st: window.shellRouter?.state.status, text: document.body.innerText.slice(0, 300) }))); throw e; }
+  try {
+    await ready();
+  } catch (e) {
+    console.log(
+      await page.evaluate(() =>
+        JSON.stringify({
+          ds: document.documentElement.dataset,
+          path: location.pathname,
+          st: window.shellRouter?.state.status,
+          text: document.body.innerText.slice(0, 300),
+        }),
+      ),
+    );
+    throw e;
+  }
   const ids = await page.evaluate(async () => {
     const base = window.design.getDocument();
-    const mk = (name, title, color) => ({ ...structuredClone(base), name, pages: [{ id: "p1", name: "Desktop", background: "#F5F3EE", nodes: [
-      { id: "t1", type: "text", name: "Heading", x: 120, y: 120, w: 620, h: 120, text: title, fontSize: 56, color: "#111111" },
-      { id: "r1", type: "rectangle", name: "Card", x: 120, y: 300, w: 420, h: 300, fill: color, radius: 24 }] }], activePage: "p1" });
-    const a = await window.fileLibrary.createFromDocument(mk("Sample A", "Sample A design", "#9B7FE0"));
-    const b = await window.fileLibrary.createFromDocument(mk("Sample B", "Sample B design", "#E0A23B"));
+    const mk = (name, title, color) => ({
+      ...structuredClone(base),
+      name,
+      pages: [
+        {
+          id: "p1",
+          name: "Desktop",
+          background: "#F5F3EE",
+          nodes: [
+            {
+              id: "t1",
+              type: "text",
+              name: "Heading",
+              x: 120,
+              y: 120,
+              w: 620,
+              h: 120,
+              text: title,
+              fontSize: 56,
+              color: "#111111",
+            },
+            {
+              id: "r1",
+              type: "rectangle",
+              name: "Card",
+              x: 120,
+              y: 300,
+              w: 420,
+              h: 300,
+              fill: color,
+              radius: 24,
+            },
+          ],
+        },
+      ],
+      activePage: "p1",
+    });
+    const a = await window.fileLibrary.createFromDocument(
+      mk("Sample A", "Sample A design", "#9B7FE0"),
+    );
+    const b = await window.fileLibrary.createFromDocument(
+      mk("Sample B", "Sample B design", "#E0A23B"),
+    );
     await window.fileLibrary.open(a);
     return { a, b };
   });

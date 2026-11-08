@@ -263,7 +263,8 @@ function previewDom(options) {
       document.getElementById("verynize-edit-style")?.remove();
       const style = document.createElement("style");
       style.id = "verynize-edit-style";
-      style.textContent = "[data-verynize-editing]{outline:none!important}[data-verynize-editing]::selection{background:rgba(162,69,211,.3)}";
+      style.textContent =
+        "[data-verynize-editing]{outline:none!important}[data-verynize-editing]::selection{background:rgba(162,69,211,.3)}";
       (document.head || document.documentElement).append(style);
       el.focus({ preventScroll: true });
       const range =

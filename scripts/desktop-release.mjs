@@ -45,10 +45,11 @@ async function main() {
   for (const asset of ["ui.js", "ui.css", "telemetry.js"])
     await fs.access(path.join(app, "Contents/Resources/app/web/dist", asset));
   execFileSync("/usr/bin/codesign", ["--verify", "--deep", "--strict", app], { stdio: "inherit" });
+  // Input file first: the lipo in Xcode 16 rejects `-verify_arch <arch> <file>`.
   execFileSync("/usr/bin/lipo", [
+    path.join(app, "Contents/MacOS/Electron"),
     "-verify_arch",
     process.arch === "x64" ? "x86_64" : "arm64",
-    path.join(app, "Contents/MacOS/Electron"),
   ]);
   const out = path.join(root, "dist/releases");
   await fs.mkdir(out, { recursive: true });

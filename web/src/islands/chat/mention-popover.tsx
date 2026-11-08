@@ -2,7 +2,15 @@
 // turns the token into a mention chip (workspace.addMention). Listens on the adopted #project-prompt directly, in the
 // capture phase, so Enter/Escape never reach the legacy handlers while the list is open.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BoxIcon, FrameIcon, ImageIcon, SparklesIcon, SquareIcon, TargetIcon, TypeIcon } from "lucide-react";
+import {
+  BoxIcon,
+  FrameIcon,
+  ImageIcon,
+  SparklesIcon,
+  SquareIcon,
+  TargetIcon,
+  TypeIcon,
+} from "lucide-react";
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
 import { legacySet } from "@/lib/bridge";
 import { cn } from "@/lib/utils";
@@ -13,8 +21,20 @@ const TOKEN = /(?:^|\s)@([^\s@]{0,40})$/;
 
 export function MentionIcon({ type, className }: { type?: string; className?: string }) {
   // A DOM element picked in a live preview's Edit mode (Wonder PM5): purple target.
-  if (type === "element") return <TargetIcon className={cn("size-3.5 shrink-0 text-primary-text", className)} />;
-  const Icon = type === "frame" ? FrameIcon : type === "text" ? TypeIcon : type === "image" ? ImageIcon : type === "shader" ? SparklesIcon : type === "rectangle" ? SquareIcon : BoxIcon;
+  if (type === "element")
+    return <TargetIcon className={cn("size-3.5 shrink-0 text-primary-text", className)} />;
+  const Icon =
+    type === "frame"
+      ? FrameIcon
+      : type === "text"
+        ? TypeIcon
+        : type === "image"
+          ? ImageIcon
+          : type === "shader"
+            ? SparklesIcon
+            : type === "rectangle"
+              ? SquareIcon
+              : BoxIcon;
   return <Icon className={cn("size-3.5 shrink-0 text-muted-foreground", className)} />;
 }
 
@@ -43,7 +63,10 @@ export function MentionPopover() {
       // Feature-detected per keystroke: the workspace may gain searchElements after mount.
       if (!workspace()?.searchElements) return close();
       const caret = prompt.selectionStart ?? prompt.value.length;
-      const found = prompt.selectionStart === prompt.selectionEnd ? prompt.value.slice(0, caret).match(TOKEN) : null;
+      const found =
+        prompt.selectionStart === prompt.selectionEnd
+          ? prompt.value.slice(0, caret).match(TOKEN)
+          : null;
       if (!found) {
         dismissed.current = null;
         return close();
@@ -105,17 +128,26 @@ export function MentionPopover() {
       prompt.removeEventListener("keydown", onKey, true);
       prompt.removeEventListener("blur", close);
       prompt.removeEventListener("bd-mention-pick", onPick);
-      for (const name of ["aria-haspopup", "aria-controls", "aria-expanded", "aria-activedescendant"]) prompt.removeAttribute(name);
+      for (const name of [
+        "aria-haspopup",
+        "aria-controls",
+        "aria-expanded",
+        "aria-activedescendant",
+      ])
+        prompt.removeAttribute(name);
     };
   }, []);
 
   useEffect(() => {
     const prompt = document.getElementById("project-prompt");
-    if (match && items[active]) prompt?.setAttribute("aria-activedescendant", `bd-mention-${active}`);
+    if (match && items[active])
+      prompt?.setAttribute("aria-activedescendant", `bd-mention-${active}`);
   }, [match, items, active]);
 
   const pick = (item: ChatMention) =>
-    document.getElementById("project-prompt")?.dispatchEvent(new CustomEvent("bd-mention-pick", { detail: item }));
+    document
+      .getElementById("project-prompt")
+      ?.dispatchEvent(new CustomEvent("bd-mention-pick", { detail: item }));
   // shadcn Popover anchored to the composer's top edge. Focus stays in the prompt (aria-activedescendant); Escape,
   // outside clicks and blur are handled by the prompt listeners above, so the popover's own dismissal is disabled.
   return (
@@ -137,9 +169,20 @@ export function MentionPopover() {
         >
           {/* -m-2 pulls the rows out to a 4px inset inside the popover's 12px padding, like the chat menus. */}
           <div className={cn(hook.mentionPopover, "-m-2 text-sm text-foreground-2")}>
-            <p className="flex h-6 items-center px-2 text-muted-foreground">{match.query ? `Layers matching “${match.query}”` : "Mention a layer"}</p>
-            <ul id="bd-mention-list" role="listbox" aria-label="Canvas layers" className="m-0 flex max-h-56 list-none flex-col overflow-y-auto p-0">
-              {items.length === 0 && <li className="flex h-6 items-center px-2 text-subtle-foreground">No matching layers</li>}
+            <p className="flex h-6 items-center px-2 text-muted-foreground">
+              {match.query ? `Layers matching “${match.query}”` : "Mention a layer"}
+            </p>
+            <ul
+              id="bd-mention-list"
+              role="listbox"
+              aria-label="Canvas layers"
+              className="m-0 flex max-h-56 list-none flex-col overflow-y-auto p-0"
+            >
+              {items.length === 0 && (
+                <li className="flex h-6 items-center px-2 text-subtle-foreground">
+                  No matching layers
+                </li>
+              )}
               {items.map((item, i) => (
                 <li
                   key={item.id}
@@ -149,11 +192,18 @@ export function MentionPopover() {
                   onMouseDown={(event) => event.preventDefault()}
                   onMouseMove={() => setActive(i)}
                   onClick={() => pick(item)}
-                  className={cn("flex h-6 cursor-default items-center gap-2 rounded-md px-2", i === active && "bg-muted")}
+                  className={cn(
+                    "flex h-6 cursor-default items-center gap-2 rounded-md px-2",
+                    i === active && "bg-muted",
+                  )}
                 >
                   <MentionIcon type={item.type} />
                   <span className="min-w-0 truncate">{item.label}</span>
-                  {item.type && <span className="ml-auto shrink-0 text-xs text-subtle-foreground capitalize">{item.type}</span>}
+                  {item.type && (
+                    <span className="ml-auto shrink-0 text-xs text-subtle-foreground capitalize">
+                      {item.type}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

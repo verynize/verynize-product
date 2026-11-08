@@ -30,7 +30,11 @@ const LANES = ["node", "electron", "cloud", "serial"];
 // ---------------------------------------------------------------- arguments
 
 function parseArgs(argv) {
-  const opts = { lanes: [], groups: [], mode: null };
+  const opts = {
+    lanes: /** @type {string[]} */ ([]),
+    groups: /** @type {string[]} */ ([]),
+    mode: null,
+  };
   const value = (i, name) => {
     if (i >= argv.length || argv[i].startsWith("--")) fail(`${name} needs a value`);
     return argv[i];
@@ -550,7 +554,7 @@ export function runProcess(command, args, { env, timeoutMs, cwd = ROOT }) {
     const kill = (signal) => {
       try {
         if (process.platform === "win32") child.kill(signal);
-        else process.kill(-child.pid, signal);
+        else if (child.pid !== undefined) process.kill(-child.pid, signal);
       } catch {}
       if (signal === "SIGKILL") sweep();
     };
@@ -692,7 +696,7 @@ async function runAll(selected, opts, env) {
         active.set(entry.id, entry);
         entry.locks.forEach((lock) => locks.add(lock));
         const [command, ...args] = argv(entry);
-        (entry.lane === "electron" ? runElectron : runProcess)(command, args, {
+        void (entry.lane === "electron" ? runElectron : runProcess)(command, args, {
           env: { ...env, ...entry.env },
           timeoutMs: entry.timeoutMs,
         }).then((run) => {

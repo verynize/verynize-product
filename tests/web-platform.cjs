@@ -157,7 +157,8 @@ async function openBrowser(url) {
     // No window controls on the web: the title bar starts at the 8px edge gap, and there is no repositories sidebar.
     const chrome = await page.evaluate(() => ({
       platform: document.documentElement.dataset.platform,
-      inset: getComputedStyle(document.querySelector('[data-chrome-bar][role="banner"]')).paddingLeft,
+      inset: getComputedStyle(document.querySelector('[data-chrome-bar][role="banner"]'))
+        .paddingLeft,
       sidebar: !!document.getElementById("chrome-sidebar"),
     }));
     assert.deepEqual(chrome, { platform: "web", inset: "8px", sidebar: false });
@@ -169,16 +170,21 @@ async function openBrowser(url) {
         await window.fileLibrary.createFromDocument(doc);
       }, name);
     const tabNames = () =>
-      page.locator("[data-file-tab]:visible").evaluateAll((tabs) =>
-        tabs.map((tab) => tab.querySelector("input")?.value ?? tab.textContent.trim()),
-      );
+      page
+        .locator("[data-file-tab]:visible")
+        .evaluateAll((tabs) =>
+          tabs.map((tab) => tab.querySelector("input")?.value ?? tab.textContent.trim()),
+        );
     assert.deepEqual((await tabNames()).slice(-2), ["Tab two", "Tab three"]);
     await page.locator("#shell-new-file").click();
     const switcher = page.locator("#file-switcher");
     await switcher.waitFor();
     assert.equal(await switcher.locator("[data-switcher-new]").isVisible(), true, "New file row");
     assert.equal(
-      await switcher.locator('[data-switcher-section="Recents"] [data-switcher-file] [data-switcher-name]').first().innerText(),
+      await switcher
+        .locator('[data-switcher-section="Recents"] [data-switcher-file] [data-switcher-name]')
+        .first()
+        .innerText(),
       "Tab three",
       "Recents are newest first",
     );
@@ -186,7 +192,11 @@ async function openBrowser(url) {
     await page.keyboard.press("Enter");
     await switcher.waitFor({ state: "detached" });
     await page.waitForFunction(() => window.design.getDocument().name === "Tab two");
-    assert.deepEqual((await tabNames()).slice(-2), ["Tab two", "Tab three"], "opening keeps every tab");
+    assert.deepEqual(
+      (await tabNames()).slice(-2),
+      ["Tab two", "Tab three"],
+      "opening keeps every tab",
+    );
     await page.locator("[data-document-tab]").hover();
     await page.locator("[data-document-tab] [data-file-tab-close]").click();
     await page.waitForFunction(() => window.design.getDocument().name === "Tab three");

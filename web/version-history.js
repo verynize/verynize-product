@@ -66,7 +66,7 @@
     return new Promise((resolve, reject) => {
       const tx = handle.transaction(["meta", "snapshots"], mode);
       let result;
-      Promise.resolve(run(tx.objectStore("meta"), tx.objectStore("snapshots"))).then(
+      void Promise.resolve(run(tx.objectStore("meta"), tx.objectStore("snapshots"))).then(
         (value) => (result = value),
       );
       tx.oncomplete = () => resolve(result);
@@ -251,7 +251,7 @@
           { idleMs: settings.idleMs },
         ),
       );
-    persist(t, captured);
+    void persist(t, captured);
     scheduleIdle();
     changed(edits.map((edit) => edit.artboardId));
     return captured.map((entry) => entry.meta);
@@ -274,7 +274,7 @@
     const captured = V.idle(state, Date.now(), (id) => V.snapshot(doc, id), {
       idleMs: settings.idleMs,
     });
-    persist(t, captured);
+    void persist(t, captured);
     if (captured.length) changed(captured.map((entry) => entry.meta.artboardId));
     scheduleIdle();
   }

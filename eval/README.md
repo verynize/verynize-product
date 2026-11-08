@@ -2,12 +2,12 @@
 
 Tujuan: cara yang bisa diulang untuk membuktikan atau membantah bahwa taste UI hasil Verynize ≥ Wonder dan Pen. Dasar: [review kritis](../docs/audits/2026-10-29-design-quality-review.md) (Kritik 5, Tahap 6) dan [audit](../docs/audits/2026-10-29-design-quality.md) (definisi "minimal 1:1").
 
-| Tier | Apa | Biaya | Perintah |
-|---|---|---|---|
-| 1 | Fidelity codec deterministik (30 fixture: JSX dan HTML+CSS) | gratis, CI | `node eval/run-fidelity.mjs [--verbose]` |
-| 1b | Fidelity import HTML/CSS vs render Chrome asli | gratis, butuh Chrome | `node eval/run-import-fidelity.mjs [--verbose]` |
-| 2 | Checklist judge multimodal per brief | 1 panggilan CLI per gambar | `node eval/run-judge.mjs --brief <id> --image <png>` lalu `node eval/summarize.mjs` |
-| 3 | Blind pairwise + Bradley-Terry | waktu reviewer | `node eval/make-pairs.mjs` → `eval/pairwise/review.html` → `node eval/score-pairs.mjs` |
+| Tier | Apa                                                         | Biaya                      | Perintah                                                                               |
+| ---- | ----------------------------------------------------------- | -------------------------- | -------------------------------------------------------------------------------------- |
+| 1    | Fidelity codec deterministik (30 fixture: JSX dan HTML+CSS) | gratis, CI                 | `node eval/run-fidelity.mjs [--verbose]`                                               |
+| 1b   | Fidelity import HTML/CSS vs render Chrome asli              | gratis, butuh Chrome       | `node eval/run-import-fidelity.mjs [--verbose]`                                        |
+| 2    | Checklist judge multimodal per brief                        | 1 panggilan CLI per gambar | `node eval/run-judge.mjs --brief <id> --image <png>` lalu `node eval/summarize.mjs`    |
+| 3    | Blind pairwise + Bradley-Terry                              | waktu reviewer             | `node eval/make-pairs.mjs` → `eval/pairwise/review.html` → `node eval/score-pairs.mjs` |
 
 Semua import ke modul repo hanya lewat `eval/lib/adapter.mjs`. Jika API codec berubah, perbaiki di sana saja.
 
@@ -46,6 +46,7 @@ node eval/capture.mjs --brief 01-saas-dashboard --app verynize --run run-1 --htm
 ```
 
 **Verynize.** Jalankan app desktop (`npm start`), buka dokumen baru, kirim prompt di panel chat dengan model/effort yang dibekukan. Setelah selesai, ambil gambar artboard dengan salah satu cara (konsisten untuk semua run):
+
 1. Utama: pilih artboard → Export → PNG 1× → simpan → `capture.mjs --png`. Ini memakai renderer offscreen yang sama dengan `take_screenshot` MCP.
 2. Lewat MCP dari agent luar: `take_screenshot { id: <artboard>, scale: 1 }` mengembalikan PNG base64; simpan blok gambar ke file lalu `capture.mjs --png`.
 3. Cadangan headless: `npm run cli -- --root <folder-dokumen> export <NAMA> > /tmp/export.html` lalu `capture.mjs --html` (renderer `export-html.mjs` memakai mapping gaya yang sama dengan canvas, `web/node-style.js`; bedanya hanya font/lingkungan browser — tetap jangan dicampur dengan cara 1 dalam satu perbandingan).

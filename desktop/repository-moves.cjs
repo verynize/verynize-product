@@ -105,7 +105,10 @@ async function requireCommitted(root) {
 }
 
 class RepositoryMoves {
-  /** `busy(root)`: true while an agent run uses that folder or one of its worktrees. */
+  /**
+   * `busy(root)`: true while an agent run uses that folder or one of its worktrees.
+   * @param {{registry?: any, busy?: (root: string) => boolean | Promise<boolean>}} [options]
+   */
   constructor({ registry, busy = () => false } = {}) {
     if (!registry) throw Error("Repository registry required");
     this.registry = registry;

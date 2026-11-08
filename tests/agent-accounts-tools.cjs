@@ -297,7 +297,9 @@ test("tool config: servers per scope, secrets kept out of the renderer view, per
   );
   assert.deepEqual(run.servers[0].env, { API_KEY: "sk-test-123", EXTRA: "on" });
   assert.deepEqual(
-    (await config.forRun("codex", { projects: [project] })).servers.map((s) => s.name).sort(),
+    (await config.forRun("codex", { projects: [project] })).servers
+      .map((s) => s.name)
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
     ["docs", "files"],
   );
   assert.deepEqual(

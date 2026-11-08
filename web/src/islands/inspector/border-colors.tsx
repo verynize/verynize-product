@@ -12,7 +12,14 @@ import { Eye } from "lucide-react";
 import { BorderSidesIcon, ClosedEyeIcon, RemoveIcon, StrokeWeightIcon } from "@/components/icons";
 import type { DesignDocument } from "@/lib/bridge";
 import { BindableField } from "./bind";
-import { Field, IconAffix, IconButton, NativeSelect, OptionalSection, type IconType } from "./controls";
+import {
+  Field,
+  IconAffix,
+  IconButton,
+  NativeSelect,
+  OptionalSection,
+  type IconType,
+} from "./controls";
 import { EffectColorField, LineStyleMenu } from "./effects";
 import { fmt, patchNodes, setField, type Node } from "./model";
 
@@ -77,10 +84,9 @@ const uniformColor = (n: BorderNode, tokens: Tokens): SideColor =>
 const colorsOf = (n: BorderNode, tokens: Tokens): SideColor[] =>
   sideColors(n)?.map((c) => ({ ...c })) ?? SIDES.map(() => uniformColor(n, tokens));
 const hiddenOf = (n: BorderNode): boolean[] =>
-  SIDES.map((_, i) =>
-    n.strokeHidden === true ? true : four(n.strokeHiddenSides)?.[i] === true,
-  );
-const clean = (c: SideColor): SideColor => (c.token ? { color: c.color, token: c.token } : { color: c.color });
+  SIDES.map((_, i) => (n.strokeHidden === true ? true : four(n.strokeHiddenSides)?.[i] === true));
+const clean = (c: SideColor): SideColor =>
+  c.token ? { color: c.color, token: c.token } : { color: c.color };
 
 /** The selection's bindings without the border width variable. */
 function withoutWidthBinding(node: Node) {
@@ -136,7 +142,11 @@ function sidesIcon(present: boolean[] | null): IconType {
   return icon;
 }
 
-const firstSide = (widths: number[]) => Math.max(0, widths.findIndex((value) => value > 0));
+const firstSide = (widths: number[]) =>
+  Math.max(
+    0,
+    widths.findIndex((value) => value > 0),
+  );
 
 export function BorderSection({ doc, node, selection }: Props) {
   const tokens = doc.tokens ?? {};
@@ -234,7 +244,11 @@ export function BorderSection({ doc, node, selection }: Props) {
         data-border-entry={side ? side.toLowerCase() : "all"}
         data-border-side={side ? side.toLowerCase() : undefined}
       >
-        <div className="flex items-center gap-2" data-border-row data-hidden={isHidden || undefined}>
+        <div
+          className="flex items-center gap-2"
+          data-border-row
+          data-hidden={isHidden || undefined}
+        >
           <div className="min-w-0 flex-1">{widthField}</div>
           <NativeSelect
             name={index === null ? "strokeSide" : `strokeSide-${index}`}

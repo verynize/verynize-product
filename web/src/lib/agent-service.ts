@@ -14,6 +14,7 @@
 //
 // No React and no DOM here, so the module stays testable on its own.
 import type { AgentEvent, DesktopApi } from "./desktop-api";
+import { textOf } from "./utils";
 
 export type { AgentEvent };
 export type AgentRuntime = "desktop" | "web";
@@ -147,10 +148,10 @@ export function normalizeWebEvent(raw: AgentEvent): AgentEvent {
         typeof raw.output === "string" ? raw.output : JSON.stringify(raw.output ?? "");
       break;
     case "status":
-      event.text = STATUS_TEXT[String(raw.status)] ?? String(raw.status ?? "");
+      event.text = STATUS_TEXT[String(raw.status)] ?? textOf(raw.status ?? "");
       break;
     case "error":
-      event.text = String(raw.message ?? raw.text ?? "The model API reported an error");
+      event.text = textOf(raw.message ?? raw.text ?? "The model API reported an error");
       break;
     case "done":
       event.code = raw.code === "ok" ? 0 : (raw.code ?? "error");

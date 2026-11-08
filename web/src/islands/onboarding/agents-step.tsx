@@ -30,7 +30,7 @@ const INSTALL: Record<string, string> = {
   codex: "https://github.com/openai/codex",
 };
 
-export function AgentsStep({ onContinue }: { onContinue(): void }) {
+export function AgentsStep({ onContinue }: { onContinue: () => void }) {
   const [providers, setProviders] = useState<Provider[] | null>(null);
   const [pending, setPending] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -160,8 +160,8 @@ function AgentStatus({
   id: string;
   provider: Provider | undefined;
   pending: boolean;
-  onConnect(): void;
-  onCancel(): void;
+  onConnect: () => void;
+  onCancel: () => void;
 }) {
   if (!provider || provider.comingSoon)
     return (
@@ -201,7 +201,13 @@ function AgentStatus({
       </Button>
     );
   return (
-    <Button variant="secondary" size="sm" data-status="signed-out" data-oai-siwc-button={id === "codex" ? "" : undefined} onClick={onConnect}>
+    <Button
+      variant="secondary"
+      size="sm"
+      data-status="signed-out"
+      data-oai-siwc-button={id === "codex" ? "" : undefined}
+      onClick={onConnect}
+    >
       {id === "codex" ? "Continue with ChatGPT" : "Connect"}
     </Button>
   );

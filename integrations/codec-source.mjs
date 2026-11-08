@@ -34,7 +34,7 @@ export function documentFromMeta(meta = {}, fallbackName = "Imported") {
     version: 2,
     name: typeof meta.name === "string" && meta.name.trim() ? meta.name : fallbackName,
     activePage: page.id,
-    tokens: { ...(meta.tokens || {}) },
+    tokens: { ...meta.tokens },
     pages: [page],
   };
   if (meta.variables && typeof meta.variables === "object") doc.variables = clone(meta.variables);

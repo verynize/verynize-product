@@ -35,7 +35,11 @@ import { platform } from "@/lib/platform";
 type LivePreview = {
   pickRegion?(
     host: HTMLElement,
-    options: { width: number; height: number; elementAt(point: { x: number; y: number }): Promise<unknown> },
+    options: {
+      width: number;
+      height: number;
+      elementAt(point: { x: number; y: number }): Promise<unknown>;
+    },
   ): Promise<{ x: number; y: number; width: number; height: number } | null>;
   insertCaptured?(captured: unknown, place: (page: unknown) => { x: number; y: number }): void;
   editMode?(): void;
@@ -131,13 +135,21 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
         elementAt: (point) => desktop()!.previewElementAt!({ ...point, target: "tab" }),
       });
       if (!region) return;
-      const captured = await desktop()!.captureLivePreview!({ url: tab.url, region, target: "tab" });
+      const captured = await desktop()!.captureLivePreview!({
+        url: tab.url,
+        region,
+        target: "tab",
+      });
       // Captured layers land right of the preview frame on the canvas, which then shows them.
       await showOnCanvas(tab.frameId);
       const doc = window.design.getDocument();
-      const node = doc.pages.flatMap((page) => page.nodes).find((candidate) => candidate.id === tab.frameId);
+      const node = doc.pages
+        .flatMap((page) => page.nodes)
+        .find((candidate) => candidate.id === tab.frameId);
       if (!node) throw Error("The preview frame is no longer on the canvas.");
-      const before = new Set(doc.pages.flatMap((page) => page.nodes.map((candidate) => candidate.id)));
+      const before = new Set(
+        doc.pages.flatMap((page) => page.nodes.map((candidate) => candidate.id)),
+      );
       preview.insertCaptured(captured, () => ({ x: node.x + node.w + 80, y: node.y }));
       const added = window.design
         .getDocument()
@@ -163,12 +175,22 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
     >
       <div data-pt="bar" role="toolbar" aria-label="Preview browser">
         <Tip label="Back" side="bottom">
-          <button type="button" aria-label="Back" disabled={!running} onClick={() => navigate("back")}>
+          <button
+            type="button"
+            aria-label="Back"
+            disabled={!running}
+            onClick={() => navigate("back")}
+          >
             <ChevronLeft />
           </button>
         </Tip>
         <Tip label="Forward" side="bottom">
-          <button type="button" aria-label="Forward" disabled={!running} onClick={() => navigate("forward")}>
+          <button
+            type="button"
+            aria-label="Forward"
+            disabled={!running}
+            onClick={() => navigate("forward")}
+          >
             <ChevronRight />
           </button>
         </Tip>
@@ -230,7 +252,13 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
           />
         ) : (
           <div data-pt="placeholder" role="status">
-            <strong>{tab.status === "starting" ? "Starting your app" : tab.status === "error" ? "Preview failed" : "Preview stopped"}</strong>
+            <strong>
+              {tab.status === "starting"
+                ? "Starting your app"
+                : tab.status === "error"
+                  ? "Preview failed"
+                  : "Preview stopped"}
+            </strong>
             <p>
               {tab.status === "starting"
                 ? "Waiting for the app…"
@@ -254,12 +282,23 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
             </button>
           </Tip>
           <Tip label="Inspect element" shortcut="⌘⇧I">
-            <button type="button" aria-pressed={false} disabled={!running} onClick={() => void perform(edit)}>
+            <button
+              type="button"
+              aria-pressed={false}
+              disabled={!running}
+              onClick={() => void perform(edit)}
+            >
               <TargetIcon />
               Edit
             </button>
           </Tip>
-          <Tip label={<span>Capture<span data-pt="tip-note">Add an editable design to canvas</span></span>}>
+          <Tip
+            label={
+              <span>
+                Capture<span data-pt="tip-note">Add an editable design to canvas</span>
+              </span>
+            }
+          >
             <button
               type="button"
               aria-pressed={mode === "capture"}
@@ -287,7 +326,9 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
               >
                 <DropdownMenu.Item
                   disabled={!running}
-                  onSelect={() => void perform(() => desktop()?.previewOpenBrowser?.({ target: "tab" }))}
+                  onSelect={() =>
+                    void perform(() => desktop()?.previewOpenBrowser?.({ target: "tab" }))
+                  }
                 >
                   <ExternalLinkIcon />
                   Open in browser

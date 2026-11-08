@@ -87,10 +87,12 @@ const path = require("node:path");
       for (let i = 0; i < points.length; i++) {
         assert.ok(
           pixels[i].every((v, c) => Math.abs(v - expected[c]) <= 1),
-          `${name} at ${points[i]}: rgb(${pixels[i]}) != rgb(${expected}) (${file})`,
+          `${name} at ${points[i].join(",")}: rgb(${pixels[i].join(",")}) != rgb(${expected.join(",")}) (${file})`,
         );
       }
-      console.log(`${name}: ${points.length} background samples = rgb(${expected}); ${file}`);
+      console.log(
+        `${name}: ${points.length} background samples = rgb(${expected.join(",")}); ${file}`,
+      );
     }
     await page.locator("#find-layers-button").click();
     await input.fill("Section 0");

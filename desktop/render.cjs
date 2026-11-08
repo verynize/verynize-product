@@ -405,6 +405,7 @@ function saveRequest(options) {
   if (!EXPORT_TYPES[extension]) throw Error("Unsupported export format");
   const base =
     options.name
+      // oxlint-disable-next-line no-control-regex -- control characters are not allowed in file names
       .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "-")
       .replace(/^[.\s-]+/, "")
       .slice(0, 120) || "export";

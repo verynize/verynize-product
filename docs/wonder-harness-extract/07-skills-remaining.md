@@ -115,18 +115,18 @@ Read the files and pass their markup to create_icons in batches of 20. For path 
 
 A glyph from an installed icon package or a set the user names (Lucide, Feather, Font Awesome, Heroicons, Phosphor, Tabler, Radix, Material, Bootstrap, Simple Icons) comes through its react-icons subpackage with its name kept, never as copied svg markup; an inline svg is only for artwork no icon set covers. Lucide `bell-dot` is `LuBellDot`:
 
-| Set | Prefix | Import from |
-|---|---|---|
-| Lucide (`lucide-react`) | `Lu` | `react-icons/lu` |
-| Feather | `Fi` | `react-icons/fi` |
-| Font Awesome 6 | `Fa` | `react-icons/fa6` |
-| Material | `Md` | `react-icons/md` |
-| Bootstrap | `Bs` | `react-icons/bs` |
-| Heroicons v2 | `Hi` | `react-icons/hi2` |
-| Phosphor | `Pi` | `react-icons/pi` |
-| Tabler | `Tb` | `react-icons/tb` |
-| Radix | `Rx` | `react-icons/rx` |
-| Simple Icons (brands) | `Si` | `react-icons/si` |
+| Set                     | Prefix | Import from       |
+| ----------------------- | ------ | ----------------- |
+| Lucide (`lucide-react`) | `Lu`   | `react-icons/lu`  |
+| Feather                 | `Fi`   | `react-icons/fi`  |
+| Font Awesome 6          | `Fa`   | `react-icons/fa6` |
+| Material                | `Md`   | `react-icons/md`  |
+| Bootstrap               | `Bs`   | `react-icons/bs`  |
+| Heroicons v2            | `Hi`   | `react-icons/hi2` |
+| Phosphor                | `Pi`   | `react-icons/pi`  |
+| Tabler                  | `Tb`   | `react-icons/tb`  |
+| Radix                   | `Rx`   | `react-icons/rx`  |
+| Simple Icons (brands)   | `Si`   | `react-icons/si`  |
 
 `react-icons/hi` and `react-icons/fa` are the older Heroicons v1 and Font Awesome 5, so v2 and v6 names resolve only from `hi2` and `fa6`.
 

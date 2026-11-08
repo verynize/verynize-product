@@ -8,6 +8,10 @@ import { randomUUID } from "node:crypto";
 export interface LintProblem {
   id: string;
   severity: string;
+  rule?: string;
+  ref?: string | null;
+  message?: string;
+  fix?: string;
   [detail: string]: unknown;
 }
 export interface LintResult {
@@ -92,7 +96,7 @@ export function createReceipt({
         })
       : null,
     lint: compactLint(lint),
-    reviewNote: String(reviewNote || "").trim(),
+    reviewNote: typeof reviewNote === "string" ? reviewNote.trim() : "",
     createdAt: new Date().toISOString(),
   });
 }

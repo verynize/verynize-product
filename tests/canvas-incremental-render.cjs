@@ -135,7 +135,7 @@ const fs = require("node:fs/promises"),
     const touched = () =>
       page.evaluate(() => {
         window.__watch.note(window.__watch.takeRecords());
-        return [...window.__touched].sort();
+        return [...window.__touched].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
       });
     // The canvas as markup, without what changes on its own (shader status and canvas sizes, the clip-proof ring).
     const markup = () =>
@@ -528,7 +528,10 @@ const fs = require("node:fs/promises"),
       },
       { kept: false },
     );
-    assert.deepEqual(branch.gone.toSorted(), ["S", "k1", "k2", "k3"]);
+    assert.deepEqual(
+      branch.gone.toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+      ["S", "k1", "k2", "k3"],
+    );
     // Undo and redo replace the document with new objects: unchanged nodes keep their elements.
     await edit("undo", () => {
       const b = document.getElementById("undo");
@@ -550,7 +553,7 @@ const fs = require("node:fs/promises"),
       { kept: false },
     );
     assert.deepEqual(
-      [redone.replaced, redone.gone.toSorted()],
+      [redone.replaced, redone.gone.toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0))],
       [[], ["S", "k1", "k2", "k3"]],
       "redo removes only the deleted branch",
     );
@@ -757,7 +760,9 @@ const fs = require("node:fs/promises"),
     const culledNow = () =>
       page
         .locator("#canvas > .layer[data-culled]")
-        .evaluateAll((els) => els.map((e) => e.dataset.id).sort());
+        .evaluateAll((els) =>
+          els.map((e) => e.dataset.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+        );
     // Clipping boards entirely outside the view plus half a viewport on each side.
     const offscreen = () =>
       page.evaluate(() => {

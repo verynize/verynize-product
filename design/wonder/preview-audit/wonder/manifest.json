@@ -7,744 +7,434 @@
       "sha256": "bc0b2a3e97c33ac9ccf30069e4f75f8362dd90f5953d0a07697ed56b37f80651",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF1-selected.png",
       "sha256": "21768cb8bb8f378ae008e4dd5575539f0dec11b5165d85a7afd9acccf64b4af6",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-back-hover.png",
       "sha256": "eac461de5fe8bf48be180ddd4566b9c6e2ef4f153df670b05fa849644f98441f",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-expand-hover.png",
       "sha256": "d609959f08f57ac64506ccd2e27da33b51ec4a733d788afaa0be541283c2853c",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-forward-hover.png",
       "sha256": "699294638cd27f3d6f365fc17cbc1b623ae8e41f2eaf8f9cbc8e5d5dded30b1d",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-path-about.png",
       "sha256": "ebf278d606c5d683a5f23972d4819756ed2eb5f806b23829591455884d4a97bf",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-path-hover.png",
       "sha256": "d0d6b49e4f9244120eee073ee3cc86166833ccb8bef014c8c54e76ad5041c1ed",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-path-verified.png",
       "sha256": "523b07858c57bc2b929eade0897f4533a293fd6b376b6dbdd667763dd339e719",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-path.png",
       "sha256": "cc0ea43bcaeb088d878c18d02a6dc8c91ef6da926d07ec93a40489446d3f8563",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-publish-hover.png",
       "sha256": "3d356bed4c768e2468bf27a69a3a6fc4fd4ec17043ffe775b76d35d3da2fb3f6",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-reload-hover.png",
       "sha256": "efa20741552d66626c40cb7c866b44539bf2126eae1e071970fbf550966ac8dc",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-stop-hover.png",
       "sha256": "a43e491889b5bb380229121c6ce5108a4d6355d15e3363179d8ce0064261c2ca",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF2-toolbar.png",
       "sha256": "ad9ec6c9a4d29f92b26f2209703d44a6ed2a1a4b8c64e53089c55879758aacce",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF3-expanded-verified.png",
       "sha256": "68ea5682e7607efb2f6457b18ae326fd8ec2685e8d77e45134120668baf94b84",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF3-expanded.png",
       "sha256": "3af8d101a97a9bb42d884da038e85a5d78e2c050a27305959e2e7af8f1fa1da7",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF4-presets.png",
       "sha256": "8014d47734bc65c0b12d4fadbbc983f1f4e7abe252cec85020bfd10318d46163",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF4-resize.png",
       "sha256": "26796270f739454e4626bf0debb9c64cd1ce7a0e4b243d6a3f9f81529b492a70",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF5-context.png",
       "sha256": "80ed7803627f5591363e640e7022f635740748972dd8469dd229d8666d0c3613",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PF6-inspector.png",
       "sha256": "c8b7c54f69d22e0a4767807536ba23f6d7b08e3a5b750fbb2968f1fcb171504e",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM1-capture-hover.png",
       "sha256": "d25b93cffe48fc2267546c9e0709470f99b2366bf99b67e99290cc3705b9c4d1",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM1-edit-hover.png",
       "sha256": "fa43e639f28374e46adaaaf86d7fea5015a83f5dedbcc9597bb08cc48e23e571",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM1-navigate-hover.png",
       "sha256": "c27943bbd7234187466e9ca90f449a7e998046a4eb0a1e887fddf36a4bdbe123",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM1-toolbar-verified.png",
       "sha256": "a7bab99aa5c2b7d11934b1751c970bae837d978bfda509ec5d50bb7f9c5f0b87",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM1-toolbar.png",
       "sha256": "de926e530e5cd741d3ad03e73c17398fbbcf14c654d2488c206d48b1c2e5007e",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM2-about.png",
       "sha256": "30e3b424fbce244aed0384f70e97cde4ca90b4a4928942c3c3c8b1d50715f9eb",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM2-navigate.png",
       "sha256": "bfcfb0faf8866d5dd35868d16ab67ff3691331b61452e65904957a8b2c8ad7c3",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM2-typed-verified.png",
       "sha256": "97ee834d3dc023eab4bba12d2d5059165ecb6f7226e3bf7377d01ed4913d8290",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM2-typed.png",
       "sha256": "6bed81e374b5e418d8edf237ee7abcfd268a4a5aac5e7bd52889768193211db7",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM3-edited.png",
       "sha256": "bc60fc07b09a4de4c29e43ec7267c466ddce188c558b28ced0b61e63059bdafa",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM3-hover-verified.png",
       "sha256": "89f4be1fb35728e7621207645d3628759cc9374467d7758f43437e7403f5dcba",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM3-hover.png",
       "sha256": "3f80f7ff587d0f269a6cd311ba698dc21ac3ddfcc3bf9777ef7124f4c2262fbf",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM3-inspector.png",
       "sha256": "c133f2cdc6c01fcbb81a31e6e90d19133e167f2697b679baa71e5d1806fe5f10",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM3-select.png",
       "sha256": "6cc45dadf311f615094633174a22eb9f733041e28bdad36f4fbaaf1f93e858f8",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM4-capture.png",
       "sha256": "2f8b5c0c61bc96fffa8f9f006abf35e6a57dfe71266afd924065b543374ce7a7",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM4-result.png",
       "sha256": "cf1cc7f3293c77ef2ae9825e599142b21e1ac471fe435e158f88156334377e99",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM5-context-verified.png",
       "sha256": "b1143f2812d9a4cbd2812f0e7fd12e4b1b2f21a030ee990a692e2caee433804b",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PM5-context.png",
       "sha256": "d5c773070b480b78cd08fe6d94d826d25a7ce2b17946f27a82544d2ba1960ed2",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PP1-publish.png",
       "sha256": "d96217e89b6906ab64ff9e7f736d72099f9f2c1205ce54cb086ae3f17fc543b5",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PP2-stopped-verified.png",
       "sha256": "5d191f2275ee3c8d6dc4fd7919b387858715fa1087d7e93ff1bebd397abc3c31",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PP2-stopped.png",
       "sha256": "ce79bd35d0e17388db991bf057d0b663683e56c3da9fc034a408765b7603b287",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS1-hover.png",
       "sha256": "3006fde14d82cf4cea83d1ca38eddca6612bd8db7d7bb45624013c68cf321834",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS1-idle.png",
       "sha256": "6584a4b1ea71abbf3bf32d2d8959bffa53d0a41ec87e006aba4587fd176b9151",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS1-menu.png",
       "sha256": "574e3045dd7ff16fbcc8651fe2cae7017a5aaa3203962db0805924498ab55a31",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS2-card-final.png",
       "sha256": "c40522a75c2c95b0f0b8c133c1e935e23b077ab7795c4b31fc735edbb35ce946",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS2-card-verified.png",
       "sha256": "9ba53bbb1248250c29cfeef5b85df17951fcb402ad8a57ec28983e65188f2c18",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS2-card.png",
       "sha256": "8bbf6082e2ffc548f4e0d92d52e02c0114bcbfe8e5e0753175f5a40467ded5fa",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS2-edit.png",
       "sha256": "f025e305a8a1efb03a8716e9c150b13c70cf766409ddbc14eb73543b8577e884",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS3-starting-verified.png",
       "sha256": "56559f5cdf672a665e83c6e6ce1650214e794583a50635240f53e5f94be693ba",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS3-starting.png",
       "sha256": "ba9b0771d3016b879d33004258277646f657d886965e24526f2e16fd386472d3",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS4-error-verified.png",
       "sha256": "c86b97dfefa3cc4613317dd39469073e038d144c30c5a5280902e559dd4f1b44",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS4-error.png",
       "sha256": "e23d3fef3dd080b0e58b901a388a7082cb1c72b9dd710ccb9ff703bf2088f929",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS4-logs.png",
       "sha256": "eff13483486d7e168b0b66f42f0f61fb425221407bcbdcf1d2fb55541a6293f8",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS4-transition.png",
       "sha256": "4ec076b6eb32112f71211fa7a7be0038e10561b6222a1e2345e8692f30491d77",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS5-paused.png",
       "sha256": "a56156937b3e00b1a9fcdb9bfbd3cccc35ac697daa5149aeaa8299cd4038e0eb",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS6-code.png",
       "sha256": "f68b52c34a8d245b4976d2477e00a9962f10971d525014da4ca674bbf849b0f7",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "PS6-show-preview.png",
       "sha256": "dba11ad3d13d53fd81e5467add2f7b32a3f0e7e6c400cd63333c16f7fae936c4",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X1-settings.png",
       "sha256": "465d8b47a9eb3b0ae52c98f6a3efdcd801d823326b24e1bcae9a86adc301e2c4",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X2-changes.png",
       "sha256": "fad1ed91eaf8eebff0344c963309e5e6d2bda3a1c930247346cfd85cf4d428d8",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X3-terminal.png",
       "sha256": "d4a738fbc0e4c82bb8927e82e2ed9e25802688f7e4376268bcf8e9d6b1548b8f",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X4-more-actions-verified.png",
       "sha256": "d2bd67bc2d9589a445250f393c5a0120bb18d1cff14d821e989d398f250c5c05",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X4-more-actions.png",
       "sha256": "447c9478986938ca2782fb6f1533d4507b1070c8e3865d4651bb4620a43033fc",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     },
     {
       "file": "X5-running-menu.png",
       "sha256": "9f53e4065c64c76a450da362c0942f0a79d397917432cb2c1ae54f1815ad714c",
       "width": 2880,
       "height": 1740,
-      "capture_css_rect": [
-        0,
-        30,
-        1440,
-        870
-      ]
+      "capture_css_rect": [0, 30, 1440, 870]
     }
   ]
 }

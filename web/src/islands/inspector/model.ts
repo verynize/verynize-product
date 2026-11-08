@@ -272,4 +272,3 @@ export const FONTS = [
   "serif",
   "sans-serif",
 ];
-

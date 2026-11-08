@@ -14,7 +14,10 @@ import { sourceMapUpload } from "./web-start/build/telemetry.mjs";
 
 const island = process.env.ISLAND;
 if (!island) throw new Error("Set ISLAND=<name> (see web/src/islands)");
-const entries: Record<string, string> = { ui: "./web/src/ui.tsx", telemetry: "./web/src/telemetry.ts" };
+const entries: Record<string, string> = {
+  ui: "./web/src/ui.tsx",
+  telemetry: "./web/src/telemetry.ts",
+};
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 const upload = !!process.env.SENTRY_AUTH_TOKEN;
 
@@ -37,7 +40,9 @@ export default defineConfig({
     sourcemap: upload ? "hidden" : false,
     minify: process.env.NODE_ENV !== "development",
     lib: {
-      entry: fileURLToPath(new URL(entries[island] ?? `./web/src/islands/${island}.tsx`, import.meta.url)),
+      entry: fileURLToPath(
+        new URL(entries[island] ?? `./web/src/islands/${island}.tsx`, import.meta.url),
+      ),
       formats: ["iife"],
       name: `BdIsland_${island.replace(/\W/g, "_")}`,
       fileName: () => `${island}.js`,

@@ -199,8 +199,20 @@ const DORMANT = [
 const BOX = ["x", "y", "w", "h"];
 // Shader mode (shaderFill) and the shader settings of a non-shader layer have no class; Shader layers write
 // them as JSX attributes instead (shaders.mjs). Values equal to the node defaults are left out.
-const SHADER_KEYS = ["shaderFill", "shaderPreset", "shaderSpeed", "shaderIntensity", "shaderColors", "shaderParams"];
-const SHADER_DEFAULTS = { shaderFill: false, shaderPreset: "aurora", shaderSpeed: 1, shaderIntensity: 1 };
+const SHADER_KEYS = [
+  "shaderFill",
+  "shaderPreset",
+  "shaderSpeed",
+  "shaderIntensity",
+  "shaderColors",
+  "shaderParams",
+];
+const SHADER_DEFAULTS = {
+  shaderFill: false,
+  shaderPreset: "aurora",
+  shaderSpeed: 1,
+  shaderIntensity: 1,
+};
 
 // --- write ---------------------------------------------------------------------------------------
 
@@ -306,7 +318,10 @@ export function applyResidual(node, attrs, { tokens = {}, warnings = [], where =
   if (r.shadows !== undefined) group(["shadows", "shadow"], shadowSig);
   if (r.filters !== undefined) group(["filters"], filterSig);
   if (r.masks !== undefined) group(["masks", "mask"], maskSig);
-  if (r.strokeHidden === true || (Array.isArray(r.strokeHiddenSides) && r.strokeHiddenSides.includes(true)))
+  if (
+    r.strokeHidden === true ||
+    (Array.isArray(r.strokeHiddenSides) && r.strokeHiddenSides.includes(true))
+  )
     group(STROKE_KEYS, borderSig);
   if (r.outlineHidden === true) group(OUTLINE_KEYS, outlineSig);
   if (r.textRuns !== undefined && node.type === "text") {

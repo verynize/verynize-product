@@ -2,7 +2,7 @@
 // @layer, @supports), selector matching with specificity, shorthand expansion and the cascade
 // (origin, !important, layers, specificity, source order, inline styles). Values are kept as text;
 // var() and unit resolution happen per element in codec-html.mjs.
-import { splitTop, matchMedia } from "./codec-css.mjs";
+import { splitTop } from "./codec-css.mjs";
 
 // ---------------------------------------------------------------------------------------------
 // Stylesheet parsing

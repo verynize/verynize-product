@@ -12,7 +12,8 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-effects-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
@@ -22,13 +23,12 @@ const path = require("node:path");
     const page = await app.firstWindow({ timeout: 20000 });
     await page.waitForSelector("#canvas .layer");
     const node = (id) =>
-      page.evaluate(
-        (id) => {
-          const d = window.design.getDocument();
-          return (d.pages.find((p) => p.id === d.activePage) ?? d.pages[0]).nodes.find((n) => n.id === id);
-        },
-        id,
-      );
+      page.evaluate((id) => {
+        const d = window.design.getDocument();
+        return (d.pages.find((p) => p.id === d.activePage) ?? d.pages[0]).nodes.find(
+          (n) => n.id === id,
+        );
+      }, id);
     const css = (id, prop) =>
       page
         .locator(`#canvas [data-id="${id}"]`)
@@ -49,9 +49,39 @@ const path = require("node:path");
           id: "p",
           name: "Effects",
           nodes: [
-            { id: "back", name: "Back", type: "rectangle", x: 20, y: 20, w: 200, h: 120, color: "#3366ff" },
-            { id: "card", name: "Card", type: "rectangle", x: 60, y: 40, w: 200, h: 120, color: "#ffcc00", radius: 16 },
-            { id: "label", name: "Label", type: "text", x: 20, y: 200, w: 200, h: 40, text: "Hello", color: "#111111", fontSize: 24 },
+            {
+              id: "back",
+              name: "Back",
+              type: "rectangle",
+              x: 20,
+              y: 20,
+              w: 200,
+              h: 120,
+              color: "#3366ff",
+            },
+            {
+              id: "card",
+              name: "Card",
+              type: "rectangle",
+              x: 60,
+              y: 40,
+              w: 200,
+              h: 120,
+              color: "#ffcc00",
+              radius: 16,
+            },
+            {
+              id: "label",
+              name: "Label",
+              type: "text",
+              x: 20,
+              y: 200,
+              w: 200,
+              h: 40,
+              text: "Hello",
+              color: "#111111",
+              fontSize: 24,
+            },
           ],
         },
       ];
@@ -64,7 +94,16 @@ const path = require("node:path");
     // Blend: all 18 modes are offered; Multiply applies mix-blend-mode, undo restores Normal.
     await page.locator("#blend-mode").click();
     assert.equal(await page.locator("[data-blend]").count(), 18);
-    for (const mode of ["plus-darker", "plus-lighter", "difference", "exclusion", "hue", "saturation", "color", "luminosity"])
+    for (const mode of [
+      "plus-darker",
+      "plus-lighter",
+      "difference",
+      "exclusion",
+      "hue",
+      "saturation",
+      "color",
+      "luminosity",
+    ])
       assert.equal(await page.locator(`[data-blend="${mode}"]`).count(), 1, mode);
     await page.locator('[data-blend="multiply"]').click();
     assert.equal((await node("card")).blendMode, "multiply");
@@ -86,7 +125,16 @@ const path = require("node:path");
     const borderGone = async () => {
       const b = await node("card");
       assert.deepEqual(
-        [b.strokeWidth, b.strokeColor, b.strokeWidths, b.strokeColors, b.strokeToken, b.strokeStyle, b.strokeHidden, b.strokeHiddenSides],
+        [
+          b.strokeWidth,
+          b.strokeColor,
+          b.strokeWidths,
+          b.strokeColors,
+          b.strokeToken,
+          b.strokeStyle,
+          b.strokeHidden,
+          b.strokeHiddenSides,
+        ],
         [0, "#000000", undefined, undefined, undefined, undefined, undefined, undefined],
       );
       assert.equal(await css("card", "border-top-width"), "0px");
@@ -98,11 +146,19 @@ const path = require("node:path");
       page
         .locator(`${section} > div:first-child button`)
         .evaluateAll((els) => els.map((el) => el.getAttribute("aria-label")));
-    const height = async (selector) => Math.round((await page.locator(selector).boundingBox()).height);
+    const height = async (selector) =>
+      Math.round((await page.locator(selector).boundingBox()).height);
     const borderDefault = async () => {
       const b = await node("card");
       assert.deepEqual(
-        [b.strokeWidth, b.strokeColor, b.strokeWidths, b.strokeColors, b.strokeStyle, b.strokeHidden],
+        [
+          b.strokeWidth,
+          b.strokeColor,
+          b.strokeWidths,
+          b.strokeColors,
+          b.strokeStyle,
+          b.strokeHidden,
+        ],
         [1, "#000000", undefined, undefined, undefined, undefined],
       );
       assert.equal(await css("card", "border-top-width"), "1px");
@@ -125,7 +181,10 @@ const path = require("node:path");
     };
     const pickLineStyle = async (menu, value) => {
       await page.getByRole("button", { name: menu, exact: true }).click();
-      await page.getByRole("menu", { name: menu }).locator(`[data-line-style-option="${value}"]`).click();
+      await page
+        .getByRole("menu", { name: menu })
+        .locator(`[data-line-style-option="${value}"]`)
+        .click();
       // The menu closes on pick.
       await page.getByRole("menu", { name: menu }).waitFor({ state: "detached" });
     };
@@ -159,7 +218,9 @@ const path = require("node:path");
     assert.equal(await css("card", "border-top-width"), "2px");
 
     const sides = () =>
-      page.locator("#border-section [data-border-side]").evaluateAll((els) => els.map((el) => el.dataset.borderSide));
+      page
+        .locator("#border-section [data-border-side]")
+        .evaluateAll((els) => els.map((el) => el.dataset.borderSide));
     // Wonder H4: in All mode `+` splits into Top and Right (both keep the All values; Bottom and Left draw
     // nothing), the next `+` adds Bottom, then Left, and with four sides `+` is disabled. One undo step each.
     const sidesGlyph = () =>
@@ -173,7 +234,9 @@ const path = require("node:path");
     assert.deepEqual(b.strokeColors, Array(4).fill({ color: "#ff0000" }));
     assert.deepEqual(await sides(), ["top", "right"]);
     assert.deepEqual(
-      await Promise.all(["top", "right", "bottom", "left"].map((s) => css("card", `border-${s}-width`))),
+      await Promise.all(
+        ["top", "right", "bottom", "left"].map((s) => css("card", `border-${s}-width`)),
+      ),
       ["2px", "2px", "0px", "0px"],
     );
     assert.equal(await sidesGlyph(), "1100", "the Sides glyph draws Top and Right solid");
@@ -194,7 +257,10 @@ const path = require("node:path");
     // `−`, colour); with all four the header `+` is disabled. Each side hides and removes on its own.
     await page.getByRole("button", { name: "Independent border sides", exact: true }).click();
     b = await node("card");
-    assert.deepEqual([b.strokeWidths, b.strokeColors], [[2, 2, 2, 2], Array(4).fill({ color: "#ff0000" })]);
+    assert.deepEqual(
+      [b.strokeWidths, b.strokeColors],
+      [[2, 2, 2, 2], Array(4).fill({ color: "#ff0000" })],
+    );
     assert.deepEqual(await sides(), ["top", "right", "bottom", "left"]);
     assert.equal(await page.locator("[name=strokeWidth]").count(), 0);
     assert.equal(await page.locator("#border-section .insp-add").isDisabled(), true);
@@ -203,7 +269,13 @@ const path = require("node:path");
     assert.equal(await css("card", "border-top-width"), "5px");
     await page.locator('[data-border-side="top"] [data-border-tool="visibility"]').click();
     b = await node("card");
-    assert.deepEqual([b.strokeHiddenSides, b.strokeWidths], [[true, false, false, false], [5, 2, 2, 2]]);
+    assert.deepEqual(
+      [b.strokeHiddenSides, b.strokeWidths],
+      [
+        [true, false, false, false],
+        [5, 2, 2, 2],
+      ],
+    );
     assert.equal(await css("card", "border-top-width"), "0px");
     assert.equal(await css("card", "border-left-width"), "2px");
     await page.locator('[data-border-side="top"] [data-border-tool="visibility"]').click();
@@ -219,7 +291,10 @@ const path = require("node:path");
     assert.deepEqual((await node("card")).strokeWidths, [5, 5, 2, 2]);
     await undo();
     // The side selector moves an entry to a free side; sides already drawn are disabled.
-    assert.equal(await page.locator('[name="strokeSide-3"] option[value="top"]').isDisabled(), true);
+    assert.equal(
+      await page.locator('[name="strokeSide-3"] option[value="top"]').isDisabled(),
+      true,
+    );
     await page.locator('[name="strokeSide-3"]').selectOption("right");
     assert.deepEqual((await node("card")).strokeWidths, [5, 2, 2, 0]);
     await undo();
@@ -230,7 +305,10 @@ const path = require("node:path");
     await undo();
     await page.getByRole("button", { name: "Independent border sides", exact: true }).click();
     b = await node("card");
-    assert.deepEqual([b.strokeWidths, b.strokeColors, b.strokeWidth, b.strokeColor], [undefined, undefined, 5, "#ff0000"]);
+    assert.deepEqual(
+      [b.strokeWidths, b.strokeColors, b.strokeWidth, b.strokeColor],
+      [undefined, undefined, 5, "#ff0000"],
+    );
     await undo();
     // Removing the last side removes the border.
     for (const side of ["top", "bottom", "left"])
@@ -298,7 +376,9 @@ const path = require("node:path");
     // Wonder A4: a new shadow is Box, X 0, Y 4, blur 4, spread 0, #000000 at 25 %, labelled "Box Shadow".
     await page.locator("#shadow-section .insp-add").click();
     await page.waitForSelector("#shadow-editor");
-    assert.deepEqual((await node("card")).shadows, [{ type: "box", x: 0, y: 4, blur: 4, spread: 0, color: "#00000040" }]);
+    assert.deepEqual((await node("card")).shadows, [
+      { type: "box", x: 0, y: 4, blur: 4, spread: 0, color: "#00000040" },
+    ]);
     assert.equal((await page.locator('[data-shadow-edit="0"]').textContent()).trim(), "Box Shadow");
     assert.equal(await page.locator('[data-shadow-row="0"]').getAttribute("data-open"), "true");
     // The editor: title + close, labelled Box / Drop segments, X / Y / blur / spread on one row, 288 px wide.
@@ -310,7 +390,9 @@ const path = require("node:path");
       ["Box", "Drop"],
     );
     const fieldTops = await Promise.all(
-      ["x", "y", "blur", "spread"].map(async (k) => Math.round((await page.locator(`[name=shadow-0-${k}]`).boundingBox()).y)),
+      ["x", "y", "blur", "spread"].map(async (k) =>
+        Math.round((await page.locator(`[name=shadow-0-${k}]`).boundingBox()).y),
+      ),
     );
     assert.equal(new Set(fieldTops).size, 1, "X / Y / blur / spread share one row");
     await commit("[name=shadow-0-x]", "0");
@@ -318,13 +400,18 @@ const path = require("node:path");
     await commit("[name=shadow-0-blur]", "4");
     await commit("[name=shadow-0-spread]", "-4");
     await commit("[name=shadow-0-colorAlpha]", "25");
-    assert.deepEqual((await node("card")).shadows, [{ type: "box", x: 0, y: 12, blur: 4, spread: -4, color: "#00000040" }]);
+    assert.deepEqual((await node("card")).shadows, [
+      { type: "box", x: 0, y: 12, blur: 4, spread: -4, color: "#00000040" },
+    ]);
     assert.equal(await css("card", "box-shadow"), "rgba(0, 0, 0, 0.25) 0px 12px 4px -4px");
     // "Inner shadow" is a drawn 16 px box (not a native input stripped by the global reset) that toggles.
     const inner = page.getByRole("checkbox", { name: "Inner shadow" });
     const innerBox = await inner.boundingBox();
     assert.deepEqual([Math.round(innerBox.width), Math.round(innerBox.height)], [16, 16]);
-    assert.notEqual(await inner.evaluate((el) => getComputedStyle(el).backgroundColor), "rgba(0, 0, 0, 0)");
+    assert.notEqual(
+      await inner.evaluate((el) => getComputedStyle(el).backgroundColor),
+      "rgba(0, 0, 0, 0)",
+    );
     assert.equal(await inner.getAttribute("aria-checked"), "false");
     await inner.click();
     assert.equal(await inner.getAttribute("aria-checked"), "true");
@@ -344,7 +431,9 @@ const path = require("node:path");
     // Bind the drop shadow colour to the "accent" Colors variable and follow the variable.
     await page.evaluate(() =>
       window.design.updateNodes(["card"], (c) => ({
-        shadows: c.shadows.map((s, i) => (i === 1 ? { ...s, token: "accent", color: "#ff0000" } : s)),
+        shadows: c.shadows.map((s, i) =>
+          i === 1 ? { ...s, token: "accent", color: "#ff0000" } : s,
+        ),
       })),
     );
     await page.evaluate(() => {
@@ -364,7 +453,10 @@ const path = require("node:path");
     // Text shadow is offered on text layers only and renders as text-shadow.
     await page.evaluate(() => window.design.setSelection(["label"]));
     await page.locator("#shadow-section .insp-add").click();
-    assert.equal(await page.locator('[data-shadow-editor="0"] [data-shadow-type="text"]').count(), 1);
+    assert.equal(
+      await page.locator('[data-shadow-editor="0"] [data-shadow-type="text"]').count(),
+      1,
+    );
     await page.locator('[data-shadow-editor="0"] [data-shadow-type="text"]').click();
     assert.match(await css("label", "text-shadow"), /rgba\(0, 0, 0, 0\.25\) 0px 4px 4px/);
     await page.keyboard.press("Escape");
@@ -382,17 +474,41 @@ const path = require("node:path");
     assert.equal(await css("card", "filter"), "blur(2px)");
     await page.locator("[name=filter-0-type]").click();
     const menu = page.locator('[data-filter-menu="0"]');
-    assert.deepEqual(await menu.locator('[role="group"]').evaluateAll((els) => els.map((e) => e.getAttribute("aria-label"))), ["Layer", "Backdrop"]);
+    assert.deepEqual(
+      await menu
+        .locator('[role="group"]')
+        .evaluateAll((els) => els.map((e) => e.getAttribute("aria-label"))),
+      ["Layer", "Backdrop"],
+    );
     for (const group of ["layer", "backdrop"])
       assert.deepEqual(
-        (await menu.locator(`[data-filter-option^="${group}:"]`).allTextContents()).map((t) => t.trim()),
-        ["Blur", "Brightness", "Contrast", "Grayscale", "Hue rotation", "Invert", "Saturate", "Sepia"],
+        (await menu.locator(`[data-filter-option^="${group}:"]`).allTextContents()).map((t) =>
+          t.trim(),
+        ),
+        [
+          "Blur",
+          "Brightness",
+          "Contrast",
+          "Grayscale",
+          "Hue rotation",
+          "Invert",
+          "Saturate",
+          "Sepia",
+        ],
       );
-    assert.equal(await menu.locator('[data-filter-option="layer:blur"] svg').count(), 1, "current item is checked");
+    assert.equal(
+      await menu.locator('[data-filter-option="layer:blur"] svg').count(),
+      1,
+      "current item is checked",
+    );
     assert.equal(await menu.locator('[data-filter-option="backdrop:blur"] svg').count(), 0);
     await page.keyboard.press("Escape");
     await page.waitForSelector('[data-filter-menu="0"]', { state: "detached" });
-    assert.deepEqual((await node("card")).filters, [{ type: "blur", value: 2 }], "Escape keeps the filter");
+    assert.deepEqual(
+      (await node("card")).filters,
+      [{ type: "blur", value: 2 }],
+      "Escape keeps the filter",
+    );
     // Amount field: no unit suffix.
     assert.equal(await page.locator('[data-filter-row="0"] [data-field-suffix]').count(), 0);
     await pickFilter(0, "layer:brightness");
@@ -420,7 +536,10 @@ const path = require("node:path");
     await page.waitForSelector("#mask-editor");
     assert.deepEqual((await node("card")).masks, [{ type: "linear", rotation: 180, alpha: 100 }]);
     // 180deg is the CSS default direction, so the computed value omits it.
-    assert.equal(await css("card", "mask-image"), "linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0))");
+    assert.equal(
+      await css("card", "mask-image"),
+      "linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0))",
+    );
     await page.locator('[data-mask-editor="0"] [data-mask-type="conic"]').click();
     await commit("[name=mask-0-rotation]", "45");
     await commit("[name=mask-0-alpha]", "80");
@@ -429,7 +548,9 @@ const path = require("node:path");
     assert.deepEqual([Math.round(invertBox.width), Math.round(invertBox.height)], [16, 16]);
     await invert.click();
     assert.equal(await invert.getAttribute("aria-checked"), "true");
-    assert.deepEqual((await node("card")).masks, [{ type: "conic", rotation: 45, alpha: 80, invert: true }]);
+    assert.deepEqual((await node("card")).masks, [
+      { type: "conic", rotation: 45, alpha: 80, invert: true },
+    ]);
     assert.match(await css("card", "mask-image"), /conic-gradient\(from 45deg/);
     await page.keyboard.press("Escape");
     await page.locator('[data-mask-row="0"] [data-effect-tool="visibility"]').click();
@@ -438,12 +559,24 @@ const path = require("node:path");
 
     // Export: the same declarations reach the headless HTML.
     const html = await page.evaluate(() => window.design.exportHTML());
-    for (const part of ["box-shadow: rgba(0, 0, 0, 0.25) 0px 12px 4px -4px", "filter: brightness(1.1)", "2px dashed", "outline-offset: 4px", "mask-image: conic-gradient(from 45deg", "text-shadow:"])
+    for (const part of [
+      "box-shadow: rgba(0, 0, 0, 0.25) 0px 12px 4px -4px",
+      "filter: brightness(1.1)",
+      "2px dashed",
+      "outline-offset: 4px",
+      "mask-image: conic-gradient(from 45deg",
+      "text-shadow:",
+    ])
       assert.ok(html.includes(part), part);
 
     // Removing the last mask collapses Mask back to its 31 px header + divider (no sticky CSS field).
-    const maskHeight = async () => Math.round((await page.locator("#mask-section").boundingBox()).height);
-    assert.equal(await page.locator("[name=mask]").count(), 0, "no legacy CSS field for structured masks");
+    const maskHeight = async () =>
+      Math.round((await page.locator("#mask-section").boundingBox()).height);
+    assert.equal(
+      await page.locator("[name=mask]").count(),
+      0,
+      "no legacy CSS field for structured masks",
+    );
     assert.equal(await maskHeight(), 81, "one mask row: 40 above, 16 below (Wonder A6)");
     await page.locator('[data-mask-row="0"] [data-effect-tool="remove"]').click();
     assert.equal((await node("card")).masks, undefined);
@@ -455,8 +588,18 @@ const path = require("node:path");
     // Validation rejects malformed effects (shared with design-store validateDocument).
     const rejected = await page.evaluate(() => {
       const out = [];
-      for (const patch of [{ blendMode: "burn" }, { shadows: [{ type: "text", x: 0, y: 0, blur: 0, spread: 0, color: "#000000" }] }, { filters: [{ type: "brightness", value: 9 }] }, { masks: [{ type: "diamond" }] }]) {
-        try { window.design.updateNodes(["card"], patch); out.push(false); } catch { out.push(true); }
+      for (const patch of [
+        { blendMode: "burn" },
+        { shadows: [{ type: "text", x: 0, y: 0, blur: 0, spread: 0, color: "#000000" }] },
+        { filters: [{ type: "brightness", value: 9 }] },
+        { masks: [{ type: "diamond" }] },
+      ]) {
+        try {
+          window.design.updateNodes(["card"], patch);
+          out.push(false);
+        } catch {
+          out.push(true);
+        }
       }
       return out;
     });
@@ -468,8 +611,28 @@ const path = require("node:path");
         id: "glass-page",
         name: "Glass",
         nodes: [
-          { id: "under", name: "Under", type: "rectangle", x: 0, y: 0, w: 100, h: 100, color: "#3366ff", radius: 0 },
-          { id: "glass", name: "Glass", type: "rectangle", x: 0, y: 0, w: 100, h: 100, color: "transparent", radius: 0 },
+          {
+            id: "under",
+            name: "Under",
+            type: "rectangle",
+            x: 0,
+            y: 0,
+            w: 100,
+            h: 100,
+            color: "#3366ff",
+            radius: 0,
+          },
+          {
+            id: "glass",
+            name: "Glass",
+            type: "rectangle",
+            x: 0,
+            y: 0,
+            w: 100,
+            h: 100,
+            color: "transparent",
+            radius: 0,
+          },
         ],
       });
       d.activePage = "glass-page";
@@ -486,7 +649,11 @@ const path = require("node:path");
     const centre = async (png) =>
       page.evaluate(async (src) => {
         const image = new Image();
-        await new Promise((ok, fail) => { image.onload = ok; image.onerror = fail; image.src = src; });
+        await new Promise((ok, fail) => {
+          image.onload = ok;
+          image.onerror = fail;
+          image.src = src;
+        });
         const c = document.createElement("canvas");
         c.width = image.naturalWidth;
         c.height = image.naturalHeight;
@@ -495,14 +662,27 @@ const path = require("node:path");
         return [...ctx.getImageData(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1).data];
       }, png);
     const near = (px, want, what) =>
-      assert.ok(px.slice(0, 3).every((v, i) => Math.abs(v - want[i]) <= 24), `${what}: ${px} ≉ ${want}`);
+      assert.ok(
+        px.slice(0, 3).every((v, i) => Math.abs(v - want[i]) <= 24),
+        `${what}: ${px} ≉ ${want}`,
+      );
     const onCanvas = await page.locator('#canvas [data-id="glass"]').screenshot();
     // #3366ff inverted is #cc9900.
-    near(await centre("data:image/png;base64," + onCanvas.toString("base64")), [204, 153, 0], "canvas backdrop invert");
+    near(
+      await centre("data:image/png;base64," + onCanvas.toString("base64")),
+      [204, 153, 0],
+      "canvas backdrop invert",
+    );
     const glassHtml = await page.evaluate(() => window.design.exportHTML());
-    assert.ok(glassHtml.includes("backdrop-filter: invert(1)"), "exported HTML keeps the backdrop filter");
+    assert.ok(
+      glassHtml.includes("backdrop-filter: invert(1)"),
+      "exported HTML keeps the backdrop filter",
+    );
     const rendered = await page.evaluate(
-      (html) => window.desktop.renderDesign({ html, width: 100, height: 100, scale: 1 }).then((r) => r.dataURL),
+      (html) =>
+        window.desktop
+          .renderDesign({ html, width: 100, height: 100, scale: 1 })
+          .then((r) => r.dataURL),
       glassHtml,
     );
     near(await centre(rendered), [204, 153, 0], "exported HTML renders the backdrop invert");
@@ -511,7 +691,10 @@ const path = require("node:path");
     // wait in the Export options popover, and the open header shows only `−`.
     await page.evaluate(() => window.design.setSelection(["glass"]));
     await page.locator("#export-section .insp-add").click();
-    const exportName = await page.getByRole("textbox", { name: "Export file name" }).locator("..").boundingBox();
+    const exportName = await page
+      .getByRole("textbox", { name: "Export file name" })
+      .locator("..")
+      .boundingBox();
     const scaleBox = await page.locator("#artwork-scale").locator("..").boundingBox();
     const formatBox = await page.locator("#artwork-format").locator("..").boundingBox();
     assert.equal(Math.round(exportName.width), 256);
@@ -524,7 +707,9 @@ const path = require("node:path");
     assert.equal(await page.locator("#artwork-scope").isVisible(), true);
     await page.keyboard.press("Escape");
 
-    console.log("PASS inspector effects: 18 blend modes, border style, real outline, box/inner/drop/text shadows with variable colour, layer/backdrop filters (menu, backdrop render + export), gradient masks (collapse on removal), visible checkboxes, undo, canvas CSS, export, validation");
+    console.log(
+      "PASS inspector effects: 18 blend modes, border style, real outline, box/inner/drop/text shadows with variable colour, layer/backdrop filters (menu, backdrop render + export), gradient masks (collapse on removal), visible checkboxes, undo, canvas CSS, export, validation",
+    );
   } finally {
     await app.close();
     await fs.rm(profile, { recursive: true, force: true });

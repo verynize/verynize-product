@@ -38,18 +38,29 @@ function rank(entry: Entry, query: string) {
 function Surface({ className, ...props }: ComponentProps<typeof Command>) {
   return (
     <Command
-      className={cn("h-auto rounded-xl border border-card-border bg-background p-1 text-sm text-foreground-2 shadow-menu", className)}
+      className={cn(
+        "h-auto rounded-xl border border-card-border bg-background p-1 text-sm text-foreground-2 shadow-menu",
+        className,
+      )}
       {...props}
     />
   );
 }
 function Empty({ className, ...props }: ComponentProps<typeof CommandEmpty>) {
-  return <CommandEmpty className={cn("flex h-6 items-center px-2 py-0 text-sm text-subtle-foreground", className)} {...props} />;
+  return (
+    <CommandEmpty
+      className={cn("flex h-6 items-center px-2 py-0 text-sm text-subtle-foreground", className)}
+      {...props}
+    />
+  );
 }
 function Row({ className, ...props }: ComponentProps<typeof CommandItem>) {
   return (
     <CommandItem
-      className={cn("h-6 gap-1.5 text-sm text-foreground data-[selected=true]:bg-muted data-[selected=true]:text-foreground", className)}
+      className={cn(
+        "h-6 gap-1.5 text-sm text-foreground data-[selected=true]:bg-muted data-[selected=true]:text-foreground",
+        className,
+      )}
       {...props}
     />
   );
@@ -70,7 +81,7 @@ export function SlashCommands({ state }: { state: ChatState }) {
     if (!open) return;
     let live = true;
     setLoading(true);
-    loadAgentCommands(agent, root).then((list) => {
+    void loadAgentCommands(agent, root).then((list) => {
       if (!live) return;
       setAgentCommands(list);
       setLoading(false);
@@ -121,7 +132,10 @@ export function SlashCommands({ state }: { state: ChatState }) {
     };
     const update = () => {
       const caret = prompt.selectionStart ?? prompt.value.length;
-      const found = prompt.selectionStart === prompt.selectionEnd ? prompt.value.slice(0, caret).match(TOKEN) : null;
+      const found =
+        prompt.selectionStart === prompt.selectionEnd
+          ? prompt.value.slice(0, caret).match(TOKEN)
+          : null;
       if (!found) {
         dismissedAt = null;
         if (forced && !prompt.value.startsWith("/")) return;
@@ -161,12 +175,23 @@ export function SlashCommands({ state }: { state: ChatState }) {
         event.preventDefault();
         event.stopImmediatePropagation();
       };
-      const index = Math.max(0, list.findIndex((e) => e.name === current));
+      const index = Math.max(
+        0,
+        list.findIndex((e) => e.name === current),
+      );
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         if (!list.length) return;
         stop();
-        setSelected(list[(index + (event.key === "ArrowDown" ? 1 : list.length - 1)) % list.length].name);
-      } else if ((event.key === "Enter" || event.key === "Tab") && !event.shiftKey && !event.metaKey && !event.ctrlKey && list.length) {
+        setSelected(
+          list[(index + (event.key === "ArrowDown" ? 1 : list.length - 1)) % list.length].name,
+        );
+      } else if (
+        (event.key === "Enter" || event.key === "Tab") &&
+        !event.shiftKey &&
+        !event.metaKey &&
+        !event.ctrlKey &&
+        list.length
+      ) {
         stop();
         choose(list[index]);
       } else if (event.key === "Escape") {
@@ -214,7 +239,9 @@ export function SlashCommands({ state }: { state: ChatState }) {
 
   if (!open) return null;
   const pick = (entry: Entry) =>
-    document.getElementById("project-prompt")?.dispatchEvent(new CustomEvent("bd-slash-pick", { detail: entry }));
+    document
+      .getElementById("project-prompt")
+      ?.dispatchEvent(new CustomEvent("bd-slash-pick", { detail: entry }));
   return (
     <Surface
       id="chat-slash-commands"
@@ -224,7 +251,12 @@ export function SlashCommands({ state }: { state: ChatState }) {
       className="absolute inset-x-0 bottom-full z-40 mb-1.5"
     >
       <p className="flex h-6 items-center px-2 text-muted-foreground">Runs in this chat</p>
-      <CommandList ref={listRef} id="chat-slash-list" aria-label="Slash commands" className="max-h-72">
+      <CommandList
+        ref={listRef}
+        id="chat-slash-list"
+        aria-label="Slash commands"
+        className="max-h-72"
+      >
         <Empty>{loading ? "Loading commands…" : "No matching commands"}</Empty>
         {entries.map((entry) => (
           <Row

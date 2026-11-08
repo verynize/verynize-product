@@ -17,7 +17,11 @@ export function PreviewTabs({ tabClass, activeClass }: { tabClass: string; activ
             key={tab.frameId}
             data-preview-tab={tab.frameId}
             data-status={tab.status}
-            className={cn(tabClass, "group/preview-tab relative min-w-0 shrink gap-0 p-0", isActive && activeClass)}
+            className={cn(
+              tabClass,
+              "group/preview-tab relative min-w-0 shrink gap-0 p-0",
+              isActive && activeClass,
+            )}
           >
             <button
               type="button"
@@ -30,7 +34,9 @@ export function PreviewTabs({ tabClass, activeClass }: { tabClass: string; activ
                 <span data-pt="dot" data-status={tab.status} aria-hidden="true" />
               </span>
               <span className="min-w-0 truncate">
-                <span className={cn(isActive ? "text-foreground" : "text-inherit")}>{tab.name}</span>
+                <span className={cn(isActive ? "text-foreground" : "text-inherit")}>
+                  {tab.name}
+                </span>
                 <span className="text-muted-foreground">&nbsp;·&nbsp;{label}</span>
               </span>
             </button>

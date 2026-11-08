@@ -75,7 +75,13 @@ export class ActorCache {
         "SELECT type, name, tbl_name AS tbl, sql FROM main.sqlite_master WHERE sql IS NOT NULL AND name NOT LIKE 'sqlite_%' ORDER BY rowid",
       )
       .all()
-      .map((row) => ({ type: row.type, name: row.name, tbl: row.tbl, sql: row.sql }));
+      .map((row) => ({
+        type: row.type,
+        // sqlite_master.name is always TEXT
+        name: String(row.name),
+        tbl: row.tbl,
+        sql: row.sql,
+      }));
   }
 
   /** (Re)create the capture triggers of tables that are new or changed since the last call. */
@@ -163,7 +169,9 @@ export class ActorCache {
     this.syncTriggers(schema);
     const changes = this.db.prepare("SELECT DISTINCT tbl, pk FROM temp.vz_changes").all();
     const schemaText = JSON.stringify(schema);
-    const keys = new Map(changes.map((change) => [`${change.tbl}\u0000${change.pk}`, change]));
+    const keys = new Map(
+      changes.map((change) => [`${String(change.tbl)}\u0000${String(change.pk)}`, change]),
+    );
     let dropped = [];
     if (schemaText !== this.schema) {
       // New or altered tables are written whole; tables that disappeared are removed.
@@ -176,7 +184,7 @@ export class ActorCache {
         if (committed.get(name) === table.sql) continue;
         const select = `SELECT json_array(${table.pk.map(quote).join(",")}) AS pk FROM main.${quote(name)}`;
         for (const { pk } of this.db.prepare(select).all())
-          keys.set(`${name}\u0000${pk}`, { tbl: name, pk });
+          keys.set(`${name}\u0000${String(pk)}`, { tbl: name, pk });
       }
       dropped = [...committed.keys()].filter((name) => !this.tables.has(name));
     }

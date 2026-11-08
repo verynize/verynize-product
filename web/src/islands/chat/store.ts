@@ -2,7 +2,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type ChatPart = {
-  kind: "text" | "thinking" | "tool" | "permission" | "error" | string;
+  kind: "text" | "thinking" | "tool" | "permission" | "error" | (string & {});
   text?: string;
   at?: number;
   end?: number;
@@ -29,11 +29,35 @@ export type ChatPart = {
   agent?: string;
   account?: { id: string; name: string; system: boolean };
 };
-export type ChatQuestion = { id: string; question: string; header?: string; options?: { label: string; description?: string }[]; multiSelect?: boolean };
+export type ChatQuestion = {
+  id: string;
+  question: string;
+  header?: string;
+  options?: { label: string; description?: string }[];
+  multiSelect?: boolean;
+};
 /** A canvas element referenced from the composer (@mention or selection chip). */
-export type ChatMention = { id: string; label: string; pageId: string; type?: string; /** Agent-facing short id ("bok" or "bok.tem"). */ shortId?: string };
-export type QueuedTask = { id: string; text: string; images?: string[]; mentions?: ChatMention[]; at: number };
-export type ChatUsage = { inputTokens?: number; outputTokens?: number; contextWindow?: number; costUsd?: number; rateLimit?: { label: string; usedPercent: number; resetsAt?: number }[] };
+export type ChatMention = {
+  id: string;
+  label: string;
+  pageId: string;
+  type?: string;
+  /** Agent-facing short id ("bok" or "bok.tem"). */ shortId?: string;
+};
+export type QueuedTask = {
+  id: string;
+  text: string;
+  images?: string[];
+  mentions?: ChatMention[];
+  at: number;
+};
+export type ChatUsage = {
+  inputTokens?: number;
+  outputTokens?: number;
+  contextWindow?: number;
+  costUsd?: number;
+  rateLimit?: { label: string; usedPercent: number; resetsAt?: number }[];
+};
 export type ChatMessage = {
   role: "user" | "assistant";
   text: string;
@@ -57,7 +81,13 @@ export type ChatMessage = {
   /** Second-opinion review of the reply at index `of`, written by the other provider. */
   review?: { of: number; author?: string; diff?: boolean };
 };
-export type ChatDefaults = { agent: string; model: string; access: string; effort: string; instructions: string };
+export type ChatDefaults = {
+  agent: string;
+  model: string;
+  access: string;
+  effort: string;
+  instructions: string;
+};
 export type ChatState = {
   version: number;
   projectKey: string;
@@ -66,7 +96,13 @@ export type ChatState = {
   queued: number;
   session: string;
   conversationId: string | null;
-  conversations: { id: string; title: string; created: number; count: number; /** A run is in progress in this chat. */ busy?: boolean }[];
+  conversations: {
+    id: string;
+    title: string;
+    created: number;
+    count: number;
+    /** A run is in progress in this chat. */ busy?: boolean;
+  }[];
   messages: ChatMessage[];
   /** kind: image | file | folder | figma | chat | text. */
   attachments: { kind: string; name: string; url?: string }[];
@@ -99,9 +135,27 @@ export type ChatState = {
   /** Extra working directories of the current chat (/add-dir, linked worktrees). */
   directories?: string[];
 };
-export type ChatSummary = { id: string; title: string; created: number; count: number; branch?: string; /** Worktree folder (absent when the chat shares the repository root). */ root?: string; busy?: boolean };
+export type ChatSummary = {
+  id: string;
+  title: string;
+  created: number;
+  count: number;
+  branch?: string;
+  /** Worktree folder (absent when the chat shares the repository root). */ root?: string;
+  busy?: boolean;
+};
 export type WorkspaceActions = Partial<
-  Record<"openDesign" | "saveDesign" | "saveDesignAs" | "gitStatus" | "createWorktree" | "livePreview" | "captureApp" | "exportPDF", () => void>
+  Record<
+    | "openDesign"
+    | "saveDesign"
+    | "saveDesignAs"
+    | "gitStatus"
+    | "createWorktree"
+    | "livePreview"
+    | "captureApp"
+    | "exportPDF",
+    () => void
+  >
 >;
 export type AgentModel = { id: string; name: string; description?: string };
 
@@ -120,18 +174,18 @@ type Workspace = {
   setPartOpen(messageIndex: number, partIndex: number, open: boolean): void;
   removeAttachment(index: number): void;
   attachImages?(files: File[]): void;
-  listModels?(agent: string): Promise<AgentModel[]>;
+  listModels?: (agent: string) => Promise<AgentModel[]>;
   // --- chat parity contract (implemented in web/desktop-panel.js) ---
   answerQuestion?(messageIndex: number, partIndex: number, answers: Record<string, string>): void;
-  steer?(text: string): void;
+  steer?: (text: string) => void;
   /** Queue a follow-up behind the running turn (runs it right away when idle). */
-  queueMessage?(text: string): void;
+  queueMessage?: (text: string) => void;
   editQueued?(id: string, text: string): void;
   moveQueued?(id: string, delta: -1 | 1): void;
   removeQueued?(id: string): void;
   sendQueuedNow?(id: string): void;
   /** Opens verynize:// links (artboards/elements) on the canvas; returns false if unhandled. */
-  openLink?(url: string): boolean;
+  openLink?: (url: string) => boolean;
   /** Search canvas elements for the @ popover. */
   searchElements?(query: string): ChatMention[];
   addMention?(mention: ChatMention): void;
@@ -156,13 +210,17 @@ type Workspace = {
   attachedImages?(): { path: string; name: string }[];
   /** Start a fresh provider session for the next message (keeps the transcript). */
   clearSession?(): void;
-  setDraft?(text: string): void;
+  setDraft?: (text: string) => void;
   getQueue?(): QueuedTask[];
   /** Run id of the current conversation's active run (tests/debugging). */
   activeRunId?(): string | null;
   // --- Code workspace contract (web/desktop-panel.js; driven by web/src/islands/code) ---
   setChatFactory?(fn: (() => unknown) | null): void;
-  createChat?(extra: { id?: string; repoId?: string; worktree?: { path: string; branch: string | null } | null }): void;
+  createChat?(extra: {
+    id?: string;
+    repoId?: string;
+    worktree?: { path: string; branch: string | null } | null;
+  }): void;
   switchProject?(key: string, name: string, options?: { select?: string; create?: boolean }): void;
   chatSummaries?(key: string): ChatSummary[];
   removeChat?(id: string): boolean;
@@ -213,7 +271,7 @@ export function useModels(agent: string, enabled: boolean): AgentModel[] {
       });
       modelCache.set(agent, request);
     }
-    request.then((value) => {
+    void request.then((value) => {
       // An empty list (web: signed out, model API off) is asked again next time instead of being kept.
       if (!value.length) modelCache.delete(agent);
       if (live) setModels(value.filter((m) => m.id !== "default"));
@@ -231,7 +289,9 @@ export function useModels(agent: string, enabled: boolean): AgentModel[] {
  */
 export function agentOptions(): { id: string; label: string; available: boolean }[] {
   const select = document.getElementById("project-agent") as HTMLSelectElement | null;
-  return select ? [...select.options].map((o) => ({ id: o.value, label: o.text, available: !o.disabled })) : [];
+  return select
+    ? [...select.options].map((o) => ({ id: o.value, label: o.text, available: !o.disabled }))
+    : [];
 }
 
 /** Whether a provider was detected (desktop-panel disables the `<option>` of missing ones). */

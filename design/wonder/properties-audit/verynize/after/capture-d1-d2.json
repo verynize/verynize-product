@@ -58,9 +58,7 @@
   {
     "file": "D1-click-created.png",
     "tool": "move",
-    "selection": [
-      "0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc"
-    ],
+    "selection": ["0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc"],
     "nodes": [
       {
         "id": "0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc",
@@ -81,9 +79,7 @@
   {
     "file": "D2-click.png",
     "tool": "move",
-    "selection": [
-      "0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc"
-    ],
+    "selection": ["0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc"],
     "nodes": [
       {
         "id": "0fdb6cb4-9c14-46c0-96a0-89d37c8cb8fc",
@@ -104,9 +100,7 @@
   {
     "file": "D1-drag-created.png",
     "tool": "move",
-    "selection": [
-      "f6893f89-d2bb-40df-8a88-801b3f474741"
-    ],
+    "selection": ["f6893f89-d2bb-40df-8a88-801b3f474741"],
     "nodes": [
       {
         "id": "f6893f89-d2bb-40df-8a88-801b3f474741",
@@ -127,9 +121,7 @@
   {
     "file": "D2-drag.png",
     "tool": "move",
-    "selection": [
-      "f6893f89-d2bb-40df-8a88-801b3f474741"
-    ],
+    "selection": ["f6893f89-d2bb-40df-8a88-801b3f474741"],
     "nodes": [
       {
         "id": "f6893f89-d2bb-40df-8a88-801b3f474741",
@@ -171,9 +163,7 @@
   {
     "file": "D1-preset-created.png",
     "tool": "move",
-    "selection": [
-      "886202a1-34c5-4958-8466-7e49e603f731"
-    ],
+    "selection": ["886202a1-34c5-4958-8466-7e49e603f731"],
     "nodes": [
       {
         "id": "886202a1-34c5-4958-8466-7e49e603f731",
@@ -194,9 +184,7 @@
   {
     "file": "D2-preset.png",
     "tool": "move",
-    "selection": [
-      "886202a1-34c5-4958-8466-7e49e603f731"
-    ],
+    "selection": ["886202a1-34c5-4958-8466-7e49e603f731"],
     "nodes": [
       {
         "id": "886202a1-34c5-4958-8466-7e49e603f731",

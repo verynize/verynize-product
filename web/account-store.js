@@ -149,7 +149,14 @@
         )
           continue;
         // Provider sessions, machine paths and permissions cannot be resumed on another machine.
-        const { sessionId, forkFrom, worktree, dirs, repoId, ...transcript } = chat;
+        const {
+          sessionId: _sessionId,
+          forkFrom: _forkFrom,
+          worktree: _worktree,
+          dirs: _dirs,
+          repoId: _repoId,
+          ...transcript
+        } = chat;
         const old = valueOf("chat:" + chat.id);
         const storedProject = old && JSON.parse(old).project;
         put(
@@ -233,7 +240,8 @@
           for (const [key, change] of earlyChanges) pending.set(key, change);
           emit();
         }
-        for (const [key, change] of [...pending]) {
+        // A snapshot: `pending` changes while each write is awaited.
+        for (const [key, change] of Array.from(pending)) {
           let item;
           try {
             ({ item } = await request("/api/me/state/" + encodeURIComponent(key), {

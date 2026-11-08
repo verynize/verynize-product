@@ -37,7 +37,7 @@ const DESKTOP_AGENTS = [
   { id: "codex", name: "Codex", Mark: CodexMark },
 ];
 
-export function AiStep({ onContinue, onSkip }: { onContinue(): void; onSkip(): void }) {
+export function AiStep({ onContinue, onSkip }: { onContinue: () => void; onSkip: () => void }) {
   const { loading, error, credential, connected, off } = useAiStatus();
   const status = loading ? "loading" : error ? "error" : connected ? "connected" : "missing";
   return (
@@ -138,7 +138,7 @@ export function AiStep({ onContinue, onSkip }: { onContinue(): void; onSkip(): v
   );
 }
 
-export function ReadyStep({ onDone }: { onDone(): void }) {
+export function ReadyStep({ onDone }: { onDone: () => void }) {
   const { credential, connected } = useAiStatus();
   return (
     <div className="flex w-full max-w-sm flex-col items-center text-center">

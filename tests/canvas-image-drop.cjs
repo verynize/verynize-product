@@ -179,8 +179,10 @@ const os = require("node:os");
     assert.ok(Math.abs(small.x - (wide.x + 1640)) < 0.01);
     assert.ok(Math.abs(small.y - (local.y - 30)) < 0.01, "shorter images are centred in the row");
     assert.deepEqual(
-      (await page.evaluate(() => window.design.getSelection())).sort(),
-      [...second.ids].sort(),
+      (await page.evaluate(() => window.design.getSelection())).sort((a, b) =>
+        a < b ? -1 : a > b ? 1 : 0,
+      ),
+      [...second.ids].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
     );
     await page.evaluate(() => window.design.runCommand("edit.undo"));
     assert.equal((await images()).length, 1, "one undo step removes the whole drop");

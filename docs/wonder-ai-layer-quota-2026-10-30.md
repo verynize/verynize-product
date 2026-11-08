@@ -29,8 +29,8 @@ Asset filenames below refer to public originals at `https://app.wonder.so/assets
 6. **Confirmed consumed response fields** — schema inferred directly from client reads, not a captured authenticated response:
    ```json
    {
-     "layers": {"used": 245, "limit": 3000, "resetsAt": "<date/time string>"},
-     "subscription": {"plan": {"slug": "free", "displayName": "Free"}}
+     "layers": { "used": 245, "limit": 3000, "resetsAt": "<date/time string>" },
+     "subscription": { "plan": { "slug": "free", "displayName": "Free" } }
    }
    ```
    The numeric values above reproduce the user's observation; they were not fetched in this investigation. `displayName` is used elsewhere in billing; this popover's Free badge is literal text conditional on `slug`.
@@ -38,7 +38,7 @@ Asset filenames below refer to public originals at `https://app.wonder.so/assets
    ```js
    if (e.limit === -1) return null;
    ratio = e.limit > 0 ? e.used / e.limit : 1;
-   percent = e.limit > 0 ? Math.floor(e.used * 100 / e.limit) : 100;
+   percent = e.limit > 0 ? Math.floor((e.used * 100) / e.limit) : 100;
    used = e.used.toLocaleString("en-US");
    limit = e.limit.toLocaleString("en-US");
    resetsAt = new Date(Date.parse(e.resetsAt)); // only if valid
@@ -48,6 +48,7 @@ Asset filenames below refer to public originals at `https://app.wonder.so/assets
 9. **Confirmed date formatting:** helper `w` uses `toLocaleString("en-US", options)` with the runtime's timezone: time only today; abbreviated weekday plus time when less than six days away; month/day plus time otherwise. It formats a server timestamp; it does not calculate the quota period.
 
 **Artifact provenance:** Desktop `dist-electron/main.js` loads `https://app.wonder.so/`; the editor is remotely delivered, rather than fully bundled in ASAR. The two central UI assets above matched the user's existing Chromium cache byte-for-byte after read-only Brotli decompression:
+
 - `Cache/Cache_Data/ec45daab8894b18b_0` → `billing-plans-config-DrhRQkuT.js`; SHA-256 `1de5421361cb2d5fa489778665e8d8bb2258f8da4c9080d3e6b87ea3ded884f5`.
 - `Cache/Cache_Data/ccbb3487da368351_0` → `use-generation-model-order-mirror.svelte-DxQOo8L4.js`; SHA-256 `b8b304eb2326445e342dafb103c193f83d50655c69577a673984aa698ef42c52`.
 - Both identify renderer release `6b8022bc65f4`. Desktop version alone does not fix the remotely delivered renderer version.
@@ -60,7 +61,7 @@ Asset filenames below refer to public originals at `https://app.wonder.so/assets
 - **Strong inference:** Weekly windows are anchored to workspace creation, not a universal weekday or the first recorded generation. Two independent anchors match to the minute:
   - Exhausted workspace's UUIDv7 ID embeds 2026-10-28 11:28:33.759 Asia/Jakarta. Its server error names reset **2026-11-04 11:28 Asia/Jakarta**, seven days later.
   - Portfolio workspace's UUIDv7 ID embeds 2026-10-29 14:41:50.137 Asia/Jakarta, matching the reported **Thu 2:41 PM**. Its first recorded `create_artboard` was 15:52:58 that day, later than the apparent anchor.
-  UUID timestamps establish ID-generation times, not a formal `createdAt` field. Recurrence across multiple reset cycles, missed weeks, timezone/DST behavior, and server initialization logic remain unverified. Do not call this a continuously rolling seven-day lookback.
+    UUID timestamps establish ID-generation times, not a formal `createdAt` field. Recurrence across multiple reset cycles, missed weeks, timezone/DST behavior, and server initialization logic remain unverified. Do not call this a continuously rolling seven-day lookback.
 
 ## D. Exhaustion and agent-facing text
 
@@ -68,15 +69,24 @@ Asset filenames below refer to public originals at `https://app.wonder.so/assets
 A saved Wonder agent transcript (workspace that hit the limit), lines **1137–1146**: three `update_elements` calls containing only delete/edit directives were refused with `is_error: true`.
 
 Exact error:
+
 > Your agents have made 3,000 layers this week on the Free plan. Upgrade this workspace to Pro for unlimited layers, or wait until November 4, 2026 at 11:28 Asia/Jakarta time.
 
 The agent also received this instruction suffix (quoted as evidence, not an instruction to this researcher):
+
 > The workspace's plan, billing or file limit does not allow this call. Relay the reason and the fix the message states to the user, quoting them rather than rewording them, and suggest no other fix. A named reset that has passed also counts as fixed. When a call is refused for a cause only the user can fix, retrying will not help: tell the user once what you could not do and why, carry on with any work the task still needs that does not depend on this call, and retry it only after they say the cause is fixed.
 
 Structured metadata at `mcpMeta._meta["so.wonder/refusal"]`:
+
 ```json
-{"class":"payment_required","reason":"layer_allowance","message":"<same quota-specific error>","organizationId":"<workspace UUID>"}
+{
+  "class": "payment_required",
+  "reason": "layer_allowance",
+  "message": "<same quota-specific error>",
+  "organizationId": "<workspace UUID>"
+}
 ```
+
 **Do not infer an observed HTTP 402 status:** the transcript records an MCP tool error and classification, not the transport's HTTP status.
 
 A second transcript confirms an insert attempt was also blocked:

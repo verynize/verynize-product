@@ -112,7 +112,7 @@ function Toggle({
   id: string;
   label: string;
   pressed: boolean;
-  onChange(next: boolean): void;
+  onChange: (next: boolean) => void;
   children: React.ReactNode;
 }) {
   return (

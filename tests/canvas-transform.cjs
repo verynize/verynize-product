@@ -13,14 +13,16 @@ const fs = require("node:fs/promises"),
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "canvas-transform-")),
     env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
     timeout: 20000,
   });
   try {
-    const page = await app.firstWindow({ timeout: 20000 }); await moveOffCursor(app);
+    const page = await app.firstWindow({ timeout: 20000 });
+    await moveOffCursor(app);
     const installTrace = () => {
       window.__inputTrace = [];
       for (const type of [
@@ -288,7 +290,7 @@ const fs = require("node:fs/promises"),
     // Shift snaps to 15°.
     await dragFrom(start, target.x - start.x, target.y - start.y, { modifier: "Shift" });
     a = await node("a");
-    assert.equal(Math.abs(a.rotation % 15), 0, `Shift snaps to 15° (${a.rotation})`);
+    assert.equal(Math.abs(a.rotation % 15), 0, `Shift snaps to 15° (${String(a.rotation)})`);
     assert.ok(a.rotation > -180 && a.rotation <= 180);
 
     // ---------- TR1: edge resize, Shift aspect, Alt from the centre, no distance guides ----------

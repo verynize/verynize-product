@@ -10,7 +10,8 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-binding-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
@@ -149,25 +150,29 @@ const path = require("node:path");
     assert.equal((await node("card")).strokeWidths, undefined, "All collapses the side entries");
     assert.equal((await styles("card")).border, "1px");
     await page.evaluate(() => window.design.runCommand("edit.undo"));
-    assert.deepEqual((await node("card")).strokeWidths, [1, 2, 3, 4], "one undo restores the sides");
+    assert.deepEqual(
+      (await node("card")).strokeWidths,
+      [1, 2, 3, 4],
+      "one undo restores the sides",
+    );
     await page.locator('[name="strokeSide-0"]').selectOption("all");
     for (const [field, value, override, initial, cssKey] of [
       ["radius", "18", "cornerRadii", [4, 8, 12, 16], "radius"],
       ["strokeWidth", "6", "strokeWidths", undefined, "border"],
     ]) {
-      await page.locator(`[name="${field}"]`).fill(value);
-      await page.locator(`[name="${field}"]`).press("Enter");
+      await page.locator(`[name="${String(field)}"]`).fill(value);
+      await page.locator(`[name="${String(field)}"]`).press("Enter");
       assert.equal(
         (await node("card"))[override],
         undefined,
-        `${field}: uniform input clears overrides`,
+        `${String(field)}: uniform input clears overrides`,
       );
-      assert.equal((await styles("card"))[cssKey], `${value}px`);
+      assert.equal((await styles("card"))[cssKey], `${String(value)}px`);
       await page.evaluate(() => window.design.runCommand("edit.undo"));
       assert.deepEqual(
         (await node("card"))[override],
         initial,
-        `${field}: one undo restores individual values`,
+        `${String(field)}: one undo restores individual values`,
       );
     }
     const bind = async (field) => {

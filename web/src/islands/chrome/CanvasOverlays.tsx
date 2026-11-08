@@ -135,9 +135,7 @@ function Toolbar() {
                   toolButton,
                   tool === name && "bg-accent text-foreground hover:bg-accent",
                 )}
-                onClick={() =>
-                  name === "text" || name === "pen" ? toggleTool(name) : run(id)
-                }
+                onClick={() => (name === "text" || name === "pen" ? toggleTool(name) : run(id))}
               >
                 <Icon />
               </button>

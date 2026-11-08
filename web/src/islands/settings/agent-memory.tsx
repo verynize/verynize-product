@@ -7,14 +7,29 @@ import { cn } from "@/lib/utils";
 import { Card, Row, Section, SettingsButton, TextField } from "./controls";
 import { platform } from "@/lib/platform";
 
-export type DesignPreference = { id: string; text: string; created?: string | null; updated?: string | null };
+export type DesignPreference = {
+  id: string;
+  text: string;
+  created?: string | null;
+  updated?: string | null;
+};
 export type PreferencesIpc = {
   list(): Promise<DesignPreference[]>;
   save(text: string): Promise<DesignPreference>;
   update(id: string, text: string): Promise<DesignPreference>;
   remove(id: string): Promise<unknown>;
 };
-export type AllowRule = string | ({ id?: string; label?: string; rule?: string; pattern?: string; tool?: string; agent?: string; description?: string } & Record<string, unknown>);
+export type AllowRule =
+  | string
+  | ({
+      id?: string;
+      label?: string;
+      rule?: string;
+      pattern?: string;
+      tool?: string;
+      agent?: string;
+      description?: string;
+    } & Record<string, unknown>);
 const desktop = () => platform.desktop;
 export const MAX_PREFERENCE_LENGTH = 280;
 /** How many design preferences the runtime keeps (desktop enforces the same limit). */
@@ -28,7 +43,10 @@ function CharCounter({ length, id }: { length: number; id?: string }) {
       id={id}
       data-preference-counter
       aria-live="polite"
-      className={cn("shrink-0 text-xs tabular-nums", near ? "text-warning" : "text-subtle-foreground")}
+      className={cn(
+        "shrink-0 text-xs tabular-nums",
+        near ? "text-warning" : "text-subtle-foreground",
+      )}
     >
       {length} / {MAX_PREFERENCE_LENGTH}
     </span>
@@ -37,7 +55,10 @@ function CharCounter({ length, id }: { length: number; id?: string }) {
 
 export function preferencesIpc(): PreferencesIpc | null {
   const ipc: Partial<PreferencesIpc> | undefined = desktop()?.designPreferences;
-  return ipc && (["list", "save", "update", "remove"] as const).every((k) => typeof ipc[k] === "function") ? (ipc as PreferencesIpc) : null;
+  return ipc &&
+    (["list", "save", "update", "remove"] as const).every((k) => typeof ipc[k] === "function")
+    ? (ipc as PreferencesIpc)
+    : null;
 }
 export const allowRulesAvailable = () => typeof desktop()?.listAllowRules === "function";
 
@@ -82,13 +103,15 @@ export function DesignPreferencesSection() {
   const full = (items?.length ?? 0) >= MAX_PREFERENCES;
   const add = async () => {
     const text = draft.trim();
-    if (text && !full && (await run(() => ipc!.save(text), "Design preference saved"))) setDraft("");
+    if (text && !full && (await run(() => ipc!.save(text), "Design preference saved")))
+      setDraft("");
   };
   const commitEdit = async () => {
     if (!editing) return;
     const text = editing.text.trim();
     if (!text) return;
-    if (await run(() => ipc!.update(editing.id, text), "Design preference updated")) setEditing(null);
+    if (await run(() => ipc!.update(editing.id, text), "Design preference updated"))
+      setEditing(null);
   };
 
   return (
@@ -99,7 +122,11 @@ export function DesignPreferencesSection() {
       action={
         ipc &&
         items !== null && (
-          <span id="settings-design-preference-count" data-preference-count className="shrink-0 text-sm text-muted-foreground tabular-nums">
+          <span
+            id="settings-design-preference-count"
+            data-preference-count
+            className="shrink-0 text-sm text-muted-foreground tabular-nums"
+          >
             {items.length} / {MAX_PREFERENCES}
           </span>
         )
@@ -107,7 +134,10 @@ export function DesignPreferencesSection() {
     >
       {!ipc ? (
         <Card>
-          <Row title="Available in the desktop app" description="Design preferences are stored on this computer by Verynize." />
+          <Row
+            title="Available in the desktop app"
+            description="Design preferences are stored on this computer by Verynize."
+          />
         </Card>
       ) : (
         <Card id="settings-design-preference-list">
@@ -119,7 +149,11 @@ export function DesignPreferencesSection() {
           )}
           {(items ?? []).map((pref) =>
             editing?.id === pref.id ? (
-              <div key={pref.id} data-preference-id={pref.id} className="flex items-center gap-2 py-3.5">
+              <div
+                key={pref.id}
+                data-preference-id={pref.id}
+                className="flex items-center gap-2 py-3.5"
+              >
                 <TextField
                   autoFocus
                   aria-label="Edit design preference"
@@ -138,16 +172,35 @@ export function DesignPreferencesSection() {
                     }
                   }}
                 />
-                <CharCounter id="settings-design-preference-edit-counter" length={editing.text.length} />
-                <SettingsButton aria-label="Save preference" data-preference-save disabled={busy} onClick={() => void commitEdit()}>
+                <CharCounter
+                  id="settings-design-preference-edit-counter"
+                  length={editing.text.length}
+                />
+                <SettingsButton
+                  aria-label="Save preference"
+                  data-preference-save
+                  disabled={busy}
+                  onClick={() => void commitEdit()}
+                >
                   <CheckIcon />
                 </SettingsButton>
-                <SettingsButton variant="ghost" aria-label="Cancel editing" onClick={() => setEditing(null)}>
+                <SettingsButton
+                  variant="ghost"
+                  aria-label="Cancel editing"
+                  onClick={() => setEditing(null)}
+                >
                   <XIcon />
                 </SettingsButton>
               </div>
             ) : (
-              <Row key={pref.id} title={<span data-preference-id={pref.id} data-preference-text className="break-words">{pref.text}</span>}>
+              <Row
+                key={pref.id}
+                title={
+                  <span data-preference-id={pref.id} data-preference-text className="break-words">
+                    {pref.text}
+                  </span>
+                }
+              >
                 <SettingsButton
                   variant="ghost"
                   className="w-7 px-0"
@@ -177,14 +230,22 @@ export function DesignPreferencesSection() {
               aria-describedby="settings-design-preference-new-counter"
               maxLength={MAX_PREFERENCE_LENGTH}
               disabled={full}
-              placeholder={full ? `All ${MAX_PREFERENCES} spots are used; edit or delete one first` : "Add a taste note, e.g. “Muted earth tones with one bold accent”"}
+              placeholder={
+                full
+                  ? `All ${MAX_PREFERENCES} spots are used; edit or delete one first`
+                  : "Add a taste note, e.g. “Muted earth tones with one bold accent”"
+              }
               className="min-w-0 flex-1"
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => event.key === "Enter" && void add()}
             />
             <CharCounter id="settings-design-preference-new-counter" length={draft.length} />
-            <SettingsButton id="settings-design-preference-add" disabled={busy || full || !draft.trim()} onClick={() => void add()}>
+            <SettingsButton
+              id="settings-design-preference-add"
+              disabled={busy || full || !draft.trim()}
+              onClick={() => void add()}
+            >
               <PlusIcon />
               Add
             </SettingsButton>
@@ -197,9 +258,16 @@ export function DesignPreferencesSection() {
 
 /* ---------- Allowed actions ---------- */
 const ruleLabel = (rule: AllowRule) =>
-  typeof rule === "string" ? rule : String(rule.label ?? rule.rule ?? rule.pattern ?? rule.tool ?? rule.id ?? JSON.stringify(rule));
+  typeof rule === "string"
+    ? rule
+    : String(
+        rule.label ?? rule.rule ?? rule.pattern ?? rule.tool ?? rule.id ?? JSON.stringify(rule),
+      );
 const ruleDetail = (rule: AllowRule) =>
-  typeof rule === "string" ? undefined : [rule.agent, rule.description].filter((v) => typeof v === "string" && v).join(" · ") || undefined;
+  typeof rule === "string"
+    ? undefined
+    : [rule.agent, rule.description].filter((v) => typeof v === "string" && v).join(" · ") ||
+      undefined;
 
 export function AllowedActionsSection() {
   const [rules, setRules] = useState<AllowRule[] | null>(null);
@@ -234,13 +302,20 @@ export function AllowedActionsSection() {
     >
       <Card id="settings-allow-rule-list">
         {rules !== null && rules.length === 0 && (
-          <Row title="No allowed actions yet" description="When an agent asks for permission, choose “Always allow” to skip the question next time." />
+          <Row
+            title="No allowed actions yet"
+            description="When an agent asks for permission, choose “Always allow” to skip the question next time."
+          />
         )}
         {(rules ?? []).map((rule, i) => (
           <Row
             key={`${ruleLabel(rule)}-${i}`}
             icon={<ShieldCheckIcon className="size-4 shrink-0 text-muted-foreground" />}
-            title={<span data-allow-rule className="font-mono text-xs break-all">{ruleLabel(rule)}</span>}
+            title={
+              <span data-allow-rule className="font-mono text-xs break-all">
+                {ruleLabel(rule)}
+              </span>
+            }
             description={ruleDetail(rule)}
           >
             {typeof desktop()?.removeAllowRule === "function" && (

@@ -78,7 +78,7 @@ test("pack round trip: manifest, documents, components and one shared asset", as
   const zip = encodePack(PACK);
   const files = readZip(zip);
   assert.deepEqual(
-    [...files.keys()].sort(),
+    [...files.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
     [
       "assets/" + [...files.keys()].find((k) => k.startsWith("assets/")).slice(7),
       "components/c1.json",

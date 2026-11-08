@@ -22,7 +22,7 @@ const MIGRATIONS = new URL("../../migrations/", import.meta.url);
  * @param {{url: string, authToken?: string}} options.database libSQL for env.DB and actor storage
  * @param {string} [options.dataDir] local directory for `r2` file blobs (development only)
  * @param {object} [options.coordinator] lease and liveness timings, test hooks (actors.js)
- * @returns {{env: object, coordinator: Coordinator, ready: Promise<void>, close(): Promise<void>}}
+ * @returns {{env: object, coordinator: Coordinator, ready: Promise<void>, close: () => Promise<void>}}
  */
 export function createVercelEnv({ classes, bindings, redisUrl, database, dataDir, coordinator }) {
   const redis = new RedisConnection(redisUrl);
@@ -81,7 +81,7 @@ export function createVercelEnv({ classes, bindings, redisUrl, database, dataDir
     env,
     coordinator: actors,
     ready,
-    async close() {
+    close: async () => {
       await actors.close();
       client.close();
     },

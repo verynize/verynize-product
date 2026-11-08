@@ -15,7 +15,8 @@ function labelDialogs() {
     if (!dialog) continue;
     dialog.dataset.bdDialog = "settings";
     if (info.title) dialog.setAttribute("aria-labelledby", info.title);
-    else if (info.label && !dialog.hasAttribute("aria-label")) dialog.setAttribute("aria-label", info.label);
+    else if (info.label && !dialog.hasAttribute("aria-label"))
+      dialog.setAttribute("aria-label", info.label);
     const close = info.close && document.getElementById(info.close);
     if (close) {
       close.setAttribute("aria-label", "Close");
@@ -24,8 +25,7 @@ function labelDialogs() {
     }
   }
   // Primary actions get the purple button treatment.
-  for (const id of ["cloud-create"])
-    document.getElementById(id)?.classList.add("bd-primary");
+  for (const id of ["cloud-create"]) document.getElementById(id)?.classList.add("bd-primary");
   // Cloud share: group the room actions so the panel reads like Wonder's share popover.
   const publicLink = document.getElementById("cloud-public");
   if (publicLink && !publicLink.textContent) publicLink.hidden = true;
@@ -49,7 +49,10 @@ export function DialogEnhancer() {
       const observer = new MutationObserver(() => {
         if (dialog.open) {
           labelDialogs();
-          if (!dialog.contains(document.activeElement) || document.activeElement?.classList.contains("bd-dialog-close"))
+          if (
+            !dialog.contains(document.activeElement) ||
+            document.activeElement?.classList.contains("bd-dialog-close")
+          )
             focusFirstField(dialog);
         }
       });

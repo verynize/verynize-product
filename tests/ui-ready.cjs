@@ -81,6 +81,7 @@ function assertReady(state, when) {
     const launch = await page.evaluate(
       (source) =>
         new Promise((resolve) => {
+          // oxlint-disable-next-line typescript/no-implied-eval -- rebuilds the serialized snapshot function in the page
           const snap = new Function(`return (${source})()`);
           if (document.documentElement.dataset.uiReady === "true")
             resolve({ late: true, ...snap() });
@@ -101,6 +102,7 @@ function assertReady(state, when) {
     await page.addInitScript((source) => {
       window.__uiReadyEvents = [];
       window.addEventListener("bd:ui-ready", () => {
+        // oxlint-disable-next-line typescript/no-implied-eval -- rebuilds the serialized snapshot function in the page
         window.__uiReadyEvents.push(new Function(`return (${source})()`)());
       });
     }, snapshot.toString());

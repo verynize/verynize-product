@@ -75,10 +75,13 @@ export type CapturedPreview = {
 export interface DesktopApi {
   // Agent sign-in and onboarding (desktop/agent-auth.cjs).
   agentAccountStatus(options: { agent: Agent; profile?: string }): Promise<ProfileStatus>;
-  startAgentLogin(options: { agent: Agent | string; profile?: string }): Promise<{ id: string }>;
+  startAgentLogin(options: {
+    agent: Agent | (string & {});
+    profile?: string;
+  }): Promise<{ id: string }>;
   cancelAgentLogin(options: { id: string }): Promise<unknown>;
   agentLogout(options: { agent: Agent; profile?: string }): Promise<unknown>;
-  openExternal(url: string): Promise<unknown>;
+  openExternal: (url: string) => Promise<unknown>;
   onboardingState(): Promise<{ skip: boolean }>;
   /** Share panel server default (desktop/cloud-defaults.cjs): production, or VERYNIZE_CLOUD_SERVER. */
   cloudDefaults(): Promise<{ server: string }>;
@@ -142,8 +145,8 @@ export interface DesktopApi {
     chooseDestination(): Promise<string | null>;
   };
   agentLiveStatus: {
-    mcp(options: { agent: string; chatId?: string | null }): Promise<Omit<McpSnapshot, "at">>;
-    context(options: { chatId?: string | null }): Promise<ContextBreakdown | null>;
+    mcp: (options: { agent: string; chatId?: string | null }) => Promise<Omit<McpSnapshot, "at">>;
+    context: (options: { chatId?: string | null }) => Promise<ContextBreakdown | null>;
   };
   agentMemory: MemoryIpc;
   // Integrated terminal (desktop/terminal.cjs).
@@ -172,9 +175,9 @@ export interface DesktopApi {
     height: number;
     scale: number;
   }): Promise<RenderResult>;
-  fontFaces(
+  fontFaces: (
     families: { family: string; weights: number[]; styles: string[] }[],
-  ): Promise<{ css: string }>;
+  ) => Promise<{ css: string }>;
   renderPDF(options: {
     html: string;
     width: number;
@@ -222,7 +225,7 @@ export interface DesktopApi {
   onPreviewNavigated: Untyped;
   previewInspect: Untyped;
   previewEdit: Untyped;
-  previewClearData(options: { url: string; logins: boolean }): Promise<unknown>;
+  previewClearData: (options: { url: string; logins: boolean }) => Promise<unknown>;
   previewDom: Untyped;
   captureLivePreview(
     options: PreviewTarget & { url: string; region?: unknown },
@@ -275,7 +278,7 @@ export interface DesktopApi {
   respondAgentQuestion: Untyped;
   steerAgent: Untyped;
   listAgentRuns: Untyped;
-  listAllowRules(options?: { projectKey?: string }): Promise<AllowRule[]>;
+  listAllowRules: (options?: { projectKey?: string }) => Promise<AllowRule[]>;
   removeAllowRule(rule: unknown): Promise<unknown>;
   agentToolsVersion: Untyped;
   agentTitle: Untyped;
@@ -290,14 +293,14 @@ export interface DesktopApi {
   gitPullRequest: GitApi["gitPullRequest"];
   gitCreatePullRequest: GitApi["gitCreatePullRequest"];
   designPreferences: PreferencesIpc;
-  designStylesList(): Promise<{ id: string; name: string; summary?: string }[]>;
+  designStylesList: () => Promise<{ id: string; name: string; summary?: string }[]>;
   agentBehavior: BehaviorIpc;
   // Composer: slash commands, design references, worktree files (desktop/agent-commands.cjs, chat-attachments.cjs).
   listAgentModels: Untyped;
-  listAgentCommands(options: {
+  listAgentCommands: (options: {
     agent: string;
     root?: string | null;
-  }): Promise<{ commands: AgentCommand[] }>;
+  }) => Promise<{ commands: AgentCommand[] }>;
   designReferencesList(): Promise<ReferenceCollection[]>;
   designReferencesSave(options: { name: string; images: string[] }): Promise<ReferenceCollection>;
   designReferencesAttach(options: {

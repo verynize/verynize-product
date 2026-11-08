@@ -11,6 +11,7 @@ python3 design/wonder/canvas-audit/make-pairs.py                  # pairs/<name>
 ```
 
 **Fixture** (one document, reloaded before every step; camera = zoom to fit, 36%). Page 1 holds:
+
 - the artboard `Portfolio Home Desktop`, a 1440×900 free frame that clips its content. Its children are:
   - `Site Header`, a frame containing the text `Logo`;
   - `Hero Section`, a flex row with gap 40 and padding 40, holding `Hero Text` (text, H Hug), `Hero Media` (image, 280×280) and `Accent Card` (rectangle, W Fill);
@@ -23,6 +24,7 @@ python3 design/wonder/canvas-audit/make-pairs.py                  # pairs/<name>
 Page 2 holds one rectangle.
 
 **Wonder evidence used.**
+
 - The user's two screenshots:
   - `…77784354….png`: right-click on a frame, at 1×.
   - `…28e4e270….png`: right-click on empty canvas, at 1×.
@@ -32,6 +34,7 @@ Page 2 holds one rectangle.
 Wonder measurements below come from the user screenshots, which are 1× captures. They are therefore ±1 px.
 
 **Caveat on the Wonder files.** `manifest.json` shows that several Wonder PNGs are byte-identical, so their pairs do not show the named state:
+
 - `CM2-frame.png` = `S4-frame.png` = `T1-plus/shader/text/view-a/view-b.png`. All of these are an empty page with the Frame tool active.
 - `S2-click` = `S2-drill` = `S2-escape` = `T1-move-tooltip`.
 - `TR2-hover` = `TR2-rotate`.
@@ -40,6 +43,7 @@ Wonder measurements below come from the user screenshots, which are 1× captures
 For CM2, compare against the user screenshot and `../wonder/CM2-copy-as.png` / `CM2-arrange.png` / `CM2-layout.png` / `CM2-select-layer.png`. Those do show the menu.
 
 **State names** follow Codex's Wonder names wherever one existed, so `make-pairs.py` pairs them (81 pairs). Verynize-only extra states:
+
 - `CM4-image`, `CM4-rectangle`;
 - `S1-hover-nested`, `S1-hover-deep-cmd`, `S2-click-deep-cmd`, `S2-empty-click`, `S3-shift-remove`, `S3-marquee-result`, `S3-marquee-inside-frame/-result`;
 - `S4-hug/fill/fixed/multi-selection`;
@@ -51,23 +55,24 @@ For CM2, compare against the user screenshot and `../wonder/CM2-copy-as.png` / `
 - `L1-expand-collapse`, `L2-page-delete`.
 
 Two name matches are guesses:
+
 - `TR4-guide` is my equal-spacing shot.
 - `TR4-sibling` is my edge-alignment shot.
 
 Common style of the canvas context menu (`#canvas-menu`, `web/canvas.css:64-69`; built in `web/canvas-interactions.js:1499-1519`):
 
-| | Verynize (measured) | Wonder (user screenshots) |
-|---|---|---|
-| Menu width | 210 (min-width), content-sized | 176–177 |
-| Background | `#262626` rgb(38,38,38) | rgb(28,28,28) |
-| Border | 1px `#3a3a3a` rgb(58,58,58) | 1px ≈ rgb(34–38) |
-| Radius / padding | 8 / 4 | ≈8 / ≈4 |
-| Item | 25 tall, padding 6/8, 11px Inter, radius 5 | 25 tall, ≈13px |
-| Separator | `<hr>` 1px `#383838`, 4px margin → 9px block | 1px ≈ rgb(40,40,40), ≈10px block |
-| Highlighted row | solid accent `#b93cdb` rgb(185,60,219), white text | tinted purple rgb(69,41,85), text keeps colour |
-| Shortcut text | `#8a8a8a`, uppercase (`DELETE`) | muted, glyphs (`⌘⇧H`) |
-| Submenus | none (flat list) | `›` chevrons, side flyouts |
-| Initial highlight | none | first item (`Add context`) highlighted |
+|                   | Verynize (measured)                                | Wonder (user screenshots)                      |
+| ----------------- | -------------------------------------------------- | ---------------------------------------------- |
+| Menu width        | 210 (min-width), content-sized                     | 176–177                                        |
+| Background        | `#262626` rgb(38,38,38)                            | rgb(28,28,28)                                  |
+| Border            | 1px `#3a3a3a` rgb(58,58,58)                        | 1px ≈ rgb(34–38)                               |
+| Radius / padding  | 8 / 4                                              | ≈8 / ≈4                                        |
+| Item              | 25 tall, padding 6/8, 11px Inter, radius 5         | 25 tall, ≈13px                                 |
+| Separator         | `<hr>` 1px `#383838`, 4px margin → 9px block       | 1px ≈ rgb(40,40,40), ≈10px block               |
+| Highlighted row   | solid accent `#b93cdb` rgb(185,60,219), white text | tinted purple rgb(69,41,85), text keeps colour |
+| Shortcut text     | `#8a8a8a`, uppercase (`DELETE`)                    | muted, glyphs (`⌘⇧H`)                          |
+| Submenus          | none (flat list)                                   | `›` chevrons, side flyouts                     |
+| Initial highlight | none                                               | first item (`Add context`) highlighted         |
 
 Verynize's two Radix menus (layers row and pages row) use the shadcn context-menu instead (`web/src/components/ui/context-menu.tsx`): width 176, bg rgb(34,34,34), border rgb(46,46,46), radius 10, padding 6, items 28 tall at 12px, with icons. That gives two different menu styles on the same screen.
 
@@ -76,6 +81,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## CM. Context menus
 
 ### CM1 Empty canvas (`CM1-empty.png`)
+
 - **Steps.** Fresh launch with nothing copied, nothing selected; right-click empty canvas.
 - **Verynize now.** The menu is 210×119 at the cursor. Items: `Select all ⌘A` · `Select inverse ⌘⇧A` | `Zoom to fit ⇧1` · `Zoom to selection ⇧2`.
   - Paste is filtered out entirely because the clipboard is empty.
@@ -94,6 +100,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Wrong items, extra items, wrong size and colours.
 
 ### CM2 A frame (`CM2-frame.png`, `CM2-copy-as.png`, `CM2-select-layer.png`, `CM2-arrange.png`, `CM2-layout.png`)
+
 - **Steps.** Right-click the artboard background. The artboard is selected and the menu opens.
 - **Verynize now.** One flat menu, 210×773 (36 items), clamped to `innerHeight − h − 8`:
   - `Copy ⌘C` · `Cut ⌘X` · `Duplicate ⌘D` · `Delete DELETE`
@@ -108,8 +115,9 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
   Further details:
   - Paste appears only after a copy (CM10).
   - There are no submenus, so the four submenu shots hover the nearest flat item instead: `Copy as PNG`, `Select all matching layers`, `Bring to front`, `Add auto layout`.
-  - **Bug seen in the shot:** the selection size badge (`#selection-measure`, `1440 × 900`) paints *over* the menu (`Scale 2×` row).
+  - **Bug seen in the shot:** the selection size badge (`#selection-measure`, `1440 × 900`) paints _over_ the menu (`Scale 2×` row).
   - The menu inherits no item for `Add context`, `Copy link to selection`, `Select layer ›`, `Paste to replace`, `Paste over selection`, `Hide label` or `Set as file thumbnail`.
+
 - **Source.**
   - `web/canvas-interactions.js:1504`: groups.
   - `:1468`: `shortcutText` uppercases the whole key, hence `DELETE`.
@@ -131,6 +139,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
   - `Select layer ›`: the layer stack under the pointer (e.g. `Frame`).
 
   Wonder has no Cut, Delete, Select inverse, flip/rotate/scale, unframe or zoom items in this menu.
+
 - **Fix sketch.**
   - Add submenu support to the canvas menu, or move it to the Radix `ContextMenu` in the chrome island with a portal, which also fixes the z-order.
   - Selection menu: `Add context` (send the selection to chat) | `Copy`, `Copy as ›`, `Copy link to selection` | `Select layer ›` (from `document.elementsFromPoint` → node path) and the paste family (`Paste`, `Paste to replace`, `Paste over selection`, `Duplicate`) | `Hide`/`Show`, `Lock`/`Unlock`, `Hide label` (artboards only) | `Arrange ›` (4 z-order items | 2 flips) | `Layout ›` (`Frame selection`, `Add auto layout`/`Remove auto layout`) | `Set as file thumbnail`.
@@ -140,6 +149,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Flat 36-item list versus Wonder's 14 items with 4 submenus. Most labels and the order differ. The badge overlaps the menu.
 
 ### CM3 A text layer (`CM3-text.png`)
+
 - **Verynize now.** Right-clicking `About` selects it. The menu is identical to CM2 (same 36 items; nothing is text-specific).
 - **Source.** `web/canvas-interactions.js:1499-1519`.
 - **Wonder.** `CM3-text` / `CM3-text-menu` show the same structure as CM2 (Add context … Set as file thumbnail).
@@ -147,6 +157,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch, for the same reasons as CM2.
 
 ### CM4 Non-frame child (`CM4-rectangle.png`, `CM4-image.png`, `CM4-shader.png`)
+
 - **Verynize now.** Same 36-item menu for the rectangle, image and shader.
   - Behaviour difference: with `Hero Section` already selected, right-clicking `Hero Media` keeps `Hero Section` selected. The handler uses `resolveHit()`, not `clickTarget()`, so the menu does not retarget to the child. A left click would drill into it.
 - **Source.** `web/canvas-interactions.js:1501-1502`.
@@ -155,6 +166,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Items as CM2, and right-click does not drill into a selected parent's child.
 
 ### CM5 Multi-selection (`CM5-multi.png`)
+
 - **Verynize now.** With Chip A, Chip B and About selected, right-clicking Chip B keeps all three. The menu is the same 36 items.
   - The badge shows only one node (`400 × 56`, name label `About`). There is no union box (see S4).
 - **Source.** `web/canvas-interactions.js:1502`; `web/app.js:98` (`updateMeasurement` uses `chosen()`, the first selected node).
@@ -163,6 +175,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch, as CM2.
 
 ### CM6 Hidden and locked (`CM6-hidden.png`, `CM6-locked.png`)
+
 - **Verynize now.**
   - **Hidden layer:** it has no canvas box, so it was selected from the layers panel and the empty canvas right-clicked. The full menu shows the static label `Show/hide ⌘⇧H`.
   - **Locked layer:** right-clicking `Locked badge` selects the artboard, not the locked layer, because locked layers are not hit. The menu shows `Lock/unlock ⌘⇧L`.
@@ -173,6 +186,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Static combined labels.
 
 ### CM7 Layers panel row (`CM7-row.png`)
+
 - **Verynize now.** Radix context menu, 176×107: `Rename` (pencil icon) | `Lock` · `Hide`. Rows are 28 tall, 12px, with icons and no shortcuts.
 - **Source.** `web/src/islands/sidebar/LayersSection.tsx:249-263`.
 - **Wonder.** `CM7-row` shows the **same full canvas menu** as CM2: Add context ⌘L … Set as file thumbnail.
@@ -180,6 +194,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Different menu entirely.
 
 ### CM8 Pages panel row (`CM8-page.png`)
+
 - **Verynize now.** 176×70: `Rename page` (pencil) · `Delete page` (trash, destructive red; disabled when only one page).
 - **Source.** `web/src/islands/sidebar/PagesSection.tsx:44-57`.
 - **Wonder.** `Rename F2` · `Delete` (red, dimmed when there is one page).
@@ -187,6 +202,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close. Same two actions, but different labels, icons and missing shortcut.
 
 ### CM9 Frame name label (`CM9-label.png`)
+
 - **Verynize now.** Right-clicking the artboard label (`#canvas-overlay .frame-label`) does not select the frame. It opens the empty-canvas menu: `Select all ⌘A` · `Select inverse ⌘⇧A` | `Zoom to fit ⇧1` · `Zoom to selection ⇧2`.
 - **Source.** `web/canvas-interactions.js:1501` (only `#canvas .layer` is hit-tested; labels live in the overlay, `:1038-1047`).
 - **Wonder.** `CM9-label` selects the frame and shows the frame menu (CM2).
@@ -194,6 +210,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch.
 
 ### CM10 Paste disabled state (`CM10-empty-clipboard.png`, `CM10-copied.png`)
+
 - **Verynize now.**
   - Empty clipboard: the Paste item is **absent**, not disabled (CM1 list).
   - After ⌘C on Chip A with Chip A still selected: `Paste ⌘V` appears as the 3rd item (after Copy and Cut) in the 37-item selection menu.
@@ -206,6 +223,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## T. Toolbar and tools
 
 ### T1 Toolbar buttons (`T1-move/scale/hand/frame/shader/text/view-a/view-b/plus.png`; extras `T1-eyedropper`, `T1-ellipse`)
+
 - **Verynize now.** The bottom toolbar is 44 tall, radius 24 (`rounded-3xl`). The tool buttons are 32×32 with radius 12. In order:
   - Move `V` · Scale `K` · Hand `H` · **Eyedropper `I`**
   - | Frame `F` · **Ellipse `O`** · Shader `S` · Text `T`
@@ -214,6 +232,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
   Tooltip: 24 tall, radius 8, rgb(28,28,28), 12px Inter, label plus muted key. For example `Move V` is 67.6×24, placed 8 px above the button.
 
   Active tool: `bg-accent` (grey) with foreground icon. The active layout toggle uses a purple icon.
+
 - **Source.** `web/src/islands/chrome/CanvasOverlays.tsx:66-75` (TOOLS), `:107-174` (Toolbar), `:193` (`Views`); `web/src/islands/chrome/tip.tsx`.
 - **Wonder** (`../wonder/T1-*-tooltip.png`, `design/wonder/20-frame-tool.png`). Move · Scale · Hand | Frame · Shader · Text | view-a · view-b · `+`.
   - Tooltip `Move V`; the `+` tooltip is `Save or choose a view`.
@@ -225,6 +244,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Two extra tools and a different `+` tooltip. Order, sizes and tooltip format match.
 
 ### T2 `+` menu (`T2-plus.png`)
+
 - **Verynize now.** 256×169:
   - Label `Design · edited`
   - `Save current view` · `Reset to Design`
@@ -236,6 +256,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** match (content and order).
 
 ### T3 View toggles (`T3-details.png`, `T3-design.png`)
+
 - **Verynize now.**
   - Details (⌥1) collapses the left sidebar into the floating page pill (`Page 1 ⌃` with a show-sidebar button) and keeps the right panel.
   - Design (⌥2) shows both sidebars.
@@ -245,8 +266,9 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** match (behaviour).
 
 ### T4 Per-tool canvas behaviour (`T4-scale.png`, `T4-scale-after.png`, `T4-shader.png`, `T4-shader-after.png`, `T4-text-click.png`)
+
 - **Verynize now.**
-  - **Scale (K).** Dragging a corner scales the box and content uniformly by the *dominant* factor. On a wide, short layer a small vertical move dominates: dragging `Site Header` (1440×72) by +80/+20 screen px gave **2597.9 × 129.9**, with the logo font 20 → 36.1. The badge shows `2597.9 × 129.9`.
+  - **Scale (K).** Dragging a corner scales the box and content uniformly by the _dominant_ factor. On a wide, short layer a small vertical move dominates: dragging `Site Header` (1440×72) by +80/+20 screen px gave **2597.9 × 129.9**, with the logo font 20 → 36.1. The badge shows `2597.9 × 129.9`.
   - **Shader (S).** Drag rubber-bands a rectangle, outline only. On release it creates `Aurora shader` (288×45 here) parented to the frame under the cursor. Click without drag gives a 480×300 default.
   - **Text (T).** Click creates a 240×60 text box named `Text`, content `Your next idea`, system-ui 24px, colour #25252E. That is dark text on a dark artboard. It enters editing with all text selected.
   - The tool returns to Move after each draw.
@@ -262,6 +284,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch. Text defaults differ, and the scale factor jumps on thin layers.
 
 ### T5 `?` button (`T5-help.png`)
+
 - **Verynize now.** The 26 px round `?` at bottom-left (7/7 inset) opens a popover titled `Keyboard shortcuts` (256×528) listing 19 rows:
   - Tools: Move V, Scale K, Hand H / Space, Frame F, Rectangle R, Ellipse O, Text T, Shader S, Eyedropper I
   - Flip horizontal / vertical ⇧H / ⇧V; Rotate 90° ⌥⇧R
@@ -276,6 +299,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch.
 
 ### T6 Zoom label (`T6-zoom.png`)
+
 - **Verynize now.** The `36%` button at bottom-right (24 tall) opens a 256×169 menu:
   - `Zoom in ⌘+` · `Zoom out ⌘−` · `Zoom to fit ⇧1` · `Zoom to 100%` (no shortcut shown)
   - | `Snap to objects ✓` · `Saved views…`
@@ -289,6 +313,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## S. Selection
 
 ### S1 Hover (`S1-hover.png`, `S1-hover-nested.png`, `S1-hover-deep-cmd.png`)
+
 - **Verynize now.**
   - Hovering inside the artboard with nothing selected outlines the artboard's direct child under the pointer (`Hero Section`, 464×131 screen). The outline is 1.5px accent `#b93cdb`, and its 3 children are drawn 1px dashed.
   - With `Hero Section` selected, hovering `Hero Media` outlines the child (101.6 px square) and shows the hero's spacing bands.
@@ -299,6 +324,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close.
 
 ### S2 Click, drill, Esc (`S2-classic.png`, `S2-drill.png`, `S2-double.png`, `S2-escape.png`, `S2-empty-click.png`, `S2-click-deep-cmd.png`)
+
 - **Verynize now.**
   - **Classic click** on `Hero Media` selects `Hero Section`, the artboard's direct child.
   - **A second click** drills into `Hero Media`.
@@ -314,6 +340,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch on Esc (clears instead of going up). Click and drill match.
 
 ### S3 Shift-click and marquee (`S3-shift-add.png`, `S3-shift-remove.png`, `S3-marquee.png`, `S3-marquee-result.png`, `S3-marquee-inside-frame.png`, `S3-marquee-inside-result.png`)
+
 - **Verynize now.**
   - Shift-click toggles.
   - A marquee from empty canvas selects only **top-level** nodes it intersects. Across the artboard it selects `Portfolio Home Desktop`. The marquee is a 1px accent border with a 10 % fill.
@@ -325,6 +352,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** match (behaviour).
 
 ### S4 Selection chrome (`S4-frame.png`, `S4-hug.png`, `S4-fill.png`, `S4-fixed.png`, `S4-multi-selection.png`)
+
 - **Verynize now.**
   - **Ring and handles.** 1.5px accent ring and four 8×8 white corner handles with an accent border.
   - **Name label.** 18 px above (21 px offset), accent coloured when selected (`Portfolio Home Desktop`).
@@ -350,6 +378,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## TR. Transform
 
 ### TR1 Resize (`TR1-corner.png`, `TR1-shift.png`, `TR1-alt.png`, `TR1-edge-hover.png`)
+
 - **Verynize now.**
   - Corner drag on Chip C (+40/+18 screen) gives `233 × 116.4` live. The `nwse-resize` cursor shows.
   - Shift gives `233 × 124.3` (keeps 120:64).
@@ -361,6 +390,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close. Alt also shows distance guides; edge resize is missing.
 
 ### TR2 Rotate (`TR2-hover.png`, `TR2-rotate.png`)
+
 - **Verynize now.** There is no rotate zone.
   - Hovering just outside the NE corner shows the default cursor and outlines the artboard.
   - Dragging from there starts an artboard-child marquee and deselects Chip C.
@@ -374,6 +404,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** missing.
 
 ### TR3 Nudge (`TR3-nudge.png`, `TR3-shift-nudge.png`)
+
 - **Verynize now.** → moves x 1160 → 1161; ⇧→ moves 1160 → 1171 (+1, then +10). Amounts come from the preferences `smallNudge` / `largeNudge`. Auto-layout children step through the stack instead.
 - **Source.** `web/canvas-interactions.js:1476-1484` (amounts at `:1481`).
 - **Wonder** (`TR3-nudge`, `TR3-shift-nudge`): 1 and 10.
@@ -381,6 +412,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** match.
 
 ### TR4 Smart guides (`TR4-sibling.png` = edge alignment, `TR4-guide.png` = equal spacing)
+
 - **Verynize now.**
   - Dragging Chip C shows 1px red-pink guides (`#ff3d7f`) for edge and centre alignment with siblings and the parent.
   - Equal-spacing snapping draws dashed segments with pink labels (`50`, `58` here).
@@ -391,6 +423,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close (behaviour present; colour likely differs).
 
 ### TR5 Alt distances (`TR5-alt-sibling.png`, `TR5-alt-parent.png`)
+
 - **Verynize now.**
   - With Chip A selected and Alt over Chip B: one red line labelled `40`. The hovered layer is outlined.
   - Alt over the artboard background: only **one** segment is drawn (`568`, to the hovered `Site Header` area). The expected four parent distances are missing because the hovered element is the header, not the parent.
@@ -404,6 +437,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch (colour, and the parent-distance case).
 
 ### TR6 Alt-drag duplicate (`TR6-alt-duplicate.png`, `TR6-alt-drag-result.png`)
+
 - **Verynize now.** Alt-drag duplicates on the first move. The copy follows the pointer (y 640 → 805.4) and the original stays. No distance readout appears during the drag; the Alt overlay is suppressed while `moving`.
 - **Source.** `web/canvas-interactions.js:708` (`duplicateNodes(moving, 0)`).
 - **Wonder** (`TR6-alt-duplicate`): the duplicate is named `Frame 3`. Spec §2.4 says Alt-drag shows distances for the duplicate.
@@ -411,6 +445,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close. Duplicate works; no distances; naming differs.
 
 ### TR7 Into/out of frames and flex reorder (`TR7-drag-into-flex.png`, `TR7-drag-into-flex-result.png`, `TR7-reorder-during.png`, `TR7-reorder-after.png`, `TR7-out-during.png`)
+
 - **Verynize now.**
   - **Into a flex frame.** Dragging Chip A over `Hero Section` outlines the target (1.5px accent) and shows a 2px slot bar between children. On drop it becomes a stack child.
   - **Reordering inside the stack** is live. The dragged copy is a translated ghost, and siblings reflow.
@@ -421,6 +456,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close.
 
 ### TR8 Padding/gap handles (`TR8-flex.png`, `TR8-hover.png`, `TR8-gap-padding.png`)
+
 - **Verynize now.** Bands are drawn only while the pointer is over the selected flex frame: 4 padding bands plus 2 gap bands (6 total).
   - **Padding bands:** blue `#3d8bff`, hatched on hover, `ns-resize` / `ew-resize` cursor.
   - **Gap bands:** orange `#f2541b`, hatched, with a 12×2 bar, `col-resize` / `row-resize` cursor.
@@ -433,6 +469,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## V. View / camera
 
 ### V1 Zoom (`V1-in.png`, `V1-out.png`, `V1-100.png`, `V1-shift1-fit.png`, `V1-shift2-selection.png`, `V1-pinch-at-cursor.png`)
+
 - **Verynize now.**
   - Stops are 5, 10, 25, 50, 100, 200, 400, 800, 1600 and 3200 %.
   - From the 36 % fit: ⌘+ goes to 50 %. ⌘− twice goes to 25 → 10 %.
@@ -447,18 +484,21 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close. Max zoom 3200 % versus 20000 %; no animation.
 
 ### V2 Pan (`V2-space-hold.png`, `V2-space-drag.png`, `V2-hand.png`)
+
 - **Verynize now.** Holding Space shows the `grab` cursor; dragging pans with `grabbing`. The Hand tool pans the same way.
 - **Source.** `web/canvas-interactions.js:500-504`, `:1474` (Space).
 - **Wonder** (`V2-hand`): same.
 - **Verdict:** match.
 
 ### V3 Fit / selection (`V3-fit.png`, `V3-selection.png`)
+
 - **Verynize now.** ⇧1 fits both artboards (36 %) with safe insets of 48/40/96/40. ⇧2 on Chip A gives 665 %.
 - **Source.** `web/canvas-interactions.js:8`, `:298-311`.
 - **Wonder** (`V3-fit`, `V3-selection`): same commands. The padding has not been measured yet.
 - **Verdict:** match (behaviour). Padding is to be compared.
 
 ### V4 High zoom (`V4-high-zoom.png`)
+
 - **Verynize now.** At 3200 % (the maximum) there are no rulers and no pixel grid. Chip A's corner is pixel-smooth CSS.
 - **Source.** No grid code exists.
 - **Wonder** (`V4-high-zoom`, 548 %): no rulers or grid visible. The spec says none.
@@ -467,6 +507,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## K. Keyboard and clipboard
 
 ### K1 Shortcuts panel (`K1-shortcuts.png`, `K1-command-palette.png`)
+
 - **Verynize now.**
   - The only shortcut list is the `?` popover from T5 (19 rows, no search, no sections).
   - ⌘K opens the **Files** screen (file search), not a command palette.
@@ -482,6 +523,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** mismatch.
 
 ### K2 Clipboard (`K2-paste.png`, `K2-duplicate.png`, `K2-over.png`, `K2-replace.png`, `K2-paste-here.png`)
+
 - **Verynize now.**
   - **⌘C ⌘V** with Chip A visible pastes a copy at the same x/y (760, 640) in the same parent. It is centred in the view only when the original is off-screen.
   - **⌘D** offsets the duplicate by +20/+20 (780, 660).
@@ -503,9 +545,11 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
   - Remap `Paste in place` off ⌘⇧V.
   - Add `copyPrompt` (⌘⇧⌥C) and `copyLink`.
   - Check Wonder's ⌘D offset in Codex's notes.
+
 - **Verdict:** mismatch. Paste to replace, paste over and paste here are missing; ⌘⇧V means something else.
 
 ### K3 Structure keys (`K3-frame-selection.png`, `K3-unframe.png`, `K3-hide.png`, `K3-lock.png`, `K3-delete.png`)
+
 - **Verynize now.**
   - ⌘G on Chip A and Chip B wraps them in a new free `Frame` at their union (280×64), selected.
   - ⌘⇧G unwraps and reselects both.
@@ -519,6 +563,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## TX. Text on canvas
 
 ### TX1 Text tool (`TX1-click.png`, `TX1-selection.png`, `TX1-escape.png`, `TX1-drag.png`, `TX1-drag-result.png`)
+
 - **Verynize now.**
   - **Click.** A 240×60 box, content `Your next idea` (all selected), system-ui 24px, ink and caret rgb(37,37,46).
   - **Drag.** A rubber band, then a box of the dragged size (360×63) with the same content.
@@ -538,6 +583,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ## L. Layers and pages panels
 
 ### L1 Layer rows (`L1-hover.png`, `L1-rename.png`, `L1-reorder-during.png`, `L1-expand-collapse.png`)
+
 - **Verynize now.**
   - **Rows.** 30 tall (`h-7.5`), radius 6.
   - **Hover.** Reveals three 24 px buttons: Rename (T icon), Lock, Eye. Locked and hidden rows keep their icon visible. Hovering a row outlines the layer on the canvas.
@@ -553,6 +599,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 - **Verdict:** close (tooltip strings differ).
 
 ### L2 Pages (`L2-add.png`, `L2-rename.png`, `L2-page-delete.png`, `L2-reorder-during.png`)
+
 - **Verynize now.**
   - `+` adds `Page 3` and activates it.
   - Double-click opens a modal `Page name` dialog (input, `Cancel` / `Continue`) instead of an inline field.
@@ -572,6 +619,7 @@ Verynize's two Radix menus (layers row and pages row) use the shadcn context-men
 ---
 
 ## Could not capture / not observable
+
 - **Wonder submenus on Verynize (`CM2-copy-as/select-layer/arrange/layout`).** Verynize has no submenus. The shots hover the nearest flat item.
 - **TR2 rotate.** Not observable in Verynize; there is no rotate interaction.
 - **K2 Paste to replace / Paste here at cursor.** Not observable; the commands do not exist. The shots show the unchanged result.

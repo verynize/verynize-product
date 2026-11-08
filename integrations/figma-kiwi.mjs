@@ -300,9 +300,7 @@ export function decodeMessage(schema, bytes, root) {
     const n = r.uint();
     if (n > LIMITS.array) throw new Error("Figma array is too large");
     if (f.type === "byte") return r.bytes(n).slice();
-    const list = new Array(n);
-    for (let i = 0; i < n; i++) list[i] = one(f.type, depth + 1);
-    return list;
+    return Array.from({ length: n }, () => one(f.type, depth + 1));
   };
   return one(rootName, 0);
 }

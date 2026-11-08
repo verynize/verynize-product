@@ -105,15 +105,24 @@ async function searchFixture(t) {
 
 // bundled = @vscode/ripgrep (the default), system = rg on PATH, node = the walker fallback.
 const systemRg = (() => {
-  for (const dir of [...String(process.env.PATH).split(":"), "/opt/homebrew/bin", "/usr/local/bin"]) {
+  for (const dir of [
+    ...String(process.env.PATH).split(":"),
+    "/opt/homebrew/bin",
+    "/usr/local/bin",
+  ]) {
     const candidate = path.join(dir, "rg");
-    if (dir && require("node:fs").existsSync(candidate) && !/@vscode/.test(candidate)) return candidate;
+    if (dir && require("node:fs").existsSync(candidate) && !/@vscode/.test(candidate))
+      return candidate;
   }
   return null;
 })();
 for (const variant of ["bundled", "system", "node"]) {
   const engine = variant === "node" ? "node" : "ripgrep";
-  const run = (input) => searchProjects({ ...input, engine: variant === "node" ? "node" : undefined }, variant === "system" ? { ripgrepPath: systemRg } : {});
+  const run = (input) =>
+    searchProjects(
+      { ...input, engine: variant === "node" ? "node" : undefined },
+      variant === "system" ? { ripgrepPath: systemRg } : {},
+    );
   test(
     `project search (${variant}): every project, ignore files respected, design content matched`,
     { skip: variant === "system" && !systemRg ? "no rg on PATH" : false },
@@ -151,10 +160,10 @@ for (const variant of ["bundled", "system", "node"]) {
         projects,
         designFiles: false,
       });
-      assert.deepEqual(exact.results.map((r) => r.path).sort(), [
-        "notes/untracked.md",
-        "src/app.js",
-      ]);
+      assert.deepEqual(
+        exact.results.map((r) => r.path).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+        ["notes/untracked.md", "src/app.js"],
+      );
       const re = await run({
         query: "orbit\\w+\\(",
         regex: true,
@@ -195,7 +204,10 @@ test("project search: validation, missing folders and the gitignore matcher", as
   assert.equal(ignore("sub/root-only.txt", false), false);
   assert.equal(ignore("docs/a/b/draft.md", false), true);
   const { beta } = await searchFixture(t);
-  assert.deepEqual((await listFiles(beta)).sort(), [".gitignore", "readme.txt"]);
+  assert.deepEqual(
+    (await listFiles(beta)).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [".gitignore", "readme.txt"],
+  );
   // The bundled @vscode/ripgrep binary is preferred over rg on PATH.
   const preferred = await findRipgrep();
   assert.equal(preferred, await bundledRipgrep());
@@ -295,7 +307,10 @@ test("relocate a repository: folder renamed, registry, nested projects and chat 
   const result = await moves.relocateRepository({ repoId: siteRepo.id, name: "marketing-site" });
   const renamed = path.join(parent, "marketing-site");
   assert.equal(result.root, renamed);
-  assert.deepEqual(result.moved.map((m) => m.id).sort(), [siteRepo.id, nested.id].sort());
+  assert.deepEqual(
+    result.moved.map((m) => m.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [siteRepo.id, nested.id].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+  );
   await assert.rejects(() => fs.access(site));
   const stored = await registry.get(siteRepo.id);
   assert.equal(stored.root, renamed);

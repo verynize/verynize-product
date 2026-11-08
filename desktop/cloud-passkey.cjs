@@ -55,7 +55,7 @@ function registerCloudPasskey(handle, parent) {
     child.on("closed", () => {
       child = null;
     });
-    child.loadURL(url.href);
+    void child.loadURL(url.href);
     return { opened: true };
   });
   handle("cloudPasskeyClose", close);

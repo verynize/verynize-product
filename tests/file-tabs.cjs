@@ -151,7 +151,10 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
         params: { fileId: "known-room-alias" },
       }),
     );
-    await page.waitForFunction((id) => location.pathname === "/editor/" + id && window.fileLibrary.currentId === id, fileIds.Beta);
+    await page.waitForFunction(
+      (id) => location.pathname === "/editor/" + id && window.fileLibrary.currentId === id,
+      fileIds.Beta,
+    );
     await page.evaluate((id) => window.fileLibrary.setCloud(id, null), fileIds.Beta);
     // While a tab loads, the clicked tab already looks active and the outgoing one does not.
     const target = await page.evaluate(
@@ -169,7 +172,10 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     const pendingTab = page.locator(`[data-file-tab="${target}"][data-switch-pending]`);
     await pendingTab.waitFor();
     assert.match(await pendingTab.getAttribute("class"), /bg-input/);
-    assert.doesNotMatch(await page.locator("[data-document-tab]").getAttribute("class"), /bg-input/);
+    assert.doesNotMatch(
+      await page.locator("[data-document-tab]").getAttribute("class"),
+      /bg-input/,
+    );
     await page.waitForFunction((id) => window.fileLibrary.currentId === id, target);
     assert.equal(await page.locator("[data-switch-pending]").count(), 0);
     assert.match(await page.locator("[data-document-tab]").getAttribute("class"), /bg-input/);

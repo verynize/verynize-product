@@ -160,7 +160,7 @@ const { execFileSync } = require("node:child_process");
       after.filter(
         (c) =>
           c.rpc === "turn/start" &&
-          !/agent-workdirs[\/\\]titles|word title for a design chat/.test(
+          !/agent-workdirs[/\\]titles|word title for a design chat/.test(
             JSON.stringify(c.params || {}),
           ),
       ).length,

@@ -38,7 +38,11 @@ export type LayerUsage = {
   resetsAt: number;
 };
 export type UsageIpc = {
-  read(options: { agent: "claude" | "codex"; refresh?: boolean; profile?: string }): Promise<ProviderUsage>;
+  read(options: {
+    agent: "claude" | "codex";
+    refresh?: boolean;
+    profile?: string;
+  }): Promise<ProviderUsage>;
   layers(): Promise<LayerUsage>;
 };
 
@@ -388,7 +392,9 @@ export function UsageView() {
       void desktopApi()
         ?.agentProfiles?.list()
         .then((list) => {
-          const accounts = list.profiles.filter((p) => !p.system && (p.agent !== "codex" || codexConnection.profiles.has(p.id)));
+          const accounts = list.profiles.filter(
+            (p) => !p.system && (p.agent !== "codex" || codexConnection.profiles.has(p.id)),
+          );
           setNamed(accounts);
           const read = ipc.read;
           if (!read) return;
@@ -401,14 +407,22 @@ export function UsageView() {
                 (error: unknown) =>
                   setUsage((state) => ({
                     ...state,
-                    [key]: { agent: p.agent, status: "error", message: errorText(error), limits: [], updatedAt: Date.now() },
+                    [key]: {
+                      agent: p.agent,
+                      status: "error",
+                      message: errorText(error),
+                      limits: [],
+                      updatedAt: Date.now(),
+                    },
                   })),
               )
               .finally(() => setLoading((state) => ({ ...state, [key]: false })));
           }
         })
         .catch(() => setNamed([]));
-      for (const { id } of PROVIDERS.filter((provider) => provider.id !== "codex" || codexConnection.profiles.has("system"))) {
+      for (const { id } of PROVIDERS.filter(
+        (provider) => provider.id !== "codex" || codexConnection.profiles.has("system"),
+      )) {
         setLoading((state) => ({ ...state, [id]: true }));
         ipc
           .read({ agent: id, refresh })
@@ -450,30 +464,38 @@ export function UsageView() {
       />
       <div className="flex flex-col gap-12.5">
         <VerynizeCard layers={layers} />
-        {available ? (
-          PROVIDERS.filter((provider) => provider.id !== "codex" || codexConnection.profiles.has("system")).map((provider) => (
-            <ProviderCard
-              key={provider.id}
-              provider={provider}
-              usage={usage[provider.id] ?? null}
-              loading={!!loading[provider.id]}
-              now={now}
-            />
-          ))
-        ) : null}
-        {available &&
-          named.filter((p) => p.agent !== "codex" || codexConnection.profiles.has(p.id)).map((p) => {
-            const base = PROVIDERS.find((x) => x.id === p.agent)!;
-            return (
+        {available
+          ? PROVIDERS.filter(
+              (provider) => provider.id !== "codex" || codexConnection.profiles.has("system"),
+            ).map((provider) => (
               <ProviderCard
-                key={p.id}
-                provider={{ ...base, id: `${p.agent}-account-${p.id}`, name: `${base.name} · ${p.name}` }}
-                usage={usage[`${p.agent}:${p.id}`] ?? null}
-                loading={!!loading[`${p.agent}:${p.id}`]}
+                key={provider.id}
+                provider={provider}
+                usage={usage[provider.id] ?? null}
+                loading={!!loading[provider.id]}
                 now={now}
               />
-            );
-          })}
+            ))
+          : null}
+        {available &&
+          named
+            .filter((p) => p.agent !== "codex" || codexConnection.profiles.has(p.id))
+            .map((p) => {
+              const base = PROVIDERS.find((x) => x.id === p.agent)!;
+              return (
+                <ProviderCard
+                  key={p.id}
+                  provider={{
+                    ...base,
+                    id: `${p.agent}-account-${p.id}`,
+                    name: `${base.name} · ${p.name}`,
+                  }}
+                  usage={usage[`${p.agent}:${p.id}`] ?? null}
+                  loading={!!loading[`${p.agent}:${p.id}`]}
+                  now={now}
+                />
+              );
+            })}
         {available ? null : (
           <Card>
             <Row

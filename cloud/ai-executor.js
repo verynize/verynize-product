@@ -62,7 +62,7 @@ export function createEventLog(env, run, { startSeq = 0, onEvent = () => {} } = 
   let seq = startSeq;
   let chain = Promise.resolve();
   return {
-    emit(type, fields = {}) {
+    emit: (type, fields = {}) => {
       const event = { id: run.id, chatId: run.chatId, seq: ++seq, type, ...fields };
       chain = chain.then(async () => {
         await appendEvent(env, run.id, event);

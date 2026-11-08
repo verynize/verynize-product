@@ -15,24 +15,81 @@
     "Signup-to-activation funnel with the four stated stages and counts",
     "Top 5 acquisition channels table (users, activation %, trend)"
   ],
-  "constraints": ["Single artboard 1440x900; content must fit the viewport without scrolling", "Light theme", "English copy", "No lorem ipsum", "One icon set throughout, no emoji"],
-  "assetsAllowed": { "icons": true, "photos": false, "generatedImages": false, "avatars": true, "customFonts": true },
+  "constraints": [
+    "Single artboard 1440x900; content must fit the viewport without scrolling",
+    "Light theme",
+    "English copy",
+    "No lorem ipsum",
+    "One icon set throughout, no emoji"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": false,
+    "generatedImages": false,
+    "avatars": true,
+    "customFonts": true
+  },
   "inputs": [],
   "budget": { "maxMinutes": 20, "followUpTurns": 0 },
   "checklist": [
-    { "id": "c01", "text": "All four KPI values and deltas match the prompt exactly (18,432 / +6.2%, 41.7% / -2.3 pts, 7m 48s / +0.4%, 108.9% / +1.1 pts)." },
-    { "id": "c02", "text": "The negative Activation delta is visually distinguishable from the positive deltas by color or icon, not only by the minus sign." },
-    { "id": "c03", "text": "The sidebar shows the six required items and Overview is visibly marked active." },
-    { "id": "c04", "text": "The date range text reads \"Oct 21 - Oct 27, 2026\" (dash style may vary)." },
-    { "id": "c05", "text": "The line chart shows two series (current vs previous period) with a legend or labels that distinguish them." },
-    { "id": "c06", "text": "The chart has readable axis labels or gridline values; it is not a decorative squiggle." },
-    { "id": "c07", "text": "The funnel shows exactly the four stages with counts 24,180 / 3,912 / 2,206 / 1,631." },
-    { "id": "c08", "text": "The channels table has 5 rows and columns for users, activation % and trend; numeric columns are right-aligned or tabular." },
-    { "id": "c09", "text": "The KPI cards are equal width and aligned on one row with consistent internal padding." },
-    { "id": "c10", "text": "No text is clipped, overlapping, or overflowing its container anywhere on the screen.", "critical": true },
-    { "id": "c11", "text": "All body/table text is at least 12px and labels have sufficient contrast against their background (no light-gray-on-white below roughly 4.5:1 for body text).", "critical": true },
-    { "id": "c12", "text": "There is a single dominant accent color; it is used for the active nav item, primary chart series and primary actions, not sprayed on decoration." },
-    { "id": "c13", "text": "No placeholder text remains (\"Title\", \"Lorem\", \"Button\", \"Label\", \"Card\")." , "critical": true },
-    { "id": "c14", "text": "The entire dashboard fits in 1440x900 with no cut-off section at the bottom or right edge." }
+    {
+      "id": "c01",
+      "text": "All four KPI values and deltas match the prompt exactly (18,432 / +6.2%, 41.7% / -2.3 pts, 7m 48s / +0.4%, 108.9% / +1.1 pts)."
+    },
+    {
+      "id": "c02",
+      "text": "The negative Activation delta is visually distinguishable from the positive deltas by color or icon, not only by the minus sign."
+    },
+    {
+      "id": "c03",
+      "text": "The sidebar shows the six required items and Overview is visibly marked active."
+    },
+    {
+      "id": "c04",
+      "text": "The date range text reads \"Oct 21 - Oct 27, 2026\" (dash style may vary)."
+    },
+    {
+      "id": "c05",
+      "text": "The line chart shows two series (current vs previous period) with a legend or labels that distinguish them."
+    },
+    {
+      "id": "c06",
+      "text": "The chart has readable axis labels or gridline values; it is not a decorative squiggle."
+    },
+    {
+      "id": "c07",
+      "text": "The funnel shows exactly the four stages with counts 24,180 / 3,912 / 2,206 / 1,631."
+    },
+    {
+      "id": "c08",
+      "text": "The channels table has 5 rows and columns for users, activation % and trend; numeric columns are right-aligned or tabular."
+    },
+    {
+      "id": "c09",
+      "text": "The KPI cards are equal width and aligned on one row with consistent internal padding."
+    },
+    {
+      "id": "c10",
+      "text": "No text is clipped, overlapping, or overflowing its container anywhere on the screen.",
+      "critical": true
+    },
+    {
+      "id": "c11",
+      "text": "All body/table text is at least 12px and labels have sufficient contrast against their background (no light-gray-on-white below roughly 4.5:1 for body text).",
+      "critical": true
+    },
+    {
+      "id": "c12",
+      "text": "There is a single dominant accent color; it is used for the active nav item, primary chart series and primary actions, not sprayed on decoration."
+    },
+    {
+      "id": "c13",
+      "text": "No placeholder text remains (\"Title\", \"Lorem\", \"Button\", \"Label\", \"Card\").",
+      "critical": true
+    },
+    {
+      "id": "c14",
+      "text": "The entire dashboard fits in 1440x900 with no cut-off section at the bottom or right edge."
+    }
   ]
 }

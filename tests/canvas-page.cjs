@@ -323,7 +323,7 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     const three = await heights();
     assert.ok(
       Math.max(...three) - Math.min(...three) <= 2,
-      `Three open sections split evenly (${three})`,
+      `Three open sections split evenly (${three.join(",")})`,
     );
     console.log(
       "PASS page: empty new page, no frame outline, page colour with variables collapsed, accordion properties, chat sidebar toggle, stable canvas, chat + layers, icon library",

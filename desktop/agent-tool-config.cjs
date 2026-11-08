@@ -251,7 +251,7 @@ class AgentToolConfig {
     for (const r of data.permissions.filter((r) => inProject(r, list)))
       if (!rules.has(r.tool) || r.scope === "project") rules.set(r.tool, r);
     return {
-      servers: [...byName.values()].map((s) => ({ ...s, env: { ...(s.env || {}) } })),
+      servers: [...byName.values()].map((s) => ({ ...s, env: { ...s.env } })),
       permissions: [...rules.values()],
     };
   }
@@ -270,7 +270,7 @@ function claudeServers(servers) {
               ? { headers: { Authorization: `Bearer ${process.env[s.tokenEnv]}` } }
               : {}),
           }
-        : { type: "stdio", command: s.command, args: s.args || [], env: { ...(s.env || {}) } };
+        : { type: "stdio", command: s.command, args: s.args || [], env: { ...s.env } };
   }
   return out;
 }
