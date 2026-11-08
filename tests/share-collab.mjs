@@ -270,9 +270,22 @@ try {
         switch: window.switchCoordinator?.getState?.(),
         focus: document.hasFocus(),
         hidden: document.hidden,
-        people: window.cloudPresence?.snapshot?.().people?.length,
+        people: window.cloudPresence
+          ?.snapshot?.()
+          .people?.map((p) => ({ self: p.self, name: p.name, cursor: !!p.cursor })),
+        status: document.getElementById("cloud-status")?.textContent,
       });
       console.error("cursor wait failed", JSON.stringify({ a: await a.evaluate(probe), b: await b.evaluate(probe) }));
+      // A second move: does a later cursor update get through (a lost first send) or none at all?
+      await wiggle(b, 400, 360);
+      const late = await a
+        .waitForFunction(
+          () => /Olive Other/.test(document.querySelector(".collaborator-cursor")?.textContent || ""),
+          null,
+          { timeout: 5000 },
+        )
+        .then(() => true, () => false);
+      console.error("cursor after a second move", late, JSON.stringify(await a.evaluate(probe)));
       throw error;
     });
   assert.doesNotMatch(await cursor.first().textContent(), /Designer/);
