@@ -204,13 +204,16 @@ declare global {
   }
 }
 
-/** Installs `window.cloudLinks` (desktop deep links) and opens this page's own `#room=` link once. */
+/**
+ * Installs `window.cloudLinks` (desktop deep links) and opens this page's own `#room=` link once. Both wait for
+ * `ready`: a cold-start deep link can arrive before the shell boots, and the boot would replace the opened room.
+ */
 export function installLinks(ready: Promise<void>) {
   window.cloudLinks = {
     open(href: string) {
       const link = parseRoomLink(href);
       if (!link) return false;
-      void openRoomLink(link);
+      void ready.then(() => openRoomLink(link));
       return true;
     },
   };
