@@ -1052,7 +1052,7 @@ export async function importHtml(html, options = {}) {
     }
   const beforePruning = rules.length;
   if (options.pruneCss !== false)
-    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
+    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)], options.pruneCssBudgetMs);
   stats.prunedRules = beforePruning - rules.length;
   if (!preflightRules)
     preflightRules = parseStylesheet(PREFLIGHT_CSS)
