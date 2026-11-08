@@ -2,7 +2,7 @@ const { onWindowClosed } = require("./window-cleanup.cjs");
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const { app, safeStorage } = require("electron");
-const { isEncryptionAvailable } = require("./secure-storage.cjs");
+const { isEncryptionAvailable, seal, unseal } = require("./secure-storage.cjs");
 const { pathToFileURL } = require("node:url");
 const codexImage = require("./codex-image.cjs");
 function registerGeneration(handle, parent) {
@@ -50,10 +50,10 @@ function createImageGenerator() {
         : engine.DEFAULT_IMAGE_PROVIDER;
     return saved;
   }
-  function key(saved, vendor) {
-    if (saved.keys[vendor] && secure()) {
+  async function key(saved, vendor) {
+    if (saved.keys[vendor] && (await secure())) {
       try {
-        return safeStorage.decryptString(Buffer.from(saved.keys[vendor], "base64"));
+        return await unseal(safeStorage, saved.keys[vendor]);
       } catch {
         return "";
       }
@@ -63,13 +63,15 @@ function createImageGenerator() {
   async function publicSettings(saved) {
     const engine = await load();
     const keys = Object.fromEntries(
-      ["openai", "google", "custom"].map((v) => {
-        const hasKey = !!key(saved, v);
-        return [
-          v,
-          { hasKey, keyStorage: hasKey ? (saved.keys[v] ? "keychain" : "session") : "none" },
-        ];
-      }),
+      await Promise.all(
+        ["openai", "google", "custom"].map(async (v) => {
+          const hasKey = !!(await key(saved, v));
+          return [
+            v,
+            { hasKey, keyStorage: hasKey ? (saved.keys[v] ? "keychain" : "session") : "none" },
+          ];
+        }),
+      ),
     );
     const codex = await codexImage.status();
     return {
@@ -89,7 +91,7 @@ function createImageGenerator() {
       keys,
       custom: saved.custom,
       secureStorage:
-        Object.keys(saved.keys).length || Object.keys(sessionKeys).length ? secure() : null,
+        Object.keys(saved.keys).length || Object.keys(sessionKeys).length ? await secure() : null,
       ...saved.custom,
       ...keys.custom,
       configured:
@@ -152,8 +154,8 @@ function createImageGenerator() {
           delete sessionKeys[vendor];
         }
         if (options.apiKey) {
-          if (secure()) {
-            next.keys[vendor] = safeStorage.encryptString(options.apiKey).toString("base64");
+          if (await secure()) {
+            next.keys[vendor] = await seal(safeStorage, options.apiKey);
             delete sessionKeys[vendor];
           } else {
             delete next.keys[vendor];
@@ -201,7 +203,7 @@ function createImageGenerator() {
             ...engine.providerSettings(saved, id, overrides),
             ...(options.size ? { size: options.size } : {}),
           },
-          apiKey: key(saved, entry.vendor),
+          apiKey: await key(saved, entry.vendor),
           prompt: options.prompt,
           signal,
           codex: codexImage.generate,
