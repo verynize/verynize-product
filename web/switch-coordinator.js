@@ -18,7 +18,8 @@
     window.dispatchEvent(new CustomEvent("switch-loading-change", { detail: { ...state } }));
   }
   window.switchCoordinator = {
-    begin({ kind, from, to, reason }) {
+    // `room`: the cloud room id when the destination is a room (its library file may not exist yet).
+    begin({ kind, from, to, reason, room }) {
       if (state && matches(state.token)) emit("cancel");
       state = {
         token: ++serial,
@@ -26,6 +27,7 @@
         from: identity(from),
         to: identity(to),
         reason,
+        room: room ?? null,
         phase: "begin",
         marks: { input: performance.now(), begin: performance.now() },
       };

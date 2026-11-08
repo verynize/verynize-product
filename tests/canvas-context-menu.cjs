@@ -13,7 +13,7 @@ const without = (list, ...drop) => list.filter(x => !drop.includes(x));
 (async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'canvas-context-menu-')), env = {...process.env};
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({env, args: ['.', `--user-data-dir=${dir}`], timeout: 20000});
   try {
     const page = await app.firstWindow({timeout: 20000}); await moveOffCursor(app);

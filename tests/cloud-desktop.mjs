@@ -19,6 +19,7 @@ try {
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.VERYNIZE_CLOUD_SERVER;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   // A fresh desktop profile offers the production server (desktop/cloud-defaults.cjs), but automated runs can never reach it.
   {
     const app = await electron.launch({

@@ -128,4 +128,14 @@ function registerAppPreferences(handle, win, { app, dialog, registry, userData }
   });
 }
 
-module.exports = { attachDeepLinks, registerAppPreferences, looksLikeMp3, linkFromArgv, SCHEME };
+// Read without draining: a queued OS link is an explicit editor launch.
+const hasPendingLinks = () => pending.length > 0;
+
+module.exports = {
+  hasPendingLinks,
+  attachDeepLinks,
+  registerAppPreferences,
+  looksLikeMp3,
+  linkFromArgv,
+  SCHEME,
+};

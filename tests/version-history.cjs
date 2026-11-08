@@ -23,6 +23,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const env = {
     ...process.env,
     VERYNIZE_SKIP_ONBOARDING: "1",
+    VERYNIZE_LAUNCH_EDITOR: "1",
     VERYNIZE_PREFERENCES: path.join(profile, "design-preferences.json"),
   };
   delete env.ELECTRON_RUN_AS_NODE;

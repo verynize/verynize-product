@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 (async () => {
-  const profile=await fs.mkdtemp(os.tmpdir()+'/bd-shaders-'),env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';
+  const profile=await fs.mkdtemp(os.tmpdir()+'/bd-shaders-'),env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';
   const app=await _electron.launch({timeout:20000,env,args:['.',`--user-data-dir=${profile}`]});
   try {
     const page=await app.firstWindow({timeout:15000});await waitForUiReady(page);await page.waitForSelector('#canvas .layer');

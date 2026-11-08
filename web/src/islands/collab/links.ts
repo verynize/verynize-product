@@ -142,7 +142,9 @@ export function openRoomLink(link: RoomLink, { fromAddress = false } = {}): Prom
           anonymous: !token && !signedIn,
         });
       forgetToken();
-      library()?.showEditor?.();
+      // A superseded or canceled open (another file, or back to Files) resolves without the room: stay put.
+      const now = cw.room?.();
+      if (now && now.id === link.id && now.server === link.server) library()?.showEditor?.();
     } catch (e) {
       const error = e as RoomError;
       const denied =

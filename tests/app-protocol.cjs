@@ -167,16 +167,11 @@ async function appChecks(profile) {
   const app = await launch(profile);
   try {
     const page = await editor(app);
-    // The launch entry (ENTRY, a bare /editor) is replaced with the active file's URL once the library is ready.
-    // Wait for it, so that replace can't land on top of the entries pushed below.
-    await page.waitForFunction(
-      () =>
-        !!window.fileLibrary?.currentId &&
-        location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId),
-    );
-    assert.match(page.url(), /^app:\/\/verynize\/editor\/[^/?#]+$/);
+    await page.waitForFunction(() => window.shellRouter?.state.status === "idle");
+    assert.equal(page.url(), "app://verynize/");
     assert.equal(await page.evaluate(() => location.origin), "app://verynize");
     assert.equal(await page.evaluate(() => isSecureContext), true);
+    assert.equal(await page.evaluate(() => document.body.classList.contains("files-view")), true);
     assert.ok(await ipcWorks(page));
     // Client-side routes: path, query and hash do not matter to IPC.
     // (The router replaces a bare /editor with the active file's URL.)
@@ -340,10 +335,10 @@ async function migrationChecks(profile) {
   });
   try {
     const page = await editor(again);
-    // ENTRY, or its canonical /editor/<fileId> once the library replaced the launch entry.
+    // Plain launches open Home even when a migrated profile has an active file.
     assert.match(
       page.url(),
-      /^app:\/\/verynize\/editor(\/[^/?#]+)?$/,
+      /^app:\/\/verynize\/$/,
       "editor opens without waiting for the downgrade probe",
     );
     let probe;

@@ -20,7 +20,7 @@ const pngSize=bytes=>({width:bytes.readUInt32BE(16),height:bytes.readUInt32BE(20
   // Enough families for the picker's infinite scroll to need more than one page.
   ...Array.from({length:90},(_,i)=>({id:`scroll-test-${i}`,family:`Scroll Test ${String(i).padStart(2,'0')}`,category:'sans-serif',weights:[400],styles:['normal'],kind:'web'})),
  ]));
- const env={...process.env,VERYNIZE_FONT_CACHE:fontCache};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';
+ const env={...process.env,VERYNIZE_FONT_CACHE:fontCache};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';
  const app=await _electron.launch({env,args:['.',`--user-data-dir=${path.join(dir,'profile')}`],timeout:20000});
  try{
   const page=await app.firstWindow({timeout:20000}); await moveOffCursor(app);await waitForUiReady(page);

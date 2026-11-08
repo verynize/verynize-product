@@ -442,7 +442,12 @@ app.whenReady().then(async () => {
     win.webContents.on("will-redirect", (event, url) => {
       if (!appProtocol.isAppURL(url)) event.preventDefault();
     });
-    win.loadURL(appProtocol.ENTRY_URL);
+    // Plain launches open Files. A cold-start design link keeps the editor entry, and so do automated editor tests
+    // (VERYNIZE_LAUNCH_EDITOR=1), which exercise the editor rather than the launch.
+    const editorFirst =
+      require("./app-preferences.cjs").hasPendingLinks() ||
+      process.env.VERYNIZE_LAUNCH_EDITOR === "1";
+    win.loadURL(editorFirst ? `${appProtocol.ORIGIN}/editor` : appProtocol.ENTRY_URL);
     editorWindows.add(win);
     editorOpened = true;
     win.on("closed", () => editorWindows.delete(win));

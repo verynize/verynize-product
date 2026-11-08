@@ -10,6 +10,7 @@ const path = require("node:path");
   const env = {
     ...process.env,
     VERYNIZE_SKIP_ONBOARDING: "1",
+    VERYNIZE_LAUNCH_EDITOR: "1",
     VERYNIZE_PREFERENCES: path.join(dir, "prefs.json"),
   };
   delete env.ELECTRON_RUN_AS_NODE;

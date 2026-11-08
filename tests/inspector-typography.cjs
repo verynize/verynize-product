@@ -12,7 +12,7 @@ const fs = require("node:fs/promises"),
 (async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-typography-"));
   const shots = process.env.WP_TYPE_SHOTS;
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await _electron.launch({
     env,

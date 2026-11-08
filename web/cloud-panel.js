@@ -1059,35 +1059,85 @@
    * reusing the open one); without it the current file becomes the room's record (Create room).
    * A stored outbox is restored, and when the server is unreachable the file opens offline.
    */
+  // The user-initiated room open in progress: opening the same room again joins it.
+  let connecting = null;
   async function connect(info, load = true, expected, baseline = null) {
     if (connection?.id === info.id && connection?.server === info.server && expected === undefined)
       return;
     const coordinator = window.switchCoordinator;
     const own = !info.switchToken;
+    const state = coordinator.getState();
+    if (
+      own &&
+      connecting?.id === info.id &&
+      connecting.server === info.server &&
+      state?.token === connecting.token &&
+      ["begin", "ready"].includes(state.phase)
+    )
+      return connecting.promise;
+    let origin = info.server;
+    try {
+      origin = new URL(info.server).origin;
+    } catch {}
+    const knownFile = library()?.findCloud?.(origin, info.id) || null;
+    // Opened from Files (a room link, a listed room): show the editor and its loading cover at once,
+    // under the file's URL (or the room's, until its library file exists). Not over Settings: a link
+    // opened there keeps Settings until the room has loaded.
+    const body = document.body.classList;
+    const fromHome =
+      own &&
+      load &&
+      expected === undefined &&
+      body.contains("files-view") &&
+      !body.contains("settings-open");
+    if (fromHome)
+      window.shellRequest({ view: "/editor/" + encodeURIComponent(knownFile || info.id) }, () =>
+        library()?.applyEditor?.(),
+      );
     const switchToken =
       info.switchToken ||
       coordinator.begin({
         kind: "file",
+        reason: fromHome ? "home" : undefined,
+        room: info.id,
         from: { fileKey: library()?.currentId, pageId: window.design.getView().page },
-        to: { fileKey: library()?.findCloud?.(info.server, info.id), pageId: null },
+        to: { fileKey: knownFile, pageId: null },
       });
-    try {
-      await connectCore({ ...info, switchToken }, load, expected, baseline);
-      if (
-        coordinator.getState()?.token === switchToken &&
-        coordinator.getState()?.info?.freshness !== "confirmed"
-      )
-        coordinator.rendered(switchToken, {
-          fileKey: library()?.currentId,
-          pageId: window.design.getView().page,
-          freshness: "confirmed",
-        });
-    } catch (error) {
-      coordinator.fail(switchToken, error);
-      throw error;
-    } finally {
-      if (own) coordinator.finish(switchToken);
-    }
+    const current = () =>
+      coordinator.getState()?.token === switchToken &&
+      !["cancel", "fail", "end"].includes(coordinator.getState()?.phase);
+    const run = async () => {
+      try {
+        if (fromHome) await coordinator.paint();
+        if (!current()) return;
+        await connectCore({ ...info, switchToken }, load, expected, baseline);
+        if (
+          coordinator.getState()?.token === switchToken &&
+          coordinator.getState()?.info?.freshness !== "confirmed"
+        )
+          coordinator.rendered(switchToken, {
+            fileKey: library()?.currentId,
+            pageId: window.design.getView().page,
+            freshness: "confirmed",
+          });
+      } catch (error) {
+        const active = current();
+        coordinator.fail(switchToken, error);
+        // Back to Files, replacing the failed editor entry; the caller reports the error.
+        if (fromHome && active) {
+          if (window.shellNavigation)
+            window.shellNavigation.request({ view: "/" }, { replace: true });
+          else library()?.showHome?.();
+        }
+        throw error;
+      } finally {
+        if (own) coordinator.finish(switchToken);
+        if (connecting?.token === switchToken) connecting = null;
+      }
+    };
+    const promise = run();
+    if (own) connecting = { server: info.server, id: info.id, token: switchToken, promise };
+    return promise;
   }
   async function connectCore(info, load = true, expected, baseline = null) {
     const switchToken = info.switchToken;
@@ -1160,7 +1210,8 @@
     if (
       epoch !== generation ||
       requestId !== joinRequest ||
-      window.switchCoordinator.getState()?.token !== switchToken
+      window.switchCoordinator.getState()?.token !== switchToken ||
+      ["cancel", "fail", "end"].includes(window.switchCoordinator.getState()?.phase)
     )
       return;
     let current = fetched.value,
@@ -1352,6 +1403,9 @@
   new MutationObserver(() => {
     if (!reconnectPending || editorHidden()) return;
     reconnectPending = false;
+    // A Home click owns the destination load; do not reconnect the outgoing room.
+    const switching = window.switchCoordinator.getState();
+    if (switching?.kind === "file" && ["begin", "ready"].includes(switching.phase)) return;
     reconnectOpenFile();
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("DOMContentLoaded", () => {

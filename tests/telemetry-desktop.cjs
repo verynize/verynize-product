@@ -120,6 +120,7 @@ async function raiseErrors(app, page, home, tag) {
     ...process.env,
     HOME: home,
     VERYNIZE_SKIP_ONBOARDING: "1",
+    VERYNIZE_LAUNCH_EDITOR: "1",
     SENTRY_DSN_DESKTOP: `http://0123456789abcdef0123456789abcdef@127.0.0.1:${ingest.port}/1`,
     SENTRY_TRACES_SAMPLE_RATE: "0",
   };

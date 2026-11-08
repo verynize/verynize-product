@@ -83,7 +83,9 @@ const layers = (page) => page.locator("#canvas .layer").count();
     let page, errors;
     ({ app, page, errors } = await launch(dir));
 
-    // (a) A fresh profile: one starter file, opened in the editor.
+    // (a) A fresh profile: one starter file on Home, opened only after selecting it.
+    assert.equal(new URL(page.url()).pathname, "/");
+    await page.locator(".file-open").first().click();
     await page.waitForSelector("#canvas .layer");
     await settle(page);
     const starter = await storedLibrary(page);

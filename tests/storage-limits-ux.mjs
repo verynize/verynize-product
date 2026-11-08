@@ -21,7 +21,7 @@ const mf = new Miniflare(await cloudOptions(path.join(dir, "state")));
 let app;
 try {
   const server = (await mf.ready).origin;
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   app = await electron.launch({ env, args: [".", `--user-data-dir=${path.join(dir, "profile")}`] });
   const page = await app.firstWindow();

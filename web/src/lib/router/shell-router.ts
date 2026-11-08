@@ -58,6 +58,16 @@ export { hosted };
 /* ---------- Legacy appliers (DOM + body classes only; they never touch history) ---------- */
 
 type LegacyShell = {
+  switchCoordinator?: {
+    getState(): {
+      token: number;
+      kind: string;
+      phase: string;
+      room?: string | null;
+      to: { fileKey: string | null };
+    } | null;
+    cancel(token: number): void;
+  };
   fileLibrary?: {
     applyHome?(): void;
     applyEditor?(): void;
@@ -323,10 +333,13 @@ export function request(target: ShellRequest, { replace = false }: { replace?: b
     return true;
   const from = logical();
   const next = resolve(from, target);
+  // Settings requests keep the view underneath, and a bare "/editor" (show the editor) names no other file, so
+  // neither cancels a file load in progress.
+  if ("view" in target && target.view !== "/editor") cancelDepartedFile(next.view);
   applyShell(next);
   if (same(from, next)) return true;
   if (closing) closing.desired = next;
-  else transition(from, next, replace);
+  else transition(from, next, replace || isRoomAlias(from.view, next.view));
   return true;
 }
 
@@ -372,6 +385,9 @@ export function applyLocation(area: ShellArea, location: RenderedLocation) {
   if (area === "/settings") applySettingsLocation(location);
   else {
     const view = location.pathname as ViewPath;
+    // Only a location reached after the switch began departs from it (Back/Forward, a navigation); the entry the
+    // switch started on renders late and must not cancel it.
+    if (key !== switchBeganAt) cancelDepartedFile(view);
     applyShell({ view, settings: null });
     restoreFile(view);
   }
@@ -382,6 +398,45 @@ export function applyLocation(area: ShellArea, location: RenderedLocation) {
 // a pending open; the library/coordinator checks isCurrent before committing the document.
 const fileLocation = () => history.location.pathname + "|" + (entryState().settingsUnder ?? "");
 let openingFile: { location: string; id: string } | null = null;
+const idOf = (view: string) => {
+  if (!view.startsWith("/editor/")) return "";
+  try {
+    return decodeURIComponent(view.slice(8));
+  } catch {
+    return "";
+  }
+};
+/** `from` names a cloud room by its id and `to` is that room's library file: the same file under its canonical URL. */
+function isRoomAlias(from: ViewPath, to: ViewPath) {
+  const room = idOf(from);
+  const id = idOf(to);
+  return !!room && !!id && room !== id && legacy().fileLibrary?.cloudOf(id)?.roomId === room;
+}
+/** The file switch in progress (begin/ready), if any. */
+function switching() {
+  const state = legacy().switchCoordinator?.getState();
+  return state?.kind === "file" && ["begin", "ready"].includes(state.phase) ? state : null;
+}
+/** Whether `id` (a library file id or a room id) is where the switch in progress is going. */
+function isSwitchTarget(state: NonNullable<ReturnType<typeof switching>>, id: string) {
+  if (!id) return false;
+  if (state.to.fileKey === id) return true;
+  if (!state.room) return false;
+  return state.room === id || legacy().fileLibrary?.cloudOf(id)?.roomId === state.room;
+}
+// The history entry current when the latest switch began.
+let switchBeganAt: string | undefined;
+window.addEventListener("switch-loading-change", (event) => {
+  if ((event as CustomEvent<{ phase?: string }>).detail?.phase === "begin")
+    switchBeganAt = entryState().__TSR_key;
+});
+function cancelDepartedFile(view: ViewPath) {
+  const coordinator = legacy().switchCoordinator;
+  const state = coordinator?.getState();
+  if (state?.kind !== "file" || (!state.to.fileKey && !state.room)) return;
+  if (!isSwitchTarget(state, idOf(view))) coordinator?.cancel(state.token);
+}
+
 function restoreFile(view: ViewPath) {
   if (!view.startsWith("/editor")) return;
   const lib = legacy().fileLibrary;
@@ -394,7 +449,7 @@ function restoreFile(view: ViewPath) {
         settingsUnder: path,
       });
     else {
-      // The launch entry stays the launch entry under its canonical URL (code mode restores in its place).
+      // Keep the launch entry identity under its canonical file URL.
       const wasLaunch = isLaunchEntry("/editor");
       commit(path, "replace");
       if (wasLaunch) launch.key = entryState().__TSR_key;
@@ -415,6 +470,9 @@ function restoreFile(view: ViewPath) {
     toast.error(message);
   };
   if (!file) {
+    // A room opened from Files or a link shows its URL before its library file exists.
+    const inProgress = switching();
+    if (inProgress && isSwitchTarget(inProgress, id)) return;
     fail("This file is unavailable. Choose a file from Files.");
     return;
   }
@@ -428,6 +486,9 @@ function restoreFile(view: ViewPath) {
     else commit(canonical, "replace");
     return;
   }
+  // Home clicks and room links already started this load before the destination route rendered.
+  const inProgress = switching();
+  if (inProgress && isSwitchTarget(inProgress, file.id)) return;
   if (file.id === lib.currentId) return;
   const location = fileLocation();
   if (openingFile?.id === file.id && openingFile.location === location) return;

@@ -22,7 +22,7 @@ const shots = process.env.VERYNIZE_EVIDENCE_DIR;
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-selection-colors-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${path.join(dir, "profile")}`],

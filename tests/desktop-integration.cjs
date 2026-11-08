@@ -7,7 +7,7 @@ const path=require('node:path');
 const http=require('node:http');
 (async()=>{
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'better-integration-'));
- const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';
+ const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';
  const server=http.createServer((_req,res)=>res.end('<html><body><div style="width:120px;height:80px;background:rgb(255,0,0)">Live test</div></body></html>'));
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const app=await electron.launch({env,args:['.',`--user-data-dir=${path.join(root,'profile')}`]});

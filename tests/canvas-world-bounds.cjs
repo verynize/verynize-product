@@ -5,7 +5,7 @@ const os = require("node:os");
 const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 (async () => {
   const profile = await fs.mkdtemp(os.tmpdir() + "/bounds-");
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await _electron.launch({ env, args: [".", `--user-data-dir=${profile}`] });
   try {

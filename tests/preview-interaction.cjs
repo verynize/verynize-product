@@ -4,7 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=req
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'preview-interaction-'));
   const server=http.createServer((_q,r)=>{r.setHeader('content-type','text/html');r.end('<body style="margin:0;height:3000px"><button style="width:180px;height:80px" onclick="window.clicks=(window.clicks||0)+1">App action</button></body>');});
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
-  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';
+  const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';
   const app=await _electron.launch({env,args:['.',`--user-data-dir=${dir}`]});
   try{
     const page=await app.firstWindow();await page.waitForFunction(()=>!!window.livePreview);

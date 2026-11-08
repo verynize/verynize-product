@@ -32,8 +32,10 @@ body[data-switch-loading="file"]:not([data-switch-leaving]) main > :not(#bd-swit
 #workspace[data-switch-loading="page"] #canvas {
   filter: blur(16px);
 }
+/* Fading out is visual only: input already belongs to the editor underneath (pointer moves over the canvas). */
 body[data-switch-leaving] #switch-loading-logo {
   opacity: 0;
+  pointer-events: none;
 }
 #workspace[data-switch-leaving="true"][data-switch-loading="page"] #canvas {
   filter: blur(0);

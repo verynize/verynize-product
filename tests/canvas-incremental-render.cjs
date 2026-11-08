@@ -20,6 +20,7 @@ const fs = require("node:fs/promises"),
   delete env.ELECTRON_RUN_AS_NODE;
   delete env.VERYNIZE_DISABLE_MCP;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   env.VERYNIZE_PREFERENCES = path.join(dir, "design-preferences.json");
   let client;
   const app = await _electron.launch({

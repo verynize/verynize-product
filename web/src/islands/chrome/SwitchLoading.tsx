@@ -1,16 +1,32 @@
 import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 import { LogoIcon } from "@/components/icons";
 import "./switch-loading.css";
 
 type SwitchState = {
   token: number;
+  reason?: string;
   kind: "file" | "page";
   phase: "begin" | "ready" | "end" | "fail" | "cancel";
 };
 
+/** A file opened from Files that could not load: Files is shown again (web/wonder-shell.js) and says why. */
+function announceOpenFailure(event: Event) {
+  const { name, message } =
+    (event as CustomEvent<{ name?: string; message?: string }>).detail ?? {};
+  toast.error(name ? `Couldn’t open “${name}”` : "Couldn’t open this file", {
+    id: "file-open-failed",
+    description: message || "Something went wrong while loading it. Try again.",
+  });
+}
+
 /** Presentation only: the coordinator owns data, ordering and the live outgoing canvas. */
 export function SwitchLoading() {
   const cover = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    window.addEventListener("file-open-failed", announceOpenFailure);
+    return () => window.removeEventListener("file-open-failed", announceOpenFailure);
+  }, []);
   useEffect(() => {
     const workspace = document.getElementById("workspace");
     if (!workspace) return;
@@ -83,7 +99,8 @@ export function SwitchLoading() {
       } catch {
         /* Storage can be unavailable in restricted contexts. */
       }
-      delayTimer = setTimeout(() => show(state.kind), delay);
+      if (state.kind === "file" && state.reason === "home") show(state.kind);
+      else delayTimer = setTimeout(() => show(state.kind), delay);
       safetyTimer = setTimeout(() => clear(), 30000);
     };
     const onChange = (event: Event) => update((event as CustomEvent<SwitchState>).detail);
@@ -110,7 +127,8 @@ export function SwitchLoading() {
     };
     const navigation = new MutationObserver(() => {
       if (
-        document.body.classList.contains("files-view") ||
+        (document.body.classList.contains("files-view") &&
+          !location.pathname.startsWith("/editor/")) ||
         document.body.classList.contains("code-mode")
       )
         clear(true);

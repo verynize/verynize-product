@@ -1,7 +1,7 @@
 // Cloud files in the Files home: rooms of the active workspace (`/api/orgs/:id/rooms`) plus rooms
 // shared with the account directly (`/api/me/rooms`), merged with this device's cloud-backed
 // library records so each room appears once. Opening a listed room joins it through
-// `window.cloudWorkspace.openRoom`, which creates the library record on first open.
+// the library, which selects the destination route before fetching its document.
 import "@/lib/account-store";
 import { useMemo } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import {
   type AccountScope,
 } from "@/lib/query/keys";
 import type { DesignDocument } from "@/lib/bridge";
-import type { CloudRoom, LibraryFile } from "./library";
+import { library, type CloudRoom, type LibraryFile } from "./library";
 
 type RoomRow = {
   id: string;
@@ -24,9 +24,6 @@ type RoomRow = {
   updatedAt?: number;
   organizationId?: string | null;
   organizationName?: string | null;
-};
-type CloudWorkspaceApi = {
-  openRoom(info: { server: string; id: string }): Promise<void>;
 };
 
 const RANK: Record<string, number> = { viewer: 1, commenter: 2, editor: 3, owner: 4 };
@@ -147,10 +144,13 @@ export function openEntry(file: LibraryFile, open: (id: string) => unknown) {
     return void Promise.resolve(open(file.id)).catch((e: unknown) =>
       toast(e instanceof Error ? e.message : String(e)),
     );
-  const workspace = (window as unknown as { cloudWorkspace?: CloudWorkspaceApi }).cloudWorkspace;
-  void workspace
-    ?.openRoom({ server: file.room!.server, id: file.room!.id })
-    .catch((e: unknown) => toast(e instanceof Error ? e.message : String(e)));
+  void library()
+    .openRoomFile(file.room!)
+    .catch((e: unknown) => {
+      // A failed open from Files announces itself (chrome/SwitchLoading.tsx); only earlier errors are shown here.
+      if (!(e as { notified?: boolean } | null)?.notified)
+        toast(e instanceof Error ? e.message : String(e));
+    });
 }
 
 export const ROLE_LABEL: Record<string, string> = {

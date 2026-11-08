@@ -11,7 +11,7 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "find-background-"));
   const output = process.env.BACKGROUND_SCREENSHOTS || profile;
   await fs.mkdir(output, { recursive: true });
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await _electron.launch({
     env,

@@ -47,24 +47,92 @@ try {
   delete env.ELECTRON_RUN_AS_NODE;
   for (const name of ["a", "b"])
     apps.push(
-      await _electron.launch({ env, args: [".", `--user-data-dir=${path.join(dir, name)}`] }),
+      await _electron.launch({
+        env,
+        args: [
+          ".",
+          `--user-data-dir=${path.join(dir, name)}`,
+          ...(name === "a"
+            ? [
+                `verynize://join?invite=${encodeURIComponent(`${server}/#room=${room.id}&token=${room.token}`)}`,
+              ]
+            : []),
+        ],
+      }),
     );
   const [a, b] = await Promise.all(apps.map((app) => app.firstWindow()));
   for (const page of [a, b]) page.setDefaultTimeout(20000);
+  await waitForUiReady(a);
+  await a.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, room.id);
+  assert.equal(
+    await a.evaluate(() => document.body.classList.contains("files-view")),
+    false,
+    "a cold-start design link opens its editor without a Home click",
+  );
   const cold = [];
-  for (const p of [a, b]) {
-    await waitForUiReady(p);
-    cold.push(
-      await p.evaluate(
-        async (info) => {
-          const start = performance.now();
-          await window.cloudWorkspace.openRoom(info);
-          return performance.now() - start;
-        },
-        { server, id: room.id, token: room.token },
-      ),
-    );
-  }
+  await waitForUiReady(a);
+  cold.push(
+    await a.evaluate(
+      async (info) => {
+        const start = performance.now();
+        await window.cloudWorkspace.openRoom(info);
+        return performance.now() - start;
+      },
+      { server, id: room.id, token: room.token },
+    ),
+  );
+  // b is on Files with no record of the room: opening its link (twice, like a repeated click) shows the
+  // editor and its logo at once, loads the room once, and ends on the file's URL in a single history entry.
+  await waitForUiReady(b);
+  assert.equal(await b.evaluate(() => document.body.classList.contains("files-view")), true);
+  const linkOpen = await b.evaluate(
+    async (info) => {
+      const begins = [];
+      let paint = null;
+      window.addEventListener("switch-loading-change", (event) => {
+        if (event.detail.phase !== "begin") return;
+        begins.push(event.detail.room);
+        if (begins.length === 1)
+          requestAnimationFrame(() => {
+            paint = {
+              home: document.body.classList.contains("files-view"),
+              logo: getComputedStyle(document.getElementById("switch-loading-logo")).display,
+              path: location.pathname,
+            };
+          });
+      });
+      const length = history.length;
+      const start = performance.now();
+      const href = `${info.server}/#room=${info.id}&token=${info.token}`;
+      // A link and a direct open of the same room, both while it loads.
+      window.cloudLinks.open(href);
+      void window.cloudWorkspace.openRoom({ server: info.server, id: info.id, token: info.token });
+      while (window.cloudWorkspace.room()?.id !== info.id || !paint) {
+        if (performance.now() - start > 15000) throw Error("room link did not open");
+        await new Promise((resolve) => setTimeout(resolve, 20));
+      }
+      const elapsed = performance.now() - start;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return {
+        elapsed,
+        begins,
+        paint,
+        path: location.pathname,
+        fileId: window.fileLibrary.findCloud(info.server, info.id),
+        added: history.length - length,
+      };
+    },
+    { server, id: room.id, token: room.token },
+  );
+  cold.push(linkOpen.elapsed);
+  assert.deepEqual(linkOpen.paint, {
+    home: false,
+    logo: "flex",
+    path: `/editor/${room.id}`,
+  });
+  assert.deepEqual(linkOpen.begins, [room.id], "a repeated room link starts one load");
+  assert.equal(linkOpen.path, `/editor/${encodeURIComponent(linkOpen.fileId)}`);
+  assert.equal(linkOpen.added, 1, "the room URL is replaced by the file URL, not pushed");
   await b.evaluate(async () => {
     const doc = window.design.getDocument();
     doc.name = "Local";
@@ -83,6 +151,21 @@ try {
         });
     });
   });
+  await b.evaluate(() => {
+    window.fileLibrary.showHome();
+    window.__cloudOpeningPaint = null;
+    window.addEventListener("switch-loading-change", function observe(event) {
+      if (event.detail.phase !== "begin" || event.detail.reason !== "home") return;
+      window.removeEventListener("switch-loading-change", observe);
+      requestAnimationFrame(() => {
+        window.__cloudOpeningPaint = {
+          home: document.body.classList.contains("files-view"),
+          logo: getComputedStyle(document.getElementById("switch-loading-logo")).display,
+          document: window.design.getDocument().name,
+        };
+      });
+    });
+  });
   const timing = await b.evaluate(
     async (info) => {
       const start = performance.now();
@@ -93,6 +176,15 @@ try {
   );
   await b.waitForFunction(
     () => window.design.getDocument().pages[0].nodes[0].name === "Remote while away",
+  );
+  assert.deepEqual(
+    await b.evaluate(() => window.__cloudOpeningPaint),
+    {
+      home: false,
+      logo: "flex",
+      document: "Local",
+    },
+    "cloud Home opening paints the editor logo before fetching/replacing the document",
   );
   const observations = await b.evaluate(() => window.cacheObservations);
   assert.ok(
@@ -166,6 +258,8 @@ try {
   const recovered = await restarted.firstWindow();
   await waitForUiReady(recovered);
   recovered.setDefaultTimeout(20000);
+  assert.equal(await recovered.locator("#file-home").isVisible(), true);
+  await recovered.locator(`#file-home [data-room-id="${room.id}"] .file-open`).click();
   await recovered.waitForFunction(
     () => window.cloudWorkspace.isConnected() && window.cloudWorkspace.pendingCount() === 0,
   );

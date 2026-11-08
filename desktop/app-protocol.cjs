@@ -15,8 +15,8 @@ const { pathToFileURL } = require("node:url");
 const SCHEME = "app";
 const HOST = "verynize";
 const ORIGIN = `${SCHEME}://${HOST}`;
-// Legacy startup opens the editor; "/" is the files home route (web/src/lib/router/shell-router.ts).
-const ENTRY_URL = `${ORIGIN}/editor`;
+// Plain launches open Files; explicit editor URLs are still handled by the shell router.
+const ENTRY_URL = `${ORIGIN}/`;
 const WEB_ROOT = path.resolve(__dirname, "../web");
 const INDEX = path.join(WEB_ROOT, "index.html");
 
