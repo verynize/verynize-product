@@ -7,7 +7,7 @@ import {_electron as electron} from '@playwright/test';
 import {exportHTML} from './export-html.mjs';
 test('exported authored WebGL shader actually compiles and paints in isolated Electron frame',{timeout:45000},async t=>{
  const profile=await fs.mkdtemp(path.join(os.tmpdir(),'design-shader-runtime-'));
- const env={...process.env};delete env.ELECTRON_RUN_AS_NODE;
+ const env={...process.env,VERYNIZE_LAUNCH_EDITOR:"1"};delete env.ELECTRON_RUN_AS_NODE;
  let app;t.after(async()=>{if(app)await app.close();await fs.rm(profile,{recursive:true,force:true});});
  app=await electron.launch({timeout:15000,env,args:['.',`--user-data-dir=${profile}`]});
  const page=await app.firstWindow({timeout:15000});await page.waitForSelector('#canvas');

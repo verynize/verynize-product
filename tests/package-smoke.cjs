@@ -9,6 +9,7 @@ const fs = require("node:fs/promises"),
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     executablePath: path.resolve("dist/Verynize.app/Contents/MacOS/Electron"),
     args: testElectronArgs([`--user-data-dir=${root}`]),
