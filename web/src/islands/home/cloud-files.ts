@@ -146,7 +146,11 @@ export function openEntry(file: LibraryFile, open: (id: string) => unknown) {
     );
   void library()
     .openRoomFile(file.room!)
-    .catch((e: unknown) => toast(e instanceof Error ? e.message : String(e)));
+    .catch((e: unknown) => {
+      // A failed open from Files announces itself (chrome/SwitchLoading.tsx); only earlier errors are shown here.
+      if (!(e as { notified?: boolean } | null)?.notified)
+        toast(e instanceof Error ? e.message : String(e));
+    });
 }
 
 export const ROLE_LABEL: Record<string, string> = {

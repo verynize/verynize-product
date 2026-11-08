@@ -58,12 +58,24 @@
   function showEditor(){window.shellRequest({view:'/editor'},applyEditor);}
   function applyHome(){window.switchCoordinator.cancel(window.switchCoordinator.getState()?.token);if(homeOpen)return;homeOpen=true;home.hidden=false;document.body.classList.add('files-view');$('files-home').classList.add('active');renderFiles();}
   function applyEditor(){if(!homeOpen)return;homeOpen=false;home.hidden=true;document.body.classList.remove('files-view');$('files-home').classList.remove('active');}
+  // The user-initiated open in progress: a repeated open of the same file joins it instead of starting over.
+  let inflight = null;
   async function openFile(id, options = {}) {
     const file = library.files.find((file) => file.id === id);
     if (!file) return;
     const coordinator = window.switchCoordinator;
     const own = !options.switchToken;
     const fromHome = homeOpen;
+    const state = coordinator.getState();
+    if (
+      own &&
+      inflight?.id === id &&
+      state?.token === inflight.token &&
+      ["begin", "ready"].includes(state.phase) &&
+      options.cloudJoinEpoch === undefined &&
+      !options.preserveNative
+    )
+      return inflight.promise;
     const alreadyOpen =
       library.active === id &&
       canSee(file) &&
@@ -85,6 +97,7 @@
       coordinator.begin({
         kind: "file",
         reason: fromHome ? "home" : undefined,
+        room: file.cloud && !file.cloud.detached ? file.cloud.roomId : null,
         from: { fileKey: library.active, pageId: window.design.getView().page },
         to: { fileKey: id, pageId: file.document?.activePage ?? null },
       });
@@ -92,35 +105,51 @@
       coordinator.getState()?.token === token &&
       !["cancel", "fail", "end"].includes(coordinator.getState()?.phase) &&
       (!options.isCurrent || options.isCurrent());
-    try {
-      // Give the destination tab and cover a paint before synchronous document work.
-      if (own && fromHome) await coordinator.paint();
-      if (!isCurrent()) return;
-      const result = alreadyOpen
-        ? (showEditor(), id)
-        : await openFileCore(id, { ...options, switchToken: token, isCurrent });
-      if (own && isCurrent() && coordinator.getState()?.info?.freshness !== "confirmed")
-        coordinator.rendered(token, {
-          fileKey: id,
-          pageId: window.design.getView().page,
-          freshness: "confirmed",
-        });
-      return result;
-    } catch (error) {
-      const active =
-        coordinator.getState()?.token === token &&
-        coordinator.getState()?.phase !== "cancel" &&
-        (!options.isCurrent || options.isCurrent());
-      coordinator.fail(token, error);
-      // Replace the failed /editor/<id> entry: Back must not retry the failed open.
-      if (own && active && fromHome) {
-        if (window.shellNavigation) window.shellNavigation.request({ view: "/" }, { replace: true });
-        else showHome();
+    const run = async () => {
+      try {
+        // Give the destination tab and cover a paint before synchronous document work.
+        if (own && fromHome) await coordinator.paint();
+        if (!isCurrent()) return;
+        const result = alreadyOpen
+          ? (showEditor(), id)
+          : await openFileCore(id, { ...options, switchToken: token, isCurrent });
+        if (own && isCurrent() && coordinator.getState()?.info?.freshness !== "confirmed")
+          coordinator.rendered(token, {
+            fileKey: id,
+            pageId: window.design.getView().page,
+            freshness: "confirmed",
+          });
+        return result;
+      } catch (error) {
+        const active =
+          coordinator.getState()?.token === token &&
+          coordinator.getState()?.phase !== "cancel" &&
+          (!options.isCurrent || options.isCurrent());
+        coordinator.fail(token, error);
+        if (own && active && fromHome) {
+          // Replace the failed /editor/<id> entry: Back must not retry the failed open.
+          if (window.shellNavigation) window.shellNavigation.request({ view: "/" }, { replace: true });
+          else showHome();
+          // An invalid document already reported itself (web/document-safety.js); anything else is
+          // announced here (chrome island toast), once.
+          if (!blocked.has(id)) {
+            if (error && typeof error === "object") error.notified = true;
+            window.dispatchEvent(
+              new CustomEvent("file-open-failed", {
+                detail: { name: file.name, message: String(error?.message || error) },
+              }),
+            );
+          }
+        }
+        throw error;
+      } finally {
+        if (own) coordinator.finish(token);
+        if (inflight?.token === token) inflight = null;
       }
-      throw error;
-    } finally {
-      if (own) coordinator.finish(token);
-    }
+    };
+    const promise = run();
+    if (own) inflight = { id, token, promise };
+    return promise;
   }
   async function openFileCore(id,options={}){const file=library.files.find(f=>f.id===id);if(!file)return;if(!canSee(file))throw Error('Sign in to the account that owns this file.');if(file.cloud&&!file.cloud.detached&&options.cloudJoinEpoch===undefined){await window.cloudWorkspace.openRoom({server:file.cloud.server,id:file.cloud.roomId,token:file.cloud.token,switchToken:options.switchToken});if(!options.isCurrent||options.isCurrent())showEditor();return file.id;}const invalid=window.switchCache.isTrustedLocal(file.document)?null:window.documentSafety.check(file.document);if(invalid){blocked.add(file.id);window.documentSafety.reportOpenFailure({document:file.document,source:'library',kept:'It stays in your files unchanged.'});emit();throw Error('Cannot open “'+file.name+'”: '+invalid.error)}if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');await window.documentLifecycle?.prepareSwitch(options);window.switchCoordinator.phase(options.switchToken,'flush');if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');saving=true;const previous=library.active;try{library.active=file.id;delete file.remoteOnly;window.documentSafety.withSource({source:'library',backup:true},()=>window.design.setDocument(file.document));if(!file.cloud&&!window.switchCache.isTrustedLocal(file.document)){file.document=window.design.getDocument();window.switchCache.trustLocal(file.document);}blocked.delete(file.id);title.textContent=file.name;persist();showEditor();}catch(error){library.active=previous;throw error;}finally{saving=false;}
    // Cloud-backed files (file.cloud = {server,roomId,token?,role?,detached?}) reconnect to their room: web/cloud-panel.js listens.
