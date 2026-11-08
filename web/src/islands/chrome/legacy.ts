@@ -61,11 +61,13 @@ export function initLegacy() {
   initialised = true;
   initialSnap = (document.getElementById("snap") as HTMLInputElement | null)?.checked !== false;
   for (const id of [...MENU_IDS, ...ZOOM_IDS, ...CHROME_IDS, "icon-kind", "snap"]) takeOver(id);
-  // The toolbar only mounts in the editor; Home must be able to report UI readiness.
-  for (const id of TOOL_IDS) takeOver(id, { deferred: true });
+  // The toolbar only mounts in the editor: a launch on the Files home (web/shell-request.js sets `files-view` before
+  // this runs) must not wait for it to report UI readiness; an editor launch still does.
+  const deferred = document.body.classList.contains("files-view");
+  for (const id of TOOL_IDS) takeOver(id, { deferred });
   // The emptied legacy toolbar (wonder-shell.js) is `position:fixed` and nudged right by `agent-chat-open` rules, so it
   // showed as a stray pill over the panels; park it and hand `#canvas-toolbar` to the island toolbar.
-  takeOver("canvas-toolbar", { deferred: true });
+  takeOver("canvas-toolbar", { deferred });
   const header = document.querySelector<HTMLElement>("header.app-chrome");
   hideLegacy(
     header,
