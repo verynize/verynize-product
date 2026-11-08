@@ -112,9 +112,7 @@ export function colorUses(node: Node, tokens: Tokens): Use[] {
         uses.push(holderUse(p, tokens, (d) => (d[key] as Holder[])[i], { paint: true }));
       else if (Array.isArray(p?.stops))
         p.stops.forEach((s, j) =>
-          uses.push(
-            holderUse(s, tokens, (d) => (d[key] as { stops: Holder[] }[])[i].stops[j]),
-          ),
+          uses.push(holderUse(s, tokens, (d) => (d[key] as { stops: Holder[] }[])[i].stops[j])),
         );
     });
   };
@@ -323,8 +321,7 @@ export function SelectionColorsSection({
                 label="Detach SVG color variable"
                 onClick={() =>
                   replaceSvg(svgBound, (n) => {
-                    const own =
-                      typeof n.svgColor === "string" ? n.svgColor : monochromeSvgColor(n);
+                    const own = typeof n.svgColor === "string" ? n.svgColor : monochromeSvgColor(n);
                     return {
                       svgColor: tokens[n.svgColorToken as string] || own,
                       svgColorToken: undefined,
@@ -376,15 +373,7 @@ function replaceSvg(nodes: Node[], patch: (node: Node) => Record<string, unknown
   }
 }
 
-function ColorRow({
-  index,
-  group,
-  tokens,
-}: {
-  index: number;
-  group: ColorGroup;
-  tokens: Tokens;
-}) {
+function ColorRow({ index, group, tokens }: { index: number; group: ColorGroup; tokens: Tokens }) {
   const [open, setOpen] = useState(false);
   const n = index + 1;
   const color = group.token ? tokens[group.token] || group.color : group.color;

@@ -77,4 +77,3 @@ export async function createColorToken(): Promise<string | null> {
   const button = legacy("add-token");
   return button?.onclick ? await button.onclick.call(button, new PointerEvent("click")) : null;
 }
-

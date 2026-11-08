@@ -6,7 +6,16 @@ import { mountIsland } from "@/lib/mount";
 import { hosted } from "@/lib/router/host";
 import { useChatState } from "./chat/store";
 import { workspace } from "./code/api";
-import { addRepository, newChat, newQuickChat, openChat, openRepository, refresh, repositoryByKey, start } from "./code/controller";
+import {
+  addRepository,
+  newChat,
+  newQuickChat,
+  openChat,
+  openRepository,
+  refresh,
+  repositoryByKey,
+  start,
+} from "./code/controller";
 import { openFile, openMemory } from "./code/editor-state";
 import { CodeWorkspace } from "./code/workspace";
 import { DesignChatSidebar } from "./code/design-sidebar";

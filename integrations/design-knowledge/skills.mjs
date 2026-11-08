@@ -378,30 +378,130 @@ Use when a part repeats: an app shell (header, sidebar, content) around every sc
 `;
 
 const entries = [
-  { name: 'new-design', kind: 'primary', summary: 'Design something new from a prompt, a set of separate items, or up to 4 variations: brief → style → labelled skeleton → section-by-section with screenshots → review → finish.', supporting: ['new-design-references', 'new-design-arrange', 'generate-assets', 'design-library', 'components'], body: newDesign },
-  { name: 'edit-design', kind: 'primary', summary: 'Change, fix or give feedback on an existing design: diagnose from screenshot and code, change the minimum, preserve the direction, re-verify.', supporting: ['new-design-references', 'design-library', 'components', 'design-review'], body: editDesign },
-  { name: 'design-to-code', kind: 'primary', summary: 'Build a canvas design in the user\'s repository, reusing its components, tokens and icons, then check it with the repo\'s own tools.', supporting: ['design-to-code-pull-request', 'design-library-icons'], body: designToCode },
-  { name: 'code-to-design', kind: 'primary', summary: 'Reproduce a screen or component from the user\'s code on the canvas, tokens first, faithfully, then verify against the source.', supporting: ['code-to-design-library', 'design-library-icons', 'design-library', 'components'], body: codeToDesign },
-  { name: 'design-library', kind: 'primary', summary: 'Create, alias, bind, rename or extract design tokens, choose the icon set, and build a style guide or component sheet.', supporting: ['design-library-icons', 'code-to-design-library'], body: designLibrary },
-  { name: 'generate-assets', kind: 'primary', summary: 'Source imagery and artwork without an image model: stock photos, shader fills, hand-written SVG vectors, gradients and shapes.', supporting: ['new-design-arrange'], body: generateAssets },
-  { name: 'design-review', kind: 'supporting', summary: 'Ten-point critique with 1–5 concrete fixes citing element ids; re-screenshot; max 3 repair iterations. Required before finish_artboard.', body: designReview },
-  { name: 'new-design-references', kind: 'supporting', summary: 'Gather and cite references: examples, competitive analysis, unconventional directions, reference-backed critique.', body: newDesignReferences },
-  { name: 'new-design-arrange', kind: 'supporting', summary: 'Place several artboards with data-component-x/y: flows in rows, variants in columns, 100px gaps, no overlaps.', body: newDesignArrange },
-  { name: 'design-library-icons', kind: 'supporting', summary: 'Bring a repository\'s own icons onto the canvas: find rendered glyphs, map published sets to get_icons, embed repo SVGs unchanged.', body: designLibraryIcons },
-  { name: 'design-to-code-pull-request', kind: 'supporting', summary: 'Commit design work and open a pull request only when asked, following the repo\'s conventions.', body: designToCodePullRequest },
-  { name: 'components', kind: 'supporting', summary: 'Reusable parts: main components, linked instances with their own overrides, slots for per-instance content, and the app shell pattern (one shell main, one instance per screen).', body: components },
-  { name: 'code-to-design-library', kind: 'supporting', summary: 'Import a repo\'s component library: inventory, build in import order, organize a design guide of reusable components.', body: codeToDesignLibrary },
+  {
+    name: "new-design",
+    kind: "primary",
+    summary:
+      "Design something new from a prompt, a set of separate items, or up to 4 variations: brief → style → labelled skeleton → section-by-section with screenshots → review → finish.",
+    supporting: [
+      "new-design-references",
+      "new-design-arrange",
+      "generate-assets",
+      "design-library",
+      "components",
+    ],
+    body: newDesign,
+  },
+  {
+    name: "edit-design",
+    kind: "primary",
+    summary:
+      "Change, fix or give feedback on an existing design: diagnose from screenshot and code, change the minimum, preserve the direction, re-verify.",
+    supporting: ["new-design-references", "design-library", "components", "design-review"],
+    body: editDesign,
+  },
+  {
+    name: "design-to-code",
+    kind: "primary",
+    summary:
+      "Build a canvas design in the user's repository, reusing its components, tokens and icons, then check it with the repo's own tools.",
+    supporting: ["design-to-code-pull-request", "design-library-icons"],
+    body: designToCode,
+  },
+  {
+    name: "code-to-design",
+    kind: "primary",
+    summary:
+      "Reproduce a screen or component from the user's code on the canvas, tokens first, faithfully, then verify against the source.",
+    supporting: ["code-to-design-library", "design-library-icons", "design-library", "components"],
+    body: codeToDesign,
+  },
+  {
+    name: "design-library",
+    kind: "primary",
+    summary:
+      "Create, alias, bind, rename or extract design tokens, choose the icon set, and build a style guide or component sheet.",
+    supporting: ["design-library-icons", "code-to-design-library"],
+    body: designLibrary,
+  },
+  {
+    name: "generate-assets",
+    kind: "primary",
+    summary:
+      "Source imagery and artwork without an image model: stock photos, shader fills, hand-written SVG vectors, gradients and shapes.",
+    supporting: ["new-design-arrange"],
+    body: generateAssets,
+  },
+  {
+    name: "design-review",
+    kind: "supporting",
+    summary:
+      "Ten-point critique with 1–5 concrete fixes citing element ids; re-screenshot; max 3 repair iterations. Required before finish_artboard.",
+    body: designReview,
+  },
+  {
+    name: "new-design-references",
+    kind: "supporting",
+    summary:
+      "Gather and cite references: examples, competitive analysis, unconventional directions, reference-backed critique.",
+    body: newDesignReferences,
+  },
+  {
+    name: "new-design-arrange",
+    kind: "supporting",
+    summary:
+      "Place several artboards with data-component-x/y: flows in rows, variants in columns, 100px gaps, no overlaps.",
+    body: newDesignArrange,
+  },
+  {
+    name: "design-library-icons",
+    kind: "supporting",
+    summary:
+      "Bring a repository's own icons onto the canvas: find rendered glyphs, map published sets to get_icons, embed repo SVGs unchanged.",
+    body: designLibraryIcons,
+  },
+  {
+    name: "design-to-code-pull-request",
+    kind: "supporting",
+    summary:
+      "Commit design work and open a pull request only when asked, following the repo's conventions.",
+    body: designToCodePullRequest,
+  },
+  {
+    name: "components",
+    kind: "supporting",
+    summary:
+      "Reusable parts: main components, linked instances with their own overrides, slots for per-instance content, and the app shell pattern (one shell main, one instance per screen).",
+    body: components,
+  },
+  {
+    name: "code-to-design-library",
+    kind: "supporting",
+    summary:
+      "Import a repo's component library: inventory, build in import order, organize a design guide of reusable components.",
+    body: codeToDesignLibrary,
+  },
 ];
 
 /** Old skill names that still resolve: alias → current skill. */
 export const skillAliases = {
-  variations: { target: 'new-design', note: 'Variations are part of new-design now; follow its "Variations" section.' },
-  'design-system': { target: 'design-library', note: 'design-system is now design-library; its style guide and component sheet steps are in section 5.' },
+  variations: {
+    target: "new-design",
+    note: 'Variations are part of new-design now; follow its "Variations" section.',
+  },
+  "design-system": {
+    target: "design-library",
+    note: "design-system is now design-library; its style guide and component sheet steps are in section 5.",
+  },
 };
 
-export const skills = Object.fromEntries(entries.map(e => [e.name, e]));
+export const skills = Object.fromEntries(entries.map((e) => [e.name, e]));
 
-const normalize = name => String(name || '').toLowerCase().trim().replace(/[\s_]+/g, '-');
+const normalize = (name) =>
+  String(name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-");
 
 /** Resolve a skill name or alias to the canonical skill name, or null. */
 export function resolveSkillName(name) {
@@ -416,32 +516,49 @@ export function resolveSkillName(name) {
  * @returns {{ name: string, kind: 'primary'|'supporting'|'alias', summary: string, supporting?: string[], aliasOf?: string }[]}
  */
 export function listSkills({ aliases = true } = {}) {
-  const out = entries.map(({ name, kind, summary, supporting }) => ({ name, kind, summary, ...(supporting ? { supporting } : {}) }));
-  if (aliases) for (const [name, { target }] of Object.entries(skillAliases)) out.push({ name, kind: 'alias', aliasOf: target, summary: `Old name for ${target}; resolves to it.` });
+  const out = entries.map(({ name, kind, summary, supporting }) => ({
+    name,
+    kind,
+    summary,
+    ...(supporting ? { supporting } : {}),
+  }));
+  if (aliases)
+    for (const [name, { target }] of Object.entries(skillAliases))
+      out.push({
+        name,
+        kind: "alias",
+        aliasOf: target,
+        summary: `Old name for ${target}; resolves to it.`,
+      });
   return out;
 }
 
 export function getSkill(name) {
   const key = normalize(name);
   const target = resolveSkillName(key);
-  if (!target) throw new Error(`Unknown skill "${name}". Available: ${entries.map(e => e.name).join(', ')}`);
+  if (!target)
+    throw new Error(`Unknown skill "${name}". Available: ${entries.map((e) => e.name).join(", ")}`);
   const body = skills[target].body;
   return key === target ? body : `> ${skillAliases[key].note}\n\n${body}`;
 }
 
 /** Markdown for a get_skills call without a name. */
 export function skillCatalog() {
-  const primary = entries.filter(e => e.kind === 'primary');
-  const supporting = entries.filter(e => e.kind === 'supporting');
+  const primary = entries.filter((e) => e.kind === "primary");
+  const supporting = entries.filter((e) => e.kind === "supporting");
   return `## Skills
 
 Load the one skill that matches the job with get_skills {skill} before starting it, and follow it step by step. A quick text, color, spacing or icon tweak needs no skill.
 
 ### Primary (one per job)
-${primary.map(e => `- **${e.name}**: ${e.summary}${e.supporting.length ? ` Supporting: ${e.supporting.join(', ')}.` : ''}`).join('\n')}
+${primary.map((e) => `- **${e.name}**: ${e.summary}${e.supporting.length ? ` Supporting: ${e.supporting.join(", ")}.` : ""}`).join("\n")}
 
 ### Supporting (a primary skill says when to load them)
-${supporting.map(e => `- **${e.name}**: ${e.summary}`).join('\n')}
+${supporting.map((e) => `- **${e.name}**: ${e.summary}`).join("\n")}
 
-Once a style is chosen or named, call get_design_guidelines {style}. Always run design-review before finish_artboard. Old names still work: ${Object.entries(skillAliases).map(([a, { target }]) => `${a} → ${target}`).join(', ')}.`;
+Once a style is chosen or named, call get_design_guidelines {style}. Always run design-review before finish_artboard. Old names still work: ${Object.entries(
+    skillAliases,
+  )
+    .map(([a, { target }]) => `${a} → ${target}`)
+    .join(", ")}.`;
 }

@@ -46,7 +46,12 @@ function snapshotDocument(region, options = {}) {
   if (options.root && !rootEl) throw Error("The element is no longer on the page");
   const rootBox = rootEl && rootEl.getBoundingClientRect();
   const area = rootBox
-    ? { x: rootBox.left, y: rootBox.top, width: Math.max(1, rootBox.width), height: Math.max(1, rootBox.height) }
+    ? {
+        x: rootBox.left,
+        y: rootBox.top,
+        width: Math.max(1, rootBox.width),
+        height: Math.max(1, rootBox.height),
+      }
     : region || { x: 0, y: 0, width: innerWidth, height: innerHeight };
   const kept = options.keep ? (window.__verynizeCapture = new Map()) : null;
   const local = ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
@@ -890,23 +895,26 @@ function captureModel(snapshot) {
     for (const node of nodes)
       if (!node.parentId && node.type === "text" && !node.backgroundFills)
         node.backgroundFills = [{ type: "solid", color: backdrop }];
-    if (!snapshot.element) nodes.unshift({
-    id: "capture-region",
-    parentId: null,
-    type: "frame",
-    name: "Captured region",
-    x: 0,
-    y: 0,
-    w: snapshot.area.width,
-    h: snapshot.area.height,
-    color: "transparent",
-    text: "",
-    fontSize: 16,
-    radius: 0,
-    clipContent: true,
-    layout: "free",
-    ...(snapshot.url ? { capture: { source: { url: snapshot.url, region: snapshot.area } } } : {}),
-  });
+  if (!snapshot.element)
+    nodes.unshift({
+      id: "capture-region",
+      parentId: null,
+      type: "frame",
+      name: "Captured region",
+      x: 0,
+      y: 0,
+      w: snapshot.area.width,
+      h: snapshot.area.height,
+      color: "transparent",
+      text: "",
+      fontSize: 16,
+      radius: 0,
+      clipContent: true,
+      layout: "free",
+      ...(snapshot.url
+        ? { capture: { source: { url: snapshot.url, region: snapshot.area } } }
+        : {}),
+    });
   return {
     version: 2,
     name: snapshot.title || "Captured app",

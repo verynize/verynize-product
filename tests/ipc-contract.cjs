@@ -23,7 +23,7 @@ test("every handle() channel in desktop/*.cjs is a literal declared in the IPC c
       assert.ok(!handled.has(name), `${name} is registered twice (${handled.get(name)}, ${file})`);
       handled.set(name, file);
     }
-    for (const match of source.matchAll(/(?<![\w.])handle\(\s*(?!["'`])([^)]{0,40})/g))
+    for (const match of source.matchAll(/(?<![\w.])handle\(\s*(?![\s"'`])([^)]{0,40})/g))
       assert.fail(`${file}: handle(${match[1]}…) must name its channel with a string literal`);
   }
   assert.deepEqual(sorted(handled.keys()), sorted(contract));
@@ -34,7 +34,7 @@ test("every preload call() channel is declared in the IPC contract and registere
   const called = new Set();
   for (const [, name] of source.matchAll(/\bcall\(\s*["'`](\w+)["'`]/g)) called.add(name);
   assert.equal(
-    [...source.matchAll(/\bcall\(\s*(?!["'`])/g)].length,
+    [...source.matchAll(/\bcall\(\s*(?![\s"'`])/g)].length,
     0,
     "preload names every channel literally",
   );

@@ -44,7 +44,10 @@
   z-index: 46;
   background: var(--background);
   color: var(--foreground);
-  font: 400 12px/16px Inter, system-ui, sans-serif;
+  font:
+    400 12px/16px Inter,
+    system-ui,
+    sans-serif;
 }
 #preview-tab-view[hidden] {
   display: none;
@@ -131,7 +134,10 @@ body[data-pt="view"]:not(.code-mode):not(.files-view) #canvas-toolbar {
   border-radius: 6px;
   background: transparent;
   color: var(--foreground);
-  font: 400 13px/18px Inter, system-ui, sans-serif;
+  font:
+    400 13px/18px Inter,
+    system-ui,
+    sans-serif;
   outline: none;
 }
 [data-pt="path"]:hover:not(:disabled),
@@ -222,7 +228,10 @@ body[data-pt="view"]:not(.code-mode):not(.files-view) #canvas-toolbar {
   border-radius: 8px;
   background: transparent;
   color: inherit;
-  font: 400 14px/20px Inter, system-ui, sans-serif;
+  font:
+    400 14px/20px Inter,
+    system-ui,
+    sans-serif;
   cursor: pointer;
 }
 [data-pt="toolbar"] svg {
@@ -288,7 +297,10 @@ body[data-pt="view"]:not(.code-mode):not(.files-view) #canvas-toolbar {
   height: 28px;
   padding: 0 8px;
   border-radius: 6px;
-  font: 400 14px/20px Inter, system-ui, sans-serif;
+  font:
+    400 14px/20px Inter,
+    system-ui,
+    sans-serif;
   outline: none;
   cursor: default;
   white-space: nowrap;

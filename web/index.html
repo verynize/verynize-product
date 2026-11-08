@@ -1,8 +1,271 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verynize</title><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/desktop-panel.css"><link rel="stylesheet" href="/cloud-panel.css"><link rel="stylesheet" href="/page-loader.css"><link rel="stylesheet" href="/settings.css"><link rel="stylesheet" href="/wonder-shell.css"><link rel="stylesheet" href="/live-preview.css"><link rel="stylesheet" href="/preview-frame-chrome.css"><link rel="stylesheet" href="/preview-edit.css"><link rel="stylesheet" href="/canvas.css">
-<link rel="stylesheet" href="/vector-edit.css"><link rel="stylesheet" href="/dist/ui.css"></head><body>
-<header class="app-chrome"><button id="files-home" class="chrome-tab" title="Files"><span>Files</span></button><div class="chrome-divider"></div><div class="document-tab"><input id="document-name" aria-label="Document name" value="Untitled"></div><button id="shell-new-file" class="icon-button" aria-label="New file" title="New file"></button><div class="chrome-spacer"></div><button id="undo" aria-label="Undo" title="Undo"></button><button id="redo" aria-label="Redo" title="Redo"></button><button id="save-project" title="Save design" aria-label="Save design"></button><button id="open-project" title="Open design" aria-label="Open design"></button><button id="export" title="Export HTML" aria-label="Export HTML"></button><button id="preview" title="Preview" aria-label="Preview"></button><button id="shell-search" title="Search files" aria-label="Search files"></button><button id="shell-settings" title="Settings" aria-label="Settings"></button></header>
-<main><aside id="layer-panel"><div class="label">PAGES <button id="add-page" aria-label="Add page">+</button></div><select id="pages" aria-label="Page"></select><div class="row"><button id="rename-page">Rename</button><button id="delete-page">Delete</button></div><div class="label">INSERT</div><div class="tool-grid"><button id="rectangle">▢ Rectangle</button><button id="text">T Text</button><button id="add-frame">⊞ Frame</button><button id="image">▧ Image / SVG</button><button id="add-shader">◉ Shader</button><button id="add-icon">☆ Icon</button><select id="icon-kind" aria-label="Icon shape"><option value="star">Star</option><option value="heart">Heart</option><option value="check">Check</option><option value="arrow">Arrow</option></select></div><button id="import">↓ Import HTML</button><div class="label">LAYERS</div><input id="layer-search" placeholder="Find layer" aria-label="Find layer"><div id="layers"></div><div class="label">COLOR VARIABLES</div><div id="tokens"></div><button id="add-token">+ Color variable</button><button id="import-tokens">Paste CSS variables</button><p class="hint">Shift-click: select multiple<br>Space-drag: pan · ⌘/Ctrl-wheel: zoom<br>Arrows: nudge · Shift: 10px</p></aside>
-<section id="workspace"><div class="canvas-title"><span id="page-title">DESKTOP · 1000 × 700</span><span><label class="inline"><input id="snap" type="checkbox" checked> Snap</label><button id="zoom-fit">Fit</button><button id="zoom-out">−</button><button id="zoom-reset">100%</button><button id="zoom-in">+</button></span></div><div id="canvas-wrap"><div id="canvas"></div></div><footer>Saved on this device · Select a layer to begin</footer></section>
-<aside id="properties"><div class="label">PROPERTIES</div><p id="empty">Select a layer to edit it.</p><form id="inspector" hidden><label>Name<input name="name"></label><label>Parent frame<select name="parentId"></select></label><div class="row"><label>X<input name="x" type="number"></label><label>Y<input name="y" type="number"></label></div><div class="row"><label>Width<input name="w" type="number" min="10"></label><label>Height<input name="h" type="number" min="10"></label></div><div class="row"><label>Stack order<input name="zIndex" type="number"></label><label>Radius<input name="radius" type="number" min="0"></label></div><label>Fill / text color<input name="color" type="color"></label><label>Color variable<select name="token"></select></label><label>Gradient (CSS)<input name="gradient" placeholder="linear-gradient(135deg, #b79bf3, #f1c4d8)"></label><details id="shader-settings"><summary>WebGL shader</summary><label>Preset<select name="shaderPreset"><option value="aurora">Aurora</option><option value="waves">Waves</option><option value="noise">Noise</option></select></label><div class="row"><label>Speed<input name="shaderSpeed" type="number" min="0" max="5" step="0.1"></label><label>Intensity<input name="shaderIntensity" type="number" min="0" max="2" step="0.1"></label></div><p class="hint">Fill color or a color variable drives the shader color. Speed 0 freezes motion.</p></details><label>Animated gradient<select name="animated"><option value="">None</option><option value="aurora">Aurora</option><option value="sunset">Sunset</option><option value="ocean">Ocean</option></select></label><label>Mask gradient (CSS)<input name="mask" placeholder="linear-gradient(black, transparent)"></label><div class="row"><button type="button" id="scale-down">Scale ½</button><button type="button" id="scale-up">Scale 2×</button></div><details open><summary>Typography</summary><label>Text<textarea name="text" rows="3"></textarea></label><div class="row"><button type="button" id="range-bold">Bold range</button><button type="button" id="range-italic">Italic range</button><button type="button" id="range-style">Color / size range</button></div><label>Font family<select name="fontFamily"><option>system-ui</option><option>Georgia</option><option>monospace</option><option>Arial</option></select></label><div class="row"><label>Size<input name="fontSize" type="number" min="8" max="200"></label><label>Weight<select name="fontWeight"><option>400</option><option>500</option><option>600</option><option>700</option><option>900</option></select></label></div><label>Text alignment<select name="textAlign"><option>left</option><option>center</option><option>right</option></select></label></details><details><summary>Frame layout</summary><label>Layout<select name="layout"><option value="free">Free position</option><option value="flex">Flexbox</option><option value="grid">Grid</option><option value="block">Block flow</option><option value="inline">Inline flow</option></select></label><label>Direction<select name="direction"><option>row</option><option>column</option></select></label><div class="row"><label>Gap<input name="gap" type="number" min="0"></label><label>Padding<input name="padding" type="number" min="0"></label></div><label>Grid columns<input name="columns" type="number" min="1" max="12"></label></details><div class="row"><button type="button" id="align-left">Align left</button><button type="button" id="align-top">Align top</button></div><button type="button" id="duplicate">Duplicate layer</button><button type="button" id="delete">Delete layer</button></form></aside></main>
-<input type="file" id="asset-file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/svg+xml" hidden><input type="file" id="project-file" accept=".json,.design" hidden><script src="/dist/telemetry.js"></script><script src="/platform.js"></script>
-<script src="/shell-request.js"></script><script src="/shaders.js"></script><script src="/node-style.js"></script><script src="/vector-geometry.js"></script><script src="/vector-svg.js"></script><script src="/document-core.js"></script><script src="/component-core.js"></script><script src="/room-limits.js"></script><script src="/storage-limits.js"></script><script src="/document-safety.js"></script><script src="/node-index.js"></script><script src="/selection-chrome.js"></script><script src="/canvas-drop-hits.js"></script><script src="/svg-sanitize.js"></script><script src="/image-upload.js"></script><script src="/canvas-interactions.js"></script><script src="/text-caret.js"></script><script src="/clipboard-commands.js"></script><script src="/image-drop.js"></script><script src="/vector-edit.js"></script><script src="/preview-tab.js"></script><script src="/canvas-render.js"></script><script src="/switch-coordinator.js"></script><script src="/switch-cache.js"></script><script src="/app.js"></script><script src="/canvas-tiles.js"></script><script src="/document-lifecycle.js"></script><script src="/account-store.js"></script><script src="/desktop-panel.js"></script><script src="/cloud-ops.js"></script><script src="/cloud-invite.js"></script><script src="/page-loader.js"></script><script src="/cloud-panel.js"></script><script src="/cloud-share.js"></script><script src="/cloud-assets.js"></script><script src="/figma-panel.js"></script><script src="/trace-bitmap.js"></script><script src="/settings.js"></script><script src="/wonder-shell.js"></script><script src="/views-templates.js"></script><script src="/live-preview.js"></script><script src="/preview-frame-chrome.js"></script><script src="/preview-edit.js"></script><script src="/agent-bridge.js"></script><script src="/version-history-core.js"></script><script src="/version-history.js"></script><script src="/dist/ui.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Verynize</title>
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/desktop-panel.css" />
+    <link rel="stylesheet" href="/cloud-panel.css" />
+    <link rel="stylesheet" href="/page-loader.css" />
+    <link rel="stylesheet" href="/settings.css" />
+    <link rel="stylesheet" href="/wonder-shell.css" />
+    <link rel="stylesheet" href="/live-preview.css" />
+    <link rel="stylesheet" href="/preview-frame-chrome.css" />
+    <link rel="stylesheet" href="/preview-edit.css" />
+    <link rel="stylesheet" href="/canvas.css" />
+    <link rel="stylesheet" href="/vector-edit.css" />
+    <link rel="stylesheet" href="/dist/ui.css" />
+  </head>
+  <body>
+    <header class="app-chrome">
+      <button id="files-home" class="chrome-tab" title="Files"><span>Files</span></button>
+      <div class="chrome-divider"></div>
+      <div class="document-tab">
+        <input id="document-name" aria-label="Document name" value="Untitled" />
+      </div>
+      <button
+        id="shell-new-file"
+        class="icon-button"
+        aria-label="New file"
+        title="New file"
+      ></button>
+      <div class="chrome-spacer"></div>
+      <button id="undo" aria-label="Undo" title="Undo"></button
+      ><button id="redo" aria-label="Redo" title="Redo"></button
+      ><button id="save-project" title="Save design" aria-label="Save design"></button
+      ><button id="open-project" title="Open design" aria-label="Open design"></button
+      ><button id="export" title="Export HTML" aria-label="Export HTML"></button
+      ><button id="preview" title="Preview" aria-label="Preview"></button
+      ><button id="shell-search" title="Search files" aria-label="Search files"></button
+      ><button id="shell-settings" title="Settings" aria-label="Settings"></button>
+    </header>
+    <main>
+      <aside id="layer-panel">
+        <div class="label">PAGES <button id="add-page" aria-label="Add page">+</button></div>
+        <select id="pages" aria-label="Page"></select>
+        <div class="row">
+          <button id="rename-page">Rename</button><button id="delete-page">Delete</button>
+        </div>
+        <div class="label">INSERT</div>
+        <div class="tool-grid">
+          <button id="rectangle">▢ Rectangle</button><button id="text">T Text</button
+          ><button id="add-frame">⊞ Frame</button><button id="image">▧ Image / SVG</button
+          ><button id="add-shader">◉ Shader</button><button id="add-icon">☆ Icon</button
+          ><select id="icon-kind" aria-label="Icon shape">
+            <option value="star">Star</option>
+            <option value="heart">Heart</option>
+            <option value="check">Check</option>
+            <option value="arrow">Arrow</option>
+          </select>
+        </div>
+        <button id="import">↓ Import HTML</button>
+        <div class="label">LAYERS</div>
+        <input id="layer-search" placeholder="Find layer" aria-label="Find layer" />
+        <div id="layers"></div>
+        <div class="label">COLOR VARIABLES</div>
+        <div id="tokens"></div>
+        <button id="add-token">+ Color variable</button
+        ><button id="import-tokens">Paste CSS variables</button>
+        <p class="hint">
+          Shift-click: select multiple<br />Space-drag: pan · ⌘/Ctrl-wheel: zoom<br />Arrows: nudge
+          · Shift: 10px
+        </p>
+      </aside>
+      <section id="workspace">
+        <div class="canvas-title">
+          <span id="page-title">DESKTOP · 1000 × 700</span
+          ><span
+            ><label class="inline"><input id="snap" type="checkbox" checked /> Snap</label
+            ><button id="zoom-fit">Fit</button><button id="zoom-out">−</button
+            ><button id="zoom-reset">100%</button><button id="zoom-in">+</button></span
+          >
+        </div>
+        <div id="canvas-wrap"><div id="canvas"></div></div>
+        <footer>Saved on this device · Select a layer to begin</footer>
+      </section>
+      <aside id="properties">
+        <div class="label">PROPERTIES</div>
+        <p id="empty">Select a layer to edit it.</p>
+        <form id="inspector" hidden>
+          <label>Name<input name="name" /></label
+          ><label>Parent frame<select name="parentId"></select></label>
+          <div class="row">
+            <label>X<input name="x" type="number" /></label
+            ><label>Y<input name="y" type="number" /></label>
+          </div>
+          <div class="row">
+            <label>Width<input name="w" type="number" min="10" /></label
+            ><label>Height<input name="h" type="number" min="10" /></label>
+          </div>
+          <div class="row">
+            <label>Stack order<input name="zIndex" type="number" /></label
+            ><label>Radius<input name="radius" type="number" min="0" /></label>
+          </div>
+          <label>Fill / text color<input name="color" type="color" /></label
+          ><label>Color variable<select name="token"></select></label
+          ><label
+            >Gradient (CSS)<input
+              name="gradient"
+              placeholder="linear-gradient(135deg, #b79bf3, #f1c4d8)"
+          /></label>
+          <details id="shader-settings">
+            <summary>WebGL shader</summary>
+            <label
+              >Preset<select name="shaderPreset">
+                <option value="aurora">Aurora</option>
+                <option value="waves">Waves</option>
+                <option value="noise">Noise</option>
+              </select></label
+            >
+            <div class="row">
+              <label
+                >Speed<input name="shaderSpeed" type="number" min="0" max="5" step="0.1" /></label
+              ><label
+                >Intensity<input name="shaderIntensity" type="number" min="0" max="2" step="0.1"
+              /></label>
+            </div>
+            <p class="hint">
+              Fill color or a color variable drives the shader color. Speed 0 freezes motion.
+            </p>
+          </details>
+          <label
+            >Animated gradient<select name="animated">
+              <option value="">None</option>
+              <option value="aurora">Aurora</option>
+              <option value="sunset">Sunset</option>
+              <option value="ocean">Ocean</option>
+            </select></label
+          ><label
+            >Mask gradient (CSS)<input
+              name="mask"
+              placeholder="linear-gradient(black, transparent)"
+          /></label>
+          <div class="row">
+            <button type="button" id="scale-down">Scale ½</button
+            ><button type="button" id="scale-up">Scale 2×</button>
+          </div>
+          <details open>
+            <summary>Typography</summary>
+            <label>Text<textarea name="text" rows="3"></textarea></label>
+            <div class="row">
+              <button type="button" id="range-bold">Bold range</button
+              ><button type="button" id="range-italic">Italic range</button
+              ><button type="button" id="range-style">Color / size range</button>
+            </div>
+            <label
+              >Font family<select name="fontFamily">
+                <option>system-ui</option>
+                <option>Georgia</option>
+                <option>monospace</option>
+                <option>Arial</option>
+              </select></label
+            >
+            <div class="row">
+              <label>Size<input name="fontSize" type="number" min="8" max="200" /></label
+              ><label
+                >Weight<select name="fontWeight">
+                  <option>400</option>
+                  <option>500</option>
+                  <option>600</option>
+                  <option>700</option>
+                  <option>900</option>
+                </select></label
+              >
+            </div>
+            <label
+              >Text alignment<select name="textAlign">
+                <option>left</option>
+                <option>center</option>
+                <option>right</option>
+              </select></label
+            >
+          </details>
+          <details>
+            <summary>Frame layout</summary>
+            <label
+              >Layout<select name="layout">
+                <option value="free">Free position</option>
+                <option value="flex">Flexbox</option>
+                <option value="grid">Grid</option>
+                <option value="block">Block flow</option>
+                <option value="inline">Inline flow</option>
+              </select></label
+            ><label
+              >Direction<select name="direction">
+                <option>row</option>
+                <option>column</option>
+              </select></label
+            >
+            <div class="row">
+              <label>Gap<input name="gap" type="number" min="0" /></label
+              ><label>Padding<input name="padding" type="number" min="0" /></label>
+            </div>
+            <label>Grid columns<input name="columns" type="number" min="1" max="12" /></label>
+          </details>
+          <div class="row">
+            <button type="button" id="align-left">Align left</button
+            ><button type="button" id="align-top">Align top</button>
+          </div>
+          <button type="button" id="duplicate">Duplicate layer</button
+          ><button type="button" id="delete">Delete layer</button>
+        </form>
+      </aside>
+    </main>
+    <input
+      type="file"
+      id="asset-file"
+      accept="image/png,image/jpeg,image/webp,image/gif,image/avif,image/svg+xml"
+      hidden
+    /><input type="file" id="project-file" accept=".json,.design" hidden />
+    <script src="/dist/telemetry.js"></script>
+    <script src="/platform.js"></script>
+    <script src="/shell-request.js"></script>
+    <script src="/shaders.js"></script>
+    <script src="/node-style.js"></script>
+    <script src="/vector-geometry.js"></script>
+    <script src="/vector-svg.js"></script>
+    <script src="/document-core.js"></script>
+    <script src="/component-core.js"></script>
+    <script src="/room-limits.js"></script>
+    <script src="/storage-limits.js"></script>
+    <script src="/document-safety.js"></script>
+    <script src="/node-index.js"></script>
+    <script src="/selection-chrome.js"></script>
+    <script src="/canvas-drop-hits.js"></script>
+    <script src="/svg-sanitize.js"></script>
+    <script src="/image-upload.js"></script>
+    <script src="/canvas-interactions.js"></script>
+    <script src="/text-caret.js"></script>
+    <script src="/clipboard-commands.js"></script>
+    <script src="/image-drop.js"></script>
+    <script src="/vector-edit.js"></script>
+    <script src="/preview-tab.js"></script>
+    <script src="/canvas-render.js"></script>
+    <script src="/switch-coordinator.js"></script>
+    <script src="/switch-cache.js"></script>
+    <script src="/app.js"></script>
+    <script src="/canvas-tiles.js"></script>
+    <script src="/document-lifecycle.js"></script>
+    <script src="/account-store.js"></script>
+    <script src="/desktop-panel.js"></script>
+    <script src="/cloud-ops.js"></script>
+    <script src="/cloud-invite.js"></script>
+    <script src="/page-loader.js"></script>
+    <script src="/cloud-panel.js"></script>
+    <script src="/cloud-share.js"></script>
+    <script src="/cloud-assets.js"></script>
+    <script src="/figma-panel.js"></script>
+    <script src="/trace-bitmap.js"></script>
+    <script src="/settings.js"></script>
+    <script src="/wonder-shell.js"></script>
+    <script src="/views-templates.js"></script>
+    <script src="/live-preview.js"></script>
+    <script src="/preview-frame-chrome.js"></script>
+    <script src="/preview-edit.js"></script>
+    <script src="/agent-bridge.js"></script>
+    <script src="/version-history-core.js"></script>
+    <script src="/version-history.js"></script>
+    <script src="/dist/ui.js"></script>
+  </body>
+</html>

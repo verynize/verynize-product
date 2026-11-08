@@ -1,7 +1,15 @@
 {
   "version": 1,
   "source": "docs/audits/2026-10-29-design-quality.md (Rubrik usulan 100 poin)",
-  "weights": { "hierarchy": 20, "typography": 20, "spacing": 20, "color": 10, "content": 10, "assets": 10, "consistency": 10 },
+  "weights": {
+    "hierarchy": 20,
+    "typography": 20,
+    "spacing": 20,
+    "color": 10,
+    "content": 10,
+    "assets": 10,
+    "consistency": 10
+  },
   "dimensions": {
     "hierarchy": "One clear focal point per view; the most important information and the primary action read first; secondary content is visibly subordinate; grouping matches meaning.",
     "typography": "Deliberate type scale with few sizes; appropriate faces for the brief; comfortable line length and line height; weights used for hierarchy, not noise; no default-looking system typography unless the brief calls for it.",

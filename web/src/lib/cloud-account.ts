@@ -200,7 +200,9 @@ export const organizationsChanged = () => reloadOrganizations();
 export function openSignIn() {
   if (platform.kind === "desktop") window.dispatchEvent(new Event("bd:open-onboarding"));
   else {
-    (window as unknown as { cloudWorkspace?: { openDialog?(): void } }).cloudWorkspace?.openDialog?.();
+    (
+      window as unknown as { cloudWorkspace?: { openDialog?(): void } }
+    ).cloudWorkspace?.openDialog?.();
     const section = document.getElementById("cloud-account-section") as HTMLDetailsElement | null;
     if (section) section.open = true;
   }

@@ -17,11 +17,27 @@ import {
   XIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { errorText, gitApi, presetImplementPrompt, suggestMessage, useChanges, type ChangedFile, type ChangesSummary, type FileDiff, type PullRequestStatus } from "./changes";
+import {
+  errorText,
+  gitApi,
+  presetImplementPrompt,
+  suggestMessage,
+  useChanges,
+  type ChangedFile,
+  type ChangesSummary,
+  type FileDiff,
+  type PullRequestStatus,
+} from "./changes";
 import { usePreference } from "../settings/preference-store";
 import { ChatHeaderButton, ChatRowButton } from "./controls";
 import type { ChatState } from "./store";
@@ -53,7 +69,15 @@ function remoteLabel(summary: ChangesSummary): string | null {
   return match ? match[1] : summary.remoteUrl;
 }
 
-function Counts({ added, removed, className }: { added: number; removed: number; className?: string }) {
+function Counts({
+  added,
+  removed,
+  className,
+}: {
+  added: number;
+  removed: number;
+  className?: string;
+}) {
   return (
     <span className={cn("flex shrink-0 items-center gap-1 tabular-nums", className)}>
       <span className="text-diff-add">+{added}</span>
@@ -102,15 +126,31 @@ function FileRow({
   const name = file.path.slice(slash + 1);
   const dir = slash >= 0 ? file.path.slice(0, slash) : "";
   return (
-    <li className={cn("group flex h-7 items-center gap-1.5 rounded-md pr-1 pl-2", active ? "bg-row" : "hover:bg-muted")}>
-      <ChatRowButton density="file" data-changes="file" data-path={file.path} className="min-w-0 flex-1" onClick={onSelect}>
+    <li
+      className={cn(
+        "group flex h-7 items-center gap-1.5 rounded-md pr-1 pl-2",
+        active ? "bg-row" : "hover:bg-muted",
+      )}
+    >
+      <ChatRowButton
+        density="file"
+        data-changes="file"
+        data-path={file.path}
+        className="min-w-0 flex-1"
+        onClick={onSelect}
+      >
         <StatusCode file={file} />
         <span className="min-w-0 truncate text-foreground-2">{name}</span>
         {dir && <span className="min-w-0 shrink truncate text-subtle-foreground">{dir}</span>}
       </ChatRowButton>
       {confirming ? (
         <span className="flex shrink-0 items-center gap-1">
-          <Button size="xs" variant="destructive" data-changes="discard-confirm" onClick={onConfirm}>
+          <Button
+            size="xs"
+            variant="destructive"
+            data-changes="discard-confirm"
+            onClick={onConfirm}
+          >
             Discard
           </Button>
           <Button size="icon-xs" variant="ghost" aria-label="Keep changes" onClick={onCancel}>
@@ -119,7 +159,11 @@ function FileRow({
         </span>
       ) : (
         <>
-          {file.binary ? <span className="shrink-0 text-subtle-foreground">binary</span> : <Counts added={file.added} removed={file.removed} />}
+          {file.binary ? (
+            <span className="shrink-0 text-subtle-foreground">binary</span>
+          ) : (
+            <Counts added={file.added} removed={file.removed} />
+          )}
           {canDiscard && (
             <Button
               size="icon-xs"
@@ -139,12 +183,29 @@ function FileRow({
   );
 }
 
-function DiffView({ diff, loading, error }: { diff: FileDiff | null; loading: boolean; error: string | null }) {
+function DiffView({
+  diff,
+  loading,
+  error,
+}: {
+  diff: FileDiff | null;
+  loading: boolean;
+  error: string | null;
+}) {
   const lines = useMemo(() => (diff ? diffLines(diff.diff) : []), [diff]);
   if (error) return <p className="p-4 text-destructive">{error}</p>;
-  if (!diff) return <p className="p-4 text-muted-foreground">{loading ? "Loading diff…" : "Select a file to see its changes."}</p>;
-  if (diff.binary) return <p className="p-4 text-muted-foreground">Binary file changed; no text diff to show.</p>;
-  if (!lines.length) return <p className="p-4 text-muted-foreground">No textual changes (mode or whitespace only).</p>;
+  if (!diff)
+    return (
+      <p className="p-4 text-muted-foreground">
+        {loading ? "Loading diff…" : "Select a file to see its changes."}
+      </p>
+    );
+  if (diff.binary)
+    return <p className="p-4 text-muted-foreground">Binary file changed; no text diff to show.</p>;
+  if (!lines.length)
+    return (
+      <p className="p-4 text-muted-foreground">No textual changes (mode or whitespace only).</p>
+    );
   const shown = lines.slice(0, MAX_RENDERED_LINES);
   return (
     <div id="changes-diff" className="min-w-max py-1 font-mono text-2xs">
@@ -165,7 +226,9 @@ function DiffView({ diff, loading, error }: { diff: FileDiff | null; loading: bo
         </div>
       ))}
       {(diff.truncated || lines.length > shown.length) && (
-        <p className="px-3 py-2 font-sans text-xs text-muted-foreground">Diff truncated: the file has more changes than can be shown here.</p>
+        <p className="px-3 py-2 font-sans text-xs text-muted-foreground">
+          Diff truncated: the file has more changes than can be shown here.
+        </p>
       )}
     </div>
   );
@@ -192,7 +255,8 @@ function PullRequestLink({ status }: { status: PullRequestStatus | null }) {
       </Button>
     );
   }
-  if (status.gh !== "ready" && status.message) return <span className="truncate text-subtle-foreground">{status.message}</span>;
+  if (status.gh !== "ready" && status.message)
+    return <span className="truncate text-subtle-foreground">{status.message}</span>;
   return null;
 }
 
@@ -289,8 +353,16 @@ function ChangesDialog({
   if (!api) return null;
   const hasFiles = files.length > 0;
   const unpublished = !!summary && !summary.detached && !!summary.head && !summary.upstream;
-  const canPush = !!summary?.remote && !summary.detached && !!summary.head && (unpublished || summary.ahead > 0);
-  const canCreatePr = !!summary?.remote && !summary.detached && !!summary.head && !hasFiles && !pr?.pr && pr?.gh !== "missing" && pr?.gh !== "unauthenticated";
+  const canPush =
+    !!summary?.remote && !summary.detached && !!summary.head && (unpublished || summary.ahead > 0);
+  const canCreatePr =
+    !!summary?.remote &&
+    !summary.detached &&
+    !!summary.head &&
+    !hasFiles &&
+    !pr?.pr &&
+    pr?.gh !== "missing" &&
+    pr?.gh !== "unauthenticated";
 
   const commit = () =>
     act("commit", async () => {
@@ -310,7 +382,9 @@ function ChangesDialog({
       const result = await api.gitCreatePullRequest({ root });
       const status = await api.gitPullRequest({ root }).catch(() => null);
       setPr(status ?? { gh: "ready", pr: result.pr });
-      return result.existed ? "A pull request for this branch already exists" : `Opened pull request${result.pr ? " #" + result.pr.number : ""}`;
+      return result.existed
+        ? "A pull request for this branch already exists"
+        : `Opened pull request${result.pr ? " #" + result.pr.number : ""}`;
     });
   const discard = (file: string) =>
     act("discard", async () => {
@@ -338,21 +412,36 @@ function ChangesDialog({
                   {summary.branch ?? `detached at ${summary.head ?? "?"}`}
                 </span>
                 {summary.upstream ? (
-                  <span className="flex shrink-0 items-center gap-1 tabular-nums" title={`Tracking ${summary.upstream}`}>
+                  <span
+                    className="flex shrink-0 items-center gap-1 tabular-nums"
+                    title={`Tracking ${summary.upstream}`}
+                  >
                     <ArrowUpIcon className="size-3" aria-label="ahead" />
                     {summary.ahead}
                     <ArrowDownIcon className="size-3" aria-label="behind" />
                     {summary.behind}
                   </span>
                 ) : (
-                  summary.remote && <span className="shrink-0 text-subtle-foreground">not published</span>
+                  summary.remote && (
+                    <span className="shrink-0 text-subtle-foreground">not published</span>
+                  )
                 )}
-                {remoteLabel(summary) && <span className="min-w-0 truncate text-subtle-foreground">· {remoteLabel(summary)}</span>}
+                {remoteLabel(summary) && (
+                  <span className="min-w-0 truncate text-subtle-foreground">
+                    · {remoteLabel(summary)}
+                  </span>
+                )}
               </span>
             )}
             <PullRequestLink status={pr} />
             <span className="flex-1" />
-            <Button size="icon-sm" variant="ghost" aria-label="Refresh changes" title="Refresh" onClick={() => void refresh()}>
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              aria-label="Refresh changes"
+              title="Refresh"
+              onClick={() => void refresh()}
+            >
               <RefreshCwIcon className="size-3.5" />
             </Button>
           </div>
@@ -362,7 +451,8 @@ function ChangesDialog({
           <div className="flex w-changes-list shrink-0 flex-col border-r border-border">
             <div className="flex h-8 shrink-0 items-center justify-between px-3 text-muted-foreground">
               <span>
-                {summary?.totals.files ?? 0} {summary?.totals.files === 1 ? "file" : "files"} changed
+                {summary?.totals.files ?? 0} {summary?.totals.files === 1 ? "file" : "files"}{" "}
+                changed
               </span>
               {summary && <Counts added={summary.totals.added} removed={summary.totals.removed} />}
             </div>
@@ -381,7 +471,11 @@ function ChangesDialog({
                     onCancel={() => setConfirming(null)}
                   />
                 ))}
-                {summary?.truncated && <li className="px-2 py-1 text-subtle-foreground">Only the first {files.length} files are listed.</li>}
+                {summary?.truncated && (
+                  <li className="px-2 py-1 text-subtle-foreground">
+                    Only the first {files.length} files are listed.
+                  </li>
+                )}
               </ul>
             </ScrollArea>
             {!hasFiles && (
@@ -410,7 +504,10 @@ function ChangesDialog({
           <p
             id="changes-status"
             role={error ? "alert" : "status"}
-            className={cn("-mt-1 flex items-center gap-1.5 text-xs", error ? "text-destructive" : "text-muted-foreground")}
+            className={cn(
+              "-mt-1 flex items-center gap-1.5 text-xs",
+              error ? "text-destructive" : "text-muted-foreground",
+            )}
           >
             {!error && notice && <CheckIcon className="size-3.5 shrink-0 text-diff-add" />}
             {error ?? notice ?? "The agent is still working; commit when the turn finishes."}
@@ -425,7 +522,14 @@ function ChangesDialog({
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && hasFiles && message.trim() && !working && !running) {
+              if (
+                event.key === "Enter" &&
+                (event.metaKey || event.ctrlKey) &&
+                hasFiles &&
+                message.trim() &&
+                !working &&
+                !running
+              ) {
                 event.preventDefault();
                 void commit();
               }
@@ -433,16 +537,32 @@ function ChangesDialog({
             className="max-h-24 min-w-0 flex-1 resize-none"
           />
           <div className="flex shrink-0 items-center gap-1.5">
-            <Button id="changes-commit" size="sm" disabled={!hasFiles || !message.trim() || !!working || running} onClick={() => void commit()}>
+            <Button
+              id="changes-commit"
+              size="sm"
+              disabled={!hasFiles || !message.trim() || !!working || running}
+              onClick={() => void commit()}
+            >
               <GitCommitHorizontalIcon className="size-3.5" />
               {working === "commit" ? "Committing…" : "Commit"}
             </Button>
-            <Button id="changes-push" size="sm" variant="outline" disabled={!canPush || !!working} onClick={() => void push()}>
+            <Button
+              id="changes-push"
+              size="sm"
+              variant="outline"
+              disabled={!canPush || !!working}
+              onClick={() => void push()}
+            >
               <UploadIcon className="size-3.5" />
               {working === "push" ? "Pushing…" : unpublished ? "Publish branch" : "Push"}
             </Button>
             {pr?.pr ? (
-              <Button id="changes-open-pr" size="sm" variant="outline" onClick={() => void api.openExternal(pr.pr!.url)}>
+              <Button
+                id="changes-open-pr"
+                size="sm"
+                variant="outline"
+                onClick={() => void api.openExternal(pr.pr!.url)}
+              >
                 <GitPullRequestIcon className="size-3.5" />
                 View PR
               </Button>
@@ -467,9 +587,17 @@ function ChangesDialog({
 }
 
 /** "Open the side panel on the pull request": the branch's pull request, read with `gh` when the preference is on. */
-function usePullRequest(root: string | null, summary: ChangesSummary | null, enabled: boolean, reload: number) {
+function usePullRequest(
+  root: string | null,
+  summary: ChangesSummary | null,
+  enabled: boolean,
+  reload: number,
+) {
   const [status, setStatus] = useState<PullRequestStatus | null>(null);
-  const key = enabled && root && summary?.branch ? `${root}\n${summary.branch}\n${summary.upstream ?? ""}\n${summary.ahead}` : "";
+  const key =
+    enabled && root && summary?.branch
+      ? `${root}\n${summary.branch}\n${summary.upstream ?? ""}\n${summary.ahead}`
+      : "";
   useEffect(() => {
     setStatus(null);
     const api = gitApi();
@@ -504,7 +632,16 @@ export function ChangesButton({ state }: { state: ChatState }) {
     if (!next) setClosed((n) => n + 1);
   };
   const dialog = (
-    <ChangesDialog open={open} onOpenChange={onOpenChange} state={state} root={root} summary={summary} refresh={refresh} setSummary={setSummary} running={running} />
+    <ChangesDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      state={state}
+      root={root}
+      summary={summary}
+      refresh={refresh}
+      setSummary={setSummary}
+      running={running}
+    />
   );
   if (pr) {
     const label = pr.isDraft ? "Draft" : pr.state.charAt(0) + pr.state.slice(1).toLowerCase();
@@ -541,7 +678,11 @@ export function ChangesButton({ state }: { state: ChatState }) {
     <>
       <ChatHeaderButton
         id="changes-button"
-        title={summary ? `${count} changed ${count === 1 ? "file" : "files"} on ${summary.branch ?? "detached HEAD"}` : "Changes"}
+        title={
+          summary
+            ? `${count} changed ${count === 1 ? "file" : "files"} on ${summary.branch ?? "detached HEAD"}`
+            : "Changes"
+        }
         className="min-w-0 shrink justify-start"
         onClick={() => setOpen(true)}
       >
@@ -557,7 +698,9 @@ export function ChangesButton({ state }: { state: ChatState }) {
           </>
         ) : (
           <span className="truncate text-muted-foreground">
-            {summary && summary.ahead > 0 ? `${summary.ahead} unpushed ${summary.ahead === 1 ? "commit" : "commits"}` : "No changes"}
+            {summary && summary.ahead > 0
+              ? `${summary.ahead} unpushed ${summary.ahead === 1 ? "commit" : "commits"}`
+              : "No changes"}
           </span>
         )}
       </ChatHeaderButton>

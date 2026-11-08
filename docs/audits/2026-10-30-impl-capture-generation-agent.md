@@ -2,8 +2,8 @@
 
 Agen: capture/generation. Cakupan: dua celah di `docs/implementation-status.md` › "Remaining gaps against Wonder's shipped product":
 
-1. *Arbitrary remote webpage capture with full assets/custom fonts, interactive region selection, source mapping, and interactive behavior recovery.*
-2. *Photographic image model providers and smooth/high-fidelity curve tracing.*
+1. _Arbitrary remote webpage capture with full assets/custom fonts, interactive region selection, source mapping, and interactive behavior recovery._
+2. _Photographic image model providers and smooth/high-fidelity curve tracing._
 
 Semua kode dan teks UI ditulis orisinal (paritas perilaku, tidak menyalin kode vendor). `docs/implementation-status.md` tidak diubah; koordinator yang memperbaruinya.
 
@@ -59,7 +59,7 @@ Semua kode dan teks UI ditulis orisinal (paritas perilaku, tidak menyalin kode v
 
 - Pipeline:
   1. Downscale ke `detail` (default 256, rentang 16–1024).
-  2. Kuantisasi palet. Warna dipilih dari jumlah piksel *interior* (piksel AA di tepi tidak menjadi warna baru), dan warna yang berjarak < 24 dari warna terpilih digabung.
+  2. Kuantisasi palet. Warna dipilih dari jumlah piksel _interior_ (piksel AA di tepi tidak menjadi warna baru), dan warna yang berjarak < 24 dari warna terpilih digabung.
   3. **Contour tracing** per warna di sepanjang tepi piksel (loop luar dan lubang, `fill-rule="evenodd"`).
   4. Penghapusan tangga: titik tengah setiap run, dengan sudut piksel asli dipertahankan bila kedua run ≥ 3 px.
   5. **Ramer–Douglas–Peucker** untuk deteksi sudut tambahan (belokan > 60°) dan untuk menentukan segmen lurus (`L`).
@@ -67,18 +67,19 @@ Semua kode dan teks UI ditulis orisinal (paritas perilaku, tidak menyalin kode v
   - Warna yang menutupi seluruh kanvas opak digambar sebagai `<rect>` latar, dan lapisan yang lebih kecil diberi hairline stroke berwarna sama untuk menutup celah anti-alias. `shape-rendering="crispEdges"` dihapus.
 - **Metrik fidelitas** (`tests/generation-trace.cjs`): sumber anti-alias di-trace, SVG dirasterisasi ulang di ukuran sumber, lalu IoU dihitung per kelas warna.
 
-  | Kasus | Ambang (ditetapkan) | Hasil |
-  | --- | --- | --- |
-  | Lingkaran | ≥ 0.985 | 0.996 / 0.994 |
-  | Lingkaran 512 px di-downscale | ≥ 0.98 | 0.998 / 0.998 |
-  | Bintang | ≥ 0.975 | 0.995 / 0.985 |
-  | Glyph tebal "Rg" | ≥ 0.965 | 0.995 / 0.980 |
-  | Scene empat warna | ≥ 0.965 per warna | 0.997 / 0.985 / 0.987 / 0.978 |
+  | Kasus                         | Ambang (ditetapkan) | Hasil                         |
+  | ----------------------------- | ------------------- | ----------------------------- |
+  | Lingkaran                     | ≥ 0.985             | 0.996 / 0.994                 |
+  | Lingkaran 512 px di-downscale | ≥ 0.98              | 0.998 / 0.998                 |
+  | Bintang                       | ≥ 0.975             | 0.995 / 0.985                 |
+  | Glyph tebal "Rg"              | ≥ 0.965             | 0.995 / 0.980                 |
+  | Scene empat warna             | ≥ 0.965 per warna   | 0.997 / 0.985 / 0.987 / 0.978 |
 
   Uji kehalusan juga lulus:
   - Lingkaran menjadi satu subpath dengan **4 kubik**, deviasi radial maksimum **0.20 px** (ambang 0.75).
   - Bintang memakai 17 segmen (ambang 10–30).
   - Persegi dua warna tetap memakai sudut tepat dan garis lurus.
+
 - `tests/generation.cjs` (uji tracing dua warna yang lama) tetap lulus tanpa perubahan asersi.
 
 ## File
@@ -139,11 +140,11 @@ Batasan "font hasil capture belum diteruskan ke ekspor" sudah ditutup.
   - Mask glyph dibandingkan dengan IoU: hasil vs referensi yang dirender dengan Inter Bold harus ≥ 0.9, hasil vs fallback serif harus ≤ 0.7. PDF dirasterisasi dengan `sips` macOS.
 
     | Format | IoU vs referensi Inter Bold | IoU vs fallback serif |
-    | --- | --- | --- |
-    | PNG | 1.000 | 0.283 |
-    | JPG | 1.000 | 0.285 |
-    | WebP | 1.000 | 0.283 |
-    | PDF | 1.000 | 0.301 |
+    | ------ | --------------------------- | --------------------- |
+    | PNG    | 1.000                       | 0.283                 |
+    | JPG    | 1.000                       | 0.285                 |
+    | WebP   | 1.000                       | 0.283                 |
+    | PDF    | 1.000                       | 0.301                 |
 
   - Byte woff2 di `exportHTML` identik dengan file yang di-capture. Font yang tidak dipakai tidak ikut diekspor. Ekspor Tailwind dan CSS memuat aturannya. `fonts.missing` tidak menyebut family hasil capture.
 - **Validasi**:

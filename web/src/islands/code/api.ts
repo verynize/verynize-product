@@ -6,7 +6,16 @@ import { platform } from "@/lib/platform";
 export { workspace };
 export type Repository = { id: string; name: string; root: string; addedAt: number; git?: boolean };
 export type Worktree = { path: string; branch: string | null; shared: boolean };
-export type PreviewProposal = {saved?: boolean; id: string; root: string; command: string[]; setup?: string[]; port: number; chatId?: string | null; name?: string | null};
+export type PreviewProposal = {
+  saved?: boolean;
+  id: string;
+  root: string;
+  command: string[];
+  setup?: string[];
+  port: number;
+  chatId?: string | null;
+  name?: string | null;
+};
 export type DevServerStatus = {
   proposal?: PreviewProposal | null;
   state: "stopped" | "starting" | "running" | "exited" | "failed";
@@ -22,11 +31,24 @@ export type DevServerStatus = {
   setupPending?: boolean;
 };
 export type PreviewCommand = { name: string; command: string[]; url?: string };
-export type PreviewConfig = { command: string[]; setup?: string[]; setupSteps?: string[][]; stopSteps?: string[][]; commands?: PreviewCommand[]; url?: string };
-export type PreviewConfigInput = { root?: string; command?: string[]; commands?: PreviewCommand[]; setup?: string[] | string[][]; stop?: string[][]; url?: string };
+export type PreviewConfig = {
+  command: string[];
+  setup?: string[];
+  setupSteps?: string[][];
+  stopSteps?: string[][];
+  commands?: PreviewCommand[];
+  url?: string;
+};
+export type PreviewConfigInput = {
+  root?: string;
+  command?: string[];
+  commands?: PreviewCommand[];
+  setup?: string[] | string[][];
+  stop?: string[][];
+  url?: string;
+};
 export type ProjectFile = { path: string; size: number };
 export type ChangedFile = { path: string; status: string };
-
 
 export const desktop = () => platform.desktop;
 

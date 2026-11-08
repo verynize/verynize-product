@@ -3,15 +3,32 @@
 // The document change itself is one call to `window.design.moveNodes` (validated, one undo step, world
 // positions kept); this hook only tracks the pointer and the indicator. React re-renders only when the drop
 // target changes, never per pointer move.
-import { useCallback, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+} from "react";
 import { design } from "@/lib/bridge";
 import type { TreeNode } from "./hooks";
 
 export type DropPosition = "above" | "below" | "inside";
 /** Indicator geometry is relative to the rows container. */
-export type Drop = { id: string; position: DropPosition; top: number; height: number; indent: number };
+export type Drop = {
+  id: string;
+  position: DropPosition;
+  top: number;
+  height: number;
+  indent: number;
+};
 
-type MoveNodes = (ids: string[], targetId: string | null, position: DropPosition) => string[] | null;
+type MoveNodes = (
+  ids: string[],
+  targetId: string | null,
+  position: DropPosition,
+) => string[] | null;
 
 const DRAG_THRESHOLD = 4;
 const EDGE_SCROLL = 24;
@@ -85,24 +102,38 @@ export function useLayerDrag({
           rel = 0;
         } else {
           // Below the last row: behind everything at the page root.
-          row = rows.filter((r) => byId.get(r.dataset.id ?? "")?.parentId == null).pop() ?? rows[rows.length - 1];
+          row =
+            rows.filter((r) => byId.get(r.dataset.id ?? "")?.parentId == null).pop() ??
+            rows[rows.length - 1];
           end = true;
         }
         const target = byId.get(row.dataset.id ?? "");
         if (!target || excluded.has(target.id)) return null;
         const expandedWithChildren =
-          row.getAttribute("aria-expanded") === "true" && nodesRef.current.some((n) => n.parentId === target.id);
+          row.getAttribute("aria-expanded") === "true" &&
+          nodesRef.current.some((n) => n.parentId === target.id);
         let position: DropPosition;
         if (end) position = "below";
-        else if (target.type === "frame") position = rel < 0.25 ? "above" : rel > 0.75 && !expandedWithChildren ? "below" : "inside";
+        else if (target.type === "frame")
+          position =
+            rel < 0.25 ? "above" : rel > 0.75 && !expandedWithChildren ? "below" : "inside";
         else position = rel < 0.5 ? "above" : "below";
-        const parent = position === "inside" ? target : target.parentId ? byId.get(target.parentId) : undefined;
+        const parent =
+          position === "inside" ? target : target.parentId ? byId.get(target.parentId) : undefined;
         if (parent?.locked) return null;
         const b = row.getBoundingClientRect();
         const depth = Number(row.style.getPropertyValue("--layer-depth")) || 0;
         // Past the end of the list the line sits under the last row (which may be a child of the target).
-        const top = end ? rows[rows.length - 1].getBoundingClientRect().bottom - base.top : b.top - base.top + (position === "below" ? b.height : 0);
-        return { id: target.id, position, top, height: position === "inside" ? b.height : 0, indent: depth + (position === "inside" ? 1 : 0) };
+        const top = end
+          ? rows[rows.length - 1].getBoundingClientRect().bottom - base.top
+          : b.top - base.top + (position === "below" ? b.height : 0);
+        return {
+          id: target.id,
+          position,
+          top,
+          height: position === "inside" ? b.height : 0,
+          indent: depth + (position === "inside" ? 1 : 0),
+        };
       };
 
       const begin = () => {

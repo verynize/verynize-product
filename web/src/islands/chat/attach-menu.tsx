@@ -50,7 +50,8 @@ import { workspace, type ChatState, type ChatSummary } from "./store";
 const TRIGGER =
   "flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground-2 data-[state=open]:bg-muted data-[state=open]:text-foreground-2";
 const SURFACE = "rounded-xl border-card-border bg-background p-1 text-sm text-foreground-2";
-const ROW = "h-6 gap-2 text-sm text-foreground-2 focus:bg-muted focus:text-foreground-2 data-[state=open]:bg-muted";
+const ROW =
+  "h-6 gap-2 text-sm text-foreground-2 focus:bg-muted focus:text-foreground-2 data-[state=open]:bg-muted";
 const LABEL = "flex h-6 items-center truncate px-2 py-0 text-sm font-normal text-muted-foreground";
 
 function Item({ className, ...props }: ComponentProps<typeof DropdownMenuItem>) {
@@ -63,7 +64,13 @@ function SubContent({ className, ...props }: ComponentProps<typeof DropdownMenuS
   // The shared SubContent has no portal of its own; DropdownMenuPortal keeps it in portalContainer().
   return (
     <DropdownMenuPortal>
-      <DropdownMenuSubContent sideOffset={6} alignOffset={-5} collisionPadding={8} className={cn(SURFACE, "min-w-44", className)} {...props} />
+      <DropdownMenuSubContent
+        sideOffset={6}
+        alignOffset={-5}
+        collisionPadding={8}
+        className={cn(SURFACE, "min-w-44", className)}
+        {...props}
+      />
     </DropdownMenuPortal>
   );
 }
@@ -88,17 +95,31 @@ function useLinkGroups(state: ChatState): LinkGroup[] {
     key: repo.root,
     name: repo.name,
     repoId: repo.id,
-    chats: (ws?.chatSummaries?.(repo.root) ?? []).filter((chat) => chat.id !== state.conversationId),
+    chats: (ws?.chatSummaries?.(repo.root) ?? []).filter(
+      (chat) => chat.id !== state.conversationId,
+    ),
   }));
-  if (!repositories.some((repo) => repo.root === state.projectKey) && state.projectKey !== "unattached") {
-    groups.push({ key: state.projectKey, name: state.projectName || "This project", chats: (ws?.chatSummaries?.(state.projectKey) ?? state.conversations).filter((chat) => chat.id !== state.conversationId) });
+  if (
+    !repositories.some((repo) => repo.root === state.projectKey) &&
+    state.projectKey !== "unattached"
+  ) {
+    groups.push({
+      key: state.projectKey,
+      name: state.projectName || "This project",
+      chats: (ws?.chatSummaries?.(state.projectKey) ?? state.conversations).filter(
+        (chat) => chat.id !== state.conversationId,
+      ),
+    });
   }
-  const quick = (ws?.chatSummaries?.("unattached") ?? []).filter((chat) => chat.id !== state.conversationId && chat.count > 0);
+  const quick = (ws?.chatSummaries?.("unattached") ?? []).filter(
+    (chat) => chat.id !== state.conversationId && chat.count > 0,
+  );
   if (quick.length) groups.push({ key: "unattached", name: "Quick chats", chats: quick });
   // Wonder lists other repositories first and the current one (with "New worktree") last.
-  return [...groups.filter((g) => g.key !== state.projectKey), ...groups.filter((g) => g.key === state.projectKey)].filter(
-    (g) => g.chats.length > 0 || (g.key === state.projectKey && !!g.repoId),
-  );
+  return [
+    ...groups.filter((g) => g.key !== state.projectKey),
+    ...groups.filter((g) => g.key === state.projectKey),
+  ].filter((g) => g.chats.length > 0 || (g.key === state.projectKey && !!g.repoId));
 }
 
 function LinkMenu({ state }: { state: ChatState }) {
@@ -128,7 +149,10 @@ function LinkMenu({ state }: { state: ChatState }) {
               </Item>
             ))}
             {group.key === state.projectKey && group.repoId && (
-              <Item id="chat-link-new-worktree" onSelect={() => void linkNewWorktree(group.repoId as string)}>
+              <Item
+                id="chat-link-new-worktree"
+                onSelect={() => void linkNewWorktree(group.repoId as string)}
+              >
                 <LucidePlusIcon />
                 New worktree
               </Item>
@@ -157,7 +181,11 @@ function ReferencesMenu() {
       </SubTrigger>
       <SubContent className="max-h-80 w-60 overflow-y-auto">
         {(collections ?? []).map((collection) => (
-          <Item key={collection.id} data-reference={collection.id} onSelect={() => void attachCollection(collection.id)}>
+          <Item
+            key={collection.id}
+            data-reference={collection.id}
+            onSelect={() => void attachCollection(collection.id)}
+          >
             <FolderIcon />
             <span className="min-w-0 truncate">{collection.name}</span>
             <span className="ml-auto text-subtle-foreground">{collection.count}</span>
@@ -239,7 +267,10 @@ export function WorkingDirectories({ state }: { state: ChatState }) {
         <span
           key={dir}
           title={dir}
-          className={cn(hook.mention, "group/dir flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border bg-chat-chip-bg px-2 text-base leading-5.25 text-foreground-2")}
+          className={cn(
+            hook.mention,
+            "group/dir flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border bg-chat-chip-bg px-2 text-base leading-5.25 text-foreground-2",
+          )}
         >
           <span className="relative flex size-3.5 shrink-0 items-center justify-center">
             <FolderIcon className="size-3.5 text-muted-foreground transition-opacity group-hover/dir:opacity-0 group-focus-within/dir:opacity-0" />

@@ -3,7 +3,11 @@ import { can, platform } from "@/lib/platform";
 
 export type TerminalSession = { id: string; shell: string; cwd: string };
 export type TerminalDataEvent = { id: string; data: string };
-export type TerminalExitEvent = { id: string; exitCode: number | null; signal: number | string | null };
+export type TerminalExitEvent = {
+  id: string;
+  exitCode: number | null;
+  signal: number | string | null;
+};
 
 export type TerminalBridge = {
   terminalCreate(options: { cwd: string; cols?: number; rows?: number }): Promise<TerminalSession>;

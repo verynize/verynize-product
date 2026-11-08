@@ -180,7 +180,8 @@ function makeElement(tag, attrs, parent) {
 
 /** Parse HTML into a tree of {tag, attrs, children, parent} elements and {text} nodes. */
 export function parseHtml(source) {
-  if (String(source).length > 5_000_000) throw new Error("HTML parse stage exceeds 5000000 characters");
+  if (String(source).length > 5_000_000)
+    throw new Error("HTML parse stage exceeds 5000000 characters");
   const s = String(source || "").replace(/^﻿/, "");
   const root = makeElement("#document", {}, null);
   const stack = [root];
@@ -283,7 +284,8 @@ export function parseHtml(source) {
             if (["ul", "ol", "table", "dl", "select", "div"].includes(stack[k].tag)) break;
           }
         }
-        if (++elementTotal > NODE_LIMITS.perDocument + 256) throw new Error("HTML parse stage exceeds document element budget");
+        if (++elementTotal > NODE_LIMITS.perDocument + 256)
+          throw new Error("HTML parse stage exceeds document element budget");
         const el = makeElement(tag, attrs, top());
         top().children.push(el);
         i = j;
@@ -1030,7 +1032,7 @@ export async function importHtml(html, options = {}) {
     if (classes.length >= 10 && known / classes.length >= 0.6) tailwindPage = true;
   }
 
-  const expandImport = declaration => {
+  const expandImport = (declaration) => {
     if (declaration.property === "border-radius" && declaration.value.includes("/"))
       warnings.push("elliptical border radius is approximated by horizontal radii");
     return expand(declaration);
@@ -1062,7 +1064,8 @@ export async function importHtml(html, options = {}) {
       stats.rules++;
     }
   const beforePruning = rules.length;
-  if (options.pruneCss !== false) rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
+  if (options.pruneCss !== false)
+    rules = pruneImportRules(rules, [htmlEl, ...all(htmlEl, () => true)]);
   stats.prunedRules = beforePruning - rules.length;
   if (!preflightRules)
     preflightRules = parseStylesheet(PREFLIGHT_CSS)
@@ -1134,7 +1137,10 @@ export async function importHtml(html, options = {}) {
   const rootFsBox = { value: 16 };
   const cascadeDeadline = performance.now() + 60_000;
   const computeElement = (el, parent) => {
-    if (performance.now() > cascadeDeadline) throw new Error("HTML cascade exceeds 60000ms budget; simplify the stylesheet or import fewer boards");
+    if (performance.now() > cascadeDeadline)
+      throw new Error(
+        "HTML cascade exceeds 60000ms budget; simplify the stylesheet or import fewer boards",
+      );
     const entries = [];
     const sigEntries = [];
     for (const rule of uaRules)
@@ -1434,7 +1440,13 @@ export async function importHtml(html, options = {}) {
       }
       if (property === "background-image" && /url\(/i.test(v)) {
         for (const p of ["background-position", "background-repeat"])
-          if (info.style.has(p) && !((p === "background-position" && /^(center|50% 50%)$/.test(info.style.get(p))) || (p === "background-repeat" && info.style.get(p) === "no-repeat")))
+          if (
+            info.style.has(p) &&
+            !(
+              (p === "background-position" && /^(center|50% 50%)$/.test(info.style.get(p))) ||
+              (p === "background-repeat" && info.style.get(p) === "no-repeat")
+            )
+          )
             warnings.push(
               `${p}:${info.style.get(p)} is approximated by a centered cover/contain image fill`,
             );
@@ -1456,7 +1468,11 @@ export async function importHtml(html, options = {}) {
                 ? "cover"
                 : /contain/.test(info.style.get("background-size") || "")
                   ? "contain"
-                  : info.style.get("background-size") === "100% 100%" ? "fill" : info.style.get("background-size") === "auto" ? "none" : "cover",
+                  : info.style.get("background-size") === "100% 100%"
+                    ? "fill"
+                    : info.style.get("background-size") === "auto"
+                      ? "none"
+                      : "cover",
             });
         }
         v =
@@ -2019,7 +2035,10 @@ export async function importHtml(html, options = {}) {
         el.parent && el.parent !== bodyEl ? computeElement(el.parent, bodyInfo) : bodyInfo;
       await emit(el, parentInfo, "", { root: true });
     }
-  } else if ((options.fragment ?? !/<(?:html|head|body)[\s>]/i.test(String(html))) || (options.split !== "none" && all(bodyEl, () => true).length > NODE_LIMITS.perPage)) {
+  } else if (
+    (options.fragment ?? !/<(?:html|head|body)[\s>]/i.test(String(html))) ||
+    (options.split !== "none" && all(bodyEl, () => true).length > NODE_LIMITS.perPage)
+  ) {
     // A fragment (pasted markup without <html>/<body>): each top-level element is an artboard, styled
     // with the page's own <style> rules and inheriting from the implied <html>/<body>.
     const bodyInfo = computeElement(bodyEl, htmlComputed);
@@ -2104,7 +2123,10 @@ export async function importHtml(html, options = {}) {
   validateDocument(target);
   const pageId = options.pageId || target.activePage || target.pages[0].id;
   if (!lines.length) throw new Error("No importable elements were found in the HTML");
-  const result = createArtboards(target, pageId, jsx, { viewport: view, split: options.split || "pages" });
+  const result = createArtboards(target, pageId, jsx, {
+    viewport: view,
+    split: options.split || "pages",
+  });
   const unsupported = [...stats.unsupported].sort((a, b) => b[1] - a[1]);
   if (unsupported.length)
     warnings.push(

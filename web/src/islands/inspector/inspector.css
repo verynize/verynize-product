@@ -51,7 +51,8 @@
    The utilities are compiled !important, and for important declarations an earlier cascade layer wins. The bundle
    orders its layers properties, theme, utilities, base, so this has to live in `theme` to beat the ring utility. */
 @layer theme {
-  html[data-input-modality="pointer"] #properties
+  html[data-input-modality="pointer"]
+    #properties
     :is(button, [role="button"], [role="radio"], [role="checkbox"], summary):focus-visible {
     outline: none !important;
     --tw-ring-shadow: 0 0 #0000 !important;

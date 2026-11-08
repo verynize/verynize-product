@@ -44,7 +44,8 @@ function buildRows(nodes: TreeNode[], expanded: Set<string>, query: string): Row
       const node = list[i];
       const hasChildren = children.has(node.id);
       const open = q ? true : expanded.has(node.id);
-      if (!q || node.name.toLowerCase().includes(q)) rows.push({ node, depth, hasChildren, expanded: open });
+      if (!q || node.name.toLowerCase().includes(q))
+        rows.push({ node, depth, hasChildren, expanded: open });
       if (hasChildren && open) walk(node.id, depth + 1);
     }
   };
@@ -72,7 +73,9 @@ function toggleFlag(node: TreeNode, key: "locked" | "hidden") {
 function select(id: string, event: MouseEvent | KeyboardEvent) {
   const current = design().getSelection();
   if (event.shiftKey || event.metaKey || event.ctrlKey) {
-    design().setSelection(current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+    design().setSelection(
+      current.includes(id) ? current.filter((x) => x !== id) : [...current, id],
+    );
   } else if (current.length !== 1 || current[0] !== id) {
     design().setSelection([id]);
   }
@@ -106,7 +109,9 @@ const LayerRow = memo(function LayerRow({
   );
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
-    const rows = Array.from(e.currentTarget.parentElement?.querySelectorAll<HTMLElement>(".layer-row") ?? []);
+    const rows = Array.from(
+      e.currentTarget.parentElement?.querySelectorAll<HTMLElement>(".layer-row") ?? [],
+    );
     const index = rows.indexOf(e.currentTarget);
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
@@ -138,7 +143,12 @@ const LayerRow = memo(function LayerRow({
           data-id={node.id}
           data-role={node.role}
           className={cn(
-            contract("layer-row", selected && "active", node.hidden && "is-hidden", node.locked && "is-locked"),
+            contract(
+              "layer-row",
+              selected && "active",
+              node.hidden && "is-hidden",
+              node.locked && "is-locked",
+            ),
             "group relative m-0 flex h-7.5 w-full shrink-0 items-center rounded-md border-0 bg-transparent py-0 pr-2 text-xs text-foreground-2 hover:bg-muted",
             selected && "bg-selection hover:bg-selection",
             dragging && "opacity-50",
@@ -228,7 +238,11 @@ const LayerRow = memo(function LayerRow({
                   data-toggle="locked"
                   aria-pressed={Boolean(node.locked)}
                   aria-label={`${node.locked ? "Unlock" : "Lock"} ${node.name}`}
-                  className={cn(contract(node.locked && "on"), action, node.locked && "flex text-foreground")}
+                  className={cn(
+                    contract(node.locked && "on"),
+                    action,
+                    node.locked && "flex text-foreground",
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFlag(node, "locked");
@@ -244,7 +258,11 @@ const LayerRow = memo(function LayerRow({
                   data-toggle="hidden"
                   aria-pressed={Boolean(node.hidden)}
                   aria-label={`${node.hidden ? "Show" : "Hide"} ${node.name}`}
-                  className={cn(contract(node.hidden && "on"), action, node.hidden && "flex text-foreground")}
+                  className={cn(
+                    contract(node.hidden && "on"),
+                    action,
+                    node.hidden && "flex text-foreground",
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFlag(node, "hidden");
@@ -289,7 +307,9 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
     const ids = selectionKey.split(",");
     const parents = ancestorsOf(ids, nodes);
     if (parents.length) {
-      setExpanded((prev) => (parents.every((p) => prev.has(p)) ? prev : new Set([...prev, ...parents])));
+      setExpanded((prev) =>
+        parents.every((p) => prev.has(p)) ? prev : new Set([...prev, ...parents]),
+      );
     }
     requestAnimationFrame(() => {
       const row = treeRef.current?.querySelector(`[data-id="${CSS.escape(ids[ids.length - 1])}"]`);
@@ -322,7 +342,13 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
 
   return (
     <section aria-label="Layers" className="flex min-h-0 flex-1 flex-col">
-      <SectionHeader title="Layers" open={open} onToggle={onToggle} controls="bd-layer-tree" className="-mt-px">
+      <SectionHeader
+        title="Layers"
+        open={open}
+        onToggle={onToggle}
+        controls="bd-layer-tree"
+        className="-mt-px"
+      >
         <IconButton
           label="Collapse all"
           disabled={expanded.size === 0 || Boolean(query)}
@@ -411,9 +437,17 @@ function DropIndicator({ drop }: { drop: Drop }) {
       data-position={drop.position}
       className={cn(
         "pointer-events-none absolute right-0 z-10",
-        inside ? "left-0 rounded-md border border-primary" : "h-0.5 -translate-y-1/2 rounded-full bg-primary",
+        inside
+          ? "left-0 rounded-md border border-primary"
+          : "h-0.5 -translate-y-1/2 rounded-full bg-primary",
       )}
-      style={{ "--drop-top": `${drop.top}px`, "--drop-height": `${drop.height}px`, "--drop-depth": drop.indent } as CSSProperties}
+      style={
+        {
+          "--drop-top": `${drop.top}px`,
+          "--drop-height": `${drop.height}px`,
+          "--drop-depth": drop.indent,
+        } as CSSProperties
+      }
     />
   );
 }

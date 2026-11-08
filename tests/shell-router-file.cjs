@@ -49,8 +49,7 @@ const { pathToFileURL } = require("node:url");
             window.shellRouter?.state.location.pathname ===
               (route === "/editor"
                 ? "/editor/" + encodeURIComponent(window.fileLibrary.currentId)
-                : route) &&
-            document.body.classList.contains("files-view") === (route === "/"),
+                : route) && document.body.classList.contains("files-view") === (route === "/"),
           route,
         );
         assert.equal(page.url(), url, "memory navigation never changes file URL or cloud fragment");

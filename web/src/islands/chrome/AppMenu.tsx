@@ -2,7 +2,14 @@
 // Opened by any `.app-menu-trigger` click or `window.dispatchEvent(new CustomEvent("bd:open-app-menu", {detail:{anchor}}))`.
 // Command ids stay reachable: inside the open menu they are menu items; while it is closed hidden proxies own them
 // (tests call e.g. `document.getElementById('delete-page').click()`; legacy shortcuts call `$('#undo').click()`).
-import { useCallback, useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 import {
   Braces,
   Code,
@@ -28,11 +35,25 @@ import {
 } from "lucide-react";
 import { legacySet, useDesign } from "@/lib/bridge";
 import { legacySelect, MENU_IDS, run } from "./legacy";
-import { MenuContent, MenuGroup, MenuItem, MenuLabel, MenuRoot, MenuSeparator, MenuTrigger, Shortcut } from "./menu";
+import {
+  MenuContent,
+  MenuGroup,
+  MenuItem,
+  MenuLabel,
+  MenuRoot,
+  MenuSeparator,
+  MenuTrigger,
+  Shortcut,
+} from "./menu";
 import { useIconKinds } from "./useIconKinds";
 import { requestVisibility, useCloudState } from "../share/api";
 
-type Command = { id: (typeof MENU_IDS)[number]; label: string; icon: ComponentType<{ className?: string }>; shortcut?: string };
+type Command = {
+  id: (typeof MENU_IDS)[number];
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  shortcut?: string;
+};
 const GROUPS: { label?: string; items: Command[] }[] = [
   {
     items: [
@@ -77,14 +98,26 @@ const GROUPS: { label?: string; items: Command[] }[] = [
 
 // Former project-dialog actions (web/desktop-panel.js window.agentWorkspace.actions), listed under File.
 type WorkspaceActions = Partial<Record<"saveDesignAs" | "captureApp" | "exportPDF", () => void>>;
-const FILE_ACTIONS: { id: string; action: keyof WorkspaceActions; label: string; icon: ComponentType<{ className?: string }> }[] = [
+const FILE_ACTIONS: {
+  id: string;
+  action: keyof WorkspaceActions;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}[] = [
   { id: "design-save-as", action: "saveDesignAs", label: "Save design as…", icon: Save },
-  { id: "project-capture", action: "captureApp", label: "Capture app to canvas", icon: MonitorPlay },
+  {
+    id: "project-capture",
+    action: "captureApp",
+    label: "Capture app to canvas",
+    icon: MonitorPlay,
+  },
   { id: "project-pdf", action: "exportPDF", label: "Export PDF", icon: Download },
 ];
-const workspaceActions = () => (window.agentWorkspace as unknown as { actions?: WorkspaceActions } | undefined)?.actions;
+const workspaceActions = () =>
+  (window.agentWorkspace as unknown as { actions?: WorkspaceActions } | undefined)?.actions;
 
-const exists = (id: string) => !!(document.getElementById(`legacy-${id}`) || document.getElementById(id));
+const exists = (id: string) =>
+  !!(document.getElementById(`legacy-${id}`) || document.getElementById(id));
 
 export function AppMenu() {
   const doc = useDesign();
@@ -122,13 +155,17 @@ export function AppMenu() {
   }, [open]);
 
   useEffect(() => {
-    const onEvent = (event: Event) => show((event as CustomEvent<{ anchor?: HTMLElement }>).detail?.anchor ?? null);
+    const onEvent = (event: Event) =>
+      show((event as CustomEvent<{ anchor?: HTMLElement }>).detail?.anchor ?? null);
     // Route every `.app-menu-trigger` (sidebar header, page pill, …) here, whoever rendered it.
     const triggerOf = (event: Event) =>
-      event.target instanceof Element ? event.target.closest<HTMLElement>(".app-menu-trigger") : null;
+      event.target instanceof Element
+        ? event.target.closest<HTMLElement>(".app-menu-trigger")
+        : null;
     const onPointerDown = (event: PointerEvent) => {
       const trigger = triggerOf(event);
-      skipClick.current = trigger && openRef.current && anchorRef.current === trigger ? trigger : null;
+      skipClick.current =
+        trigger && openRef.current && anchorRef.current === trigger ? trigger : null;
     };
     const onClick = (event: MouseEvent) => {
       const trigger = triggerOf(event);
@@ -184,7 +221,12 @@ export function AppMenu() {
     <>
       <MenuRoot open={open} onOpenChange={setOpen} modal={false}>
         <MenuTrigger asChild>
-          <span ref={triggerRef} aria-hidden="true" tabIndex={-1} className="pointer-events-none fixed" />
+          <span
+            ref={triggerRef}
+            aria-hidden="true"
+            tabIndex={-1}
+            className="pointer-events-none fixed"
+          />
         </MenuTrigger>
         <MenuContent
           id="bd-app-menu"
@@ -195,7 +237,8 @@ export function AppMenu() {
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             const active = document.activeElement;
-            if (!active || active === document.body) anchorRef.current?.focus({ preventScroll: true });
+            if (!active || active === document.body)
+              anchorRef.current?.focus({ preventScroll: true });
           }}
         >
           {GROUPS.map((group, index) => {
@@ -230,10 +273,16 @@ export function AppMenu() {
                     id={makePublic ? "file-make-public" : "file-make-private"}
                     disabled={!canChangeVisibility}
                     // After the menu has closed, so its focus return does not fight the dialog.
-                    onSelect={() => requestAnimationFrame(() => requestVisibility(makePublic ? "public" : "private"))}
+                    onSelect={() =>
+                      requestAnimationFrame(() =>
+                        requestVisibility(makePublic ? "public" : "private"),
+                      )
+                    }
                   >
                     {makePublic ? <Globe /> : <Lock />}
-                    <span className="truncate">{makePublic ? "Make file public" : "Make file private"}</span>
+                    <span className="truncate">
+                      {makePublic ? "Make file public" : "Make file private"}
+                    </span>
                   </MenuItem>
                 )}
                 {group.label === "File" &&
@@ -276,7 +325,15 @@ export function AppMenu() {
   );
 }
 
-function Section({ label, first, children }: { label?: string; first: boolean; children: ReactNode }) {
+function Section({
+  label,
+  first,
+  children,
+}: {
+  label?: string;
+  first: boolean;
+  children: ReactNode;
+}) {
   return (
     <>
       {!first && <MenuSeparator />}

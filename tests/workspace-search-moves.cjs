@@ -105,15 +105,24 @@ async function searchFixture(t) {
 
 // bundled = @vscode/ripgrep (the default), system = rg on PATH, node = the walker fallback.
 const systemRg = (() => {
-  for (const dir of [...String(process.env.PATH).split(":"), "/opt/homebrew/bin", "/usr/local/bin"]) {
+  for (const dir of [
+    ...String(process.env.PATH).split(":"),
+    "/opt/homebrew/bin",
+    "/usr/local/bin",
+  ]) {
     const candidate = path.join(dir, "rg");
-    if (dir && require("node:fs").existsSync(candidate) && !/@vscode/.test(candidate)) return candidate;
+    if (dir && require("node:fs").existsSync(candidate) && !/@vscode/.test(candidate))
+      return candidate;
   }
   return null;
 })();
 for (const variant of ["bundled", "system", "node"]) {
   const engine = variant === "node" ? "node" : "ripgrep";
-  const run = (input) => searchProjects({ ...input, engine: variant === "node" ? "node" : undefined }, variant === "system" ? { ripgrepPath: systemRg } : {});
+  const run = (input) =>
+    searchProjects(
+      { ...input, engine: variant === "node" ? "node" : undefined },
+      variant === "system" ? { ripgrepPath: systemRg } : {},
+    );
   test(
     `project search (${variant}): every project, ignore files respected, design content matched`,
     { skip: variant === "system" && !systemRg ? "no rg on PATH" : false },

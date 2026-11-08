@@ -81,7 +81,10 @@ function ServerForm({
   const api = desktopApi();
   const { connected: codexConnected } = useCodexConnection();
   const [d, setD] = useState<Draft>(initial);
-  useEffect(() => setD(initial.id || codexConnected ? initial : { ...initial, agents: "claude" }), [initial, codexConnected]);
+  useEffect(
+    () => setD(initial.id || codexConnected ? initial : { ...initial, agents: "claude" }),
+    [initial, codexConnected],
+  );
   const set = (patch: Partial<Draft>) => setD((v) => ({ ...v, ...patch }));
   const save = async () => {
     const [command, ...args] = argv(d.command);
@@ -190,7 +193,9 @@ function ServerForm({
           value={d.agents}
           onChange={(e) => set({ agents: e.target.value as Draft["agents"] })}
         >
-          {(codexConnected || d.agents === "both") && <option value="both">{codexConnected ? "Claude Code and Codex" : "Claude Code"}</option>}
+          {(codexConnected || d.agents === "both") && (
+            <option value="both">{codexConnected ? "Claude Code and Codex" : "Claude Code"}</option>
+          )}
           <option value="claude">Claude Code only</option>
           {codexConnected && <option value="codex">Codex only</option>}
         </NativeSelect>
@@ -283,72 +288,76 @@ export function ToolsPage() {
           description="Disabled servers stay saved but are not passed to chats."
         >
           <Card id="tools-server-list">
-            {servers.filter((s) => codexConnected || s.agents.includes("claude")).map((s) => (
-              <div key={s.id} data-tool-server={s.name}>
-                <Row
-                  title={s.name}
-                  description={
-                    <>
-                      <span className="block truncate font-mono text-xs">
-                        {s.transport === "http" ? s.url : [s.command, ...(s.args ?? [])].join(" ")}
-                      </span>
-                      <span>
-                        {s.scope === "global" ? "All projects" : `Only ${repoName(s.project)}`} ·{" "}
-                        {s.agents.length === 2 && codexConnected
-                          ? "Claude Code and Codex"
-                          : s.agents.includes("claude")
-                            ? "Claude Code"
-                            : "Codex"}
-                        {s.envKeys?.length ? ` · env: ${s.envKeys.join(", ")}` : ""}
-                      </span>
-                    </>
-                  }
-                >
-                  <Toggle
-                    aria-label={`Use ${s.name}`}
-                    checked={s.enabled}
-                    onCheckedChange={(enabled) =>
-                      void api
-                        .agentToolConfig!.setEnabled({ id: s.id, enabled })
-                        .then(reload, (e: unknown) => toast(errorText(e)))
-                    }
-                  />
-                  <SettingsButton
-                    variant="ghost"
-                    data-action="edit"
-                    onClick={() =>
-                      setEditing({
-                        id: s.id,
-                        name: s.name,
-                        transport: s.transport,
-                        command: [s.command ?? "", ...(s.args ?? [])]
-                          .map((a) => (/\s/.test(a) ? JSON.stringify(a) : a))
-                          .join(" "),
-                        env: (s.envKeys ?? []).join("\n"),
-                        url: s.url ?? "",
-                        tokenEnv: s.tokenEnv ?? "",
-                        scope: s.scope === "global" ? "global" : (s.project ?? "global"),
-                        agents: s.agents.length === 2 ? "both" : s.agents[0],
-                      })
+            {servers
+              .filter((s) => codexConnected || s.agents.includes("claude"))
+              .map((s) => (
+                <div key={s.id} data-tool-server={s.name}>
+                  <Row
+                    title={s.name}
+                    description={
+                      <>
+                        <span className="block truncate font-mono text-xs">
+                          {s.transport === "http"
+                            ? s.url
+                            : [s.command, ...(s.args ?? [])].join(" ")}
+                        </span>
+                        <span>
+                          {s.scope === "global" ? "All projects" : `Only ${repoName(s.project)}`} ·{" "}
+                          {s.agents.length === 2 && codexConnected
+                            ? "Claude Code and Codex"
+                            : s.agents.includes("claude")
+                              ? "Claude Code"
+                              : "Codex"}
+                          {s.envKeys?.length ? ` · env: ${s.envKeys.join(", ")}` : ""}
+                        </span>
+                      </>
                     }
                   >
-                    Edit
-                  </SettingsButton>
-                  <SettingsButton
-                    variant="ghost"
-                    data-action="remove"
-                    aria-label={`Remove ${s.name}`}
-                    onClick={() =>
-                      void api
-                        .agentToolConfig!.removeServer({ id: s.id })
-                        .then(reload, (e: unknown) => toast(errorText(e)))
-                    }
-                  >
-                    <Trash2Icon />
-                  </SettingsButton>
-                </Row>
-              </div>
-            ))}
+                    <Toggle
+                      aria-label={`Use ${s.name}`}
+                      checked={s.enabled}
+                      onCheckedChange={(enabled) =>
+                        void api
+                          .agentToolConfig!.setEnabled({ id: s.id, enabled })
+                          .then(reload, (e: unknown) => toast(errorText(e)))
+                      }
+                    />
+                    <SettingsButton
+                      variant="ghost"
+                      data-action="edit"
+                      onClick={() =>
+                        setEditing({
+                          id: s.id,
+                          name: s.name,
+                          transport: s.transport,
+                          command: [s.command ?? "", ...(s.args ?? [])]
+                            .map((a) => (/\s/.test(a) ? JSON.stringify(a) : a))
+                            .join(" "),
+                          env: (s.envKeys ?? []).join("\n"),
+                          url: s.url ?? "",
+                          tokenEnv: s.tokenEnv ?? "",
+                          scope: s.scope === "global" ? "global" : (s.project ?? "global"),
+                          agents: s.agents.length === 2 ? "both" : s.agents[0],
+                        })
+                      }
+                    >
+                      Edit
+                    </SettingsButton>
+                    <SettingsButton
+                      variant="ghost"
+                      data-action="remove"
+                      aria-label={`Remove ${s.name}`}
+                      onClick={() =>
+                        void api
+                          .agentToolConfig!.removeServer({ id: s.id })
+                          .then(reload, (e: unknown) => toast(errorText(e)))
+                      }
+                    >
+                      <Trash2Icon />
+                    </SettingsButton>
+                  </Row>
+                </div>
+              ))}
             <ServerForm
               repos={repos}
               initial={editing}

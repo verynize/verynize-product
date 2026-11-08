@@ -4,17 +4,17 @@ Celah: "Full CSS/Tailwind import/export fidelity; external stylesheet resolution
 
 ## Ringkasan
 
-| Bagian | Status | Bukti |
-|---|---|---|
-| Import HTML + CSS (cascade, specificity, `!important`, `@layer`, style inline, inheritance, custom property/`var()`, media query untuk viewport pilihan) | Diimplementasikan | `integrations/codec-html.test.mjs`, fixture 29, `eval/run-import-fidelity.mjs` |
-| Resolusi stylesheet eksternal (`<link>`, `@import` bertingkat dengan layer/media, file lokal dan http(s), batas ukuran/waktu/jumlah, folder dibatasi) | Diimplementasikan | `codec-html.test.mjs` (file sementara asli + server HTTP lokal asli) |
-| Token `:root` → variabel warna; custom property bertipe → variabel Dimension/Number/Font family/Font weight + binding | Diimplementasikan | `codec-html.test.mjs`, fixture 29, `codec-cli.test.mjs` |
-| Utilitas Tailwind v4 lewat engine asli: arbitrary value, token tema, varian responsif diterapkan untuk viewport, varian state/dark dicatat (`variantClasses`) dan ditulis balik | Diimplementasikan | fixture 22 (tetap), 27, 30; `codec-html.test.mjs` |
-| Export JSX Tailwind lossless untuk seluruh properti skema (efek terstruktur, efek tersembunyi, warna variabel bayangan, binding, text range tumpang tindih, lock, preview artboard, properti "dorman") | Diimplementasikan | `integrations/codec-roundtrip.test.mjs`, fixture 28 |
-| Export HTML/CSS (stylesheet berbasis class) lossless dan bisa diimpor kembali | Diimplementasikan | `codec-roundtrip.test.mjs`, `codec-cli.test.mjs` |
-| Round trip umum dokumen → JSX → dokumen dan dokumen → HTML/CSS → dokumen = identitas (modulo id) | Diimplementasikan, dengan batas tercatat di bawah | `codec-roundtrip.test.mjs` |
-| Tes cakupan properti yang meng-enumerasi skema dari validator | Diimplementasikan | `codec-roundtrip.test.mjs` (`schemaKeys`) |
-| Integrasi ke dialog "Import HTML" di aplikasi dan tool MCP | **Belum** — tersedia lewat modul dan CLI | lihat Batas |
+| Bagian                                                                                                                                                                                                 | Status                                            | Bukti                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Import HTML + CSS (cascade, specificity, `!important`, `@layer`, style inline, inheritance, custom property/`var()`, media query untuk viewport pilihan)                                               | Diimplementasikan                                 | `integrations/codec-html.test.mjs`, fixture 29, `eval/run-import-fidelity.mjs` |
+| Resolusi stylesheet eksternal (`<link>`, `@import` bertingkat dengan layer/media, file lokal dan http(s), batas ukuran/waktu/jumlah, folder dibatasi)                                                  | Diimplementasikan                                 | `codec-html.test.mjs` (file sementara asli + server HTTP lokal asli)           |
+| Token `:root` → variabel warna; custom property bertipe → variabel Dimension/Number/Font family/Font weight + binding                                                                                  | Diimplementasikan                                 | `codec-html.test.mjs`, fixture 29, `codec-cli.test.mjs`                        |
+| Utilitas Tailwind v4 lewat engine asli: arbitrary value, token tema, varian responsif diterapkan untuk viewport, varian state/dark dicatat (`variantClasses`) dan ditulis balik                        | Diimplementasikan                                 | fixture 22 (tetap), 27, 30; `codec-html.test.mjs`                              |
+| Export JSX Tailwind lossless untuk seluruh properti skema (efek terstruktur, efek tersembunyi, warna variabel bayangan, binding, text range tumpang tindih, lock, preview artboard, properti "dorman") | Diimplementasikan                                 | `integrations/codec-roundtrip.test.mjs`, fixture 28                            |
+| Export HTML/CSS (stylesheet berbasis class) lossless dan bisa diimpor kembali                                                                                                                          | Diimplementasikan                                 | `codec-roundtrip.test.mjs`, `codec-cli.test.mjs`                               |
+| Round trip umum dokumen → JSX → dokumen dan dokumen → HTML/CSS → dokumen = identitas (modulo id)                                                                                                       | Diimplementasikan, dengan batas tercatat di bawah | `codec-roundtrip.test.mjs`                                                     |
+| Tes cakupan properti yang meng-enumerasi skema dari validator                                                                                                                                          | Diimplementasikan                                 | `codec-roundtrip.test.mjs` (`schemaKeys`)                                      |
+| Integrasi ke dialog "Import HTML" di aplikasi dan tool MCP                                                                                                                                             | **Belum** — tersedia lewat modul dan CLI          | lihat Batas                                                                    |
 
 ## Arsitektur
 

@@ -85,8 +85,8 @@ else process.exit(0);
     VERYNIZE_WORKSPACES_DIR: path.join(root, "workspaces"),
   };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
-  await require('./helpers/chatgpt-provider.cjs').seedChatGPTAccount(profile);
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  await require("./helpers/chatgpt-provider.cjs").seedChatGPTAccount(profile);
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
@@ -392,10 +392,22 @@ else process.exit(0);
       "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==";
     await page.evaluate((src) => {
       const list = JSON.parse(localStorage.getItem("verynize-user-templates"));
-      list[0].document.pages[0].nodes.push({ id: "img-asset", type: "image", name: "Logo", x: 1, y: 1, w: 8, h: 8, parentId: null, src });
+      list[0].document.pages[0].nodes.push({
+        id: "img-asset",
+        type: "image",
+        name: "Logo",
+        x: 1,
+        y: 1,
+        w: 8,
+        h: 8,
+        parentId: null,
+        src,
+      });
       localStorage.setItem("verynize-user-templates", JSON.stringify(list));
     }, png);
-    const zipBytes = await page.evaluate(async () => [...(await window.designTemplates.exportZip())]);
+    const zipBytes = await page.evaluate(async () => [
+      ...(await window.designTemplates.exportZip()),
+    ]);
     assert.deepEqual(zipBytes.slice(0, 2), [0x50, 0x4b]);
     const zipFile = path.join(root, "pack.zip");
     await fs.writeFile(zipFile, Buffer.from(zipBytes));
@@ -410,10 +422,15 @@ else process.exit(0);
     });
     await page.locator("#template-import-file").setInputFiles(zipFile);
     await page.waitForFunction(() =>
-      /Imported 1 templates and 1 components/.test(document.getElementById("template-status").textContent),
+      /Imported 1 templates and 1 components/.test(
+        document.getElementById("template-status").textContent,
+      ),
     );
     const restored = await page.evaluate(
-      () => window.designTemplates.userTemplates()[0].document.pages[0].nodes.find((n) => n.name === "Logo").src,
+      () =>
+        window.designTemplates
+          .userTemplates()[0]
+          .document.pages[0].nodes.find((n) => n.name === "Logo").src,
     );
     assert.equal(restored, png);
     await page.locator("#templates-close").click();

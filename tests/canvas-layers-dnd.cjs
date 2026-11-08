@@ -14,7 +14,8 @@ const fs = require("node:fs/promises"),
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "canvas-layers-dnd-")),
     env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
@@ -528,13 +529,11 @@ const fs = require("node:fs/promises"),
     await page.mouse.move(p.x, p.y, { steps: 8 });
     const entering = await tree(["row:1", "k3:2", "r:2", "k1:2"]);
     const heldParent = (await node("r")).parentId;
-    const bar = await page
-      .locator("#canvas-overlay .drop-line")
-      .evaluate((e) => ({
-        hidden: e.hidden,
-        w: e.getBoundingClientRect().width,
-        color: getComputedStyle(e).backgroundColor,
-      }));
+    const bar = await page.locator("#canvas-overlay .drop-line").evaluate((e) => ({
+      hidden: e.hidden,
+      w: e.getBoundingClientRect().width,
+      color: getComputedStyle(e).backgroundColor,
+    }));
     await page.mouse.up();
     assert.deepEqual(
       entering,

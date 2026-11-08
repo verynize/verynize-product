@@ -7,7 +7,14 @@ import { cn } from "@/lib/utils";
 type IconButtonProps = ComponentProps<"button"> & { label: string; tooltip?: boolean };
 
 /** 24px icon-only button with a tooltip. */
-export function IconButton({ label, tooltip = true, className, children, ref, ...props }: IconButtonProps) {
+export function IconButton({
+  label,
+  tooltip = true,
+  className,
+  children,
+  ref,
+  ...props
+}: IconButtonProps) {
   const button = (
     <button
       ref={ref}
@@ -32,7 +39,15 @@ export function IconButton({ label, tooltip = true, className, children, ref, ..
 }
 
 /** Wraps one control in the app tooltip (instead of a native `title`). */
-export function Hint({ label, side = "top", children }: { label: string; side?: "top" | "bottom"; children: ReactNode }) {
+export function Hint({
+  label,
+  side = "top",
+  children,
+}: {
+  label: string;
+  side?: "top" | "bottom";
+  children: ReactNode;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>

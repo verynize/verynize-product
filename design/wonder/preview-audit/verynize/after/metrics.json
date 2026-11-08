@@ -1,239 +1,194 @@
 {
- "shots": {
-  "PS1-idle": {
-   "label": "Start preview"
+  "shots": {
+    "PS1-idle": {
+      "label": "Start preview"
+    },
+    "PS1-menu": {
+      "items": ["Open in a tab⌘⌥P", "|", "Preview settings"]
+    },
+    "X1-settings": {},
+    "PS2-card": {
+      "text": "Preview setup Saved by auto mode python3 -m http.server 8000 You can change it in Preview settings."
+    },
+    "PS3-starting": {
+      "card": "Starting your app preview-sandbox · App · 0:01 Stop Starting app sh -c \"sleep 4; exit 7\" Waiting for the app Show terminal"
+    },
+    "PS4-error": {
+      "card": "Couldn’t start your app preview-sandbox · App The start command exited before the app was ready. App stopped sh -c \"sleep 4; exit 7\" · exit 7 Show preview Not reached View logs Try again Fix with agent Sends the error and available logs to your agent."
+    },
+    "PF1-selected": {},
+    "PF2-toolbar": {
+      "controls": [
+        "Back",
+        "Forward",
+        "Reload",
+        "Preview path",
+        "Publish",
+        "Stop preview",
+        "Open in a tab"
+      ]
+    },
+    "PF2-back-hover": {
+      "tooltip": "Back⌘["
+    },
+    "PF2-forward-hover": {
+      "tooltip": "Forward⌘]"
+    },
+    "PF2-reload-hover": {
+      "tooltip": "Reload⇧-click ignores cache"
+    },
+    "PF2-path-hover": {
+      "tooltip": "http://localhost:49163/"
+    },
+    "PF2-publish-hover": {
+      "tooltip": "Publish to the web"
+    },
+    "PF2-stop-hover": {
+      "tooltip": null
+    },
+    "PF2-expand-hover": {
+      "tooltip": "Open in a tab⌘⌥P"
+    },
+    "PF2-path": {
+      "value": "/"
+    },
+    "PM1-navigate-hover": {
+      "tooltip": "Open in a tab⌘⌥P"
+    },
+    "PM1-edit-hover": {
+      "tooltip": "Open in a tab⌘⌥P"
+    },
+    "PM1-capture-hover": {
+      "tooltip": "Open in a tab⌘⌥P"
+    },
+    "X4-more-actions": {
+      "items": ["Send all input to app", "Open in browser"]
+    },
+    "PM2-navigate": {
+      "mode": "navigate"
+    },
+    "PM2-typed": {
+      "count": "Count: 1",
+      "input": "Sunbird"
+    },
+    "PM2-about": {
+      "path": "/about/"
+    },
+    "PF3-expanded": {
+      "tab": "Junco · Preview"
+    },
+    "PF4-presets": {
+      "items": [
+        "iPhone 17402 × 874",
+        "iPhone 18 Pro402 × 874",
+        "iPhone Air420 × 912",
+        "iPhone 18 Pro Max440 × 956",
+        "iPhone Duo Folded466 × 678",
+        "iPhone Duo Open626 × 890",
+        "iPad Air 11\"820 × 1180",
+        "iPad Mini 8.3\"744 × 1133",
+        "MacBook Air1280 × 832",
+        "MacBook Pro 14\"1512 × 982",
+        "MacBook Pro 16\"1728 × 1117",
+        "Desktop1920 × 1080",
+        "TV3840 × 2160"
+      ]
+    },
+    "PF5-context": {
+      "items": [
+        "Copy⌘C",
+        "Copy as",
+        "Copy link to selection",
+        "|",
+        "Select layer",
+        "Paste⌘V",
+        "Paste styles⌘⌥V",
+        "Paste to replace⌘⇧R",
+        "Paste over selection⌘⇧V",
+        "Duplicate⌘D",
+        "|",
+        "Hide⌘⇧H",
+        "Lock⌘⇧L",
+        "|",
+        "Arrange",
+        "Show terminal",
+        "Clear preview data",
+        "Clear preview data (including logins)",
+        "|",
+        "Layout",
+        "|",
+        "Set as file thumbnail"
+      ]
+    },
+    "X3-terminal": {
+      "text": "Terminal Copy logs Hide terminal Serving HTTP on 127.0.0.1 port 49163 (http://127.0.0.1:49163/) ... 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET / HTTP/1.1\" 200 - 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET / HTTP/1.1\" 200 - 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET /bird.svg HTTP/1.1\" 200 - 127.0.0.1 - "
+    },
+    "PF6-inspector": {
+      "inspector": "P Share Variables Icons Properties Screen template MacBook Pro 14\" Position X Y ° Left Left Right Left & Right Center Scale Top Top Bottom Top & Bottom Center Scale Z Layout W px H px Appearance Opacity % Export"
+    },
+    "PP1-publish": {
+      "text": "Publish to the web Not published yet Share your app Build this app and share it at a public link. Environment variables 0 keys sent Publish"
+    },
+    "X5-running-menu": {
+      "items": ["Open in a tab⌘⌥P", "Go to preview", "Open in browser", "|", "Preview settings"],
+      "label": "Stop preview"
+    },
+    "PS2-edit": {
+      "run": "python3 -m http.server 49163 --bind 127.0.0.1"
+    },
+    "PS6-code": {
+      "label": "Stop preview"
+    },
+    "PS6-show-preview": {
+      "selected": ["e1da29aa-55d3-4a38-8bc0-19f93fdb9fe2"]
+    },
+    "PM3-hover": {},
+    "PM3-select": {
+      "badge": "1432 Fill x 42.5 Hug"
+    },
+    "PM3-inspector": {
+      "inspector": "P Share Variables Icons Properties Position X Y ° Left Left Right Left & Right Center Scale Top Top Bottom Top & Bottom Center Scale Z Layout W px H px Padding px px Margin px px Appearance Opacity % Corner radius Clip content Typography system-ui (unsupported) Thin Extra Light Light Regular Medium Semi Bold Bold Extra Bold Black px Line height Letter spacing |A| px Text Fill 100 %"
+    },
+    "PM3-edited": {
+      "title": "Sunbird edited sandbox"
+    },
+    "X2-changes": {
+      "text": "Preview changes Not in your code yet h1 “Sunbird preview sandbox” Text “Sunbird preview sandbox” “Sunbird edited sandbox” Hide all changes Compare with the original Revert all changes Puts back the original values"
+    },
+    "PF4-resize": {
+      "viewport": [402, 874],
+      "crumbTruncated": true
+    },
+    "PM5-context": {
+      "mentions": ["h1 \"Sunbird edited…"]
+    },
+    "PM4-capture": {},
+    "PM4-result": {
+      "frame": [418, 246, 1512],
+      "text": [2030, 246, 1432, 42.5, "Text", "Sunbird edited sandbox"]
+    },
+    "PP2-stopped": {},
+    "PS5-paused": {
+      "card": "Ready to start your preview preview-sandbox · App Start this preview to connect to your local app. Last address: localhost:49163 Start preview",
+      "server": "stopped"
+    }
   },
-  "PS1-menu": {
-   "items": [
-    "Open in a tab⌘⌥P",
-    "|",
-    "Preview settings"
-   ]
+  "seams": {
+    "expandOpensTab": true,
+    "phoneViewport": [402, 874],
+    "contextMenuShowsTerminal": true,
+    "headerOpenInTab": true,
+    "cmdAltPOpensTab": true,
+    "capturePlacement": {
+      "frame": [418, 246, 1512],
+      "text": [2030, 246, 1432, 42.5, "Text", "Sunbird edited sandbox"],
+      "gap": 100,
+      "topAligned": true
+    },
+    "frameStopAsks": "Discard preview edits? 1 unsaved edit will be lost when this preview stops. This can’t be undone. Keep editing Discard and stop",
+    "keepEditingKeepsRunning": "running",
+    "headerStopAsks": "Discard preview edits? 1 unsaved edit will be lost when this preview stops. This can’t be undone. Keep editing Discard and stop"
   },
-  "X1-settings": {},
-  "PS2-card": {
-   "text": "Preview setup Saved by auto mode python3 -m http.server 8000 You can change it in Preview settings."
-  },
-  "PS3-starting": {
-   "card": "Starting your app preview-sandbox · App · 0:01 Stop Starting app sh -c \"sleep 4; exit 7\" Waiting for the app Show terminal"
-  },
-  "PS4-error": {
-   "card": "Couldn’t start your app preview-sandbox · App The start command exited before the app was ready. App stopped sh -c \"sleep 4; exit 7\" · exit 7 Show preview Not reached View logs Try again Fix with agent Sends the error and available logs to your agent."
-  },
-  "PF1-selected": {},
-  "PF2-toolbar": {
-   "controls": [
-    "Back",
-    "Forward",
-    "Reload",
-    "Preview path",
-    "Publish",
-    "Stop preview",
-    "Open in a tab"
-   ]
-  },
-  "PF2-back-hover": {
-   "tooltip": "Back⌘["
-  },
-  "PF2-forward-hover": {
-   "tooltip": "Forward⌘]"
-  },
-  "PF2-reload-hover": {
-   "tooltip": "Reload⇧-click ignores cache"
-  },
-  "PF2-path-hover": {
-   "tooltip": "http://localhost:49163/"
-  },
-  "PF2-publish-hover": {
-   "tooltip": "Publish to the web"
-  },
-  "PF2-stop-hover": {
-   "tooltip": null
-  },
-  "PF2-expand-hover": {
-   "tooltip": "Open in a tab⌘⌥P"
-  },
-  "PF2-path": {
-   "value": "/"
-  },
-  "PM1-navigate-hover": {
-   "tooltip": "Open in a tab⌘⌥P"
-  },
-  "PM1-edit-hover": {
-   "tooltip": "Open in a tab⌘⌥P"
-  },
-  "PM1-capture-hover": {
-   "tooltip": "Open in a tab⌘⌥P"
-  },
-  "X4-more-actions": {
-   "items": [
-    "Send all input to app",
-    "Open in browser"
-   ]
-  },
-  "PM2-navigate": {
-   "mode": "navigate"
-  },
-  "PM2-typed": {
-   "count": "Count: 1",
-   "input": "Sunbird"
-  },
-  "PM2-about": {
-   "path": "/about/"
-  },
-  "PF3-expanded": {
-   "tab": "Junco · Preview"
-  },
-  "PF4-presets": {
-   "items": [
-    "iPhone 17402 × 874",
-    "iPhone 18 Pro402 × 874",
-    "iPhone Air420 × 912",
-    "iPhone 18 Pro Max440 × 956",
-    "iPhone Duo Folded466 × 678",
-    "iPhone Duo Open626 × 890",
-    "iPad Air 11\"820 × 1180",
-    "iPad Mini 8.3\"744 × 1133",
-    "MacBook Air1280 × 832",
-    "MacBook Pro 14\"1512 × 982",
-    "MacBook Pro 16\"1728 × 1117",
-    "Desktop1920 × 1080",
-    "TV3840 × 2160"
-   ]
-  },
-  "PF5-context": {
-   "items": [
-    "Copy⌘C",
-    "Copy as",
-    "Copy link to selection",
-    "|",
-    "Select layer",
-    "Paste⌘V",
-    "Paste styles⌘⌥V",
-    "Paste to replace⌘⇧R",
-    "Paste over selection⌘⇧V",
-    "Duplicate⌘D",
-    "|",
-    "Hide⌘⇧H",
-    "Lock⌘⇧L",
-    "|",
-    "Arrange",
-    "Show terminal",
-    "Clear preview data",
-    "Clear preview data (including logins)",
-    "|",
-    "Layout",
-    "|",
-    "Set as file thumbnail"
-   ]
-  },
-  "X3-terminal": {
-   "text": "Terminal Copy logs Hide terminal Serving HTTP on 127.0.0.1 port 49163 (http://127.0.0.1:49163/) ... 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET / HTTP/1.1\" 200 - 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET / HTTP/1.1\" 200 - 127.0.0.1 - - [31/Oct/2026 15:51:39] \"GET /bird.svg HTTP/1.1\" 200 - 127.0.0.1 - "
-  },
-  "PF6-inspector": {
-   "inspector": "P Share Variables Icons Properties Screen template MacBook Pro 14\" Position X Y ° Left Left Right Left & Right Center Scale Top Top Bottom Top & Bottom Center Scale Z Layout W px H px Appearance Opacity % Export"
-  },
-  "PP1-publish": {
-   "text": "Publish to the web Not published yet Share your app Build this app and share it at a public link. Environment variables 0 keys sent Publish"
-  },
-  "X5-running-menu": {
-   "items": [
-    "Open in a tab⌘⌥P",
-    "Go to preview",
-    "Open in browser",
-    "|",
-    "Preview settings"
-   ],
-   "label": "Stop preview"
-  },
-  "PS2-edit": {
-   "run": "python3 -m http.server 49163 --bind 127.0.0.1"
-  },
-  "PS6-code": {
-   "label": "Stop preview"
-  },
-  "PS6-show-preview": {
-   "selected": [
-    "e1da29aa-55d3-4a38-8bc0-19f93fdb9fe2"
-   ]
-  },
-  "PM3-hover": {},
-  "PM3-select": {
-   "badge": "1432 Fill x 42.5 Hug"
-  },
-  "PM3-inspector": {
-   "inspector": "P Share Variables Icons Properties Position X Y ° Left Left Right Left & Right Center Scale Top Top Bottom Top & Bottom Center Scale Z Layout W px H px Padding px px Margin px px Appearance Opacity % Corner radius Clip content Typography system-ui (unsupported) Thin Extra Light Light Regular Medium Semi Bold Bold Extra Bold Black px Line height Letter spacing |A| px Text Fill 100 %"
-  },
-  "PM3-edited": {
-   "title": "Sunbird edited sandbox"
-  },
-  "X2-changes": {
-   "text": "Preview changes Not in your code yet h1 “Sunbird preview sandbox” Text “Sunbird preview sandbox” “Sunbird edited sandbox” Hide all changes Compare with the original Revert all changes Puts back the original values"
-  },
-  "PF4-resize": {
-   "viewport": [
-    402,
-    874
-   ],
-   "crumbTruncated": true
-  },
-  "PM5-context": {
-   "mentions": [
-    "h1 \"Sunbird edited…"
-   ]
-  },
-  "PM4-capture": {},
-  "PM4-result": {
-   "frame": [
-    418,
-    246,
-    1512
-   ],
-   "text": [
-    2030,
-    246,
-    1432,
-    42.5,
-    "Text",
-    "Sunbird edited sandbox"
-   ]
-  },
-  "PP2-stopped": {},
-  "PS5-paused": {
-   "card": "Ready to start your preview preview-sandbox · App Start this preview to connect to your local app. Last address: localhost:49163 Start preview",
-   "server": "stopped"
-  }
- },
- "seams": {
-  "expandOpensTab": true,
-  "phoneViewport": [
-   402,
-   874
-  ],
-  "contextMenuShowsTerminal": true,
-  "headerOpenInTab": true,
-  "cmdAltPOpensTab": true,
-  "capturePlacement": {
-   "frame": [
-    418,
-    246,
-    1512
-   ],
-   "text": [
-    2030,
-    246,
-    1432,
-    42.5,
-    "Text",
-    "Sunbird edited sandbox"
-   ],
-   "gap": 100,
-   "topAligned": true
-  },
-  "frameStopAsks": "Discard preview edits? 1 unsaved edit will be lost when this preview stops. This can’t be undone. Keep editing Discard and stop",
-  "keepEditingKeepsRunning": "running",
-  "headerStopAsks": "Discard preview edits? 1 unsaved edit will be lost when this preview stops. This can’t be undone. Keep editing Discard and stop"
- },
- "failures": [],
- "pageErrors": []
+  "failures": [],
+  "pageErrors": []
 }

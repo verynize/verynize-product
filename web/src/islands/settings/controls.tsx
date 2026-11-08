@@ -5,14 +5,24 @@ import { Switch as SwitchPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
 
 /** 18px page title with an optional description and trailing action. */
-export function PageHeader({ title, description, action }: { title: string; description?: ReactNode; action?: ReactNode }) {
+export function PageHeader({
+  title,
+  description,
+  action,
+}: {
+  title: string;
+  description?: ReactNode;
+  action?: ReactNode;
+}) {
   return (
     <div className="mb-10.5 px-4">
       <div className="flex min-h-6 items-center justify-between gap-4">
         <h1 className="text-xl font-medium text-foreground">{title}</h1>
         {action}
       </div>
-      {description && <p className="mt-2 max-w-150 text-sm leading-5 text-muted-foreground">{description}</p>}
+      {description && (
+        <p className="mt-2 max-w-150 text-sm leading-5 text-muted-foreground">{description}</p>
+      )}
     </div>
   );
 }
@@ -93,7 +103,9 @@ export function Row({
         <Title htmlFor={htmlFor} className="m-0 block text-sm text-foreground">
           {title}
         </Title>
-        {description && <div className="max-w-110 text-sm text-muted-foreground">{description}</div>}
+        {description && (
+          <div className="max-w-110 text-sm text-muted-foreground">{description}</div>
+        )}
       </div>
       {children !== undefined && <div className="flex shrink-0 items-center gap-2">{children}</div>}
     </div>
@@ -105,7 +117,11 @@ export function IconTile({ children, badge }: { children: ReactNode; badge?: Rea
   return (
     <span className="relative flex size-8 shrink-0 items-center justify-center rounded-lg border border-card-border bg-background text-foreground-3">
       {children}
-      {badge && <span className="absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center">{badge}</span>}
+      {badge && (
+        <span className="absolute -right-1 -bottom-1 flex size-3.5 items-center justify-center">
+          {badge}
+        </span>
+      )}
     </span>
   );
 }
@@ -167,7 +183,8 @@ export function CommitField({
 }) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (ref.current && document.activeElement !== ref.current) ref.current.value = String(value ?? "");
+    if (ref.current && document.activeElement !== ref.current)
+      ref.current.value = String(value ?? "");
   }, [value]);
   return (
     <TextField
@@ -197,7 +214,8 @@ export function SettingsButton({
         "inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-md px-2.5 text-sm whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
         variant === "secondary" && "bg-input text-foreground hover:bg-accent",
         variant === "primary" && "bg-primary text-primary-foreground hover:bg-primary-hover",
-        variant === "ghost" && "bg-transparent text-foreground-3 hover:bg-muted hover:text-foreground",
+        variant === "ghost" &&
+          "bg-transparent text-foreground-3 hover:bg-muted hover:text-foreground",
         variant === "tint" && "bg-primary-tint text-primary-text hover:bg-accent",
         className,
       )}
@@ -228,7 +246,14 @@ export function ChoiceTile({
       >
         {children}
       </span>
-      <span className={cn("text-sm", selected ? "font-medium text-foreground" : "text-muted-foreground")}>{label}</span>
+      <span
+        className={cn(
+          "text-sm",
+          selected ? "font-medium text-foreground" : "text-muted-foreground",
+        )}
+      >
+        {label}
+      </span>
     </button>
   );
 }

@@ -52,7 +52,13 @@ function AccountRow({
   const run = async (task: () => Promise<unknown> | undefined, done?: string) => {
     try {
       const result = await task();
-      if (result && typeof result === "object" && "message" in result && typeof result.message === "string") toast(result.message);
+      if (
+        result &&
+        typeof result === "object" &&
+        "message" in result &&
+        typeof result.message === "string"
+      )
+        toast(result.message);
       else if (done) toast(done);
       window.dispatchEvent(new Event("bd:agent-accounts-changed"));
       onChanged();

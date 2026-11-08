@@ -145,7 +145,10 @@ export function HelpMenu() {
                 <span data-whats-new-title="" className="truncate text-sm leading-5">
                   {title}
                 </span>
-                <span data-whats-new-date="" className="truncate text-xs leading-3 text-foreground-3">
+                <span
+                  data-whats-new-date=""
+                  className="truncate text-xs leading-3 text-foreground-3"
+                >
                   {date}
                 </span>
               </span>

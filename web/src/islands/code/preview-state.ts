@@ -16,11 +16,20 @@ type LivePreviewApi = {
 type PreviewTabApi = { open(frameId: string): unknown };
 type PreviewEditsApi = { confirmBeforeStop?(frameId: string): Promise<boolean> };
 const globals = () =>
-  window as unknown as { livePreview?: LivePreviewApi; previewTab?: PreviewTabApi; previewEdits?: PreviewEditsApi };
+  window as unknown as {
+    livePreview?: LivePreviewApi;
+    previewTab?: PreviewTabApi;
+    previewEdits?: PreviewEditsApi;
+  };
 
 /** idle: not running · investigating: the agent is detecting the setup · starting: setup or server starting. */
 export type PreviewPhase = "idle" | "investigating" | "starting" | "running";
-type Entry = { status: DevServerStatus | null; starting: number; investigating: boolean; snapshot: Snapshot };
+type Entry = {
+  status: DevServerStatus | null;
+  starting: number;
+  investigating: boolean;
+  snapshot: Snapshot;
+};
 export type Snapshot = { status: DevServerStatus | null; phase: PreviewPhase };
 
 const entries = new Map<string, Entry>();
@@ -69,7 +78,8 @@ export function refreshPreview(root: string | null | undefined): Promise<void> {
   return next;
 }
 /** Tell every preview surface that the dev server of `root` may have changed. */
-export const announce = (root: string) => window.dispatchEvent(new CustomEvent("bd:dev-server-changed", { detail: { root } }));
+export const announce = (root: string) =>
+  window.dispatchEvent(new CustomEvent("bd:dev-server-changed", { detail: { root } }));
 
 export function usePreview(root: string | null | undefined): Snapshot {
   const snapshot = useSyncExternalStore(
@@ -121,10 +131,22 @@ export function previewFrame(state: ChatState): string | null {
 
 /** The frame of this chat's preview, without creating one. */
 function existingFrame(state: ChatState): string | null {
-  const doc = (window as unknown as { design?: { getDocument(): { pages: { nodes: { id: string; preview?: { root?: string; chatId?: string } }[] }[] } } }).design?.getDocument();
+  const doc = (
+    window as unknown as {
+      design?: {
+        getDocument(): {
+          pages: { nodes: { id: string; preview?: { root?: string; chatId?: string } }[] }[];
+        };
+      };
+    }
+  ).design?.getDocument();
   const node = doc?.pages
     .flatMap((page) => page.nodes)
-    .find((n) => n.preview?.root === state.activeRoot && (n.preview?.chatId || "") === (state.conversationId || ""));
+    .find(
+      (n) =>
+        n.preview?.root === state.activeRoot &&
+        (n.preview?.chatId || "") === (state.conversationId || ""),
+    );
   return node?.id ?? null;
 }
 
@@ -144,7 +166,10 @@ export function goToPreview(state: ChatState) {
 
 export function openInBrowser(root: string) {
   const url = entryFor(root).status?.url;
-  if (url) void (desktop() as { openExternal?(url: string): Promise<unknown> } | undefined)?.openExternal?.(url);
+  if (url)
+    void (
+      desktop() as { openExternal?(url: string): Promise<unknown> } | undefined
+    )?.openExternal?.(url);
 }
 
 /** "Open in a tab ⌘⌥P" (the tab is owned by window.previewTab); a separate window when no tab support exists. */
@@ -195,7 +220,9 @@ export async function startPreview(state: ChatState): Promise<DevServerStatus | 
   announce(root);
   if (!state.codeMode) workspace()?.openChat?.();
   previewFrame(state);
-  window.dispatchEvent(new CustomEvent("bd:preview-setup-state", { detail: { root, state: "starting", message: "" } }));
+  window.dispatchEvent(
+    new CustomEvent("bd:preview-setup-state", { detail: { root, state: "starting", message: "" } }),
+  );
   setStatus("Starting the preview…");
   try {
     const next = await api.start({ root });
@@ -205,16 +232,23 @@ export async function startPreview(state: ChatState): Promise<DevServerStatus | 
       setStatus(`Preview running at ${next.url}`);
       if (!state.codeMode) globals().livePreview?.show(next.url, details(state));
     } else if (next.state !== "starting") {
-      const message = next.error || next.tail?.split("\n").slice(-2).join(" ") || "The app did not start.";
+      const message =
+        next.error || next.tail?.split("\n").slice(-2).join(" ") || "The app did not start.";
       setStatus(message);
       // The frame card shows the exit code and command from this status (header-started runs too).
-      window.dispatchEvent(new CustomEvent("bd:preview-setup-state", { detail: { root, state: "failed", message, status: next } }));
+      window.dispatchEvent(
+        new CustomEvent("bd:preview-setup-state", {
+          detail: { root, state: "failed", message, status: next },
+        }),
+      );
     }
     return next;
   } catch (error) {
     const message = errorMessage(error);
     setStatus(message);
-    window.dispatchEvent(new CustomEvent("bd:preview-setup-state", { detail: { root, state: "failed", message } }));
+    window.dispatchEvent(
+      new CustomEvent("bd:preview-setup-state", { detail: { root, state: "failed", message } }),
+    );
     return null;
   } finally {
     update(root, { starting: Math.max(0, entryFor(root).starting - 1) });

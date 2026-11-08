@@ -27,12 +27,12 @@ document names, chat content and account details are left out.
 
 ## Task 1: migration on a real profile copy
 
-| | file:// before | app:// after migration | file:// after |
-|---|---|---|---|
-| localStorage keys | 16 | 16 | 16 |
-| bytes (UTF-16, key+value) | 2,687,780 | 2,687,780 | 2,687,780 |
-| identical SHA-256 vs baseline | n/a | 16/16 | 16/16 |
-| IndexedDB databases | none | none | none |
+|                               | file:// before | app:// after migration | file:// after |
+| ----------------------------- | -------------- | ---------------------- | ------------- |
+| localStorage keys             | 16             | 16                     | 16            |
+| bytes (UTF-16, key+value)     | 2,687,780      | 2,687,780              | 2,687,780     |
+| identical SHA-256 vs baseline | n/a            | 16/16                  | 16/16         |
+| IndexedDB databases           | none           | none                   | none          |
 
 Key groups: the document model (`verynize-v2`), the file library (`verynize-library-v1`, ~0.4 M chars),
 chats and drafts per project and unattached (`better-agent-chats:*`, `better-agent-drafts:*`, ~1.9 M chars),
@@ -89,10 +89,10 @@ and no console errors. The `file://` data is byte-identical to the baseline.
    - After 3 failed attempts it gives up, because each attempt can block startup for up to 15 s.
    - The record now includes `replaced` and `failedKeys` (key names only).
    - Writing the marker can no longer reject `migrateStorage` and stop startup.
-   After the fix, the same real-copy scenario gives `{recovered: true, copied 7, replaced 7, kept 2}`:
-   16/16 hashes identical to the baseline and 5 files on the home screen.
-   Regression test: `tests/storage-migration.cjs`, added to `test:desktop`. It fails on the old code at
-   "file:// data wins over defaults".
+     After the fix, the same real-copy scenario gives `{recovered: true, copied 7, replaced 7, kept 2}`:
+     16/16 hashes identical to the baseline and 5 files on the home screen.
+     Regression test: `tests/storage-migration.cjs`, added to `test:desktop`. It fails on the old code at
+     "file:// data wins over defaults".
 3. **Near quota.** In this Electron build, filling localStorage until `setItem` throws stops at about
    52.4 M chars (about 100 MB UTF-16) per origin. A real copy padded to the limit (216 keys, 104,856,440 bytes)
    migrated in 848 ms, with 216/216 identical hashes and nothing failed. Passing the data through
@@ -109,21 +109,21 @@ files. Reload kept `/editor`, and there were no console errors. The full flow ra
 `_electron.launch({args: ['.', '--user-data-dir=…']})`, which is the same `electron .`. It ran on a second
 fresh copy for this branch and on a third fresh copy for detached `origin/staging`:
 
-| Step | spike/app-router (this branch) | staging (file://) |
-|---|---|---|
-| Launch | `app://verynize/editor`, 5 files | `file://…/web/index.html`, 5 files |
-| Files tab → home | `app://verynize/` | home (URL unchanged) |
-| Back | `/editor`, editor view | no-op: stays on home |
-| Forward | `/`, home | no-op |
-| ⌘R (menu `CmdOrCtrl+R`) on `/` | stays on `/`, home view, styles loaded | comes back as **editor** |
-| ⌘R on `/editor` | `/editor`, editor | editor |
-| Settings | opens | opens |
-| New file (name prompt) | 6 files, new document opens | same |
-| R + drag rectangle | 0 → 1 layer | same |
-| Save (menu, stubbed dialog → /tmp) | `.verynize.json` written with 1 node | same |
-| Open project folder (stubbed dialog → /tmp) | ok | ok |
-| Quit + relaunch | 6 files, new document reopened with its rectangle | same |
-| Console errors/warnings (excluding Electron's dev CSP warning) | none | none |
+| Step                                                           | spike/app-router (this branch)                    | staging (file://)                  |
+| -------------------------------------------------------------- | ------------------------------------------------- | ---------------------------------- |
+| Launch                                                         | `app://verynize/editor`, 5 files                  | `file://…/web/index.html`, 5 files |
+| Files tab → home                                               | `app://verynize/`                                 | home (URL unchanged)               |
+| Back                                                           | `/editor`, editor view                            | no-op: stays on home               |
+| Forward                                                        | `/`, home                                         | no-op                              |
+| ⌘R (menu `CmdOrCtrl+R`) on `/`                                 | stays on `/`, home view, styles loaded            | comes back as **editor**           |
+| ⌘R on `/editor`                                                | `/editor`, editor                                 | editor                             |
+| Settings                                                       | opens                                             | opens                              |
+| New file (name prompt)                                         | 6 files, new document opens                       | same                               |
+| R + drag rectangle                                             | 0 → 1 layer                                       | same                               |
+| Save (menu, stubbed dialog → /tmp)                             | `.verynize.json` written with 1 node              | same                               |
+| Open project folder (stubbed dialog → /tmp)                    | ok                                                | ok                                 |
+| Quit + relaunch                                                | 6 files, new document reopened with its rectangle | same                               |
+| Console errors/warnings (excluding Electron's dev CSP warning) | none                                              | none                               |
 
 Nothing regressed versus staging. Back/Forward and reload-on-home are new behaviour that works.
 

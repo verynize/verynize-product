@@ -6,27 +6,74 @@
   "viewport": { "width": 1280, "height": 800, "capture": "viewport" },
   "prompt": "Recreate the attached reference screen as faithfully as possible as an editable design at 1280x800. Match layout, spacing, type sizes and weights, colors, corner radii, borders and copy exactly. Do not redesign, add or remove anything. The fonts are Inter (UI) and a system monospace such as SF Mono or Menlo (hashes and durations); if a font is unavailable, use the closest match and say so.",
   "requiredContent": ["Everything visible in eval/references/07-reference.png"],
-  "constraints": ["1280x800 single artboard", "No additions or omissions", "Copy must match character for character"],
-  "assetsAllowed": { "icons": true, "photos": false, "generatedImages": false, "avatars": false, "customFonts": true },
+  "constraints": [
+    "1280x800 single artboard",
+    "No additions or omissions",
+    "Copy must match character for character"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": false,
+    "generatedImages": false,
+    "avatars": false,
+    "customFonts": true
+  },
   "inputs": [
     { "role": "reference image (attach this)", "path": "eval/references/07-reference.png" },
-    { "role": "source of truth for scoring (do not give to the app)", "path": "eval/references/07-reference.html" }
+    {
+      "role": "source of truth for scoring (do not give to the app)",
+      "path": "eval/references/07-reference.html"
+    }
   ],
   "budget": { "maxMinutes": 20, "followUpTurns": 0 },
-  "scoring": { "pixelDiff": "optional: compare with eval/references/07-reference.png at 1280x800", "judgeAlsoGetsReference": true },
+  "scoring": {
+    "pixelDiff": "optional: compare with eval/references/07-reference.png at 1280x800",
+    "judgeAlsoGetsReference": true
+  },
   "checklist": [
-    { "id": "c01", "text": "Overall layout matches: left sidebar (~248px), top bar, main area with header row, 3 stat cards and a deployments list on the left and an activity panel on the right." },
-    { "id": "c02", "text": "Sidebar items match in text and order (Overview, Deployments active, Domains, Logs, Usage, Settings) and the workspace name \"Halyard Labs\" appears." },
-    { "id": "c03", "text": "The page title reads \"Deployments\" with the subtitle text matching the reference." },
-    { "id": "c04", "text": "Three stat cards show exactly: \"Builds today 128\", \"Median build 1m 42s\", \"Error rate 0.8%\" (with their deltas)." },
-    { "id": "c05", "text": "The deployments list has the same 5 rows with matching commit messages, branches, status badges and times." },
-    { "id": "c06", "text": "Status badge colors match the reference (Ready green, Building amber, Failed red)." },
+    {
+      "id": "c01",
+      "text": "Overall layout matches: left sidebar (~248px), top bar, main area with header row, 3 stat cards and a deployments list on the left and an activity panel on the right."
+    },
+    {
+      "id": "c02",
+      "text": "Sidebar items match in text and order (Overview, Deployments active, Domains, Logs, Usage, Settings) and the workspace name \"Halyard Labs\" appears."
+    },
+    {
+      "id": "c03",
+      "text": "The page title reads \"Deployments\" with the subtitle text matching the reference."
+    },
+    {
+      "id": "c04",
+      "text": "Three stat cards show exactly: \"Builds today 128\", \"Median build 1m 42s\", \"Error rate 0.8%\" (with their deltas)."
+    },
+    {
+      "id": "c05",
+      "text": "The deployments list has the same 5 rows with matching commit messages, branches, status badges and times."
+    },
+    {
+      "id": "c06",
+      "text": "Status badge colors match the reference (Ready green, Building amber, Failed red)."
+    },
     { "id": "c07", "text": "Commit hashes/durations use a monospaced face as in the reference." },
-    { "id": "c08", "text": "The primary button \"New deployment\" matches color (near-black) and position (top right of header)." },
-    { "id": "c09", "text": "Card corner radii and 1px borders resemble the reference (no heavy shadows added)." },
+    {
+      "id": "c08",
+      "text": "The primary button \"New deployment\" matches color (near-black) and position (top right of header)."
+    },
+    {
+      "id": "c09",
+      "text": "Card corner radii and 1px borders resemble the reference (no heavy shadows added)."
+    },
     { "id": "c10", "text": "The activity panel contains the same 4 entries in the same order." },
-    { "id": "c11", "text": "Nothing was added that is not in the reference (extra charts, illustrations, extra buttons)." },
+    {
+      "id": "c11",
+      "text": "Nothing was added that is not in the reference (extra charts, illustrations, extra buttons)."
+    },
     { "id": "c12", "text": "No text is clipped, overlapping, or overflowing.", "critical": true },
-    { "id": "c13", "text": "Copy differs from the reference in no more than two places.", "critical": true }
+    {
+      "id": "c13",
+      "text": "Copy differs from the reference in no more than two places.",
+      "critical": true
+    }
   ]
 }

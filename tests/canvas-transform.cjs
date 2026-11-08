@@ -13,14 +13,16 @@ const fs = require("node:fs/promises"),
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "canvas-transform-")),
     env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
     timeout: 20000,
   });
   try {
-    const page = await app.firstWindow({ timeout: 20000 }); await moveOffCursor(app);
+    const page = await app.firstWindow({ timeout: 20000 });
+    await moveOffCursor(app);
     const installTrace = () => {
       window.__inputTrace = [];
       for (const type of [

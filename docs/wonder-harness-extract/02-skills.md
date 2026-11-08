@@ -1,6 +1,4 @@
-
-
----
+***
 
 ## get_skills {"skill": "code-to-design"}
 
@@ -40,7 +38,6 @@ Keep the source's structure, text, labels and var() references exactly as writte
 
 A repo-owned image (a logo, hero photo or illustration) is part of the reproduction. prepare_image_upload returns a single-use upload URL: PUT the original file's bytes to it and use the `imageUrl` it returns. Avatars and logos never load from external URLs.
 
-
 ---
 
 ## get_skills {"skill": "design-library"}
@@ -70,7 +67,6 @@ get_design_tokens lists the tokens with their `cssVar`. create_design_tokens app
 To extract tokens from an existing design, look for the values that recur (a colour in several places, a repeated spacing step, the heading and body fonts, a shared radius), create them, then rewrite each element that used a value to reference its token, so editing the token restyles the design.
 
 When a repository value meets a file token of the same name and a different value, keep the user's token and name the conflict in your reply; a token with another name and the same value is reused.
-
 
 ---
 
@@ -113,7 +109,6 @@ Edit the files in place with small, exact replacements and leave them uncommitte
 
 Reply with your edits, the components you reused or extended, each new component with its reason, and the values left as literals.
 
-
 ---
 
 ## get_skills {"skill": "edit-design"}
@@ -135,7 +130,6 @@ For a reported problem, look at a screenshot of the area and read its code, find
 For feedback, look at a screenshot and the structure, then give one to five concrete improvements. Give each finding as the element, the change and the design principle it serves, most important first. The principles are hierarchy, spacing, type, colour, contrast, composition, clutter and content. Load new-design-references when real-world references would strengthen them. Apply the ones the user picks.
 
 After a page with several sections, a set of variations, or a change that spans several sections, restructures the layout or replaces the hero, review the result once with design-review and fix what it finds.
-
 
 ---
 

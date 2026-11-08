@@ -9,7 +9,11 @@ import { cn } from "@/lib/utils";
 export const MenuRoot = Menu.Root;
 export const MenuTrigger = Menu.Trigger;
 
-export function MenuContent({ className, sideOffset = 8, ...props }: ComponentProps<typeof Menu.Content>) {
+export function MenuContent({
+  className,
+  sideOffset = 8,
+  ...props
+}: ComponentProps<typeof Menu.Content>) {
   return (
     <Menu.Portal container={portalContainer()}>
       <Menu.Content
@@ -31,11 +35,18 @@ export function MenuGroup({ className, ...props }: ComponentProps<typeof Menu.Gr
 }
 
 export function MenuLabel({ className, ...props }: ComponentProps<typeof Menu.Label>) {
-  return <Menu.Label className={cn("flex h-6.25 items-center px-1.5 text-muted-foreground", className)} {...props} />;
+  return (
+    <Menu.Label
+      className={cn("flex h-6.25 items-center px-1.5 text-muted-foreground", className)}
+      {...props}
+    />
+  );
 }
 
 export function MenuSeparator({ className, ...props }: ComponentProps<typeof Menu.Separator>) {
-  return <Menu.Separator className={cn("h-px shrink-0 bg-toolbar-divider", className)} {...props} />;
+  return (
+    <Menu.Separator className={cn("h-px shrink-0 bg-toolbar-divider", className)} {...props} />
+  );
 }
 
 const itemClass =
@@ -56,7 +67,11 @@ export function MenuPseudoLabelItem(props: ComponentProps<typeof Menu.Item>) {
   );
 }
 
-export function MenuCheckboxItem({ className, children, ...props }: ComponentProps<typeof Menu.CheckboxItem>) {
+export function MenuCheckboxItem({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof Menu.CheckboxItem>) {
   return (
     <Menu.CheckboxItem className={cn(itemClass, className)} {...props}>
       {children}

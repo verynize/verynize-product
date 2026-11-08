@@ -14,27 +14,77 @@
     "One CTA per plan",
     "FAQ link line at the bottom"
   ],
-  "constraints": ["1280x800 single artboard", "Same plans, prices and features as the original", "No new sections"],
-  "assetsAllowed": { "icons": true, "photos": false, "generatedImages": false, "avatars": false, "customFonts": true },
+  "constraints": [
+    "1280x800 single artboard",
+    "Same plans, prices and features as the original",
+    "No new sections"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": false,
+    "generatedImages": false,
+    "avatars": false,
+    "customFonts": true
+  },
   "inputs": [
     { "role": "starting screen image (attach this)", "path": "eval/references/08-start.png" },
-    { "role": "starting screen as Tailwind HTML (attach or paste for apps that accept code)", "path": "eval/references/08-start.html" },
-    { "role": "starting screen as Verynize JSX (paste via create_artboard, then ask for the refinement)", "path": "eval/references/08-start.jsx" }
+    {
+      "role": "starting screen as Tailwind HTML (attach or paste for apps that accept code)",
+      "path": "eval/references/08-start.html"
+    },
+    {
+      "role": "starting screen as Verynize JSX (paste via create_artboard, then ask for the refinement)",
+      "path": "eval/references/08-start.jsx"
+    }
   ],
   "budget": { "maxMinutes": 15, "followUpTurns": 0 },
   "checklist": [
-    { "id": "c01", "text": "All three plans with prices $0, $29 and $79 (per user/month for paid plans) are present." },
-    { "id": "c02", "text": "Each plan lists the same feature items as the original (wording may be tightened, meaning unchanged, none dropped)." },
-    { "id": "c03", "text": "Exactly one plan is visually marked as recommended (badge, border, elevation or color) and it is Team." },
-    { "id": "c04", "text": "The recommended plan's CTA is the single most prominent button on the screen." },
-    { "id": "c05", "text": "The three plan cards are equal width, top-aligned, and share identical internal padding." },
-    { "id": "c06", "text": "Prices are the largest text inside each card and use a consistent size across cards." },
-    { "id": "c07", "text": "The original's mixed alignment (centered/left mix) is resolved into a consistent alignment scheme." },
-    { "id": "c08", "text": "The original's clashing colors are replaced by a restrained palette with one accent." },
+    {
+      "id": "c01",
+      "text": "All three plans with prices $0, $29 and $79 (per user/month for paid plans) are present."
+    },
+    {
+      "id": "c02",
+      "text": "Each plan lists the same feature items as the original (wording may be tightened, meaning unchanged, none dropped)."
+    },
+    {
+      "id": "c03",
+      "text": "Exactly one plan is visually marked as recommended (badge, border, elevation or color) and it is Team."
+    },
+    {
+      "id": "c04",
+      "text": "The recommended plan's CTA is the single most prominent button on the screen."
+    },
+    {
+      "id": "c05",
+      "text": "The three plan cards are equal width, top-aligned, and share identical internal padding."
+    },
+    {
+      "id": "c06",
+      "text": "Prices are the largest text inside each card and use a consistent size across cards."
+    },
+    {
+      "id": "c07",
+      "text": "The original's mixed alignment (centered/left mix) is resolved into a consistent alignment scheme."
+    },
+    {
+      "id": "c08",
+      "text": "The original's clashing colors are replaced by a restrained palette with one accent."
+    },
     { "id": "c09", "text": "A Monthly/Yearly toggle is present and its state is clear." },
-    { "id": "c10", "text": "No new sections were added (no testimonials, logos, comparison tables)." },
+    {
+      "id": "c10",
+      "text": "No new sections were added (no testimonials, logos, comparison tables)."
+    },
     { "id": "c11", "text": "No text is clipped, overlapping, or overflowing.", "critical": true },
-    { "id": "c12", "text": "Feature list text is at least 13px with sufficient contrast.", "critical": true },
-    { "id": "c13", "text": "The refined screen is clearly better than the attached starting screen in hierarchy and spacing (judge sees both)." }
+    {
+      "id": "c12",
+      "text": "Feature list text is at least 13px with sufficient contrast.",
+      "critical": true
+    },
+    {
+      "id": "c13",
+      "text": "The refined screen is clearly better than the attached starting screen in hierarchy and spacing (judge sees both)."
+    }
   ]
 }

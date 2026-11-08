@@ -6,7 +6,6 @@ import { platform } from "@/lib/platform";
 
 export type LineStat = { added: number; removed: number; files: number };
 
-
 export function useLineStats(roots: string[], enabled: boolean): Record<string, LineStat> {
   const [stats, setStats] = useState<Record<string, LineStat>>({});
   const key = enabled ? [...new Set(roots)].sort().join("\n") : "";
@@ -25,7 +24,8 @@ export function useLineStats(roots: string[], enabled: boolean): Record<string, 
         .then((result) => {
           if (!live) return;
           const next: Record<string, LineStat> = {};
-          for (const [root, value] of Object.entries(result)) if (!("error" in value)) next[root] = value;
+          for (const [root, value] of Object.entries(result))
+            if (!("error" in value)) next[root] = value;
           setStats(next);
         })
         .catch(() => {});

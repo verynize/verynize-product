@@ -2,13 +2,7 @@ import { ImportGenerationSection } from "./import-generation";
 import { useCodexConnection } from "./codex-connection";
 // One component per settings section. Element ids and data attributes are test contracts (tests/settings.cjs).
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  CopyIcon,
-  ExternalLinkIcon,
-  GaugeIcon,
-  GlobeIcon,
-  ServerIcon,
-} from "lucide-react";
+import { CopyIcon, ExternalLinkIcon, GaugeIcon, GlobeIcon, ServerIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FigmaIcon } from "@/components/icons";
 import { AdvancedSection, ChatSoundRow } from "./preferences-extra";
@@ -40,7 +34,6 @@ type PageProps = {
   setPreference(changes: Partial<Preferences>): void;
   accounts: Record<string, string>;
 };
-
 
 function Pages({ children }: { children: ReactNode }) {
   return <div className="flex flex-col gap-12.5">{children}</div>;
@@ -133,7 +126,9 @@ function ThemePreview({ theme }: { theme: "system" | "light" | "dark" }) {
       </>
     );
   return (
-    <span className={cn("absolute inset-0", theme === "light" ? "bg-preview-light" : "bg-preview-dark")}>
+    <span
+      className={cn("absolute inset-0", theme === "light" ? "bg-preview-light" : "bg-preview-dark")}
+    >
       {card(theme)}
     </span>
   );
@@ -172,7 +167,10 @@ export function PreferencesPage({ preferences, setPreference }: PageProps) {
         <Section id="settings-notifications" title="Notifications">
           <Card>
             <ChatSoundRow preferences={preferences} setPreference={setPreference} />
-            <Row title="Desktop notifications" description="Alerts when a chat finishes or needs you.">
+            <Row
+              title="Desktop notifications"
+              description="Alerts when a chat finishes or needs you."
+            >
               <Toggle
                 aria-label="Desktop notifications"
                 data-pref="notifications"
@@ -200,7 +198,10 @@ export function PreferencesPage({ preferences, setPreference }: PageProps) {
                 ))}
               </div>
             </Row>
-            <Row title="Reduce motion" description="Pause animated gradients and use calmer transitions.">
+            <Row
+              title="Reduce motion"
+              description="Pause animated gradients and use calmer transitions."
+            >
               <Toggle
                 aria-label="Reduce motion"
                 data-pref="reduceMotion"
@@ -232,7 +233,11 @@ export function PreferencesPage({ preferences, setPreference }: PageProps) {
                 ))}
               </div>
             </Row>
-            <Row title="Small nudge" description="How far an arrow key moves a layer, in pixels." htmlFor="settings-small-nudge">
+            <Row
+              title="Small nudge"
+              description="How far an arrow key moves a layer, in pixels."
+              htmlFor="settings-small-nudge"
+            >
               <CommitField
                 id="settings-small-nudge"
                 data-pref="smallNudge"
@@ -314,7 +319,11 @@ export function AgentsPage({ api, accounts }: PageProps) {
         <Section
           id="settings-agent-runtime"
           title="How agents run"
-          description={codexConnected ? "Claude runs through your Claude Code install. Codex runs locally through app-server using your ChatGPT connection." : "Claude runs through the Claude Agent SDK on your Claude Code install."}
+          description={
+            codexConnected
+              ? "Claude runs through your Claude Code install. Codex runs locally through app-server using your ChatGPT connection."
+              : "Claude runs through the Claude Agent SDK on your Claude Code install."
+          }
         >
           <Card>
             <Row
@@ -328,7 +337,11 @@ export function AgentsPage({ api, accounts }: PageProps) {
             </Row>
           </Card>
         </Section>
-        <Section id="settings-agent-about" title="About" description="The design tool set agents use on the canvas.">
+        <Section
+          id="settings-agent-about"
+          title="About"
+          description="The design tool set agents use on the canvas."
+        >
           <Card>
             <Row
               title="Design tools version"
@@ -373,7 +386,9 @@ export function ModelsPage({ api }: PageProps) {
   const effectiveAgent = agent === "codex" && !codexConnected ? "claude" : agent;
   const effectiveModel = effectiveAgent === agent ? model : "";
   const effectiveEffort = effectiveAgent === agent ? effort : "";
-  const [access, setAccess] = useState(legacyAccess[initial.access ?? ""] || initial.access || "edit");
+  const [access, setAccess] = useState(
+    legacyAccess[initial.access ?? ""] || initial.access || "edit",
+  );
   return (
     <>
       <PageHeader title="Default Models" />
@@ -384,7 +399,11 @@ export function ModelsPage({ api }: PageProps) {
           description="Choose your agent and model. Leave the model blank to use the CLI’s configured default."
         >
           <Card>
-            <Row title="Agent" description="Provider for new tasks." htmlFor="settings-default-agent">
+            <Row
+              title="Agent"
+              description="Provider for new tasks."
+              htmlFor="settings-default-agent"
+            >
               <NativeSelect
                 id="settings-default-agent"
                 className="w-44"
@@ -395,7 +414,11 @@ export function ModelsPage({ api }: PageProps) {
                 <option value="claude">Claude</option>
               </NativeSelect>
             </Row>
-            <Row title="Model" description="Enter a model ID supported by your account." htmlFor="settings-default-model">
+            <Row
+              title="Model"
+              description="Enter a model ID supported by your account."
+              htmlFor="settings-default-model"
+            >
               <TextField
                 id="settings-default-model"
                 className="w-44"
@@ -444,7 +467,14 @@ export function ModelsPage({ api }: PageProps) {
             <SettingsButton
               id="settings-save-models"
               variant="primary"
-              onClick={() => api.actions.saveModels({ agent: effectiveAgent, model: effectiveModel.trim(), effort: effectiveEffort, access })}
+              onClick={() =>
+                api.actions.saveModels({
+                  agent: effectiveAgent,
+                  model: effectiveModel.trim(),
+                  effort: effectiveEffort,
+                  access,
+                })
+              }
             >
               Save defaults
             </SettingsButton>
@@ -518,7 +548,9 @@ export function ConnectionsPage({ api, preferences }: PageProps) {
               description={
                 <>
                   Use the local design server from your preferred agent:{" "}
-                  <code className="font-mono text-xs text-foreground-3">npm run mcp -- --root /absolute/design-folder</code>
+                  <code className="font-mono text-xs text-foreground-3">
+                    npm run mcp -- --root /absolute/design-folder
+                  </code>
                 </>
               }
             >

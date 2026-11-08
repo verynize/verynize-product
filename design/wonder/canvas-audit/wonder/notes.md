@@ -336,9 +336,8 @@ Authoritative K1-open-verified and K1-scroll-01…09.png. Continuous right drawe
 
 Measurements / RGB: Drawer320wide, text inset12, rows32pitch; input32high; background(28,28,28), purple focus. No action invoked from listing.
 
-
-
 Shortcut transcription (reading order; key symbols normalized to macOS notation; these are advertised bindings, not all behaviorally verified):
+
 - APPLICATION: Command palette⌘K; Go to settings⌘,.
 - TOOLS: Move toolV; Scale toolK; Hand toolH; Temporary hand toolSpace; Frame toolF; Text toolT; Shader toolS; Eye dropperI; Eye dropper(alt)⌃C.
 - EDIT: Copy⌘C; Copy as code⌘⇧C; Copy styles⌘⌥C; Copy prompt⌘⇧⌥C; Paste⌘V; Paste styles⌘⌥V; Paste to replace⌘⇧R; Paste over selection⌘⇧V; Cut⌘X; Undo⌘Z; Redo⌘⇧Z; Redo(alt)⌘Y; Duplicate⌘D; Delete⌫; Select all⌘A; RenameF2; Rename layer⌘R.

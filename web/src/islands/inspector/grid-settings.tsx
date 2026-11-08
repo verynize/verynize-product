@@ -124,7 +124,10 @@ function Tracks({ axis, node, selection }: Props & { axis: Axis }) {
     patchNodes(selection, (m) => {
       const k = count(m, axis);
       const next = [...weightsOf(m, axis, k), 1];
-      return { [axis]: Math.min(MAX_TRACKS, k + 1), ...sizesPatch(axis, next.slice(0, MAX_TRACKS)) };
+      return {
+        [axis]: Math.min(MAX_TRACKS, k + 1),
+        ...sizesPatch(axis, next.slice(0, MAX_TRACKS)),
+      };
     });
   const remove = (index: number) =>
     patchNodes(selection, (m) => {

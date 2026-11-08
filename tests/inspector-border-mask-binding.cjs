@@ -19,14 +19,16 @@ const PNG =
   await fs.writeFile(imagePath, Buffer.from(PNG, "base64"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
     timeout: 20000,
   });
   try {
-    let page = await app.firstWindow({ timeout: 20000 }); await moveOffCursor(app);
+    let page = await app.firstWindow({ timeout: 20000 });
+    await moveOffCursor(app);
     await page.waitForSelector("#canvas .layer");
     const doc = () => page.evaluate(() => window.design.getDocument());
     const node = (id) =>
@@ -131,8 +133,7 @@ const PNG =
     );
     await page.locator("[data-bound-color=strokeColor]").hover();
     await page.waitForFunction(
-      () =>
-        getComputedStyle(document.querySelector("[data-detach-token]")).opacity === "1",
+      () => getComputedStyle(document.querySelector("[data-detach-token]")).opacity === "1",
     );
     await detach.click();
     n = await node("card");

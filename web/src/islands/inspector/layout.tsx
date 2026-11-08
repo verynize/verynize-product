@@ -407,7 +407,12 @@ function SizeField({
         .filter((n) => wanted.has(n.id))
         .map((n) => {
           const c = choiceOf(n, axis, parentOf(doc, n));
-          const v = c === "relative" ? fmt(n[k.pct]) : c === "calc" ? String(n[k.calc] ?? "") : fmt(n[axis]);
+          const v =
+            c === "relative"
+              ? fmt(n[k.pct])
+              : c === "calc"
+                ? String(n[k.calc] ?? "")
+                : fmt(n[axis]);
           return c + ":" + v;
         }),
     ).size > 1;

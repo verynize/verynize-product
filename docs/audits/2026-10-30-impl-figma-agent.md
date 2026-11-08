@@ -4,13 +4,13 @@ Celah: "Native Figma clipboard conversion, OAuth account connection and full Fig
 
 ## Ringkasan
 
-| Bagian | Status | Bukti |
-|---|---|---|
-| Tempel (paste) lapisan dari Figma | Diimplementasikan | `tests/figma-binary.cjs`, `tests/figma-paste.cjs` (Electron, clipboard sistem asli) |
-| Impor file `.fig` (dialog + drag-drop) | Diimplementasikan | `tests/figma-binary.cjs`, `tests/figma-paste.cjs` |
-| OAuth Figma (PKCE, loopback, safeStorage, refresh, disconnect) | Diimplementasikan, **needs live credential** | `tests/figma-oauth.cjs` terhadap server OAuth fixture lokal |
-| Fidelity konversi (vektor, boolean, auto layout, constraint, efek, gradien, stroke per sisi, teks, komponen, gambar) | Diimplementasikan dengan batas tercatat | `tests/figma-binary.cjs`, `tests/figma-import.cjs` |
-| `.pen` | Tidak layak — ditolak dengan penjelasan | `tests/figma-binary.cjs`, `tests/figma-paste.cjs` |
+| Bagian                                                                                                               | Status                                       | Bukti                                                                               |
+| -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Tempel (paste) lapisan dari Figma                                                                                    | Diimplementasikan                            | `tests/figma-binary.cjs`, `tests/figma-paste.cjs` (Electron, clipboard sistem asli) |
+| Impor file `.fig` (dialog + drag-drop)                                                                               | Diimplementasikan                            | `tests/figma-binary.cjs`, `tests/figma-paste.cjs`                                   |
+| OAuth Figma (PKCE, loopback, safeStorage, refresh, disconnect)                                                       | Diimplementasikan, **needs live credential** | `tests/figma-oauth.cjs` terhadap server OAuth fixture lokal                         |
+| Fidelity konversi (vektor, boolean, auto layout, constraint, efek, gradien, stroke per sisi, teks, komponen, gambar) | Diimplementasikan dengan batas tercatat      | `tests/figma-binary.cjs`, `tests/figma-import.cjs`                                  |
+| `.pen`                                                                                                               | Tidak layak — ditolak dengan penjelasan      | `tests/figma-binary.cjs`, `tests/figma-paste.cjs`                                   |
 
 ## Arsitektur
 

@@ -27,7 +27,10 @@ function useTerminalAppearance(root: RefObject<HTMLElement | null>): TerminalApp
     };
     read();
     const observer = new MutationObserver(read);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-ui-theme", "class", "style"] });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-ui-theme", "class", "style"],
+    });
     return () => observer.disconnect();
   }, [root]);
   return appearance;
@@ -66,14 +69,18 @@ export function TerminalPanel({ cwd }: { cwd: string | null }): JSX.Element {
       if (index < 0) return;
       const rest = current.filter((tab) => tab.key !== key);
       setTabs(rest);
-      setActive((selected) => (selected === key ? (rest[Math.min(index, rest.length - 1)]?.key ?? null) : selected));
+      setActive((selected) =>
+        selected === key ? (rest[Math.min(index, rest.length - 1)]?.key ?? null) : selected,
+      );
     },
     [setTabs],
   );
 
   const labelTab = useCallback(
     (key: number, session: TerminalSession) => {
-      setTabs(tabsRef.current.map((tab) => (tab.key === key ? { ...tab, label: session.shell } : tab)));
+      setTabs(
+        tabsRef.current.map((tab) => (tab.key === key ? { ...tab, label: session.shell } : tab)),
+      );
     },
     [setTabs],
   );
@@ -88,8 +95,16 @@ export function TerminalPanel({ cwd }: { cwd: string | null }): JSX.Element {
   const showTerminals = cwd !== null && available;
 
   return (
-    <div ref={rootRef} data-slot="terminal-panel" className="flex size-full min-h-0 flex-col bg-terminal text-foreground-2">
-      <div role="tablist" aria-label="Terminals" className="flex h-10 shrink-0 items-center gap-1 border-b border-border px-1.5">
+    <div
+      ref={rootRef}
+      data-slot="terminal-panel"
+      className="flex size-full min-h-0 flex-col bg-terminal text-foreground-2"
+    >
+      <div
+        role="tablist"
+        aria-label="Terminals"
+        className="flex h-10 shrink-0 items-center gap-1 border-b border-border px-1.5"
+      >
         {tabs.map((tab) => {
           const label = tab.label ?? "Terminal";
           const selected = tab.key === active;
@@ -114,7 +129,10 @@ export function TerminalPanel({ cwd }: { cwd: string | null }): JSX.Element {
               >
                 {label}
               </button>
-              <SquareTerminalIcon aria-hidden className="pointer-events-none absolute left-1.5 size-3.5 group-hover:invisible" />
+              <SquareTerminalIcon
+                aria-hidden
+                className="pointer-events-none absolute left-1.5 size-3.5 group-hover:invisible"
+              />
               <button
                 type="button"
                 aria-label={`Close ${label}`}
@@ -139,7 +157,9 @@ export function TerminalPanel({ cwd }: { cwd: string | null }): JSX.Element {
       <div className="relative min-h-0 flex-1">
         {showTerminals ? null : (
           <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-xs text-muted-foreground">
-            {available ? "Open a repository to use the terminal" : "The terminal is available in the Verynize desktop app"}
+            {available
+              ? "Open a repository to use the terminal"
+              : "The terminal is available in the Verynize desktop app"}
           </div>
         )}
         {showTerminals && tabs.length === 0 ? (

@@ -1,5 +1,16 @@
 // Layer type icons for the layer tree. Glyphs come from lucide or the shared set in @/components/icons.
-import { AppWindow, Circle, Frame, Image as ImageIcon, LayoutGrid, PenTool, Square, Star, Type, type LucideIcon } from "lucide-react";
+import {
+  AppWindow,
+  Circle,
+  Frame,
+  Image as ImageIcon,
+  LayoutGrid,
+  PenTool,
+  Square,
+  Star,
+  Type,
+  type LucideIcon,
+} from "lucide-react";
 import {
   ComponentInstanceIcon,
   ComponentMainIcon,
@@ -25,7 +36,14 @@ export function LayerTypeIcon({
   node,
   className,
 }: {
-  node: { type: string; layout?: unknown; direction?: unknown; ellipse?: unknown; preview?: unknown; role?: string };
+  node: {
+    type: string;
+    layout?: unknown;
+    direction?: unknown;
+    ellipse?: unknown;
+    preview?: unknown;
+    role?: string;
+  };
   className?: string;
 }) {
   // Components (Figma 25): filled four-diamond main, hollow diamond instance, square-plus slot.

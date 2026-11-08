@@ -23,9 +23,17 @@ function renameDocument(name: string) {
 function useVisibilityLabel() {
   const cloud = useCloudState();
   if (cloud.connected && cloud.visibility === "public")
-    return { public: true, aria: "Public file · Share settings", tip: "Public · Anyone with the link" };
+    return {
+      public: true,
+      aria: "Public file · Share settings",
+      tip: "Public · Anyone with the link",
+    };
   if (cloud.connected)
-    return { public: false, aria: "Shared file · Share settings", tip: "Private · Only members can access" };
+    return {
+      public: false,
+      aria: "Shared file · Share settings",
+      tip: "Private · Only members can access",
+    };
   return { public: false, aria: "Private file · Share", tip: "Private · Share" };
 }
 
@@ -101,7 +109,11 @@ export function FileHeader({ onCollapse }: { onCollapse: () => void }) {
         </TooltipTrigger>
         <TooltipContent side="bottom">{visibility.tip}</TooltipContent>
       </Tooltip>
-      <IconButton label="Hide sidebar" className="ml-2.75 text-muted-foreground" onClick={onCollapse}>
+      <IconButton
+        label="Hide sidebar"
+        className="ml-2.75 text-muted-foreground"
+        onClick={onCollapse}
+      >
         <PanelLeftIcon className="size-4" />
       </IconButton>
     </div>

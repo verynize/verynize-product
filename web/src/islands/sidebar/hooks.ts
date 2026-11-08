@@ -25,7 +25,8 @@ export function useDesignSlice<T>(select: (doc: DesignDocument) => T): T {
     });
   }, []);
   const key = useSyncExternalStore(subscribe, () => {
-    if (keyRef.current === null) keyRef.current = JSON.stringify(selectRef.current(design().getDocument()));
+    if (keyRef.current === null)
+      keyRef.current = JSON.stringify(selectRef.current(design().getDocument()));
     return keyRef.current;
   });
   return useMemo(() => JSON.parse(key) as T, [key]);
@@ -43,7 +44,10 @@ export function useDocSummary(): DocSummary {
 }
 
 /** Only the fields the layer tree renders. */
-export type TreeNode = Pick<LayerNode, "id" | "name" | "type" | "parentId" | "hidden" | "locked"> & {
+export type TreeNode = Pick<
+  LayerNode,
+  "id" | "name" | "type" | "parentId" | "hidden" | "locked"
+> & {
   layout?: string;
   direction?: string;
   ellipse?: boolean;
@@ -90,7 +94,9 @@ export function useLayerPreview(): LayerPreview {
 export function applyLayerPreview(nodes: TreeNode[], preview: LayerPreview): TreeNode[] {
   if (!preview) return nodes;
   const ids = new Set(preview.ids);
-  const moved = nodes.filter((n) => ids.has(n.id)).map((n) => ({ ...n, parentId: preview.parentId }));
+  const moved = nodes
+    .filter((n) => ids.has(n.id))
+    .map((n) => ({ ...n, parentId: preview.parentId }));
   if (!moved.length) return nodes;
   const rest = nodes.filter((n) => !ids.has(n.id));
   const siblings = rest.filter((n) => (n.parentId || null) === preview.parentId);

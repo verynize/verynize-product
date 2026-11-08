@@ -79,14 +79,16 @@ s.__reactFiber$fixture={_debugSource:{fileName:'/repo/src/components/Fiber.jsx',
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "capture-remote-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
     timeout: 20000,
   });
   try {
-    const page = await app.firstWindow({ timeout: 20000 }); await moveOffCursor(app);
+    const page = await app.firstWindow({ timeout: 20000 });
+    await moveOffCursor(app);
     await page.waitForFunction(() => !!window.desktop?.captureRemote && !!window.webCapture);
     const { validateDocument } = await import("../integrations/design-store.mjs");
 
@@ -316,7 +318,9 @@ s.__reactFiber$fixture={_debugSource:{fileName:'/repo/src/components/Fiber.jsx',
     await page.locator("#live-frame").waitFor();
     await page.frameLocator("#live-frame").locator("#cta").waitFor();
     // The frame toolbar no longer has a region button (Wonder parity); the picker stays reachable through the API.
-    await page.evaluate(() => { void window.livePreview.captureRegion(); });
+    await page.evaluate(() => {
+      void window.livePreview.captureRegion();
+    });
     const wrap = await page.locator("#live-preview .live-frame-wrap").boundingBox();
     const frameScale = await page
       .locator("#live-frame")
@@ -377,7 +381,9 @@ s.__reactFiber$fixture={_debugSource:{fileName:'/repo/src/components/Fiber.jsx',
     );
     assert.ok(JSON.stringify(live.children).includes("Get started"));
     // Escape cancels the picker without capturing.
-    await page.evaluate(() => { void window.livePreview.captureRegion(); });
+    await page.evaluate(() => {
+      void window.livePreview.captureRegion();
+    });
     await page.locator("#live-preview .capture-picker").waitFor();
     await page.keyboard.press("Escape");
     assert.equal(await page.locator("#live-preview .capture-picker").count(), 0);

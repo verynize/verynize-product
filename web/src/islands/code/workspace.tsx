@@ -1,6 +1,13 @@
 // Code workspace layout (Wonder code mode): sidebar | chat column (toolbar, transcript + composer or file editor)
 // | files + terminal panel. The window title bar stays on top (chrome island) and hosts the breadcrumb.
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import { createPortal } from "react-dom";
 import { useBodyClass } from "@/lib/bridge";
 import { cn } from "@/lib/utils";
@@ -82,7 +89,9 @@ function useSplit() {
     handle.addEventListener("pointerup", up);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const current = panel.current?.querySelector<HTMLElement>("#code-files")?.getBoundingClientRect().height ?? 300;
+    const current =
+      panel.current?.querySelector<HTMLElement>("#code-files")?.getBoundingClientRect().height ??
+      300;
     if (event.key === "ArrowUp" || event.key === "ArrowDown") {
       event.preventDefault();
       commit(current + (event.key === "ArrowUp" ? -24 : 24));
@@ -110,12 +119,18 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
   useEffect(() => rootChanged(root), [root]);
   // A project opened outside the list (legacy openProject) appears once the registry knows it.
   useEffect(() => {
-    if (state.projectKey !== QUICK && !repositoryByKey(state.projectKey)) void refresh().catch(() => {});
+    if (state.projectKey !== QUICK && !repositoryByKey(state.projectKey))
+      void refresh().catch(() => {});
   }, [state.projectKey]);
 
   useEffect(() => {
     const onKey = (event: globalThis.KeyboardEvent) => {
-      if (!document.body.classList.contains("code-mode") || !(event.metaKey || event.ctrlKey) || event.altKey) return;
+      if (
+        !document.body.classList.contains("code-mode") ||
+        !(event.metaKey || event.ctrlKey) ||
+        event.altKey
+      )
+        return;
       const key = event.key.toLowerCase();
       if (key === "b") {
         event.preventDefault();
@@ -139,7 +154,12 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
   const togglePanel = () => setPanelOpen((open) => !open);
 
   return (
-    <div id="code-workspace" aria-label="Code workspace" data-route-owner={routed ? "start" : undefined} className={cn("fixed inset-0 z-30 flex bg-settings text-foreground-2", !codeMode && "hidden")}>
+    <div
+      id="code-workspace"
+      aria-label="Code workspace"
+      data-route-owner={routed ? "start" : undefined}
+      className={cn("fixed inset-0 z-30 flex bg-settings text-foreground-2", !codeMode && "hidden")}
+    >
       {slot && createPortal(<Breadcrumb state={state} />, slot)}
       {codeMode && !sidebarCollapsed && <CodeSidebar state={state} />}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -147,13 +167,23 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
         <div className="h-chrome shrink-0 border-b border-border" />
         <div className="flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
-            {codeMode && <Toolbar state={state} panelOpen={panelOpen} onTogglePanel={togglePanel} />}
+            {codeMode && (
+              <Toolbar state={state} panelOpen={panelOpen} onTogglePanel={togglePanel} />
+            )}
             {!file && <ChatTabs state={state} />}
             {file && <FileEditor file={file} />}
-            <div ref={chatHost} id="code-chat-host" className={cn("flex min-h-0 flex-1 flex-col", file && "hidden")} />
+            <div
+              ref={chatHost}
+              id="code-chat-host"
+              className={cn("flex min-h-0 flex-1 flex-col", file && "hidden")}
+            />
           </div>
           {panelOpen && (
-            <aside id="code-panel" aria-label="Files and terminal" className="m-0 flex w-code-panel shrink-0 flex-col border-l border-border bg-background p-0">
+            <aside
+              id="code-panel"
+              aria-label="Files and terminal"
+              className="m-0 flex w-code-panel shrink-0 flex-col border-l border-border bg-background p-0"
+            >
               <div className="flex h-10 shrink-0 items-center justify-end gap-2 border-b border-border px-2">
                 {codeMode && <ChangesButton state={state} />}
               </div>

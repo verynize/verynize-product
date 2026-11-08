@@ -13,7 +13,8 @@ const path = require("node:path");
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "use-as-mask-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = "1"; env.VERYNIZE_LAUNCH_EDITOR = "1";
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
@@ -319,7 +320,11 @@ const path = require("node:path");
     assert.equal(all[at].masks, undefined);
     assert.deepEqual(await selection(), [shape.id]);
     assert.equal(shape.radius, 0);
-    assert.equal(shape.clipContent, true, "the detached Frame clips its content (P5-detached-layer-inspector)");
+    assert.equal(
+      shape.clipContent,
+      true,
+      "the detached Frame clips its content (P5-detached-layer-inspector)",
+    );
     assert.equal(await page.getByRole("checkbox", { name: "Clip content" }).isChecked(), true);
     const detached = await box(shape.id);
     near(

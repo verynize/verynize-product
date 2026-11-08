@@ -277,7 +277,10 @@ function registerAgentProfiles(handle, { userData, store = null, usage = null, s
   handle("agentProfilesRemove", async (options) => {
     const profile = await profiles.find(options?.id);
     let signout;
-    if (profile.agent === 'codex' && siwc) { require('./agent-auth.cjs').accountChanged('codex', profile.id); signout = await siwc.logout(profile.id); }
+    if (profile.agent === "codex" && siwc) {
+      require("./agent-auth.cjs").accountChanged("codex", profile.id);
+      signout = await siwc.logout(profile.id);
+    }
     const result = await profiles.remove(options || {});
     usage?.forget?.(options?.id);
     return { ...result, ...(signout && !signout.revoked ? { message: signout.message } : {}) };

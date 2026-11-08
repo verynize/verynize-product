@@ -1,113 +1,42 @@
 {
   "panel": {
     "file": "C1-position-top-level.png",
-    "physical_pixel": [
-      10,
-      100
-    ],
-    "css_pixel": [
-      5.0,
-      50.0
-    ],
-    "rgb": [
-      28,
-      28,
-      28
-    ],
+    "physical_pixel": [10, 100],
+    "css_pixel": [5.0, 50.0],
+    "rgb": [28, 28, 28],
     "hex": "#1C1C1C"
   },
   "field": {
     "file": "C1-position-top-level.png",
-    "physical_pixel": [
-      100,
-      240
-    ],
-    "css_pixel": [
-      50.0,
-      120.0
-    ],
-    "rgb": [
-      43,
-      43,
-      43
-    ],
+    "physical_pixel": [100, 240],
+    "css_pixel": [50.0, 120.0],
+    "rgb": [43, 43, 43],
     "hex": "#2B2B2B"
   },
   "segment_track": {
     "file": "C1-position-top-level.png",
-    "physical_pixel": [
-      300,
-      550
-    ],
-    "css_pixel": [
-      150.0,
-      275.0
-    ],
-    "rgb": [
-      38,
-      38,
-      38
-    ],
+    "physical_pixel": [300, 550],
+    "css_pixel": [150.0, 275.0],
+    "rgb": [38, 38, 38],
     "hex": "#262626"
   },
   "segment_active": {
     "file": "C1-position-top-level.png",
-    "physical_pixel": [
-      100,
-      550
-    ],
-    "css_pixel": [
-      50.0,
-      275.0
-    ],
-    "rgb": [
-      54,
-      54,
-      54
-    ],
+    "physical_pixel": [100, 550],
+    "css_pixel": [50.0, 275.0],
+    "rgb": [54, 54, 54],
     "hex": "#363636"
   },
   "chip_background": {
     "file": "B5-numeric-variable-chip.png",
-    "physical_pixel": [
-      100,
-      595
-    ],
-    "css_pixel": [
-      50.0,
-      297.5
-    ],
-    "rgb": [
-      28,
-      28,
-      28
-    ],
+    "physical_pixel": [100, 595],
+    "css_pixel": [50.0, 297.5],
+    "rgb": [28, 28, 28],
     "hex": "#1C1C1C"
   },
   "purple_accent_most_common": [
-    [
-      [
-        162,
-        69,
-        211
-      ],
-      1001
-    ],
-    [
-      [
-        159,
-        68,
-        207
-      ],
-      24
-    ],
-    [
-      [
-        110,
-        59,
-        136
-      ],
-      8
-    ]
+    [[162, 69, 211], 1001],
+    [[159, 68, 207], 24],
+    [[110, 59, 136], 8]
   ]
 }

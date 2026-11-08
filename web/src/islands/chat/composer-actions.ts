@@ -7,7 +7,12 @@ import { workspace } from "./store";
 import { OPEN_STYLE_PICKER_EVENT, hasStyleCatalog } from "./style-picker";
 import { platform } from "@/lib/platform";
 
-export type AgentCommand = { name: string; description: string; argumentHint: string; source: string };
+export type AgentCommand = {
+  name: string;
+  description: string;
+  argumentHint: string;
+  source: string;
+};
 export type ReferenceCollection = { id: string; name: string; count: number; createdAt: number };
 
 export const chatDesktop = () => platform.desktop;
@@ -35,7 +40,12 @@ export const addToWorktree = (folder: boolean) =>
     const root = workspace()?.getState().chatRoot;
     if (!root) throw Error("This chat has no worktree; open a repository first");
     const result = await chatDesktop()?.worktreeAddFiles?.({ root, folder });
-    if (result) status(result.added.length ? `Added ${result.added.join(", ")} to this worktree` : "Nothing was added");
+    if (result)
+      status(
+        result.added.length
+          ? `Added ${result.added.join(", ")} to this worktree`
+          : "Nothing was added",
+      );
   });
 
 /** Add a folder as a working directory of this chat (picker when no path is given). */
@@ -50,8 +60,11 @@ export const addWorkingDirectory = (path?: string) =>
 export const attachTerminalOutput = () =>
   attempt(async () => {
     const ws = workspace();
-    const output = await chatDesktop()?.terminalRecentOutput?.({ cwd: ws?.getState().chatRoot ?? null });
-    if (!output?.text.trim()) throw Error("No terminal output yet: run something in the Code workspace terminal first");
+    const output = await chatDesktop()?.terminalRecentOutput?.({
+      cwd: ws?.getState().chatRoot ?? null,
+    });
+    if (!output?.text.trim())
+      throw Error("No terminal output yet: run something in the Code workspace terminal first");
     ws?.attachText?.("terminal", "Terminal output", output.text, { cwd: output.cwd });
   });
 
@@ -87,8 +100,12 @@ export const saveAttachedCollection = () =>
     const ask = window.askText ?? (async (title: string) => window.prompt(title));
     const name = (await ask("Name this design reference collection", ""))?.trim();
     if (!name) return;
-    const saved = await chatDesktop()?.designReferencesSave?.({ name, images: images.map((image) => image.path) });
-    if (saved) status(`Saved “${saved.name}” (${saved.count} image${saved.count === 1 ? "" : "s"})`);
+    const saved = await chatDesktop()?.designReferencesSave?.({
+      name,
+      images: images.map((image) => image.path),
+    });
+    if (saved)
+      status(`Saved “${saved.name}” (${saved.count} image${saved.count === 1 ? "" : "s"})`);
   });
 
 /** "+ New worktree" in "Link a chat or worktree": a fresh worktree of the repository, linked as a working directory. */
@@ -97,7 +114,8 @@ export const linkNewWorktree = (repoId: string) =>
     const api = chatDesktop()?.repositories;
     if (!api) throw Error("Worktrees need the desktop app");
     const worktree = await api.createChatWorktree({ repoId, chatId: crypto.randomUUID() });
-    if (worktree.shared) throw Error("This repository has no commits yet, so it cannot have worktrees");
+    if (worktree.shared)
+      throw Error("This repository has no commits yet, so it cannot have worktrees");
     workspace()?.addDirectory?.(worktree.path);
     status(`Linked new worktree ${worktree.branch ?? worktree.path}`);
   });
@@ -185,7 +203,10 @@ export const BUILTIN_COMMANDS: BuiltinCommand[] = [
 
 const commandCache = new Map<string, { at: number; request: Promise<AgentCommand[]> }>();
 /** The agent's own commands and skills for the chat folder (cached 30s). */
-export function loadAgentCommands(agent: string, root: string | null | undefined): Promise<AgentCommand[]> {
+export function loadAgentCommands(
+  agent: string,
+  root: string | null | undefined,
+): Promise<AgentCommand[]> {
   const key = `${agent}\u0000${root ?? ""}`;
   const cached = commandCache.get(key);
   if (cached && Date.now() - cached.at < 30000) return cached.request;

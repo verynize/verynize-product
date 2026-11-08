@@ -16,22 +16,59 @@
     "\"2 selected\" summary",
     "Primary button Continue and secondary Skip for now"
   ],
-  "constraints": ["Single screen 390x844", "English copy", "Respect safe areas (status bar top, home indicator bottom)"],
-  "assetsAllowed": { "icons": true, "photos": true, "generatedImages": true, "avatars": false, "customFonts": true },
+  "constraints": [
+    "Single screen 390x844",
+    "English copy",
+    "Respect safe areas (status bar top, home indicator bottom)"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": true,
+    "generatedImages": true,
+    "avatars": false,
+    "customFonts": true
+  },
   "inputs": [],
   "budget": { "maxMinutes": 15, "followUpTurns": 0 },
   "checklist": [
     { "id": "c01", "text": "A status bar is present at the top and no content collides with it." },
     { "id": "c02", "text": "Progress clearly communicates step 2 of 3 (dots, segments or text)." },
-    { "id": "c03", "text": "Exactly six plant tiles appear in a 2-column grid with the six specified names." },
-    { "id": "c04", "text": "Every tile has a real plant image or illustration (no gray boxes or empty placeholders).", "critical": true },
-    { "id": "c05", "text": "Monstera and Pothos are visibly selected (check, ring or fill) and the other four are visibly not selected." },
-    { "id": "c06", "text": "A \"2 selected\" summary is visible and consistent with the selection state." },
-    { "id": "c07", "text": "\"Continue\" is the most prominent control, full-width or nearly so, anchored near the bottom above the home indicator area." },
-    { "id": "c08", "text": "Side margins are consistent (about 16-24px) and tiles align to the same left and right edges." },
+    {
+      "id": "c03",
+      "text": "Exactly six plant tiles appear in a 2-column grid with the six specified names."
+    },
+    {
+      "id": "c04",
+      "text": "Every tile has a real plant image or illustration (no gray boxes or empty placeholders).",
+      "critical": true
+    },
+    {
+      "id": "c05",
+      "text": "Monstera and Pothos are visibly selected (check, ring or fill) and the other four are visibly not selected."
+    },
+    {
+      "id": "c06",
+      "text": "A \"2 selected\" summary is visible and consistent with the selection state."
+    },
+    {
+      "id": "c07",
+      "text": "\"Continue\" is the most prominent control, full-width or nearly so, anchored near the bottom above the home indicator area."
+    },
+    {
+      "id": "c08",
+      "text": "Side margins are consistent (about 16-24px) and tiles align to the same left and right edges."
+    },
     { "id": "c09", "text": "Tap targets (back, tiles, buttons) look at least ~44px tall." },
-    { "id": "c10", "text": "Body/helper text is at least 13px and readable against its background.", "critical": true },
-    { "id": "c11", "text": "No text is clipped, truncated mid-word unintentionally, or overlapping.", "critical": true },
+    {
+      "id": "c10",
+      "text": "Body/helper text is at least 13px and readable against its background.",
+      "critical": true
+    },
+    {
+      "id": "c11",
+      "text": "No text is clipped, truncated mid-word unintentionally, or overlapping.",
+      "critical": true
+    },
     { "id": "c12", "text": "A search field is present above the grid." },
     { "id": "c13", "text": "The screen fits 390x844; nothing important is cut off at the bottom." }
   ]

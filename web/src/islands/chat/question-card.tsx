@@ -60,17 +60,24 @@ export function QuestionCard({
   // Take focus when the card appears, unless the user is typing elsewhere.
   useEffect(() => {
     const focused = document.activeElement;
-    if (onSubmit && (!focused || focused === document.body)) card.current?.focus({ preventScroll: true });
+    if (onSubmit && (!focused || focused === document.body))
+      card.current?.focus({ preventScroll: true });
   }, [onSubmit]);
 
   if (part.answers) return <Answered part={part} />;
   const closed = !onSubmit || sent || (part.state !== undefined && part.state !== "pending");
 
   const draftOf = (q: ChatQuestion) => drafts[q.id] ?? empty();
-  const update = (q: ChatQuestion, next: Partial<Draft>) => setDrafts((all) => ({ ...all, [q.id]: { ...(all[q.id] ?? empty()), ...next } }));
+  const update = (q: ChatQuestion, next: Partial<Draft>) =>
+    setDrafts((all) => ({ ...all, [q.id]: { ...(all[q.id] ?? empty()), ...next } }));
   const toggle = (q: ChatQuestion, label: string, qi: number) => {
     const d = draftOf(q);
-    if (q.multiSelect) update(q, { picked: d.picked.includes(label) ? d.picked.filter((v) => v !== label) : [...d.picked, label] });
+    if (q.multiSelect)
+      update(q, {
+        picked: d.picked.includes(label)
+          ? d.picked.filter((v) => v !== label)
+          : [...d.picked, label],
+      });
     else {
       update(q, { picked: [label], otherOn: false });
       if (qi < questions.length - 1) setActive(qi + 1);
@@ -140,7 +147,10 @@ export function QuestionCard({
                   key={q.id}
                   disabled={closed}
                   onFocus={() => setActive(qi)}
-                  className={cn("m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0", qi > 0 && "border-t border-card-border pt-3")}
+                  className={cn(
+                    "m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0",
+                    qi > 0 && "border-t border-card-border pt-3",
+                  )}
                 >
                   {q.header && (
                     <span className="flex">
@@ -149,9 +159,17 @@ export function QuestionCard({
                       </span>
                     </span>
                   )}
-                  <legend className="float-left w-full p-0 break-words text-foreground">{q.question}</legend>
-                  {q.multiSelect && <span className="text-xs text-subtle-foreground">Select all that apply</span>}
-                  <div role={q.multiSelect ? "group" : "radiogroup"} aria-label={q.question} className="flex flex-col gap-1">
+                  <legend className="float-left w-full p-0 break-words text-foreground">
+                    {q.question}
+                  </legend>
+                  {q.multiSelect && (
+                    <span className="text-xs text-subtle-foreground">Select all that apply</span>
+                  )}
+                  <div
+                    role={q.multiSelect ? "group" : "radiogroup"}
+                    aria-label={q.question}
+                    className="flex flex-col gap-1"
+                  >
                     {options.map((option, oi) => {
                       const on = d.picked.includes(option.label);
                       return (
@@ -167,14 +185,20 @@ export function QuestionCard({
                             aria-hidden="true"
                             className={cn(
                               "mt-px flex size-4.5 shrink-0 items-center justify-center rounded-sm border text-xs tabular-nums",
-                              on ? "border-ring bg-primary text-primary-foreground" : "border-edge text-muted-foreground",
+                              on
+                                ? "border-ring bg-primary text-primary-foreground"
+                                : "border-edge text-muted-foreground",
                             )}
                           >
                             {on ? <CheckIcon className="size-3" /> : oi < 9 ? oi + 1 : ""}
                           </span>
                           <span className="flex min-w-0 flex-col">
                             <span className="break-words">{option.label}</span>
-                            {option.description && <span className="break-words text-muted-foreground">{option.description}</span>}
+                            {option.description && (
+                              <span className="break-words text-muted-foreground">
+                                {option.description}
+                              </span>
+                            )}
                           </span>
                         </ChatOptionButton>
                       );
@@ -186,7 +210,10 @@ export function QuestionCard({
                         d.otherOn ? "border-ring bg-settings" : "border-card-border bg-settings",
                       )}
                     >
-                      <span aria-hidden="true" className="flex size-4.5 shrink-0 items-center justify-center rounded-sm border border-edge text-xs text-muted-foreground tabular-nums">
+                      <span
+                        aria-hidden="true"
+                        className="flex size-4.5 shrink-0 items-center justify-center rounded-sm border border-edge text-xs text-muted-foreground tabular-nums"
+                      >
                         {options.length < 9 ? options.length + 1 : ""}
                       </span>
                       {/* Inline field inside the option row (the row draws the border and focus state). */}
@@ -195,8 +222,12 @@ export function QuestionCard({
                         value={d.other}
                         placeholder={options.length ? "Other…" : "Your answer…"}
                         aria-label={`Other answer: ${q.question}`}
-                        onFocus={() => update(q, { otherOn: true, picked: q.multiSelect ? d.picked : [] })}
-                        onChange={(event) => update(q, { other: event.target.value, otherOn: true })}
+                        onFocus={() =>
+                          update(q, { otherOn: true, picked: q.multiSelect ? d.picked : [] })
+                        }
+                        onChange={(event) =>
+                          update(q, { other: event.target.value, otherOn: true })
+                        }
                         className="h-full min-w-0 flex-1 bg-transparent text-foreground outline-hidden placeholder:text-subtle-foreground"
                       />
                     </div>
@@ -219,9 +250,13 @@ export function QuestionCard({
               </>
             )}
             {closed && !sent && (
-              <span className="mr-auto text-xs text-subtle-foreground">{onSubmit ? "No longer waiting for an answer" : "Answer from the chat window"}</span>
+              <span className="mr-auto text-xs text-subtle-foreground">
+                {onSubmit ? "No longer waiting for an answer" : "Answer from the chat window"}
+              </span>
             )}
-            {sent && <span className="mr-auto text-xs text-subtle-foreground">Sending answer…</span>}
+            {sent && (
+              <span className="mr-auto text-xs text-subtle-foreground">Sending answer…</span>
+            )}
           </div>
         </CardFooter>
       </Card>
