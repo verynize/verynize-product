@@ -88,6 +88,12 @@ const { checkHomeOpening } = require("./helpers/home-first-opening.cjs");
     await failure.waitFor({ state: "visible" });
     assert.match(await failure.textContent(), /Sign in to open a room/);
     assert.equal(await failure.count(), 1);
+    assert.equal(
+      await page.locator(`[data-file-tab="${failing}"]`).count(),
+      0,
+      "the failed file's pending tab is removed",
+    );
+    await page.waitForTimeout(500); // let the toast finish entering before the screenshot
     await shot(page, "open-failed-toast");
 
     // Repeated opens of a file that is loading join that load: a double click on its card, and two opens
