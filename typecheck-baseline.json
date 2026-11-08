@@ -1,6 +1,6 @@
 {
   "desktop": {
-    "total": 809,
+    "total": 783,
     "files": {
       "desktop/agent-access.cjs TS2339": 4,
       "desktop/agent-auth.cjs TS18047": 2,
@@ -84,7 +84,7 @@
       "integrations/codec-html.mjs TS1005": 1,
       "integrations/codec-html.mjs TS1109": 2,
       "integrations/codec-html.mjs TS17008": 1,
-      "integrations/codec-html.mjs TS2339": 32,
+      "integrations/codec-html.mjs TS2339": 6,
       "integrations/codec-html.mjs TS2353": 1,
       "integrations/codec-residual.mjs TS2349": 2,
       "integrations/codec-residual.mjs TS2464": 1,
@@ -226,14 +226,14 @@
     }
   },
   "integrations": {
-    "total": 154,
+    "total": 128,
     "files": {
       "integrations/assets-live-smoke.mjs TS2353": 3,
       "integrations/assets.mjs TS2339": 2,
       "integrations/codec-html.mjs TS1005": 1,
       "integrations/codec-html.mjs TS1109": 2,
       "integrations/codec-html.mjs TS17008": 1,
-      "integrations/codec-html.mjs TS2339": 32,
+      "integrations/codec-html.mjs TS2339": 6,
       "integrations/codec-html.mjs TS2353": 1,
       "integrations/codec-residual.mjs TS2349": 2,
       "integrations/codec-residual.mjs TS2464": 1,
@@ -281,7 +281,7 @@
     }
   },
   "cloud": {
-    "total": 367,
+    "total": 341,
     "files": {
       "cloud/ai-executor.js TS2322": 2,
       "cloud/ai-executor.js TS2339": 38,
@@ -330,7 +330,7 @@
       "integrations/codec-html.mjs TS1005": 1,
       "integrations/codec-html.mjs TS1109": 2,
       "integrations/codec-html.mjs TS17008": 1,
-      "integrations/codec-html.mjs TS2339": 32,
+      "integrations/codec-html.mjs TS2339": 6,
       "integrations/codec-html.mjs TS2353": 1,
       "integrations/codec-residual.mjs TS2349": 2,
       "integrations/codec-residual.mjs TS2464": 1,
