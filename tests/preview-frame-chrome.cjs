@@ -30,7 +30,7 @@ const freePort = () => new Promise(resolve => { const s = net.createServer(); s.
   });
   await new Promise(resolve => site.listen(0, '127.0.0.1', resolve));
   const siteURL = `http://127.0.0.1:${site.address().port}/`;
-  const env = {...process.env, VERYNIZE_SKIP_ONBOARDING: '1'}; delete env.ELECTRON_RUN_AS_NODE;
+  const env = {...process.env, VERYNIZE_SKIP_ONBOARDING: '1', VERYNIZE_LAUNCH_EDITOR: '1'}; delete env.ELECTRON_RUN_AS_NODE;
   const args = ['.', `--user-data-dir=${profile}`, ...(SHOTS ? ['--force-device-scale-factor=2', '--force-color-profile=srgb'] : [])];
   const app = await _electron.launch({env, args});
   const busy = http.createServer((_q, r) => r.end('Existing app'));

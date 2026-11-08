@@ -11,7 +11,7 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-shader-library-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],

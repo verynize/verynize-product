@@ -32,7 +32,7 @@ async function waitGone(pid,ms=5000){const end=Date.now()+ms;while(alive(pid)&&D
   const project=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'better-shell-project-')));
   await fs.writeFile(path.join(project,'package.json'),JSON.stringify({name:'fixture',private:true,scripts:{dev:'node server.js'}}));
   await fs.writeFile(path.join(project,'server.js'),SERVER);
-  const env={...process.env,VERYNIZE_PREFERENCES:path.join(profile,'design-preferences.json')};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';delete env.VERYNIZE_DISABLE_MCP;delete env.VERYNIZE_SHELL_EXEC;
+  const env={...process.env,VERYNIZE_PREFERENCES:path.join(profile,'design-preferences.json')};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';delete env.VERYNIZE_DISABLE_MCP;delete env.VERYNIZE_SHELL_EXEC;
   let app;const clients=[];let serverPid=null;
   try{
     app=await electron.launch({env,args:['.',`--user-data-dir=${profile}`]});

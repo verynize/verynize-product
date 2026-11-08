@@ -17,7 +17,7 @@ const http = require('node:http');
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const url = `http://localhost:${server.address().port}/`;
-  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1';
+  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({env, args: ['.', `--user-data-dir=${profile}`]});
   try {
     const page = await app.firstWindow();

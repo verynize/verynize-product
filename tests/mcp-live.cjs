@@ -11,7 +11,7 @@ const path=require('node:path');
   const {Client}=await import('@modelcontextprotocol/sdk/client/index.js');
   const {StreamableHTTPClientTransport}=await import('@modelcontextprotocol/sdk/client/streamableHttp.js');
   const profile=await fs.mkdtemp(path.join(os.tmpdir(),'better-mcp-live-'));
-  const env={...process.env,VERYNIZE_PREFERENCES:path.join(profile,'design-preferences.json')};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';delete env.VERYNIZE_DISABLE_MCP;
+  const env={...process.env,VERYNIZE_PREFERENCES:path.join(profile,'design-preferences.json')};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';delete env.VERYNIZE_DISABLE_MCP;
   let app,client;
   try{
     app=await electron.launch({env,args:['.',`--user-data-dir=${profile}`]});

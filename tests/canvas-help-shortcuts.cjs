@@ -15,7 +15,7 @@ const nodes = [
 
 (async () => {
   const profile = await fs.mkdtemp(os.tmpdir() + '/bd-help-'), env = {...process.env};
-  delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1';
+  delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({timeout: 20000, env, args: ['.', `--user-data-dir=${profile}`, '--force-device-scale-factor=2']}); // 2×, as on a Retina Mac: text metrics below are measured at 2×
   try {
     const p = await app.firstWindow({timeout: 15000}); await moveOffCursor(app);

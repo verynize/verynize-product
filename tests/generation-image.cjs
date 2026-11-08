@@ -82,6 +82,7 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_TEST_IMAGE_GOOGLE_URL = base;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   delete env.VERYNIZE_DISABLE_MCP;
   let logs = "";
   let mcpCalls = 0;

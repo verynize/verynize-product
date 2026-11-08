@@ -10,7 +10,7 @@ const os = require("node:os");
 // opened from (no extra entries), Back closes it, Forward and reload reopen it over the same view.
 (async () => {
   const profile = await fs.mkdtemp(`${os.tmpdir()}/settings-route-`);
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await electron.launch({ env, args: [".", `--user-data-dir=${profile}`] });
   try {

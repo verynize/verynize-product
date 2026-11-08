@@ -16,7 +16,12 @@ const shots = process.env.VERYNIZE_SCREENSHOTS || "";
 const PASSWORD = "a long enough password";
 
 async function launch(dir, label, server) {
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_CLOUD_SERVER: server };
+  const env = {
+    ...process.env,
+    VERYNIZE_SKIP_ONBOARDING: "1",
+    VERYNIZE_LAUNCH_EDITOR: "1",
+    VERYNIZE_CLOUD_SERVER: server,
+  };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await _electron.launch({
     env,

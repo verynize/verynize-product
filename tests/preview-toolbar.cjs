@@ -10,7 +10,7 @@ const http = require('node:http');
   const profile = await fs.mkdtemp(path.join(os.tmpdir(),'preview-toolbar-'));
   const server = http.createServer((_request,response) => {response.setHeader('content-type','text/html'); response.end('<h1>Toolbar capture</h1><input aria-label="App input" value="hello"><script>window.receivedKeys=[];document.addEventListener("keydown",event=>window.receivedKeys.push(event.key));</script>');});
   await new Promise(resolve => server.listen(0,'127.0.0.1',resolve));
-  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';
+  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';env.VERYNIZE_LAUNCH_EDITOR='1';
   const app = await _electron.launch({env,args:['.',`--user-data-dir=${profile}`]});
   try {
     const page = await app.firstWindow();

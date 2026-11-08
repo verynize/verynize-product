@@ -9,7 +9,7 @@ const fs = require('node:fs/promises'), os = require('node:os'), path = require(
 (async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'canvas-compositing-')), env = {...process.env};
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({env, args: ['.', `--user-data-dir=${dir}`, '--force-gpu-mem-available-mb=256'], timeout: 20000});
   let warnings = 0;
   app.process().stderr.on('data', d => { warnings += (String(d).match(/tile memory limits exceeded/g) || []).length; });

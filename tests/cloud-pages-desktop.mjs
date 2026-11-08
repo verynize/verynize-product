@@ -62,6 +62,7 @@ try {
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   for (const label of ["a", "b"])
     apps.push(
       await electron.launch({ env, args: [".", `--user-data-dir=${path.join(dir, label)}`] }),

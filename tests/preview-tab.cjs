@@ -16,7 +16,7 @@ const APP = `require('http').createServer((q,r)=>{r.setHeader('content-type','te
   const repo = path.join(dir, 'sunbird');
   await fs.mkdir(repo);
   await fs.writeFile(path.join(repo, 'server.js'), APP);
-  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1';
+  const env = {...process.env}; delete env.ELECTRON_RUN_AS_NODE; env.VERYNIZE_SKIP_ONBOARDING = '1'; env.VERYNIZE_LAUNCH_EDITOR = '1';
   const app = await _electron.launch({env, args: ['.', `--user-data-dir=${path.join(dir, 'profile')}`]});
   let root = '';
   const page = await app.firstWindow();
