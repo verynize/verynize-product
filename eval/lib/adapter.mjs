@@ -344,7 +344,7 @@ export const src = (node) => node.src;
 export const outlineWidth = (node) => node.outlineWidth;
 export const fills = (node) => node.fills;
 export const svgMarkup = (node) =>
-  /^data:image\/svg\+xml;base64,/.test(node.src || "")
+  String(node.src || "").startsWith("data:image/svg+xml;base64,")
     ? Buffer.from(node.src.split(",")[1], "base64").toString()
     : "";
 

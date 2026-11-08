@@ -42,7 +42,7 @@ try {
     ["dark", "system"].map((value) => send(ana, "preference:theme", value, 1)),
   );
   assert.deepEqual(
-    writes.map((r) => r.status).sort(),
+    writes.map((r) => r.status).sort((a, b) => a - b),
     [200, 409],
     "concurrent edits use atomic revision checks",
   );
@@ -99,7 +99,10 @@ try {
     send(ana, "chat:large", { ...large, title: "A" }, 1),
     send(ana, "chat:large", { ...large, title: "B" }, 1),
   ]);
-  assert.deepEqual(competing.map((r) => r.status).sort(), [200, 409]);
+  assert.deepEqual(
+    competing.map((r) => r.status).sort((a, b) => a - b),
+    [200, 409],
+  );
   const winner = JSON.parse((await readLarge()).value);
   assert.ok(["A", "B"].includes(winner.title));
   assert.equal(winner.text, large.text, "a stale writer cannot delete the winner's chunks");

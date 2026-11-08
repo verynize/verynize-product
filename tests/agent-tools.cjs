@@ -628,7 +628,7 @@ async function runtimeSetup(t, settings) {
     emit: (event) => {
       events.push(event);
       if (event.type === "permission-request")
-        runtime.respondPermission({ requestId: event.requestId, allow: false });
+        void runtime.respondPermission({ requestId: event.requestId, allow: false });
     },
   });
   t.after(() => runtime.close());
@@ -671,7 +671,7 @@ test("runtime: Claude chats get the Access options; ask_agent is gated; memory i
 });
 
 test("runtime: defaults keep connectors and artifacts, pass --no-chrome; Codex gets feature flags and Computer Use stops", async (t) => {
-  const { runtime, record, until, events, root } = await runtimeSetup(t, {
+  const { runtime, record, until, root } = await runtimeSetup(t, {
     shareMemory: false,
     codexComputerUse: true,
     askAgents: true,

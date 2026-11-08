@@ -91,6 +91,7 @@ const os = require("node:os");
     assert.match(print, /data:image\/png;base64,/);
     assert.doesNotMatch(print, /<script/);
     const fallback = await page.evaluate(() => {
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
       const original = HTMLCanvasElement.prototype.getContext,
         host = document.createElement("div");
       document.body.append(host);

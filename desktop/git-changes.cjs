@@ -242,7 +242,7 @@ class GitChanges {
         "Git is not installed. Install the Xcode Command Line Tools (`xcode-select --install`) or Git, then try again.",
       );
     return run(binary, ["-C", this.root, ...args], {
-      env: baseEnv({ ...GIT_ENV, ...(options.env || {}) }),
+      env: baseEnv({ ...GIT_ENV, ...options.env }),
       timeout: options.timeout || READ_TIMEOUT,
       maxBuffer: options.maxBuffer,
       cwd: this.root,

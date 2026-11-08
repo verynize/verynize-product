@@ -21,7 +21,8 @@ export type DesignStyle = { id: string; name: string; summary?: string };
 const STORAGE_KEY = "verynize.chat.design-style";
 export const OPEN_STYLE_PICKER_EVENT = "bd:open-style-picker";
 
-const styleDesktop = (): { designStylesList?(): Promise<DesignStyle[]> } | null => platform.desktop;
+const styleDesktop = (): { designStylesList?: () => Promise<DesignStyle[]> } | null =>
+  platform.desktop;
 /** Whether this desktop build offers the style catalog. */
 export const hasStyleCatalog = () => typeof styleDesktop()?.designStylesList === "function";
 
@@ -90,7 +91,7 @@ function useStyles(): DesignStyle[] {
   const [styles, setStyles] = useState<DesignStyle[]>([]);
   useEffect(() => {
     let live = true;
-    loadStyles().then((value) => live && setStyles(value));
+    void loadStyles().then((value) => live && setStyles(value));
     return () => {
       live = false;
     };

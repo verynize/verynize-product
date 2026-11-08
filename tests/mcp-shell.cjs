@@ -255,7 +255,10 @@ async function waitGone(pid, ms = 5000) {
     ).trees[0].id;
     const aligned = await json(full, "execute_action", { id: "align.top", ids: [a, b] });
     assert.equal(aligned.ran, 1);
-    assert.deepEqual([...aligned.selection].sort(), [a, b].sort());
+    assert.deepEqual(
+      [...aligned.selection].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+      [a, b].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    );
     const ys = await page.evaluate(() =>
       window.verynize
         .getDocument()

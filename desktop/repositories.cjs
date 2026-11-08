@@ -123,7 +123,7 @@ class RepositoryRegistry {
           .catch(() => "")
       : "";
     return typeof value === "string" &&
-      /^[A-Za-z0-9][A-Za-z0-9._\/-]*$/.test(value) &&
+      /^[A-Za-z0-9][A-Za-z0-9._/-]*$/.test(value) &&
       !value.includes("..")
       ? value.replace(/\/+$/, "")
       : "verynize";

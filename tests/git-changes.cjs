@@ -337,7 +337,7 @@ test("branch changes: commits since the default branch plus uncommitted and untr
       "new.txt": "untracked",
     });
     assert.deepEqual(
-      (await repo.summary()).files.map((f) => f.path).sort(),
+      (await repo.summary()).files.map((f) => f.path).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       ["index.html", "new.txt"],
       "uncommitted stays the working tree only",
     );

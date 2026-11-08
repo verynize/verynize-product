@@ -223,7 +223,7 @@ const ARROW = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" vi
     assert.match(exported.html, /<svg[^>]*viewBox="0 0 24 24"[^>]*preserveAspectRatio="none"/);
     assert.ok(
       exported.mid[0] > 200 && exported.mid[1] < 60 && exported.mid[3] > 200,
-      `PNG centre is the red stroke (${exported.mid})`,
+      `PNG centre is the red stroke (${exported.mid.join(",")})`,
     );
     assert.equal(exported.corner[3], 0, "PNG corner is transparent");
     if (exported.pdf !== null) assert.equal(exported.pdf, "%PDF-");

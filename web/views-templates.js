@@ -296,6 +296,7 @@
   };
   const cleanName = (v, fallback) =>
     String(v ?? "")
+      // oxlint-disable-next-line no-control-regex -- stripping control characters is the point
       .replace(/[\u0000-\u001f]/g, " ")
       .trim()
       .slice(0, 80) || fallback;

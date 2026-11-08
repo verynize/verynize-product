@@ -314,11 +314,11 @@ const fs = require("node:fs/promises"),
       window.design.moveNodes(window.design.getSelection(), null, "inside"),
     );
     assert.deepEqual(
-      [...moved].sort(),
+      [...moved].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       big
         .filter((n) => !n.parentId)
         .map((n) => n.id)
-        .sort(),
+        .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       "the top-level selection is the 100 artboards",
     );
     const parents = await page.evaluate(() =>

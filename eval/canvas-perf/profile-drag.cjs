@@ -9,7 +9,7 @@ const root = require("node:path").resolve(__dirname, "../.."),
   moves = Number(process.argv[3] || 5);
 const { synthetic } = require(path.join(root, "eval/canvas-perf/bench-verynize.cjs"));
 const { waitForUiReady } = require(path.join(root, "tests/helpers/ui-ready.cjs"));
-(async () => {
+void (async () => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "dprof-")),
     env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
   delete env.ELECTRON_RUN_AS_NODE;

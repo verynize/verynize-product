@@ -146,7 +146,9 @@ const os = require("node:os");
         };
         const remote = structuredClone(window.design.getDocument());
         window.fetch = async (url) => {
-          const data = new URL(String(url)).pathname.endsWith(`/api/rooms/${room}`)
+          const data = new URL(url instanceof Request ? url.url : String(url)).pathname.endsWith(
+            `/api/rooms/${room}`,
+          )
             ? { document: remote, revision: 0, role: "owner" }
             : {};
           return { ok: true, status: 200, json: async () => data };

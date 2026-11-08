@@ -441,7 +441,7 @@
       const desired = Ops.apply(Ops.apply(confirmed, retained).doc, ops).doc;
       retained = Ops.diff(confirmed, desired, { ignore: LOCAL_KEYS });
       retryRetained();
-      saveOutbox(true);
+      void saveOutbox(true);
       return;
     }
     const limits = window.VerynizeRoomLimits;
@@ -474,7 +474,7 @@
     clearTimeout(sendTimer);
     sendTimer = setTimeout(sendPending, 40);
     // sendPending writes the outbox before each send; this only covers edits waiting behind it.
-    saveOutbox();
+    void saveOutbox();
   }
   function localChange() {
     drawPeers();
@@ -505,7 +505,7 @@
     lastLocal = text;
     if (changes.length) recordLocal(before, now);
     if (ops.length) queueOps(ops);
-    else if (changes.length) saveOutbox();
+    else if (changes.length) void saveOutbox();
   }
 
   // ---- collaborative undo ---------------------------------------------------------------------
@@ -592,7 +592,7 @@
     to.push({ from: current, to: lastLocalDoc, seq: remoteSeq, at: 0, history: true });
     const send = Pages.splitLocal(changes);
     if (send.length) queueOps(send);
-    else saveOutbox();
+    else void saveOutbox();
     status(label === "undo" ? "Undid your last change" : "Redid your change");
     refreshHistoryButtons();
   }
@@ -673,8 +673,8 @@
       );
     rebuild();
     if (retryAfterRejection) retryRetained();
-    saveOutbox(true);
-    sendPending();
+    void saveOutbox(true);
+    void sendPending();
   }
   /**
    * Pages fetched on the socket (lazy rooms): each replaces its stub in the confirmed document and
@@ -705,7 +705,7 @@
     remoteSeq++; // a loaded page ends the current undo step
     if (released.length && canEdit()) queueOps(released);
     rebuild();
-    saveOutbox();
+    void saveOutbox();
   }
   /** Ids of the pages this client holds (lazy rooms request these again after a reconnect). */
   const loadedPages = () =>
@@ -720,7 +720,7 @@
     const epoch = generation,
       info = connection;
     if (socket?.readyState === WebSocket.OPEN) {
-      sendPending();
+      void sendPending();
       const until = Date.now() + 5000;
       while (pending.length && Date.now() < until && epoch === generation)
         await new Promise((resolve) => setTimeout(resolve, 50));
@@ -827,15 +827,15 @@
     else outboxTimer = setTimeout(write, 150);
   }
   window.addEventListener("pagehide", () => {
-    if (outboxTimer) saveOutbox(true);
+    if (outboxTimer) void saveOutbox(true);
   });
   const library = () => window.fileLibrary || null;
   /** Mark the room's library record as detached (left, revoked) and forget its stored outbox. */
   function forgetRoom(info) {
     if (!info) return;
     // Leaving or losing access must not erase the only durable copy of rejected edits.
-    if (retained.length || pending.length) saveOutbox(true);
-    else clearOutbox(roomKey(info));
+    if (retained.length || pending.length) void saveOutbox(true);
+    else void clearOutbox(roomKey(info));
     const lib = library(),
       id = info.fileId || lib?.findCloud?.(info.server, info.id),
       cloud = id && lib?.cloudOf?.(id);
@@ -856,7 +856,7 @@
           pinned: retained.length > 0 || pending.length > 0 || Pages.deferredOps().length > 0,
         });
     }
-    if (outboxTimer && !leave) saveOutbox(true);
+    if (outboxTimer && !leave) void saveOutbox(true);
     if (leave) forgetRoom(connection);
     // Leaving drops a matching #room= invite fragment, which the shell router otherwise keeps.
     if (leave && connection) window.shellNavigation?.clearRoomHash?.(connection.id);
@@ -1016,9 +1016,9 @@
           retryRetained();
           if (retained.length)
             status("Edits are not synced; kept on this device until the file fits.");
-          sendPending();
+          void sendPending();
           Pages.resume();
-          saveOutbox();
+          void saveOutbox();
           return;
         }
         if (message.type === "pages") return receivePages(message);
@@ -1347,7 +1347,7 @@
       if (ops.length && canEdit()) queueOps(ops);
     }
     if (restore && !record?.detached && !restore.overflow) rebuild();
-    if (protocol >= 2) saveOutbox(true);
+    if (protocol >= 2) void saveOutbox(true);
     const hydrated =
       cached && !offline && protocol >= 2
         ? new Promise((resolve) => {
@@ -1726,7 +1726,7 @@
     apply(current.document);
     conflict = false;
     $("cloud-conflict").hidden = true;
-    saveOutbox();
+    void saveOutbox();
     status("Loaded shared version");
   });
   $("cloud-overwrite").onclick = action(async () => {
@@ -2226,7 +2226,7 @@
         headers: {
           ...(options.body !== undefined ? { "Content-Type": "application/json" } : {}),
           "X-Verynize-Session": account.session,
-          ...options.headers,
+          .../** @type {Record<string, string>} */ (options.headers),
         },
       });
     },
@@ -2306,7 +2306,7 @@
       return items.length > before ? items : null;
     });
     if (!list) return;
-    closePasskeyPage();
+    void closePasskeyPage();
     status("Passkey added. You can now sign in with it.");
   });
   $("cloud-passkey-signin").onclick = action(async () => {
@@ -2345,7 +2345,7 @@
       return null;
     });
     if (!result) return;
-    closePasskeyPage();
+    void closePasskeyPage();
     saveAccount({ server, session: result.session, account: result.account });
     status(`Signed in with a passkey as ${result.account.email}`);
     refreshRooms().catch(() => {});
@@ -2464,7 +2464,7 @@
     else $("cloud-app-url").removeAttribute("href");
   }
   $("cloud-app-section").addEventListener("toggle", () => {
-    if ($("cloud-app-section").open) detectApp();
+    if ($("cloud-app-section").open) void detectApp();
   });
   $("cloud-app-publish").onclick = action(async () => {
     if (!window.verynizePlatform.can("publishApps"))

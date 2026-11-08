@@ -20,7 +20,7 @@ export const chatDesktop = () => platform.desktop;
 const status = (text: string) => workspace()?.setStatus?.(text);
 
 /** Runs an action; failures go to the chat status line. */
-export async function attempt(fn: () => unknown | Promise<unknown>) {
+export async function attempt(fn: () => unknown) {
   try {
     await fn();
   } catch (error) {

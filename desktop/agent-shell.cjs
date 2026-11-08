@@ -351,8 +351,9 @@ function registerDevServerIPC(handle, { getProject, resolveRoot }) {
     const entry = { current: null, cancelled: false };
     setups.set(projectRoot, entry);
     const runStep = async (argv) => {
-      entry.current = manager.run(projectRoot, argv, { timeoutMs: 600000, background: true });
-      const job = await entry.current,
+      const started = manager.run(projectRoot, argv, { timeoutMs: 600000, background: true });
+      entry.current = started;
+      const job = await started,
         proc = manager.find(job.id, projectRoot);
       await proc.exitPromise;
       return manager.jobInfo(proc, { output: true });

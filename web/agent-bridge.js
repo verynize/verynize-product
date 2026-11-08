@@ -102,9 +102,13 @@
         for (const r of n.textRuns || [])
           if (r.bold && n.fontFamily) add(n.fontFamily, 700, r.italic);
       }
-    return [...byFamily.values()]
-      .slice(0, 40)
-      .map((e) => ({ family: e.family, weights: [...e.weights].sort(), styles: [...e.styles] }));
+    return [...byFamily.values()].slice(0, 40).map((e) => ({
+      family: e.family,
+      weights: [...e.weights].sort((a, b) =>
+        String(a) < String(b) ? -1 : String(a) > String(b) ? 1 : 0,
+      ),
+      styles: [...e.styles],
+    }));
   };
   const syncFonts = () => {
     clearTimeout(fontState.timer);

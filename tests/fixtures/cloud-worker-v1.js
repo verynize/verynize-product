@@ -223,7 +223,7 @@ export default {
         return json({ id, ...(await response.json()) }, response.status);
       }
       const publicMatch = url.pathname.match(
-        new RegExp(`^/api/public/(${uuidPattern})\.([0-9a-f]{64})$`),
+        new RegExp(`^/api/public/(${uuidPattern}).([0-9a-f]{64})$`),
       );
       if (publicMatch && request.method === "GET")
         return env.ROOMS.getByName(publicMatch[1]).fetch(

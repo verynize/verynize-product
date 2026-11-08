@@ -34,7 +34,7 @@ const path = require("node:path");
       .filter(
         (c) =>
           c.rpc === method &&
-          !/agent-workdirs[\/\\]titles|word title for a design chat/.test(
+          !/agent-workdirs[/\\]titles|word title for a design chat/.test(
             JSON.stringify(c.params || {}),
           ),
       );
@@ -80,7 +80,7 @@ const path = require("node:path");
     );
     assert.match(await page.locator("#chat-session").textContent(), /Continues codex session/);
     const firstStart = (await rpc("thread/start"))[0].params;
-    assert.match(firstStart.cwd, /agent-workdirs[\/\\][0-9a-f-]{36}$/);
+    assert.match(firstStart.cwd, /agent-workdirs[/\\][0-9a-f-]{36}$/);
     const firstTurn = (await rpc("turn/start"))[0].params.input[0].text;
     assert.match(
       firstTurn,
@@ -441,7 +441,7 @@ const path = require("node:path");
     );
     assert.ok(
       rewound.conversations.some(
-        (c) => / · before rewind$/.test(c.title) && c.count === messages.length,
+        (c) => String(c.title).endsWith(" · before rewind") && c.count === messages.length,
       ),
       "the full transcript is kept as a branch",
     );

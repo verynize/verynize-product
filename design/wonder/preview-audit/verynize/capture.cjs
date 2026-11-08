@@ -18,7 +18,6 @@ const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
 const http = require("node:http");
-const { execFileSync } = require("node:child_process");
 
 const OUT = __dirname;
 const SANDBOX = "/tmp/preview-sandbox-vz";

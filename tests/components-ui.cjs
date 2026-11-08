@@ -402,7 +402,7 @@ const text = (id, parentId, value, extra = {}) => ({
     // ---- Canvas drag of an instance onto its own main is refused (it stays put).
     const inst = instances[0].id;
     await select([inst]);
-    await page.evaluate((id) => window.design.setCamera(40, 40, 0.25), inst);
+    await page.evaluate(() => window.design.setCamera(40, 40, 0.25));
     await page.waitForTimeout(100);
     const box = await page.locator(`#canvas .layer[data-id="${inst}"]`).boundingBox();
     const target = await page.locator(`#canvas .layer[data-id="${slot.id}"]`).boundingBox();

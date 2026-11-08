@@ -179,7 +179,7 @@ export function CommitField({
   ...props
 }: Omit<ComponentProps<"input">, "value" | "defaultValue" | "onChange"> & {
   value: string | number;
-  onCommit(value: string): void;
+  onCommit: (value: string) => void;
 }) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {

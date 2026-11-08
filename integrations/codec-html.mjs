@@ -355,15 +355,13 @@ export function parseHtml(source) {
   return root;
 }
 function findSvgEnd(s, from) {
-  let depth = 1,
-    i = from;
+  let depth = 1;
   const re = /<\/?svg\b[^>]*?(\/?)>/gi;
   re.lastIndex = from;
   for (let m; (m = re.exec(s));) {
     if (m[0][1] === "/") {
       if (--depth === 0) return m.index;
     } else if (!m[1]) depth++;
-    i = re.lastIndex;
   }
   return s.length;
 }
@@ -510,17 +508,6 @@ button,input,select,textarea{font:inherit;color:inherit;background-color:transpa
 `;
 let uaRules = null,
   preflightRules = null;
-const BLOCK_DISPLAY = new Set([
-  "block",
-  "flex",
-  "grid",
-  "flow-root",
-  "list-item",
-  "table",
-  "inline-block",
-  "inline-flex",
-  "inline-grid",
-]);
 
 // ---------------------------------------------------------------------------------------------
 // Values
@@ -555,9 +542,9 @@ function absolutize(value, { fs, rootFs, vw, vh }) {
                 ? x * fs * 1.2
                 : u === "rlh"
                   ? x * rootFs * 1.2
-                  : /w$/.test(u)
+                  : u.endsWith("w")
                     ? (x * vw) / 100
-                    : /h$/.test(u)
+                    : u.endsWith("h")
                       ? (x * vh) / 100
                       : u === "vmin"
                         ? (x * Math.min(vw, vh)) / 100
@@ -853,7 +840,7 @@ const INLINE_TEXT = new Set([
  * @returns {Promise<{document, pageId, roots, jsx, warnings, stats}>}
  */
 export async function importHtml(html, options = {}) {
-  const view = { ...MEDIA_DEFAULTS, ...(options.viewport || {}) };
+  const view = { ...MEDIA_DEFAULTS, ...options.viewport };
   const warnings = [];
   const stats = {
     elements: 0,
@@ -1133,7 +1120,6 @@ export async function importHtml(html, options = {}) {
     whiteSpace: "normal",
   };
   const computedOf = new Map();
-  const usedVars = new Map(); // name -> {type, value}
   const rootFsBox = { value: 16 };
   const cascadeDeadline = performance.now() + 60_000;
   const computeElement = (el, parent) => {
@@ -1311,7 +1297,7 @@ export async function importHtml(html, options = {}) {
         );
         continue;
       }
-      if (property === "line-height" && /%$/.test(value.trim()))
+      if (property === "line-height" && value.trim().endsWith("%"))
         value = `${r2((parseFloat(value) / 100) * fs)}px`;
       value = absolutize(value, units);
       if (/currentcolor/i.test(value) && property !== "color")
@@ -1354,8 +1340,8 @@ export async function importHtml(html, options = {}) {
   // --- JSX generation
   const lines = [];
   const doc = options.document ? structuredClone(options.document) : null;
-  const tokens = { ...(meta?.tokens || {}), ...(doc?.tokens || {}) };
-  const variables = { ...(meta?.variables || {}), ...(doc?.variables || {}) };
+  const tokens = { ...meta?.tokens, ...doc?.tokens };
+  const variables = { ...meta?.variables, ...doc?.variables };
   const tokenName = (varName) => {
     const name = varName.slice(2);
     if (meta?.tokens) {
@@ -1435,7 +1421,7 @@ export async function importHtml(html, options = {}) {
         if (v === "contents") continue;
         if (text && !/flex|grid/.test(v)) continue;
         if (v === "list-item" || v === "table" || v === "flow-root") v = "block";
-        if (/^table-/.test(v)) v = "block";
+        if (v.startsWith("table-")) v = "block";
         if (text && (v === "inline" || v === "inline-block")) continue;
       }
       if (property === "background-image" && /url\(/i.test(v)) {
@@ -1620,10 +1606,11 @@ export async function importHtml(html, options = {}) {
   // Inline content of a text element as JSX (whitespace collapsed like CSS white-space: normal).
   const inlineJsx = async (el, info) => {
     const parts = [];
-    const pre = /^pre/.test(info.whiteSpace);
+    const pre = info.whiteSpace.startsWith("pre");
     const visit = async (node, parentInfo) => {
       if (node.text !== undefined) {
-        if (!node.raw) parts.push({ text: node.text, pre: /^pre/.test(parentInfo.whiteSpace) });
+        if (!node.raw)
+          parts.push({ text: node.text, pre: parentInfo.whiteSpace.startsWith("pre") });
         return;
       }
       if (SKIP.has(node.tag)) return;
@@ -1967,7 +1954,6 @@ export async function importHtml(html, options = {}) {
     const textOnly =
       !root &&
       designType !== "frame" &&
-      kids.length > 0 &&
       kids.some(hasText) &&
       (itemized
         ? kids.every((c) => c.text !== undefined)
@@ -2117,9 +2103,8 @@ export async function importHtml(html, options = {}) {
         if (meta.page[key] !== undefined) target.pages[0][key] = meta.page[key];
   }
   target.tokens = { ...target.tokens, ...tokens };
-  if (Object.keys(variables).length)
-    target.variables = { ...(target.variables || {}), ...variables };
-  if (meta?.aliases) target.aliases = { ...(target.aliases || {}), ...meta.aliases };
+  if (Object.keys(variables).length) target.variables = { ...target.variables, ...variables };
+  if (meta?.aliases) target.aliases = { ...target.aliases, ...meta.aliases };
   validateDocument(target);
   const pageId = options.pageId || target.activePage || target.pages[0].id;
   if (!lines.length) throw new Error("No importable elements were found in the HTML");

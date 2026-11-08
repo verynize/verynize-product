@@ -1,5 +1,5 @@
 // Bauhaus style. Original to Verynize.
-import { shadow, radius } from "../elevation.mjs";
+import { shadow } from "../elevation.mjs";
 
 const ink = "#161514";
 

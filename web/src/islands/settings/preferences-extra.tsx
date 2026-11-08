@@ -6,7 +6,7 @@ import type { Preferences } from "./api";
 import { Card, NativeSelect, Row, Section, SettingsButton, Toggle } from "./controls";
 import { appPreferencesApi, playSound, resetCustomSound } from "./preference-runtime";
 
-type Props = { preferences: Preferences; setPreference(changes: Partial<Preferences>): void };
+type Props = { preferences: Preferences; setPreference: (changes: Partial<Preferences>) => void };
 
 const SOUNDS: { value: Preferences["sound"]; label: string }[] = [
   { value: "none", label: "None" },

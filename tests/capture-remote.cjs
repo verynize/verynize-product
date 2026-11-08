@@ -198,7 +198,7 @@ s.__reactFiber$fixture={_debugSource:{fileName:'/repo/src/components/Fiber.jsx',
     ]);
     assert.ok(
       cta.capture.notes.some((n) =>
-        /^On :hover: background-color rgb\(10, 20, 30\) → rgb\(200, 0, 0\)/.test(n),
+        String(n).startsWith("On :hover: background-color rgb(10, 20, 30) → rgb(200, 0, 0)"),
       ),
     );
     assert.ok(cta.capture.notes.includes("Transition background-color 250ms ease-in-out"));

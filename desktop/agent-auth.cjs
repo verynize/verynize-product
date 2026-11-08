@@ -69,7 +69,8 @@ function bounded(executable, args, spawnProcess = spawn, extra = {}) {
       if (ended) return;
       ended = true;
       clearTimeout(timer);
-      error ? reject(error) : resolve(value);
+      if (error) reject(error);
+      else resolve(value);
     };
     const chunk = (data) => {
       output += data.toString();
@@ -297,7 +298,7 @@ class AgentAuth {
   close() {
     for (const id of this.siwcLogins) this.siwc?.cancel(id);
     this.siwcLogins.clear();
-    for (const operation of [...this.pending.values()]) operation.cancel();
+    for (const operation of this.pending.values()) operation.cancel();
   }
 }
 function registerAgentAuth(handle, parent, { profiles = null, siwc = null } = {}) {

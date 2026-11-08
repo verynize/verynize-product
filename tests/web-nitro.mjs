@@ -225,7 +225,9 @@ try {
     new Promise((resolve, reject) => {
       const ws = new WebSocket(url);
       const messages = [];
-      ws.on("message", (data) => messages.push(JSON.parse(data.toString())));
+      ws.on("message", (data) =>
+        messages.push(JSON.parse(/** @type {Buffer} */ (data).toString())),
+      );
       ws.once("open", () => resolve({ ws, messages }));
       ws.once("unexpected-response", (_request, response) =>
         reject(new Error(`HTTP ${response.statusCode}`)),

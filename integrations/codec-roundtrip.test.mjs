@@ -331,7 +331,8 @@ function normalize(node) {
     if (Array.isArray(value) && !value.length && key !== "textRuns") continue;
     out[key] = typeof value === "number" ? Math.round(value * 100) / 100 : canon(value);
   }
-  if (Array.isArray(out.styleOwn)) out.styleOwn = [...out.styleOwn].sort();
+  if (Array.isArray(out.styleOwn))
+    out.styleOwn = [...out.styleOwn].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   return out;
 }
 export function diffPages(a, b) {
@@ -374,7 +375,9 @@ test("every schema property is exercised by the round-trip kitchen sink", () => 
   for (const n of getPage(sink, "p").nodes)
     for (const [key, value] of Object.entries(n))
       if (JSON.stringify(value) !== JSON.stringify(DEFAULTS[key])) used.add(key);
-  const missing = [...schemaKeys()].filter((key) => !EXEMPT.has(key) && !used.has(key)).sort();
+  const missing = [...schemaKeys()]
+    .filter((key) => !EXEMPT.has(key) && !used.has(key))
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   assert.deepEqual(
     missing,
     [],

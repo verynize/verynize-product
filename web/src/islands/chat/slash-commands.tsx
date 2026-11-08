@@ -81,7 +81,7 @@ export function SlashCommands({ state }: { state: ChatState }) {
     if (!open) return;
     let live = true;
     setLoading(true);
-    loadAgentCommands(agent, root).then((list) => {
+    void loadAgentCommands(agent, root).then((list) => {
       if (!live) return;
       setAgentCommands(list);
       setLoading(false);

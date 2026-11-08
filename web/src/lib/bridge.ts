@@ -5,7 +5,7 @@ import { useEffect, useEffectEvent, useState, useSyncExternalStore } from "react
 /* ---------- Legacy window APIs (subset used by islands) ---------- */
 export type LayerNode = {
   id: string;
-  type: "rectangle" | "text" | "frame" | "image" | "shader" | string;
+  type: "rectangle" | "text" | "frame" | "image" | "shader" | (string & {});
   parentId: string | null;
   name: string;
   x: number;
@@ -58,9 +58,9 @@ export type DesignApi = {
   commands(): { id: string; label?: string }[];
   runCommand(id: string, arg?: unknown): boolean;
   /** Constraints of a positioned layer ({h, v}: start/end/stretch/center/scale), or null when it has none. */
-  getConstraints?(id: string): { h: string; v: string } | null;
+  getConstraints?: (id: string) => { h: string; v: string } | null;
   /** Change constraints without moving the layers (one undo step). */
-  setConstraints?(ids: string[], constraints: { h?: string; v?: string }): boolean;
+  setConstraints?: (ids: string[], constraints: { h?: string; v?: string }) => boolean;
   [key: string]: unknown;
 };
 

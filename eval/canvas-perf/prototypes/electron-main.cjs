@@ -14,7 +14,7 @@ for (const s of [
 ])
   app.commandLine.appendSwitch(s);
 app.commandLine.appendSwitch("js-flags", "--expose-gc");
-app.whenReady().then(() => {
+void app.whenReady().then(() => {
   const win = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -24,6 +24,6 @@ app.whenReady().then(() => {
     y: 0,
     webPreferences: { backgroundThrottling: false, contextIsolation: true, sandbox: true },
   });
-  win.loadURL(process.env.BENCH_URL);
+  void win.loadURL(process.env.BENCH_URL);
 });
 app.on("window-all-closed", () => app.quit());

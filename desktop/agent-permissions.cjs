@@ -164,7 +164,7 @@ function describeRule(rule) {
   const match = RULE.exec(String(rule).trim());
   if (!match) return String(rule);
   const [, tool, spec] = match;
-  if (/^mcp__/.test(tool)) {
+  if (tool.startsWith("mcp__")) {
     const [, server, name] = tool.split("__");
     return !name || name === "*"
       ? `Every tool from the ${server} MCP server`

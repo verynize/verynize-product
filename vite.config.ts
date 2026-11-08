@@ -56,6 +56,26 @@ export default defineConfig({
     },
     overrides: [
       {
+        // node:test schedules and awaits top-level test()/describe() itself, so their returned
+        // promises are not floating. Only those calls are exempt: an un-awaited promise inside a
+        // test body is still reported.
+        files: ["tests/**", "integrations/*.test.mjs"],
+        rules: {
+          "typescript/no-floating-promises": [
+            "warn",
+            {
+              allowForKnownSafeCalls: [
+                {
+                  from: "package",
+                  package: "node:test",
+                  name: ["test", "it", "describe", "suite"],
+                },
+              ],
+            },
+          ],
+        },
+      },
+      {
         files: ["web/src/**/*.{ts,tsx}"],
         rules: {
           "shadcn/no-raw-colors": "error",

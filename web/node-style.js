@@ -87,7 +87,7 @@
     let i = 0;
     const peek = () => tokens[i];
     const out = [];
-    const unit = (t) => (/%$/.test(t) ? "pct" : /px$/i.test(t) ? "px" : "n");
+    const unit = (t) => (t.endsWith("%") ? "pct" : /px$/i.test(t) ? "px" : "n");
     const factor = () => {
       const t = tokens[i++];
       if (t === undefined) return null;
@@ -792,7 +792,7 @@
     const fit = pick(p.fit, IMAGE_FITS, "fill");
     let url = p.src,
       size = IMAGE_SIZE[fit];
-    if (o < 100 && !/^data:/.test(p.src)) {
+    if (o < 100 && !String(p.src).startsWith("data:")) {
       // Room asset URL: an SVG image cannot load it, so fade it against a transparent layer.
       const image = `-webkit-cross-fade(linear-gradient(transparent, transparent), url("${p.src}"), ${Math.round(o)}%)`;
       return { image, size, position: "center", repeat: "no-repeat" };
@@ -859,7 +859,14 @@
       .toLowerCase()
       .replace(/\s*!important$/, "");
     if (NAMED[v]) return NAMED[v];
-    if (/^#[0-9a-f]{3,4}$/.test(v)) v = "#" + [...v.slice(1)].map((c) => c + c).join("");
+    if (/^#[0-9a-f]{3,4}$/.test(v))
+      v =
+        "#" +
+        v
+          .slice(1)
+          .split("")
+          .map((c) => c + c)
+          .join("");
     if (/^#[0-9a-f]{6}([0-9a-f]{2})?$/.test(v))
       return v.length === 9 && v.endsWith("ff") ? v.slice(0, 7) : v;
     const m =

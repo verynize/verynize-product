@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
-import { cn } from "@/lib/utils";
+import { cn, textOf } from "@/lib/utils";
 import {
   Affix,
   Caption,
@@ -914,7 +914,7 @@ function TypePreview({ node }: { node: TypeNode }) {
     if (!el) return;
     const s = el.style;
     s.fontFamily = `"${String(node.fontFamily).replace(/"/g, "")}", var(--font-sans)`;
-    s.fontWeight = String(node.fontWeight || "400");
+    s.fontWeight = textOf(node.fontWeight || "400");
     s.textTransform = node.textTransform || "";
     s.textDecorationLine = node.textDecoration || "";
     s.textIndent = node.textIndent ? `${node.textIndent}px` : "";

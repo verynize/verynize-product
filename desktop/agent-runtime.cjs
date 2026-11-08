@@ -168,7 +168,10 @@ function normalizeDesignStyle(value) {
   if (typeof value !== "string" || !DESIGN_STYLE.test(value)) throw Error("Invalid design style");
   return value;
 }
-/** [{id, name, summary}] from the design style library, or [] when it is unavailable. */
+/**
+ * [{id, name, summary}] from the design style library, or [] when it is unavailable.
+ * @param {{importStyles?: () => Promise<{listStyles: () => unknown}>}} [options] `listStyles` may be sync or async.
+ */
 async function listDesignStyles({
   importStyles = () => import("../integrations/design-knowledge/styles/index.mjs"),
 } = {}) {
@@ -342,6 +345,7 @@ function designHooks(guard) {
 function cleanText(value, limit) {
   return typeof value === "string"
     ? value
+        // oxlint-disable-next-line no-control-regex -- stripping control characters is the point
         .replace(/[\u0000-\u001f<>]/g, " ")
         .trim()
         .slice(0, limit)
@@ -815,7 +819,7 @@ function claudeQueryOptions({
   if (memoryDir || (claudeSettings && typeof claudeSettings === "object"))
     options.settings = {
       ...(memoryDir ? { autoMemoryDirectory: memoryDir } : {}),
-      ...(claudeSettings || {}),
+      ...claudeSettings,
     };
   if (bridge?.url) {
     options.mcpServers = { [settings.MCP_SERVER_NAME]: settings.claudeMcpServer(bridge, access) };
@@ -856,10 +860,9 @@ function codexThreadParams({ cwd, access, model, persona, directories }) {
  */
 function applyClaudePolicy(options, { access, account, tools, autonomy } = {}) {
   const out = { ...options };
-  if (account?.env && Object.keys(account.env).length)
-    out.env = { ...(out.env || {}), ...account.env };
+  if (account?.env && Object.keys(account.env).length) out.env = { ...out.env, ...account.env };
   if (tools?.servers?.length)
-    out.mcpServers = { ...toolConfig.claudeServers(tools.servers), ...(out.mcpServers || {}) };
+    out.mcpServers = { ...toolConfig.claudeServers(tools.servers), ...out.mcpServers };
   const lists = toolConfig.claudePermissionLists(tools?.permissions || []);
   const allowed = [...lists.allowed, ...(autonomy?.allowedTools || [])].filter(
     (t) => !(autonomy?.deniedTools || []).includes(t),
@@ -895,7 +898,7 @@ function codexPreferenceConfig(threadParams, { preferenceWrites, bridge, agentSe
   return {
     ...threadParams,
     config: {
-      ...(threadParams.config || {}),
+      ...threadParams.config,
       [`mcp_servers.${settings.MCP_SERVER_NAME}.disabled_tools`]: disabled,
     },
   };
@@ -904,7 +907,7 @@ function codexPreferenceConfig(threadParams, { preferenceWrites, bridge, agentSe
 /** Codex thread params under "plan before edits": nothing is written without an approval. */
 function applyCodexPlanFirst(threadParams, autonomy) {
   if (!autonomy?.planFirst) return threadParams;
-  const { config, ...rest } = threadParams;
+  const { config: _config, ...rest } = threadParams;
   return { ...rest, approvalPolicy: "untrusted", sandbox: "read-only" };
 }
 
@@ -981,7 +984,7 @@ class JsonRpcChild {
       return;
     }
     if (message.id !== undefined && message.method) {
-      this.handleRequest(message);
+      void this.handleRequest(message);
       return;
     }
     if (message.id !== undefined) {
@@ -1418,7 +1421,7 @@ class AgentRuntime {
     clearTimeout(run.settleTimer);
     for (const [requestId, pending] of this.permissions)
       if (pending.runId === run.id) pending.resolve(false, requestId);
-    for (const pending of [...this.questions.values()])
+    for (const pending of this.questions.values())
       if (pending.runId === run.id) pending.resolve(null);
     for (const server of this.codexPool.values())
       for (const [threadId, child] of server.children)
@@ -1645,7 +1648,7 @@ class AgentRuntime {
     pending.resolve(allow === true, rule ? { always: true, rule } : {});
     // Other waiting requests in the same project that the new rule covers are allowed as well.
     if (rule)
-      for (const other of [...this.permissions.values()])
+      for (const other of this.permissions.values())
         if (
           other.projectKey === pending.projectKey &&
           ruleMatches(rule, other.toolName, other.input)
@@ -1827,7 +1830,7 @@ class AgentRuntime {
         CLAUDE_AGENT_SDK_CLIENT_APP: `verynize/${VERSION}`,
         CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS: "1",
         ...(params.agentSettings ? agentAccess.claudeAccessOptions(params.agentSettings).env : {}),
-        ...(params.account?.env || {}),
+        ...params.account?.env,
       }),
       stderr: (data) => {
         stderr = (stderr + data).slice(-8000);
@@ -1859,7 +1862,7 @@ class AgentRuntime {
       }, 4000).unref?.();
     };
     const map = createClaudeMapper();
-    (async () => {
+    void (async () => {
       try {
         for await (const message of q) {
           if (
@@ -2069,7 +2072,7 @@ class AgentRuntime {
         claudeSettings: params.claudeSettings,
         ...(params.agentSettings
           ? (({ env, cliArgs }) => ({
-              env: { ...env, ...(params.account?.env || {}) },
+              env: { ...env, ...params.account?.env },
               extraArgs: cliArgs,
             }))(
               agentAccess.claudeAccessOptions(params.agentSettings, {
@@ -2320,7 +2323,7 @@ class AgentRuntime {
       ],
       {
         slot: run.codexSlot || "system",
-        extraEnv: { ...(params.account?.env || {}), ...extra.env },
+        extraEnv: { ...params.account?.env, ...extra.env },
       },
     );
     // Sign-in gate: a signed-out account gets the sign-in card instead of a turn that retries for ~17 s and fails with 401.
@@ -2525,7 +2528,7 @@ class AgentRuntime {
         id: run.id,
         codexPersonality: params.codexPersonality,
         env: {
-          ...(params.account?.env || {}),
+          ...params.account?.env,
           ...toolConfig.codexServerArgs(params.tools?.servers || []).env,
         },
         extraArgs: [
@@ -2966,6 +2969,7 @@ class AgentRuntime {
         release = r;
       });
       const q = sdk.query({
+        // oxlint-disable-next-line require-yield -- an input stream that never yields keeps the session open until released
         prompt: (async function* () {
           await hold;
         })(),
@@ -3059,6 +3063,7 @@ class AgentRuntime {
           this.home && this.home !== os.homedir() ? { HOME: this.home } : {},
         );
         const q = sdk.query({
+          // oxlint-disable-next-line require-yield -- an input stream that never yields keeps the session open until released
           prompt: (async function* () {
             await hold;
           })(),

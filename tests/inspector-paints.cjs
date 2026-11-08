@@ -115,14 +115,14 @@ const LOGO = svg(
       for (;;) {
         const status = (await page.locator("#artwork-status").textContent()) || "";
         if (
-          /^Exported/.test(status) &&
+          status.startsWith("Exported") &&
           (await fs.stat(target).then(
             () => true,
             () => false,
           ))
         )
           break;
-        if (status && !/^Exported/.test(status)) throw new Error("Export failed: " + status);
+        if (status && !status.startsWith("Exported")) throw new Error("Export failed: " + status);
         if (Date.now() > deadline) throw new Error("Export timed out");
         await page.waitForTimeout(100);
       }
@@ -1017,7 +1017,7 @@ const LOGO = svg(
       ["2160p", [2700, 2160], "Card@2160p.png"],
       ["0.5", [50, 40], "Card@0.5x.png"],
     ]) {
-      await saveAs(`card-${preset}.png`);
+      await saveAs(`card-${String(preset)}.png`);
       await page.locator("#artwork-scale").selectOption(preset);
       const bytes = await exportNow();
       assert.deepEqual(pngSize(bytes), { width: size[0], height: size[1] }, preset);
@@ -1027,8 +1027,8 @@ const LOGO = svg(
         [size[0] - 2, Math.floor(size[1] / 2)],
         [Math.floor(size[0] / 2), size[1] - 2],
       ]);
-      near(corner.px[0], [255, 0, 0, 255], `${preset}: artwork fills the output`);
-      near(corner.px[1], [255, 0, 0, 255], `${preset}: artwork fills the output height`);
+      near(corner.px[0], [255, 0, 0, 255], `${String(preset)}: artwork fills the output`);
+      near(corner.px[1], [255, 0, 0, 255], `${String(preset)}: artwork fills the output height`);
     }
     // The suffix lives in the Export options popover (the name field is full width, as in Wonder A7).
     // The last export's toast sits over this button.

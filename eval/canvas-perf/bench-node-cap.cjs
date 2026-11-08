@@ -31,9 +31,9 @@ try {
       "const NODE_LIMITS = Object.freeze({ perPage: 100000, perDocument: 100000 });",
     ),
   );
-  for (const [kind, extra] of [
-    ["single", []],
-    ["pages", ["--nodes-per-page", "5000"]],
+  for (const { kind, extra } of [
+    { kind: "single", extra: [] },
+    { kind: "pages", extra: ["--nodes-per-page", "5000"] },
   ])
     run("eval/canvas-perf/bench-verynize.cjs", [
       "--sizes",

@@ -32,11 +32,11 @@ export async function startProcess(command, args, { cwd, env, ready, timeout = 9
   const exited = new Promise((resolve) => child.once("exit", resolve));
   const stop = async () => {
     try {
-      process.kill(-child.pid, "SIGTERM");
+      if (child.pid) process.kill(-child.pid, "SIGTERM");
     } catch {}
     const timer = setTimeout(() => {
       try {
-        process.kill(-child.pid, "SIGKILL");
+        if (child.pid) process.kill(-child.pid, "SIGKILL");
       } catch {}
     }, 5000);
     await exited;

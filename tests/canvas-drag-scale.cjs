@@ -149,7 +149,7 @@ const hitDocument = {
           if (cached !== expected && mismatches.length < 10)
             mismatches.push({ x, y, cached, expected });
         }
-      return { points, full, inA, fullInA, mismatches, seen: [...seen].sort() };
+      return { points, full, inA, fullInA, mismatches, seen: [...seen] };
     });
     assert.deepEqual(grid.mismatches, [], "the cache answers like elementsFromPoint everywhere");
     for (const id of ["A", "A1", "A2", "B", "B1", "C", null])
@@ -187,8 +187,9 @@ const hitDocument = {
       const isDocument = (v) => !!v && typeof v === "object" && Array.isArray(v.pages);
       const { stringify } = JSON,
         clone = window.structuredClone,
-        getDocument = window.design.getDocument,
         elementsFromPoint = document.elementsFromPoint.bind(document);
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
+      const getDocument = window.design.getDocument;
       JSON.stringify = function (v, ...rest) {
         if (counting && isDocument(v)) counts.stringify++;
         return stringify.call(this, v, ...rest);

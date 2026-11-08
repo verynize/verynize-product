@@ -2,7 +2,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type ChatPart = {
-  kind: "text" | "thinking" | "tool" | "permission" | "error" | string;
+  kind: "text" | "thinking" | "tool" | "permission" | "error" | (string & {});
   text?: string;
   at?: number;
   end?: number;
@@ -174,18 +174,18 @@ type Workspace = {
   setPartOpen(messageIndex: number, partIndex: number, open: boolean): void;
   removeAttachment(index: number): void;
   attachImages?(files: File[]): void;
-  listModels?(agent: string): Promise<AgentModel[]>;
+  listModels?: (agent: string) => Promise<AgentModel[]>;
   // --- chat parity contract (implemented in web/desktop-panel.js) ---
   answerQuestion?(messageIndex: number, partIndex: number, answers: Record<string, string>): void;
-  steer?(text: string): void;
+  steer?: (text: string) => void;
   /** Queue a follow-up behind the running turn (runs it right away when idle). */
-  queueMessage?(text: string): void;
+  queueMessage?: (text: string) => void;
   editQueued?(id: string, text: string): void;
   moveQueued?(id: string, delta: -1 | 1): void;
   removeQueued?(id: string): void;
   sendQueuedNow?(id: string): void;
   /** Opens verynize:// links (artboards/elements) on the canvas; returns false if unhandled. */
-  openLink?(url: string): boolean;
+  openLink?: (url: string) => boolean;
   /** Search canvas elements for the @ popover. */
   searchElements?(query: string): ChatMention[];
   addMention?(mention: ChatMention): void;
@@ -210,7 +210,7 @@ type Workspace = {
   attachedImages?(): { path: string; name: string }[];
   /** Start a fresh provider session for the next message (keeps the transcript). */
   clearSession?(): void;
-  setDraft?(text: string): void;
+  setDraft?: (text: string) => void;
   getQueue?(): QueuedTask[];
   /** Run id of the current conversation's active run (tests/debugging). */
   activeRunId?(): string | null;
@@ -271,7 +271,7 @@ export function useModels(agent: string, enabled: boolean): AgentModel[] {
       });
       modelCache.set(agent, request);
     }
-    request.then((value) => {
+    void request.then((value) => {
       // An empty list (web: signed out, model API off) is asked again next time instead of being kept.
       if (!value.length) modelCache.delete(agent);
       if (live) setModels(value.filter((m) => m.id !== "default"));

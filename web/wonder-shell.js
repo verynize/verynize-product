@@ -536,7 +536,8 @@
         boxSizing: "border-box",
       });
       if (node.type === "text") element.textContent = node.text || "";
-      if (node.type === "image" && /^data:image\//.test(node.src || "")) element.src = node.src;
+      if (node.type === "image" && String(node.src || "").startsWith("data:image/"))
+        element.src = node.src;
       if (node.gradient && !/url\(/i.test(node.gradient))
         element.style.backgroundImage = node.gradient;
       if (node.type === "frame") {
@@ -787,7 +788,7 @@
           "Rename",
           async () => {
             const name = await window.askText("Rename file", file.name);
-            if (name?.trim()) renameFile(file.id, name);
+            if (name?.trim()) void renameFile(file.id, name);
           },
         ],
         ["Duplicate", () => duplicateFile(file.id)],

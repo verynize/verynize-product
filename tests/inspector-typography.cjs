@@ -136,10 +136,10 @@ const fs = require("node:fs/promises"),
     const added = await page.evaluate(() => window.design.addNode("text"));
     assert.equal((await node(added)).lineHeight, "auto");
     assert.equal(await page.locator("#typography-section [name=lineHeight]").inputValue(), "Auto");
-    await page.evaluate((id) => {
+    await page.evaluate(() => {
       window.design.runCommand("edit.undo");
       window.design.setSelection(["title"]);
-    }, added);
+    });
 
     // --- Vertical alignment ----------------------------------------------------------------------------------
     assert.equal(

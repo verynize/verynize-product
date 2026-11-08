@@ -97,7 +97,7 @@ function codexMemoriesSetting(toml) {
       table = header[1].replace(/["'\s]/g, "");
       continue;
     }
-    if (/^\[\[/.test(line)) {
+    if (line.startsWith("[[")) {
       table = "\u0000";
       continue;
     }

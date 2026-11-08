@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { platform } from "@/lib/platform";
 import { queryClient } from "@/lib/query/client";
+import { textOf } from "@/lib/utils";
 import {
   accountScope,
   queryKeys,
@@ -105,7 +106,7 @@ const metadataOf = (org: Pick<Organization, "metadata">): Record<string, unknown
   if (org.metadata && typeof org.metadata === "object")
     return org.metadata as Record<string, unknown>;
   try {
-    return JSON.parse(String(org.metadata || "null")) || {};
+    return JSON.parse(textOf(org.metadata || "null")) || {};
   } catch {
     return {};
   }

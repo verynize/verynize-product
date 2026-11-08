@@ -496,7 +496,7 @@
     const byId = new Map(nodes.map((n, i) => [n.id, i]));
     const children = nodes.map(() => []),
       roots = [],
-      abs = new Array(nodes.length),
+      abs = Array.from({ length: nodes.length }),
       parent = new Int32Array(nodes.length).fill(-1);
     nodes.forEach((n, i) => {
       if (n.parentId) {

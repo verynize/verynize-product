@@ -59,7 +59,11 @@ export function parseColor(input) {
   let m = s.match(/^#([0-9a-f]{3,8})$/);
   if (m) {
     let h = m[1];
-    if (h.length === 3 || h.length === 4) h = [...h].map((c) => c + c).join("");
+    if (h.length === 3 || h.length === 4)
+      h = h
+        .split("")
+        .map((c) => c + c)
+        .join("");
     if (h.length !== 6 && h.length !== 8) return null;
     return {
       r: parseInt(h.slice(0, 2), 16),
@@ -72,7 +76,7 @@ export function parseColor(input) {
   if (m) {
     const parts = m[1]
       .replace(/\s*\/\s*/, " / ")
-      .split(/[\s,\/]+/)
+      .split(/[\s,/]+/)
       .filter(Boolean);
     const [r, g, b] = parts.slice(0, 3).map((p) => (p.endsWith("%") ? pct(p, 255) : parseFloat(p)));
     const a = parts[3] !== undefined ? pct(parts[3]) : 1;
@@ -84,7 +88,7 @@ export function parseColor(input) {
   if (m) {
     const parts = m[1]
       .replace(/\s*\/\s*/, " / ")
-      .split(/[\s\/]+/)
+      .split(/[\s/]+/)
       .filter(Boolean);
     const L = pct(parts[0]),
       C = parseFloat(parts[1]),

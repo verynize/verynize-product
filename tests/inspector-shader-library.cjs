@@ -133,7 +133,7 @@ const path = require("node:path");
     assert.deepEqual((await node()).shaderColors.center, { color: "#0000ff" });
     assert.equal((await params()).colors.center, "#0000ff");
     const blue = await pixel();
-    assert.ok(blue.rgba[2] > blue.rgba[0], `centre turns blue ${blue.rgba}`);
+    assert.ok(blue.rgba[2] > blue.rgba[0], `centre turns blue ${blue.rgba.join(",")}`);
     await page.locator("[name=shader-backgroundAlpha]").fill("50");
     await page.locator("[name=shader-backgroundAlpha]").press("Enter");
     assert.equal((await node()).shaderColors.background.color, "#020a0b80");
@@ -147,7 +147,7 @@ const path = require("node:path");
     assert.deepEqual(n.shaderColors.center, { color: "#ff0000", token: "brand/glow" });
     assert.equal((await params()).colors.center, "#ff0000");
     const red = await pixel();
-    assert.ok(red.rgba[0] > red.rgba[2], `centre follows the variable ${red.rgba}`);
+    assert.ok(red.rgba[0] > red.rgba[2], `centre follows the variable ${red.rgba.join(",")}`);
     await page.keyboard.press("Escape");
     // Changing the variable re-renders the shader with the new value.
     await page.evaluate(() => {
@@ -160,7 +160,7 @@ const path = require("node:path");
     const green = await pixel();
     assert.ok(
       green.rgba[1] > green.rgba[0] && green.rgba[1] > green.rgba[2],
-      `variable change ${green.rgba}`,
+      `variable change ${green.rgba.join(",")}`,
     );
 
     // Shader settings: six sliders, each change one undo step.

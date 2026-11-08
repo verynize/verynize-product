@@ -47,6 +47,7 @@ const LOCK_FILES = [
   ["package-lock.json", "npm"],
   ["npm-shrinkwrap.json", "npm"],
 ];
+// oxlint-disable-next-line no-control-regex -- matches ANSI escape sequences, which start with ESC
 const ANSI = /\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b[@-Z\\-_]/g;
 const LOCAL_URL =
   /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1?\]|\[::\])(?::\d{2,5})?(?:\/[^\s'"`<>)\]]*)?/i;
@@ -72,11 +73,9 @@ function childEnv(extra = {}) {
     ...extra,
   };
   delete env.ELECTRON_RUN_AS_NODE;
-  const dirs = [
-    ...String(env.PATH || "")
-      .split(path.delimiter)
-      .filter(Boolean),
-  ];
+  const dirs = String(env.PATH || "")
+    .split(path.delimiter)
+    .filter(Boolean);
   for (const dir of extraDirs()) if (!dirs.includes(dir)) dirs.push(dir);
   env.PATH = dirs.join(path.delimiter);
   return env;
@@ -861,7 +860,7 @@ class ProcessManager {
     });
     proc.timer = setTimeout(() => {
       proc.timedOut = true;
-      terminate(proc, 2000);
+      void terminate(proc, 2000);
     }, timeoutMs);
     proc.timer.unref?.();
     proc.exitPromise.then(() => clearTimeout(proc.timer));

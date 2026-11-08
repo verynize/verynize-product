@@ -52,8 +52,8 @@ test("lookups, children and descendants match whole-array scans", () => {
   assert.deepEqual(ix.children("a2"), []);
   for (const n of list)
     assert.deepEqual(
-      [...ix.descendants(n.id)].sort(),
-      [...descendantsByScan(list, n.id)].sort(),
+      [...ix.descendants(n.id)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+      [...descendantsByScan(list, n.id)].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       n.id,
     );
   assert.deepEqual(
@@ -144,7 +144,10 @@ test("a parent cycle neither loops nor hides the node itself", () => {
     ix.topmost([list[0], list[2]]).map((n) => n.id),
     ["x"],
   );
-  assert.deepEqual([...ix.descendants("x")].sort(), ["x", "y", "z"]);
+  assert.deepEqual(
+    [...ix.descendants("x")].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    ["x", "y", "z"],
+  );
 });
 
 test("2,000 nodes: all-node topmost and per-node lookups are fast", () => {

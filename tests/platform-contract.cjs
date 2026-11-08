@@ -77,7 +77,10 @@ test("capabilities are the same in web/platform.js and platform.ts and name prel
     pathToFileURL(path.join(root, "web/src/lib/platform.ts")).href
   );
   const { CAPABILITY_METHODS } = platformWith(undefined);
-  assert.deepEqual(Object.keys(CAPABILITY_METHODS).sort(), [...CAPABILITIES].sort());
+  assert.deepEqual(
+    Object.keys(CAPABILITY_METHODS).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [...CAPABILITIES].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+  );
   const preload = new Set(methodPaths(shapeOf(exposedByPreload().desktop)));
   for (const [name, methods] of Object.entries(CAPABILITY_METHODS)) {
     assert.ok(methods.length, `${name} needs at least one method`);

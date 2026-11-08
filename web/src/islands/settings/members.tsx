@@ -115,7 +115,7 @@ function IncomingInvitations({
   onAccepted,
 }: {
   scope: AccountScope;
-  onAccepted(id: string): void;
+  onAccepted: (id: string) => void;
 }) {
   const client = useQueryClient();
   // A failed load lists nothing, as before.
@@ -174,7 +174,7 @@ type Confirmation = {
   confirm: string;
   /** A destructive action: Wonder's red confirm button (as in the Share visibility dialog). */
   danger?: boolean;
-  run(): void;
+  run: () => void;
 };
 
 function ConfirmDialog({
@@ -182,7 +182,7 @@ function ConfirmDialog({
   onClose,
 }: {
   confirmation: Confirmation | null;
-  onClose(): void;
+  onClose: () => void;
 }) {
   return (
     <Dialog open={!!confirmation} onOpenChange={(open) => (open ? undefined : onClose())}>
@@ -227,11 +227,11 @@ function RowMenu({ label, children }: { label: string; children: ReactNode }) {
 }
 
 type MembersAction = {
-  run(): Promise<unknown>;
+  run: () => Promise<unknown>;
   /** Toast shown on success. */
   done?: string;
   /** Refresh what the action changed. */
-  refresh(): Promise<unknown>;
+  refresh: () => Promise<unknown>;
 };
 
 export function MembersPage() {

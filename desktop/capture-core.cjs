@@ -922,7 +922,7 @@ function captureModel(snapshot) {
     pages: [{ id, name: "Capture", nodes }],
     tokens: {},
     ...(snapshot.fontFaces?.length
-      ? { fontFaces: snapshot.fontFaces.map(({ source, ...face }) => face) }
+      ? { fontFaces: snapshot.fontFaces.map(({ source: _source, ...face }) => face) }
       : {}),
   };
 }

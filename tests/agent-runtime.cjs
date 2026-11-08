@@ -89,7 +89,7 @@ function fakeClaudeSdk(record) {
           };
           return;
         }
-        if (/^REVIEW/.test(text)) {
+        if (String(text).startsWith("REVIEW")) {
           record.reviewOptions = options;
           yield { type: "system", subtype: "init", session_id: "r", model: "fake-opus" };
           yield {
@@ -1617,7 +1617,7 @@ test("parallel runs: up to three chats run at once and every event names its run
     runtime
       .list()
       .map((r) => r.chatId)
-      .sort(),
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
     chats,
   );
   for (const run of runs) runtime.cancel(run.id);

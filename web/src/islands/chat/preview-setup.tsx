@@ -178,8 +178,8 @@ function NoticeCard({
   description: string;
   action: string;
   closeLabel: string;
-  onAction(): void;
-  onClose(): void;
+  onAction: () => void;
+  onClose: () => void;
 }) {
   return (
     <section
@@ -281,7 +281,7 @@ function ProposalCard({
 }: {
   proposal: PreviewProposal;
   state: ChatState;
-  onDismiss(): void;
+  onDismiss: () => void;
 }) {
   const [edit, setEdit] = useState(false);
   const [setup, setSetup] = useState(() => formatCommand(proposal.setup));

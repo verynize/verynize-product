@@ -1532,10 +1532,7 @@ const card = (patch = {}) => [{ ...CARD, ...patch }];
             const input = el.querySelector("input");
             let textLeft = null;
             if (chip) textLeft = chip.getBoundingClientRect().left;
-            else if (input) {
-              const range = document.createRange();
-              textLeft = input.getBoundingClientRect().left; // value text starts at the input's left edge
-            }
+            else if (input) textLeft = input.getBoundingClientRect().left; // value text starts at the input's left edge
             const r = (v) => (v == null ? null : Math.round(v * 100) / 100);
             out[key] = {
               bound: !!chip,

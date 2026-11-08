@@ -167,7 +167,7 @@ const fs = require("node:fs/promises"),
       };
     let lines = await guides();
     assert.deepEqual(
-      lines.map((l) => l.side).toSorted(),
+      lines.map((l) => l.side).toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       ["left", "top"],
       "Left/Top constraints draw guides to the left and top edges",
     );
@@ -215,7 +215,7 @@ const fs = require("node:fs/promises"),
     );
     await select(["pinned"]);
     assert.deepEqual(
-      (await guides()).map((l) => l.side).toSorted(),
+      (await guides()).map((l) => l.side).toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
       ["right", "top"],
       "a Right constraint draws to the right edge",
     );

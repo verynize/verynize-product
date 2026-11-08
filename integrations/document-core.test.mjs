@@ -17,6 +17,7 @@ import { validateDocument } from "./design-store.mjs";
 
 const read = (rel) => readFileSync(new URL("../" + rel, import.meta.url), "utf8");
 // The canvas layer defaults (`const defaults={…}` in web/app.js), a plain object literal.
+// oxlint-disable-next-line typescript/no-implied-eval -- evaluates the object literal copied from web/app.js
 const DEFAULTS = Function(
   `return (${read("web/app.js").match(/const defaults\s*=\s*(\{[^}]*\})/)[1]})`,
 )();

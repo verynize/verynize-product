@@ -251,7 +251,7 @@ async function generate({ prompt, size = "1024x1024", signal, executable, tempRo
         if (params?.threadId !== threadId) return;
         if (method === "turn/started") {
           turnId = params.turn.id;
-          if (combined.aborted) cancel();
+          if (combined.aborted) void cancel();
         }
         if (method === "item/completed" && params.item?.type === "imageGeneration")
           item = params.item;
@@ -262,7 +262,7 @@ async function generate({ prompt, size = "1024x1024", signal, executable, tempRo
       });
       combined.addEventListener("abort", cancel, { once: true });
       if (combined.aborted) {
-        cancel();
+        void cancel();
         return;
       }
       rpc
@@ -270,7 +270,7 @@ async function generate({ prompt, size = "1024x1024", signal, executable, tempRo
         .then(
           (result) => {
             turnId = result.turn.id;
-            if (combined.aborted) cancel();
+            if (combined.aborted) void cancel();
           },
           (error) => void finish(error),
         );

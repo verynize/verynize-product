@@ -371,7 +371,7 @@
       (el) =>
         (el.onclick = () => {
           window.appPreferences.set({ theme: el.dataset.theme });
-          render();
+          void render();
         }),
     );
     if (id === "agents") {
@@ -424,7 +424,7 @@
     if (!screen.hidden && selected === id) return;
     screen.hidden = false;
     document.body.classList.add("settings-open");
-    render(id);
+    void render(id);
   }
   function applyClose() {
     if (screen.hidden) return;
@@ -441,7 +441,7 @@
     },
     close,
     select: (id) => {
-      if (screen.hidden) render(id);
+      if (screen.hidden) void render(id);
       else window.shellRequest({ settings: id }, () => render(id));
     },
     applyOpen,
@@ -485,7 +485,7 @@
     }
   });
   window.addEventListener("agent-usage-changed", () => {
-    if (!screen.hidden && selected === "usage") render();
+    if (!screen.hidden && selected === "usage") void render();
   });
   window.desktop?.onAuthEvent?.((event) => {
     status(event.message);
@@ -501,7 +501,7 @@
       if (window.verynizeAlerts?.handle(event)) return;
       if (event.type !== "done" || event.stopped) return;
       if (preferences.notifications && !document.hasFocus())
-        window.desktop.notifyTask?.({
+        void window.desktop.notifyTask?.({
           title: "Agent task finished",
           body: event.code === 0 ? "Your task completed." : "The task ended with an error.",
         });

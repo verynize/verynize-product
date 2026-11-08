@@ -595,7 +595,7 @@ test("knowledge, icon, image and style-token tools", async (t) => {
   ].map((marker) => styled.indexOf(marker));
   assert.ok(
     order.every((i) => i >= 0),
-    `markers present: ${order}`,
+    `markers present: ${order.join(",")}`,
   );
   assert.deepEqual(
     [...order].sort((a, b) => a - b),
@@ -845,10 +845,10 @@ test("measured bounds from the backend drive the lint; pending remote images res
   const shot = await run("take_screenshot", { id });
   assert.equal(JSON.parse(shot.content[1].text).geometry, "measured");
   assert.match(shot.content[2].text, /WARNING images not loaded:[\s\S]*missing: HTTP 404/);
-  assert.deepEqual(fetched.sort(), [
-    "https://images.example.com/missing.jpg",
-    "https://images.example.com/ok.jpg",
-  ]);
+  assert.deepEqual(
+    fetched.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    ["https://images.example.com/missing.jpg", "https://images.example.com/ok.jpg"],
+  );
   const nodes = (await store.read("doc")).document.pages[0].nodes;
   assert.equal(nodes.find((n) => n.id === "photo-ok").assetStatus, "ready");
   assert.match(nodes.find((n) => n.id === "photo-ok").src, /^data:image\/png;base64,/);

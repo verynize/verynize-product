@@ -115,7 +115,7 @@ function CommandField({
   id?: string;
   label: string;
   value: string;
-  onChange(value: string): void;
+  onChange: (value: string) => void;
   placeholder: string;
   disabled?: boolean;
   className?: string;
@@ -173,7 +173,7 @@ function PreviewSettingsDialog({
 }: {
   root: string;
   state: ChatState;
-  onClose(): void;
+  onClose: () => void;
 }) {
   const [rows, setRows] = useState<Row[]>([emptyRow(0)]);
   const [setup, setSetup] = useState("");

@@ -160,19 +160,19 @@ const path = require("node:path");
       ["radius", "18", "cornerRadii", [4, 8, 12, 16], "radius"],
       ["strokeWidth", "6", "strokeWidths", undefined, "border"],
     ]) {
-      await page.locator(`[name="${field}"]`).fill(value);
-      await page.locator(`[name="${field}"]`).press("Enter");
+      await page.locator(`[name="${String(field)}"]`).fill(value);
+      await page.locator(`[name="${String(field)}"]`).press("Enter");
       assert.equal(
         (await node("card"))[override],
         undefined,
-        `${field}: uniform input clears overrides`,
+        `${String(field)}: uniform input clears overrides`,
       );
-      assert.equal((await styles("card"))[cssKey], `${value}px`);
+      assert.equal((await styles("card"))[cssKey], `${String(value)}px`);
       await page.evaluate(() => window.design.runCommand("edit.undo"));
       assert.deepEqual(
         (await node("card"))[override],
         initial,
-        `${field}: one undo restores individual values`,
+        `${String(field)}: one undo restores individual values`,
       );
     }
     const bind = async (field) => {

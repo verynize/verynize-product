@@ -13,7 +13,7 @@ import { AccountStep } from "./account-step";
 
 const invited = () => new URLSearchParams(location.hash.slice(1)).has("room");
 
-function PasskeyOption({ onSignedIn }: { onSignedIn(): void }) {
+function PasskeyOption({ onSignedIn }: { onSignedIn: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const run = useRef<AbortController | null>(null);
@@ -61,7 +61,7 @@ function PasskeyOption({ onSignedIn }: { onSignedIn(): void }) {
   );
 }
 
-export default function WebSignIn({ onSignedIn }: { onSignedIn(): void }) {
+export default function WebSignIn({ onSignedIn }: { onSignedIn: () => void }) {
   const invite = invited();
   return (
     <div

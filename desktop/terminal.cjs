@@ -261,11 +261,13 @@ function hookQuit() {
 
 /** Terminal output as plain text: ANSI/OSC escape sequences removed, carriage-return overwrites applied. */
 function plainTerminalText(raw) {
+  /* oxlint-disable no-control-regex -- removing escape sequences and control characters is the point */
   const text = String(raw)
     .replace(/\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)/g, "")
     .replace(/\u001b\[[0-?]*[ -/]*[@-~]/g, "")
     .replace(/\u001b[@-Z\\-_]/g, "")
     .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "");
+  /* oxlint-enable no-control-regex */
   return text
     .split("\n")
     .map((line) => line.split("\r").filter(Boolean).pop() ?? "")
@@ -416,7 +418,7 @@ function registerTerminal(handle, win, { getProject } = {}) {
   });
 
   onWindowClosed(win, () => {
-    shutdownTerminals(terminals.values());
+    void shutdownTerminals(terminals.values());
     terminals.clear();
   });
   return { count: () => terminals.size, killAll: () => shutdownTerminals(terminals.values()) };

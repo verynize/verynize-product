@@ -42,7 +42,7 @@ const os = require("node:os");
     await page.evaluate((html) => window.design.importHTML(html), html);
     const recovered = await page.evaluate(() => window.design.getDocument());
     const withoutId = (n) => {
-      const { id, parentId, ...rest } = n;
+      const { id: _id, parentId: _parentId, ...rest } = n;
       return rest;
     };
     assert.deepEqual(

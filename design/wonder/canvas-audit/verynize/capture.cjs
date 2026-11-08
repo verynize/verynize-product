@@ -503,7 +503,9 @@ const PAGE2 = [
       });
       const s = await state({ x: mouse.x, y: mouse.y });
       const nodes =
-        opts.nodes === false ? undefined : (await nodesNow()).map(({ src, textRuns, ...n }) => n);
+        opts.nodes === false
+          ? undefined
+          : (await nodesNow()).map(({ src: _src, textRuns: _textRuns, ...n }) => n);
       metrics.push({
         file,
         id,

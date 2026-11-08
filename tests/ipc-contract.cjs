@@ -8,7 +8,7 @@ const path = require("node:path");
 
 const desktop = path.join(__dirname, "../desktop");
 const read = (name) => fs.readFileSync(path.join(desktop, name), "utf8");
-const sorted = (values) => [...values].sort();
+const sorted = (values) => [...values].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
 const contract = new Set();
 const body = /export interface IpcContract \{([\s\S]*?)\n\}/.exec(read("ipc-contract.ts"));

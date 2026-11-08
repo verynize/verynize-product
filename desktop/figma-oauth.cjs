@@ -44,7 +44,7 @@ const validPort = (v) => Number.isInteger(v) && v >= 1024 && v <= 65535;
 
 /**
  * @param {{file:string, safeStorage:{isEncryptionAvailable():boolean, encryptString(s:string):Buffer, decryptString(b:Buffer):string},
- *          openExternal(url:string):Promise<unknown>, fetcher?:typeof fetch, origin?:string, timeoutMs?:number, now?:()=>number}} options
+ *          openExternal:(url:string)=>Promise<unknown>, fetcher?:typeof fetch, origin?:string, timeoutMs?:number, now?:()=>number}} options
  */
 function createFigmaOAuth({
   file,

@@ -43,7 +43,7 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     "/opt/homebrew/bin",
     "/usr/local/bin",
   ]
-    .filter(path.isAbsolute)
+    .filter((d) => path.isAbsolute(d))
     .some((d) => {
       try {
         require("node:fs").accessSync(path.join(d, "codex"), 1);

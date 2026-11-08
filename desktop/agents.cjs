@@ -18,7 +18,7 @@ const dirs = () => [
 async function discover() {
   return Promise.all(
     ["codex", "claude"].map(async (id) => {
-      for (const dir of dirs().filter(path.isAbsolute)) {
+      for (const dir of dirs().filter((dir) => path.isAbsolute(dir))) {
         const candidate = path.join(dir, id);
         try {
           await fs.access(candidate, 1);

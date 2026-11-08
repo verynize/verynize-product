@@ -312,7 +312,7 @@ test("styles API is re-exported and style tokens resolve before archetypes", () 
   assert.equal(s.style, "minimal-dark");
   assert.deepEqual(s.colors, styleTokens("minimal-dark").colors);
   assert.ok(
-    s.colors.some((c) => c.name === "color/hairline" && /^rgba\(/.test(c.value)),
+    s.colors.some((c) => c.name === "color/hairline" && String(c.value).startsWith("rgba(")),
     "extra translucent tokens are included",
   );
   const a = designTokens("ledger-precision");

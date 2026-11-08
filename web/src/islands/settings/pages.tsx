@@ -31,7 +31,7 @@ import {
 type PageProps = {
   api: SettingsApi;
   preferences: Preferences;
-  setPreference(changes: Partial<Preferences>): void;
+  setPreference: (changes: Partial<Preferences>) => void;
   accounts: Record<string, string>;
 };
 

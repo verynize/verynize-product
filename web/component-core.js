@@ -120,7 +120,9 @@
     Array.isArray(n.overrides) ? n.overrides.filter((k) => typeof k === "string") : [];
   const hasOverride = (n, key) => overridesOf(n).includes(key);
   function setOverrides(n, keys) {
-    const list = [...new Set(keys.filter(nonempty))].sort().slice(0, MAX_OVERRIDES);
+    const list = [...new Set(keys.filter(nonempty))]
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+      .slice(0, MAX_OVERRIDES);
     if (list.length) n.overrides = list;
     else delete n.overrides;
   }

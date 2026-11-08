@@ -76,7 +76,7 @@ const path = require("node:path");
     assert.equal(pasted.find((n) => n.name === "Row").layout, "flex");
     assert.equal(pasted.find((n) => n.name === "Label").text, "Checkout");
     // Pasted layers are selected and rendered: the vector is an SVG image, the text renders its characters.
-    assert.deepEqual(await p.evaluate((id) => window.design.getSelection(), card.id), [card.id]);
+    assert.deepEqual(await p.evaluate(() => window.design.getSelection()), [card.id]);
     const tri = pasted.find((n) => n.name === "Triangle");
     assert.match(
       await p.locator(`#canvas [data-id="${tri.id}"] img`).getAttribute("src"),

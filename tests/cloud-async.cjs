@@ -29,7 +29,7 @@ const path = require("node:path");
       };
       /* Background access checks (the Share popover's role and visibility) answer at once; the operations under test wait. */ window.fetch =
         (url, options) =>
-          String(url).endsWith("/access")
+          (url instanceof Request ? url.url : String(url)).endsWith("/access")
             ? Promise.resolve({
                 ok: true,
                 status: 200,

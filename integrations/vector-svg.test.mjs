@@ -335,7 +335,7 @@ test("schema: vector-only keys, limits and stroke details", () => {
       fills: [],
     }),
   );
-  for (const [extra, message] of [
+  for (const [extra, message] of /** @type {[Record<string, unknown>, RegExp][]} */ ([
     [{ paths: [] }, /1–500 paths/],
     [{ paths: Array(501).fill({ d: "M0 0" }) }, /1–500 paths/],
     [{ paths: [{ d: "Q" }] }, /Invalid vector path/],
@@ -348,7 +348,7 @@ test("schema: vector-only keys, limits and stroke details", () => {
     [{ strokeMiter: 0 }, /miter/],
     [{ strokeDash: [-1] }, /strokeDash/],
     [{ paths: Array(3).fill({ d: "M0 0" + "L1 1".repeat(49000) }) }, /at most 500000 characters/],
-  ])
+  ]))
     assert.throws(
       () => validateDocument(doc({ ...ok, ...extra })),
       message,

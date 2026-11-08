@@ -66,7 +66,7 @@ const git = (cwd, ...args) =>
       .filter(
         (c) =>
           c.rpc === method &&
-          !/agent-workdirs[\/\\]titles|word title for a design chat/.test(
+          !/agent-workdirs[/\\]titles|word title for a design chat/.test(
             JSON.stringify(c.params || {}),
           ),
       );
@@ -216,9 +216,9 @@ const git = (cwd, ...args) =>
       "the repository checkout is untouched",
     );
     await page.waitForFunction(() =>
-      /M$/.test(
-        document.querySelector('#code-file-tree [data-path="index.html"]')?.textContent || "",
-      ),
+      (
+        document.querySelector('#code-file-tree [data-path="index.html"]')?.textContent || ""
+      ).endsWith("M"),
     );
     // Filter: All files / All changes (the branch since main, commits included) / Uncommitted, with counts.
     await page.locator("#code-file-filter").click();

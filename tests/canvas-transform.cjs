@@ -290,7 +290,7 @@ const fs = require("node:fs/promises"),
     // Shift snaps to 15°.
     await dragFrom(start, target.x - start.x, target.y - start.y, { modifier: "Shift" });
     a = await node("a");
-    assert.equal(Math.abs(a.rotation % 15), 0, `Shift snaps to 15° (${a.rotation})`);
+    assert.equal(Math.abs(a.rotation % 15), 0, `Shift snaps to 15° (${String(a.rotation)})`);
     assert.ok(a.rotation > -180 && a.rotation <= 180);
 
     // ---------- TR1: edge resize, Shift aspect, Alt from the centre, no distance guides ----------

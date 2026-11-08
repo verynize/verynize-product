@@ -139,10 +139,10 @@ const APP = `require('http').createServer((q,r)=>{r.setHeader('content-type','te
     await pathField.fill("/about");
     await pathField.press("Enter");
     await page.waitForFunction(() =>
-      /\/about$/.test(
+      (
         [...document.querySelectorAll("iframe")].find((f) => f.name === "verynize-preview-tab")
-          ?.src || "",
-      ),
+          ?.src || ""
+      ).endsWith("/about"),
     );
     const preview = page.frameLocator("iframe[name=verynize-preview-tab]");
     await preview.getByRole("heading", { name: "About page" }).waitFor();

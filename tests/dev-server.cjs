@@ -83,7 +83,7 @@ test("starts the fixture through npm run dev, serves it, and stops the whole pro
   assert.deepEqual(status.command, ["npm", "run", "dev"]);
   assert.equal(status.source, "package.json");
   assert.match(await (await fetch(status.url)).text(), /Fixture app/);
-  assert.doesNotMatch(status.tail, /\u001b/, "ANSI escapes removed");
+  assert.ok(!status.tail.includes("\u001b"), "ANSI escapes removed");
   const again = await m.start(root);
   assert.equal(again.alreadyRunning, true);
   assert.equal(again.pid, status.pid);

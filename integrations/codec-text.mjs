@@ -78,7 +78,7 @@ export function styleFromSpec(spec) {
 }
 /** Merge declared styles (later wins), keeping px/ratio and px/em pairs exclusive. */
 export function mergeStyle(base, next) {
-  const out = { ...(base || {}) };
+  const out = { ...base };
   for (const [key, value] of Object.entries(next || {})) {
     if (key === "lineHeight") delete out.lineHeightPx;
     if (key === "lineHeightPx") delete out.lineHeight;

@@ -102,12 +102,12 @@ try {
     ).status,
     200,
   );
-  for (const [route, method, body] of [
+  for (const [route, method, body] of /** @type {[string, string, object?][]} */ ([
     ["/tokens", "POST", { role: "owner" }],
     ["/tokens", "POST", { role: "editor" }],
     ["/tokens/rotate", "POST"],
     ["/tokens/" + invite.id, "DELETE"],
-  ])
+  ]))
     assert.equal((await request(url + route, method, body, invite.token)).status, 403, route);
   const ownerAccess = await (await request(url + "/access", "GET", null, room.token)).json();
   assert.ok(

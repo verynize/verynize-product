@@ -14,6 +14,8 @@ import { EVAL_DIR } from "./lib/briefs.mjs";
 import { fitBradleyTerry, bootstrap, quantile } from "./lib/stats.mjs";
 
 const args = process.argv.slice(2);
+/** Array#sort's default string order (UTF-16 code units). */
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const opt = (n, d) => {
   const i = args.indexOf(n);
   return i >= 0 ? args[i + 1] : d;
@@ -63,7 +65,8 @@ for (const file of voteFiles) {
       const orig = byPair[pair.repeatOf];
       if (orig) {
         const flip = { A: "B", B: "A", tie: "tie" }[vote.choice];
-        flip === orig.choice ? consistency.agree++ : consistency.disagree++;
+        if (flip === orig.choice) consistency.agree++;
+        else consistency.disagree++;
       }
       continue; // repeats measure consistency only; not double-counted
     }
@@ -82,7 +85,7 @@ if (!comparisons.length) {
   console.error("no usable votes");
   process.exit(2);
 }
-const players = [...new Set(comparisons.flatMap((c) => [c.a, c.b]))].sort();
+const players = [...new Set(comparisons.flatMap((c) => [c.a, c.b]))].sort(byCodeUnit);
 
 // Win/tie/loss from the focus app's perspective, overall and per brief.
 function wtl(filter) {
@@ -100,12 +103,14 @@ function wtl(filter) {
     } else continue;
     void me;
     const r = (out[other] ||= { win: 0, tie: 0, loss: 0 });
-    s === 1 ? r.win++ : s === 0 ? r.loss++ : r.tie++;
+    if (s === 1) r.win++;
+    else if (s === 0) r.loss++;
+    else r.tie++;
   }
   return out;
 }
 const overall = wtl(() => true);
-const briefs = [...new Set(comparisons.map((c) => c.brief))].sort();
+const briefs = [...new Set(comparisons.map((c) => c.brief))].sort(byCodeUnit);
 const perBrief = Object.fromEntries(briefs.map((b) => [b, wtl((c) => c.brief === b)]));
 
 const ratings = fitBradleyTerry(comparisons, players);

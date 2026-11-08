@@ -113,17 +113,8 @@
     document.body.append(stack);
     return stack;
   }
-  function notify({
-    key,
-    kind,
-    title,
-    detail,
-    items = [],
-    text = undefined,
-    name = undefined,
-    onExport = undefined,
-    action = undefined,
-  }) {
+  /** @param {{key: any, kind: any, title: any, detail: any, items?: any[], text?: any, name?: any, onExport?: any, action?: any}} notice */
+  function notify({ key, kind, title, detail, items = [], text, name, onExport, action }) {
     if (dismissed.has(key)) return null;
     const add = () => {
       const stack = host();
@@ -258,7 +249,7 @@
     }
     if (repairs.length) {
       if (ctx.backup)
-        backup(JSON.stringify(d), {
+        void backup(JSON.stringify(d), {
           source: ctx.source,
           reason: "repaired",
           name: nameOf(d),
@@ -279,7 +270,7 @@
     try {
       const prepared = core.prepareDocument(structuredClone(raw), defaults, repairs);
       if (repairs.length) {
-        backup(text, {
+        void backup(text, {
           source: "startup",
           reason: "repaired",
           name: nameOf(raw),
@@ -306,7 +297,7 @@
       onExport: () => (startup.exported = true),
     });
     const box = () => document.querySelector(`#document-notices [data-key="${CSS.escape(f.key)}"]`);
-    backup(text, {
+    void backup(text, {
       source: "startup",
       reason: "invalid",
       name: nameOf(raw),

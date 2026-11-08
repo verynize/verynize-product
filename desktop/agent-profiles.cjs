@@ -22,6 +22,7 @@ function cleanName(value) {
   const name =
     typeof value === "string"
       ? value
+          // oxlint-disable-next-line no-control-regex -- stripping control characters is the point
           .replace(/[\u0000-\u001f]/g, " ")
           .trim()
           .replace(/\s+/g, " ")
@@ -201,7 +202,7 @@ class AgentProfiles {
         if (profile.agent !== agent) throw Error("That account belongs to another agent");
       }
       const data = await this.load();
-      const pick = { ...(data.chats[chatId] || {}) };
+      const pick = { ...data.chats[chatId] };
       if (id == null) delete pick[agent];
       else pick[agent] = id;
       if (Object.keys(pick).length) data.chats[chatId] = pick;
@@ -215,7 +216,7 @@ class AgentProfiles {
   }
   async chat(chatId) {
     const data = await this.load();
-    return { ...(data.chats[chatId] || {}) };
+    return { ...data.chats[chatId] };
   }
   async find(id) {
     if (typeof id !== "string" || !ID.test(id)) throw Error("Choose an account");

@@ -41,7 +41,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Spinner } from "@/components/ui/spinner";
 import { legacySet } from "@/lib/bridge";
 import { platform } from "@/lib/platform";
-import { cn } from "@/lib/utils";
+import { cn, textOf } from "@/lib/utils";
 import { AuthCard } from "./auth-card";
 import { ChatActionButton, ChatIconButton, ChatPillButton, ChatSuggestionButton } from "./controls";
 import { Markdown, openAppLink } from "./markdown";
@@ -176,7 +176,7 @@ const SHELL = /^(shell|bash|exec_command|local_shell)$/i;
 const input = (part: ChatPart) =>
   part.input && typeof part.input === "object" ? (part.input as Record<string, unknown>) : {};
 const base = (value: unknown) =>
-  String(value ?? "")
+  textOf(value ?? "")
     .split(/[\\/]/)
     .filter(Boolean)
     .at(-1) ?? "";
@@ -202,7 +202,7 @@ function describeTool(part: ChatPart) {
     return { Icon: SquareTerminalIcon, label: humanize(tool), mono: false, live };
   }
   if (SHELL.test(name)) {
-    const command = String(args.command ?? title.replace(/^\S+\s/, ""));
+    const command = textOf(args.command ?? title.replace(/^\S+\s/, ""));
     return { Icon: SquareTerminalIcon, label: command, mono: true, live: `Running ${command}` };
   }
   const file = base(
@@ -222,7 +222,7 @@ function describeTool(part: ChatPart) {
       Icon: SearchIcon,
       label: title,
       mono: false,
-      live: `Searching ${String(args.pattern ?? args.path ?? "")}`.trim(),
+      live: `Searching ${textOf(args.pattern ?? args.path ?? "")}`.trim(),
     };
   if (/web_?search|webfetch/i.test(name))
     return { Icon: GlobeIcon, label: title, mono: false, live: "Searching the web" };
@@ -317,7 +317,7 @@ function ToolRow({
     !part.hasInput && part.partialInput
       ? part.partialInput
       : shell && args.command
-        ? String(args.command)
+        ? textOf(args.command)
         : pretty(part.input ?? {});
   const block =
     "m-0 max-h-55 overflow-auto font-mono text-xs leading-4.5 break-words whitespace-pre-wrap";

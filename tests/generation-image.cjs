@@ -316,7 +316,9 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
       height: 1536,
     });
     images = await imageNodes(page);
-    assert.ok(images.some((n) => /^data:image\//.test(n.src) && n.w === 40 && n.h === 30));
+    assert.ok(
+      images.some((n) => String(n.src).startsWith("data:image/") && n.w === 40 && n.h === 30),
+    );
     const service = await app.evaluate(
       async ({ app }, { modulePath, used }) => {
         const { imageGenerator } = process.mainModule.require(modulePath);

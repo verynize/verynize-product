@@ -716,7 +716,7 @@
           e.preventDefault();
           e.stopImmediatePropagation();
           const point = centre();
-          svgFile.text().then((markup) => {
+          void svgFile.text().then((markup) => {
             if (insertSvg(markup, point, svgFile.name.replace(/\.svg$/i, "") || "Pasted SVG"))
               return;
             window.imageDrop?.dropFiles([svgFile], ...screenOf(point));

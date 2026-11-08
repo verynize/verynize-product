@@ -355,13 +355,14 @@ function render() {
           n.name;
         b.onclick = (e) => {
           if (e.shiftKey) {
-            selection.has(n.id) ? selection.delete(n.id) : selection.add(n.id);
+            if (selection.has(n.id)) selection.delete(n.id);
+            else selection.add(n.id);
           } else selection = new Set([n.id]);
           render();
         };
         const toggles = document.createElement("span");
         toggles.className = "layer-row-toggles";
-        for (const [key, icon, label] of [
+        for (const [key, , label] of [
           ["locked", "lock-simple", "Lock"],
           ["hidden", "eye", "Hide"],
         ]) {

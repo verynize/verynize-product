@@ -57,6 +57,7 @@ async function seed(page, { current, library }) {
     ({ current, library }) => {
       localStorage.setItem("verynize-v2", current);
       localStorage.setItem("verynize-library-v1", JSON.stringify(library));
+      // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
       const set = Storage.prototype.setItem;
       Storage.prototype.setItem = function (key, value) {
         if (key === "verynize-v2" || key === "verynize-library-v1") return;

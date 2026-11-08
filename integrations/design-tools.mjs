@@ -110,6 +110,9 @@ import {
   PARAM_KEYS as SHADER_PARAM_KEYS,
 } from "./shaders.mjs";
 
+/** Array#sort's default string order (UTF-16 code units). */
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 export const SERVER_NAME = "verynize";
 export const SERVER_VERSION = "0.9.0";
 /**
@@ -296,7 +299,7 @@ function bindColor(document, node, property, token) {
     );
   if (
     property === "svgColor" &&
-    !(node.type === "image" && /^data:image\/svg\+xml;base64,/.test(node.src || ""))
+    !(node.type === "image" && String(node.src || "").startsWith("data:image/svg+xml;base64,"))
   )
     throw new Error("svgColor binds only on SVG image elements");
   if (property === "outlineColor" && !(node.outlineWidth > 0))
@@ -1062,7 +1065,7 @@ async function writeAs(backend, ref, fn, options) {
   };
   const key = docKey(out.name, ref);
   sessionFor(backend).receipts.invalidate(key);
-  if (pending.length) scheduleAssets(backend, ref ?? out.name ?? undefined, pending, key);
+  if (pending.length) void scheduleAssets(backend, ref ?? out.name ?? undefined, pending, key);
   return { ...out, pendingAssets: pending.length };
 }
 
@@ -1822,7 +1825,7 @@ export function toolTable(backend, context = {}) {
         }
         if (label && label !== root.name) {
           root.name = label;
-          root.overrides = [...new Set([...(root.overrides || []), "name"])].sort();
+          root.overrides = [...new Set([...(root.overrides || []), "name"])].sort(byCodeUnit);
         }
         reflow(page, [root], [], document);
         ensureShortIds(document);

@@ -55,11 +55,11 @@ export type SettingsApi = {
   actions: {
     saveModels(values: AgentDefaults): void;
     saveMemory(text: string): void;
-    openMemory(): void;
+    openMemory: () => void;
     saveCloud(value: string): boolean;
-    openFigma(): void;
+    openFigma: () => void;
     copyMcp(): Promise<void>;
-    openAgent(): void;
+    openAgent: () => void;
     share(): void;
     discoverAgents(): Promise<AgentInfo[] | null>;
     auth(kind: AuthKind, agent: string): Promise<void>;

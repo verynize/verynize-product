@@ -16,7 +16,7 @@ const MIGRATIONS = new URL("../../migrations/", import.meta.url);
  * @param {Record<string, Function>} options.classes Durable Object classes by export name
  * @param {string} options.dataDir where databases, actors and files are kept
  * @param {Record<string, object>} options.bindings name -> {type, ...}
- * @returns {{env: object, close(): void}}
+ * @returns {{env: object, close: () => void}}
  */
 export function createNodeEnv({ classes, dataDir, bindings }) {
   const env = {};
@@ -71,7 +71,7 @@ export function createNodeEnv({ classes, dataDir, bindings }) {
   return {
     env,
     // Actors first (they commit and close their sockets), then the shared database.
-    close() {
+    close: () => {
       for (const close of closers) close();
     },
   };

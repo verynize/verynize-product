@@ -33,6 +33,7 @@ const inside = (parent, child) =>
   child.startsWith(parent.endsWith(path.sep) ? parent : parent + path.sep);
 const cleanName = (value, limit = 80) =>
   String(value ?? "")
+    // oxlint-disable-next-line no-control-regex -- stripping control characters is the point
     .replace(/[\u0000-\u001f]/g, "")
     .replace(/\s+/g, " ")
     .trim()

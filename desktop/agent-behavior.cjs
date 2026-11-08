@@ -52,8 +52,9 @@ function normalizeBranchPrefix(value) {
   return prefix;
 }
 
+/** @param {any} [input] untrusted settings patch from the renderer; every field is checked below. */
 function normalizeBehavior(input = {}, base = DEFAULTS) {
-  const out = { ...DEFAULTS, ...base, repoModes: { ...(base.repoModes || {}) } };
+  const out = { ...DEFAULTS, ...base, repoModes: { ...base.repoModes } };
   const value = input && typeof input === "object" ? input : {};
   if ("followUp" in value) {
     if (!["queue", "steer"].includes(value.followUp)) throw Error("Choose Steer or Queue");
@@ -179,7 +180,7 @@ async function commitAuthor({ runner = run } = {}) {
   let linked = null;
   if (login && email) {
     const lower = email.toLowerCase();
-    if (/@users\.noreply\.github\.com$/.test(lower))
+    if (lower.endsWith("@users.noreply.github.com"))
       linked = lower.split("@")[0].replace(/^\d+\+/, "") === login.toLowerCase();
     else {
       try {
@@ -224,7 +225,7 @@ function frontmatter(text) {
 }
 /** Built-in styles + custom ones from ~/.claude/output-styles/*.md; `current` = outputStyle in ~/.claude/settings.json. */
 async function outputStyles({ home = os.homedir() } = {}) {
-  const styles = [...BUILT_IN_STYLES.map((s) => ({ ...s, source: "built-in" }))];
+  const styles = BUILT_IN_STYLES.map((s) => ({ ...s, source: "built-in" }));
   const dir = path.join(home, ".claude", "output-styles");
   let names = [];
   try {

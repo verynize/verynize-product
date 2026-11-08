@@ -145,7 +145,7 @@ function AccountMenu({
   signedIn,
 }: {
   name: string;
-  run(kind: AuthKind): void;
+  run: (kind: AuthKind) => void;
   signedIn: boolean;
 }) {
   return (
@@ -412,7 +412,7 @@ function ServerStatus({
 }: {
   server: McpServer;
   checking: boolean;
-  onSignIn(): void;
+  onSignIn: () => void;
   signingIn: boolean;
 }) {
   if (server.status === "needs-auth")
@@ -603,8 +603,8 @@ function AddToolDialog({
 }: {
   open: boolean;
   agentName: string;
-  onOpenChange(open: boolean): void;
-  onSubmit(server: Omit<AddServer, "agent">): Promise<void>;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (server: Omit<AddServer, "agent">) => Promise<void>;
 }) {
   const [name, setName] = useState("");
   const [transport, setTransport] = useState<"stdio" | "http">("http");

@@ -5,7 +5,7 @@ const path = require("node:path");
 // See docs/canvas-performance/README.md#root-cause-five-hasfocus-visible-rules.
 // Attribute/element arguments (has-data-*, has-aria-*, has-[>svg]) remain allowed.
 const pseudoVariant =
-  /\b(?:(?:group|peer)-)?has-(?:\[[^\]\r\n]*:[^\]\r\n]*\]|(?!aria-|data-)[a-z][\w-]*(?=[:/\[]))/g;
+  /\b(?:(?:group|peer)-)?has-(?:\[[^\]\r\n]*:[^\]\r\n]*\]|(?!aria-|data-)[a-z][\w-]*(?=[:/[]))/g;
 const focusSelector = /:has\(\s*:focus/;
 
 function checkSource(source) {

@@ -244,7 +244,7 @@ function claudeAccountFrom(status, config) {
   const method = status?.authMethod || (email ? "claude.ai" : "");
   return {
     email,
-    organization: /'s Organization$/.test(organization) ? "" : organization,
+    organization: organization.endsWith("'s Organization") ? "" : organization,
     plan: claudePlan({ subscriptionType: status?.subscriptionType, authMethod: method }),
     method,
   };
@@ -839,7 +839,7 @@ class AgentTools {
     await (server.agent === "claude"
       ? this.editClaudeConfig((config) => {
           config.mcpServers = {
-            ...(config.mcpServers || {}),
+            ...config.mcpServers,
             [server.name]:
               server.transport === "http"
                 ? { type: "http", url: server.url }

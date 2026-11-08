@@ -71,7 +71,7 @@ function Segmented<T extends string>({
   label: string;
   value: T;
   options: { value: T; label: string }[];
-  onChange(value: T): void;
+  onChange: (value: T) => void;
   name: string;
 }) {
   return (
@@ -363,7 +363,7 @@ function ModeMenu({
   id: string;
   value: Access;
   inherited?: boolean;
-  onChange(value: Access | "default"): void;
+  onChange: (value: Access | "default") => void;
 }) {
   const mode = MODES.find((m) => m.value === value) ?? MODES[1];
   return (

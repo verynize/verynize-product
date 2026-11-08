@@ -176,7 +176,7 @@ async function perf(url, data) {
           res.machineBefore = before;
           res.machineAfter = machine();
           res.wallMs = Date.now() - t;
-          res.version = await b.version;
+          res.version = b.version;
           list.push(res);
           console.log(
             `${key} run ${r + 1}/${runs}: ttff ${res.ttffMs.toFixed(0)} ms, pan p50 ${res.pan.p50?.toFixed(1)} p95 ${res.pan.p95?.toFixed(1)}, zoom p95 ${res.zoom.p95?.toFixed(1)}, edit ${res.edit.p50.toFixed(1)}, drag p95 ${res.drag.p95?.toFixed(1)}, load ${before.loadavg[0]}`,

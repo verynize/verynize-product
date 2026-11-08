@@ -590,7 +590,7 @@ const pngSize = (bytes) => ({ width: bytes.readUInt32BE(16), height: bytes.readU
               Math.abs(y - WONDER[dir].y[r]) <= 0.5 &&
               w === 10 &&
               h === 10,
-            `${dir} ${r}-${c}: glyph at ${[x, y, w, h]}`,
+            `${dir} ${r}-${c}: glyph at ${[x, y, w, h].join(",")}`,
           );
         }
     }
@@ -769,7 +769,7 @@ const pngSize = (bytes) => ({ width: bytes.readUInt32BE(16), height: bytes.readU
     const cols = (await styleOf("gd", "gridTemplateColumns")).split(" ").map(parseFloat);
     assert.ok(
       Math.abs(cols[1] - 2 * cols[0]) < 1 && Math.abs(cols[0] - cols[2]) < 1,
-      `2 fr renders twice as wide: ${cols}`,
+      `2 fr renders twice as wide: ${cols.join(",")}`,
     );
     await pop.locator("[name=columnSize-1]").fill("1");
     await pop.locator("[name=columnSize-1]").press("Enter");

@@ -79,7 +79,7 @@
         }
         return;
       }
-      if (!editing) probe(id, point(parts, event));
+      if (!editing) void probe(id, point(parts, event));
     });
     layer.addEventListener("pointerleave", () => {
       if (ctx.mode === "edit") {

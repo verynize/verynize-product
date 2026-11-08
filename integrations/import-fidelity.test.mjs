@@ -53,13 +53,13 @@ test("arbitrary border, corners, outline and data background match HTML CSS", as
     [`background-image:url(${png})`, `[background-image:url(${png})]`, ["fills"]],
     [`background:url(${png})`, `[background:url(${png})]`, ["fills"]],
   ]) {
-    const baseline = nodes(await importHtml(`<div style="${css}"></div>`))[0];
+    const baseline = nodes(await importHtml(`<div style="${String(css)}"></div>`))[0];
     for (const r of [
-      await importHtml(`<div class="${cls}"></div>`),
-      jsxToDocument(`<div className="${cls}"/>`),
+      await importHtml(`<div class="${String(cls)}"></div>`),
+      jsxToDocument(`<div className="${String(cls)}"/>`),
     ])
       for (const prop of props)
-        assert.deepEqual(nodes(r)[0][prop], baseline[prop], `${cls} ${prop}`);
+        assert.deepEqual(nodes(r)[0][prop], baseline[prop], `${String(cls)} ${prop}`);
   }
   assert.ok(
     jsxToDocument('<div className="[border-radius:2px/4px]"/>').warnings.some((w) =>

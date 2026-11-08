@@ -134,7 +134,10 @@ const path = require("node:path");
     const page0 = await box("source");
     const outside = [page0.x + 20, page0.y + 20]; // inside the source, outside the target
     const YELLOW = await pixel(...outside);
-    assert.ok(YELLOW[2] < YELLOW[0] - 60, `the source paints before the conversion (${YELLOW})`);
+    assert.ok(
+      YELLOW[2] < YELLOW[0] - 60,
+      `the source paints before the conversion (${YELLOW.join(",")})`,
+    );
 
     // The item needs two or more siblings.
     for (const [ids, label] of [
@@ -145,7 +148,7 @@ const path = require("node:path");
       await select(ids);
       await rightClick(ids[0] === "kid" ? "kid" : "target");
       if ((await selection()).length !== ids.length) await select(ids);
-      assert.ok(!(await items()).includes("Use as mask"), `no Use as mask for ${label}`);
+      assert.ok(!(await items()).includes("Use as mask"), `no Use as mask for ${String(label)}`);
       await close();
     }
     await select(["source", "target"]);

@@ -17,8 +17,7 @@ const json = (result) => {
   return JSON.parse(result.content[0].text);
 };
 const strip = (node) => {
-  const { id, parentId, shortId, measured, ...rest } = node;
-  (void id, parentId, shortId, measured);
+  const { id: _id, parentId: _parentId, shortId: _shortId, measured: _measured, ...rest } = node;
   return rest;
 };
 

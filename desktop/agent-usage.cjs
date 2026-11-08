@@ -166,6 +166,7 @@ async function fetchClaudeUsage({
     release = r;
   });
   const q = sdk.query({
+    // oxlint-disable-next-line require-yield -- an input stream that never yields keeps the session open until released
     prompt: (async function* () {
       await hold;
     })(),
@@ -187,14 +188,16 @@ async function fetchClaudeUsage({
     ]);
   try {
     const account = await timed(q.accountInfo(), "Claude account");
-    const read = q.usage_EXPERIMENTAL_MAY_CHANGE_DO_NOT_RELY_ON_THIS_API_YET;
-    if (typeof read !== "function")
+    if (typeof q.usage_EXPERIMENTAL_MAY_CHANGE_DO_NOT_RELY_ON_THIS_API_YET !== "function")
       return {
         ...parseClaudeUsage({ account }),
         status: "unavailable",
         message: "Update Claude Code to see plan limits here.",
       };
-    const usage = await timed(read.call(q, { skipBehaviors: true }), "Claude usage");
+    const usage = await timed(
+      q.usage_EXPERIMENTAL_MAY_CHANGE_DO_NOT_RELY_ON_THIS_API_YET({ skipBehaviors: true }),
+      "Claude usage",
+    );
     return parseClaudeUsage({ account, usage });
   } finally {
     release();
@@ -497,9 +500,12 @@ class AgentUsage {
   }
   /** Forget cached limits of a removed account. */
   forget(profile) {
-    for (const key of [...this.cache.keys()])
-      if (key.endsWith(":" + profile)) this.cache.delete(key);
+    for (const key of this.cache.keys()) if (key.endsWith(":" + profile)) this.cache.delete(key);
   }
+  /**
+   * @param {string} agent "claude" or "codex" (checked below).
+   * @param {{refresh?: boolean, profile?: string | null}} [options]
+   */
   async provider(agent, { refresh = false, profile = null } = {}) {
     if (!["claude", "codex"].includes(agent)) throw Error("Choose Claude or Codex");
     const named = typeof profile === "string" && profile && profile !== "system" ? profile : null;
@@ -555,7 +561,7 @@ class AgentUsage {
         return { agent, status: "error", message: friendlyError(error), limits: [], updatedAt };
       }
     })();
-    this.cache.set(cacheKey, { ...(cached || {}), pending });
+    this.cache.set(cacheKey, { ...cached, pending });
     try {
       const value = await pending;
       this.cache.set(cacheKey, { at: Date.now(), value });

@@ -49,7 +49,12 @@ for (const area of areas) {
     total++;
   }
   if (run.status !== 0 && total === 0) throw Error(`No diagnostics parsed for ${area}: ${output}`);
-  current[area] = { total, files: Object.fromEntries(Object.entries(files).sort()) };
+  current[area] = {
+    total,
+    files: Object.fromEntries(
+      Object.entries(files).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+    ),
+  };
   console.log(
     `${area}: ${total} errors${baseline ? ` (baseline ${baseline[area]?.total ?? 0})` : ""}; details in .typecheck/${area}.log`,
   );

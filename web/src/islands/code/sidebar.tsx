@@ -29,7 +29,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PlusIcon } from "@/components/icons";
 import { openSharePopover } from "../share/api";
-import { cn } from "@/lib/utils";
+import { cn, textOf } from "@/lib/utils";
 import {
   ChatMenu,
   ChatMenuContent,
@@ -419,7 +419,7 @@ function NextSteps({ connected }: { connected: boolean }) {
 }
 
 function Footer() {
-  const name = String(window.appPreferences?.get?.().displayName || "You");
+  const name = textOf(window.appPreferences?.get?.().displayName || "You");
   return (
     <div
       id="code-profile"

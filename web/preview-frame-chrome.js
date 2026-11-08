@@ -531,7 +531,7 @@
     entry.url = url;
     paintBar(entry);
   }
-  window.desktop?.onPreviewNavigated?.((data) => {
+  void window.desktop?.onPreviewNavigated?.((data) => {
     if (typeof data?.url === "string") navigated(data.url);
   });
   // Back / forward shortcuts while a running preview is the selection (not while typing).

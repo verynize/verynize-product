@@ -254,7 +254,10 @@ const fs = require("node:fs/promises"),
     assert.deepEqual([inHost[0].x, inHost[0].y, inHost[0].color], [30, 40, "#00ff00"]);
     const topCopy = list.find((n) => !n.parentId && n.id !== "src" && n.id !== "host");
     assert.deepEqual([topCopy.x, topCopy.y], [700, 500]);
-    assert.deepEqual((await selection()).toSorted(), [inHost[0].id, topCopy.id].toSorted());
+    assert.deepEqual(
+      (await selection()).toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+      [inHost[0].id, topCopy.id].toSorted((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    );
     await page.keyboard.press(mod("KeyZ"));
     assert.deepEqual(
       (await nodesOf()).map((n) => n.id),

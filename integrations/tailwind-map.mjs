@@ -460,7 +460,7 @@ export function parseClasses(className, { tokens = {}, viewport = null } = {}) {
       )
         set(
           "textAlignVertical",
-          d.resolved === "center" ? "center" : /end$/.test(d.resolved) ? "bottom" : "top",
+          d.resolved === "center" ? "center" : d.resolved.endsWith("end") ? "bottom" : "top",
         );
       else ignore(d.cls, `${p}:${d.resolved} is not supported`);
     }
@@ -771,7 +771,7 @@ export function parseClasses(className, { tokens = {}, viewport = null } = {}) {
     if (v === "none") set("gradient", "");
     else if (/url\s*\(/i.test(v)) {
       const match = /^url\(\s*(["']?)(.*?)\1\s*\)$/.exec(v);
-      if (match && /^data:image\//.test(match[2]))
+      if (match && match[2].startsWith("data:image/"))
         set("fills", [{ type: "image", src: match[2], fit: "cover" }]);
       else if (match && /^https?:\/\//.test(match[2])) set("backgroundRemote", match[2]);
       else

@@ -160,10 +160,10 @@ for (const variant of ["bundled", "system", "node"]) {
         projects,
         designFiles: false,
       });
-      assert.deepEqual(exact.results.map((r) => r.path).sort(), [
-        "notes/untracked.md",
-        "src/app.js",
-      ]);
+      assert.deepEqual(
+        exact.results.map((r) => r.path).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+        ["notes/untracked.md", "src/app.js"],
+      );
       const re = await run({
         query: "orbit\\w+\\(",
         regex: true,
@@ -204,7 +204,10 @@ test("project search: validation, missing folders and the gitignore matcher", as
   assert.equal(ignore("sub/root-only.txt", false), false);
   assert.equal(ignore("docs/a/b/draft.md", false), true);
   const { beta } = await searchFixture(t);
-  assert.deepEqual((await listFiles(beta)).sort(), [".gitignore", "readme.txt"]);
+  assert.deepEqual(
+    (await listFiles(beta)).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [".gitignore", "readme.txt"],
+  );
   // The bundled @vscode/ripgrep binary is preferred over rg on PATH.
   const preferred = await findRipgrep();
   assert.equal(preferred, await bundledRipgrep());
@@ -304,7 +307,10 @@ test("relocate a repository: folder renamed, registry, nested projects and chat 
   const result = await moves.relocateRepository({ repoId: siteRepo.id, name: "marketing-site" });
   const renamed = path.join(parent, "marketing-site");
   assert.equal(result.root, renamed);
-  assert.deepEqual(result.moved.map((m) => m.id).sort(), [siteRepo.id, nested.id].sort());
+  assert.deepEqual(
+    result.moved.map((m) => m.id).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    [siteRepo.id, nested.id].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+  );
   await assert.rejects(() => fs.access(site));
   const stored = await registry.get(siteRepo.id);
   assert.equal(stored.root, renamed);

@@ -57,6 +57,9 @@ export const clone = (value) => structuredClone(value);
 // Short ids. Each node gets a page-unique code stored as `shortId`. Artboards (top-level nodes)
 // are addressed by their code ("bok"); descendants by "<artboard code>.<own code>" ("bok.tem").
 
+/** Array#sort's default string order (UTF-16 code units). */
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 const CONSONANTS = "bcdfghjklmnprstvwz",
   VOWELS = "aeiou",
   LETTERS = "abcdefghijklmnopqrstuvwxyz";
@@ -795,7 +798,7 @@ function applySvgColor(node, attrs) {
       node.svgColorToken = name;
     }
   }
-  if (!/^data:image\/svg\+xml;base64,/.test(node.src || "")) {
+  if (!String(node.src || "").startsWith("data:image/svg+xml;base64,")) {
     delete node.svgColor;
     delete node.svgColorToken;
   }
@@ -1349,7 +1352,8 @@ function materialize(document, page, ph, batch, warnings) {
       !["x", "y", "id", "parentId", "shortId", ...LINK_KEYS].includes(key) &&
       JSON.stringify(before[key]) !== JSON.stringify(ph[key]),
   );
-  if (changed.length) ph.overrides = [...new Set([...(ph.overrides || []), ...changed])].sort();
+  if (changed.length)
+    ph.overrides = [...new Set([...(ph.overrides || []), ...changed])].sort(byCodeUnit);
   if (info.stray.length)
     warnings.push(
       `${where}: ${info.stray.slice(0, 5).join(", ")} ignored; an instance's layers come from its main. Put per-instance content inside a slot: <div data-slot="Name">…</div>`,
@@ -1368,7 +1372,7 @@ function materialize(document, page, ph, batch, warnings) {
     }
     const frame = page.nodes.find((n) => n.id === slot.id);
     for (const kid of page.nodes.filter((n) => n.parentId === frame.id)) removeSubtree(page, kid);
-    frame.overrides = [...new Set([...(frame.overrides || []), "children"])].sort();
+    frame.overrides = [...new Set([...(frame.overrides || []), "children"])].sort(byCodeUnit);
     const built = buildNodes(fill.elements, { document, page, parent: frame, warnings });
     page.nodes.push(...built.nodes);
     placeBuilt(document, page, built, warnings);
@@ -1409,9 +1413,6 @@ export function reflow(page, nodes = null, warnings = [], document = null) {
   }
   if (autos.length) layoutPage(page, new Set(autos.map((n) => n.id)));
   refreshIcons(page, document || {});
-  // Legacy free frames: right/bottom offsets resolve against the frame size.
-  for (const n of page.nodes) {
-  }
   return warnings;
 }
 
@@ -1637,12 +1638,12 @@ function editVector(node, el, tokens, warnings, where) {
       if (tokens[node.strokeToken]) node.strokeColor = tokens[node.strokeToken];
     } else delete node.strokeToken;
   }
-  for (const [attrs, key] of [
-    [["strokeLinecap", "stroke-linecap"], "strokeCap"],
-    [["strokeLinejoin", "stroke-linejoin"], "strokeJoin"],
-    [["strokeMiterlimit", "stroke-miterlimit"], "strokeMiter"],
-    [["strokeDasharray", "stroke-dasharray"], "strokeDash"],
-    [["data-stroke-hidden"], "strokeHidden"],
+  for (const { attrs, key } of [
+    { attrs: ["strokeLinecap", "stroke-linecap"], key: "strokeCap" },
+    { attrs: ["strokeLinejoin", "stroke-linejoin"], key: "strokeJoin" },
+    { attrs: ["strokeMiterlimit", "stroke-miterlimit"], key: "strokeMiter" },
+    { attrs: ["strokeDasharray", "stroke-dasharray"], key: "strokeDash" },
+    { attrs: ["data-stroke-hidden"], key: "strokeHidden" },
   ])
     if (has(...attrs)) {
       if (v[key] === undefined) delete node[key];
@@ -2086,7 +2087,7 @@ export function duplicateElements(
         (key) => !keep.has(key) && JSON.stringify(plain[key]) !== JSON.stringify(root[key]),
       );
       if (changed.length)
-        root.overrides = [...new Set([...(root.overrides || []), ...changed])].sort();
+        root.overrides = [...new Set([...(root.overrides || []), ...changed])].sort(byCodeUnit);
     }
     created.push(root);
   }

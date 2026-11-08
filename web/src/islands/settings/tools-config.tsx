@@ -76,7 +76,7 @@ function ServerForm({
 }: {
   repos: Repository[];
   initial: Draft;
-  onDone(): void;
+  onDone: () => void;
 }) {
   const api = desktopApi();
   const { connected: codexConnected } = useCodexConnection();

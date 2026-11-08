@@ -63,6 +63,7 @@ const errorOf = (page, fn, arg) =>
   page.evaluate(
     async ([source, value]) => {
       try {
+        // oxlint-disable-next-line no-eval -- rebuilds the serialized test function inside the page
         await (0, eval)(source)(value);
         return "resolved";
       } catch (error) {

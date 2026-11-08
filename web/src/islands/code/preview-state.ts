@@ -14,7 +14,7 @@ type LivePreviewApi = {
   reveal?(): boolean;
 };
 type PreviewTabApi = { open(frameId: string): unknown };
-type PreviewEditsApi = { confirmBeforeStop?(frameId: string): Promise<boolean> };
+type PreviewEditsApi = { confirmBeforeStop?: (frameId: string) => Promise<boolean> };
 const globals = () =>
   window as unknown as {
     livePreview?: LivePreviewApi;

@@ -321,6 +321,7 @@ try {
     const id = window.design
       .getDocument()
       .pages[0].nodes.find((n) => n.name.startsWith("retained-")).id;
+    // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
     const send = WebSocket.prototype.send;
     let batches = 0;
     WebSocket.prototype.send = function (data) {

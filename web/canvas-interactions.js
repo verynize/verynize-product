@@ -386,7 +386,7 @@
         .filter((k) => k.parentId === n.id && !k.hidden && k.position !== "absolute")
         .map((k) => screenBox(k.id))
         .filter(Boolean);
-      const auto = n.layout === "flex" && /^space-/.test(n.justifyContent || "");
+      const auto = n.layout === "flex" && String(n.justifyContent || "").startsWith("space-");
       const gapValue = (axis) =>
         n.layout === "block" ? Number(n.gapY) || 0 : px(axis === "x" ? cs.columnGap : cs.rowGap);
       const gap = (axis, from, to, cross) => {
@@ -829,6 +829,7 @@
         cam.zoom,
       );
     }
+    // oxlint-disable-next-line unbound-method -- the native method is kept to be called below with apply(this)
     const nativeScrollIntoView = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function (...args) {
       const layer = canvas.contains(this) && this !== canvas ? this.closest(".layer") : null;
@@ -862,7 +863,7 @@
       workspace.dataset.tool = tool;
       for (const [name, id] of Object.entries(TOOL_BUTTONS))
         document.getElementById(id)?.classList.toggle("tool-active", name === tool);
-      if (tool === "eyedropper" && previous !== "eyedropper") openEyedropper();
+      if (tool === "eyedropper" && previous !== "eyedropper") void openEyedropper();
     }
     // Legacy command buttons for the tools added here; the chrome island takes their ids over (toolbar / app menu).
     for (const [id, label, run] of [
@@ -3946,13 +3947,6 @@
       c.run(arg);
       return true;
     }
-    const shortcutText = (k) =>
-      k
-        .replace("mod+", /Mac/.test(navigator.platform) ? "⌘" : "Ctrl+")
-        .replace("alt+", "⌥")
-        .replace("shift+", "⇧")
-        .replace("ctrl+", "⌃")
-        .toUpperCase();
 
     document.addEventListener("keydown", (e) => {
       if (typing(e.target) || e.defaultPrevented) return;

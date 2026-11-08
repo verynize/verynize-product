@@ -20,7 +20,6 @@
       throw Error("Enter a localhost application URL");
     return url.href;
   };
-  const allNodes = () => window.design.getDocument().pages.flatMap((page) => page.nodes);
   const current = () => entries.get(activeId);
   const changed = () => window.dispatchEvent(new Event("bd:preview-state"));
   function selected() {
@@ -240,7 +239,6 @@
       const [, highlight, rect] = layer.children;
       let hovered = null,
         start = null,
-        last = null,
         pending = false,
         queued = null,
         done = false;
@@ -320,13 +318,12 @@
         event.stopPropagation();
         event.preventDefault();
         layer.setPointerCapture(event.pointerId);
-        start = last = toPage(event);
+        start = toPage(event);
       });
       layer.addEventListener("pointermove", (event) => {
         event.stopPropagation();
         const point = toPage(event);
         if (start) {
-          last = point;
           const box = span(start, point);
           if (box.width > 3 || box.height > 3) {
             highlight.hidden = true;

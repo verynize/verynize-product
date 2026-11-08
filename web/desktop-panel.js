@@ -1198,7 +1198,7 @@
     (id) =>
       ($(id).onchange = () => {
         setDefaults(currentDefaults());
-        if (id === "project-agent") loadModels();
+        if (id === "project-agent") void loadModels();
       }),
   );
   setDefaults(defaults);
@@ -1272,7 +1272,7 @@
     document.getElementById("open-project").onclick = openDesign;
   }
   if (api)
-    api.onDesignFileChanged((event) => {
+    void api.onDesignFileChanged((event) => {
       const active = window.fileLibrary
         ?.list()
         .find((file) => file.id === window.fileLibrary.currentId);
@@ -1458,7 +1458,7 @@
       .filter(Boolean);
     if (!images.length) return;
     event.preventDefault();
-    action(async () => {
+    void action(async () => {
       await attachImageBatch(images);
     })();
   });
@@ -1481,7 +1481,7 @@
   const attachTree = (name, paths) => {
     const list = [...new Set(paths)]
       .filter((p) => !/(^|\/)(node_modules|\.git)(\/|$)/.test(p))
-      .sort();
+      .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
     attachments.push({
       kind: "folder",
       name,
@@ -1704,7 +1704,7 @@
     (versionRequest = api?.agentToolsVersion
       ? Promise.resolve()
           .then(() => api.agentToolsVersion())
-          .then((v) => (typeof v === "string" ? v : v ? String(v) : ""))
+          .then((v) => (typeof v === "string" ? v : v ? String(/** @type {string} */ (v)) : ""))
           .catch(() => {
             versionRequest = null;
             return "";
@@ -1829,7 +1829,7 @@
       const i = q.findIndex((t) => t.id === entry.nextTaskId);
       if (i >= 0) next = q.splice(i, 1)[0];
     } else if (!entry.userStopped && entry.key === projectKey) next = q.shift();
-    if (next) runTask(next, chat);
+    if (next) void runTask(next, chat);
     else renderHistory();
   };
   const lastPart = (reply, kind) => {
@@ -2151,7 +2151,8 @@
       if (chat === conversation)
         status(
           web
-            ? "Running on the model API" + (result.model ? " · " + result.model : "")
+            ? "Running on the model API" +
+                (result.model ? " · " + /** @type {string} */ (result.model) : "")
             : (result.quickChat ? "Quick chat · scratch folder" : "Running in project") +
                 " · " +
                 result.runtime +
@@ -2189,7 +2190,7 @@
           : queueOf(chat)[0];
       if (next) {
         queueOf(chat).splice(queueOf(chat).indexOf(next), 1);
-        runTask(next, chat);
+        void runTask(next, chat);
       }
     }
   };
@@ -2455,7 +2456,7 @@
       document.execCommand("copy");
       area.remove();
     };
-    (navigator.clipboard?.writeText ? navigator.clipboard.writeText(text) : Promise.reject())
+    void (navigator.clipboard?.writeText ? navigator.clipboard.writeText(text) : Promise.reject())
       .catch(fallback)
       .then(() => status("Copied"));
   };
@@ -2551,7 +2552,7 @@
     }
   };
   host.querySelector(".agent-config").addEventListener("toggle", (event) => {
-    if (event.target.open) loadModels();
+    if (event.target.open) void loadModels();
   });
   loadChats(projectKey);
   const run =

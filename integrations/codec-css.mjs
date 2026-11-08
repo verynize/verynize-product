@@ -102,7 +102,7 @@ function atom(token) {
   else if (unit === "ch" || unit === "ex") v.em = n * 0.5;
   else if (unit === "%") v.pct = n;
   else if (unit === "vw") v.vw = n;
-  else if (/vh$/.test(unit)) v.vh = n;
+  else if (unit.endsWith("vh")) v.vh = n;
   else v.n = n; // deg and bare numbers
   return v;
 }

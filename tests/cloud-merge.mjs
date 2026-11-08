@@ -62,7 +62,10 @@ const stampAt = (wall, replica) => Ops.createClock(replica, () => wall).next();
   // other pages through `external`.
   const touched = Ops.touchedPages(ops);
   assert.equal(touched.all, false);
-  assert.deepEqual([...touched.pages].sort(), ["p1", "p2"]);
+  assert.deepEqual(
+    [...touched.pages].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
+    ["p1", "p2"],
+  );
   assert.equal(
     Ops.touchedPages([
       { t: "doc", key: "name", value: "x" },

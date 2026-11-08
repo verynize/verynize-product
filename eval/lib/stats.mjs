@@ -5,8 +5,8 @@ export function fitBradleyTerry(comparisons, players, { iterations = 500, prior 
   // comparisons: [{a, b, score}] where score is 1 (a wins), 0 (b wins), 0.5 (tie).
   const idx = new Map(players.map((p, i) => [p, i]));
   const n = players.length;
-  const wins = new Array(n).fill(0),
-    games = Array.from({ length: n }, () => new Array(n).fill(0));
+  const wins = Array.from({ length: n }, () => 0),
+    games = Array.from({ length: n }, () => Array.from({ length: n }, () => 0));
   for (const { a, b, score } of comparisons) {
     const i = idx.get(a),
       j = idx.get(b);
@@ -22,7 +22,7 @@ export function fitBradleyTerry(comparisons, players, { iterations = 500, prior 
         games[i][j] += prior;
       }
   for (let i = 0; i < n; i++) wins[i] += (prior * (n - 1)) / 2;
-  let p = new Array(n).fill(1);
+  let p = Array.from({ length: n }, () => 1);
   for (let it = 0; it < iterations; it++) {
     const next = p.map((pi, i) => {
       let denom = 0;

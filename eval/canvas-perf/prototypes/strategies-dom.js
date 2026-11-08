@@ -40,7 +40,7 @@
         scene = s;
         images = imgs;
         cam = { ...opts.cam };
-        els = new Array(s.nodes.length);
+        els = Array.from({ length: s.nodes.length });
         root = document.createElement("div");
         root.style.cssText = "position:absolute;inset:0;overflow:hidden;background:#f4f4f5";
         for (const r of s.roots) root.appendChild(build(r));
@@ -73,7 +73,7 @@
       selected = -1;
     function render() {
       // mirrors web/app.js render(): a fresh element for every node, then replace the children
-      const els = new Array(scene.nodes.length);
+      const els = Array.from({ length: scene.nodes.length });
       const fresh = scene.roots.map((r) => {
         const a = scene.abs[r];
         return C.buildDom(scene, r, images, els, { root: r, rootLeft: a.x, rootTop: a.y });
@@ -225,7 +225,7 @@
         vw = host.clientWidth;
         vh = host.clientHeight;
         dpr = devicePixelRatio;
-        els = new Array(s.nodes.length);
+        els = Array.from({ length: s.nodes.length });
         grid = C.rootGrid(s);
         const wrap = document.createElement("div");
         wrap.style.cssText = "position:absolute;inset:0;overflow:hidden;background:#f4f4f5";

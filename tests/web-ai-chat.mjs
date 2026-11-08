@@ -234,7 +234,7 @@ try {
     await second.waitForFunction(() => document.documentElement.dataset.uiReady === "true");
     const until = Date.now() + 10000;
     while (secondMe.length < 2 && Date.now() < until) await new Promise((r) => setTimeout(r, 100));
-    assert.ok(secondMe.length >= 2, `GET /api/me after sign-in: ${secondMe}`);
+    assert.ok(secondMe.length >= 2, `GET /api/me after sign-in: ${secondMe.join(",")}`);
     await new Promise((resolve) => setTimeout(resolve, 300));
     assert.equal(await second.locator("#onboarding").count(), 0, "AI setup shown once per account");
 
@@ -262,7 +262,7 @@ try {
     await other.close();
     assert.ok(
       meResponses.every((status) => status === 200),
-      `GET /api/me: ${meResponses}`,
+      `GET /api/me: ${meResponses.join(",")}`,
     );
     await signInContext.close();
   }

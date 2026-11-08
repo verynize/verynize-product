@@ -478,11 +478,11 @@ function follow(id: string | null) {
 export const presence = {
   sync,
   message,
-  snapshot(): PresenceSnapshot {
+  snapshot: (): PresenceSnapshot => {
     if (!current) publish(true);
     return current ?? snapshotOf();
   },
-  subscribe(listener: () => void) {
+  subscribe: (listener: () => void) => {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },

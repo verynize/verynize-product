@@ -9,6 +9,8 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 export const FONTSOURCE_API = "https://api.fontsource.org/v1/fonts/";
+/** Array#sort's default string order (UTF-16 code units). */
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const MAX_FONT_BYTES = 2 * 1024 * 1024;
 const MAX_EMBED_BYTES = 12 * 1024 * 1024; // render.cjs caps HTML at 20 MB
 const TIMEOUT_MS = 15000;
@@ -681,7 +683,7 @@ export function extractFontFamilies(document) {
   return [...map.values()].map((e) => ({
     family: e.family,
     weights: [...e.weights].sort((a, b) => a - b),
-    styles: [...e.styles].sort(),
+    styles: [...e.styles].sort(byCodeUnit),
   }));
 }
 

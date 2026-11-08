@@ -43,7 +43,7 @@ function AccountRow({
   isDefault: boolean;
   status: ProfileStatus | null | undefined;
   pending: boolean;
-  onChanged(): void;
+  onChanged: () => void;
 }) {
   const api = desktopApi();
   const [renaming, setRenaming] = useState(false);
