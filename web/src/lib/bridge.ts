@@ -69,7 +69,13 @@ declare global {
     design: DesignApi;
     verynize: DesignApi;
     agentWorkspace?: Record<string, (...args: never[]) => unknown>;
-    fileLibrary?: Record<string, unknown> & { list(): unknown[]; currentId: string | null };
+    fileLibrary?: Record<string, unknown> & {
+      list(): unknown[];
+      currentId: string | null;
+      findCloud?(server: string, roomId: string): string | null;
+      showHome?(): void;
+      applyEditor?(): void;
+    };
     appSettings?: { open(section?: string): void; close?(): void };
     appPreferences?: { get(): Record<string, unknown> };
     askText?: (title: string, value?: string) => Promise<string | null>;

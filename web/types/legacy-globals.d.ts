@@ -90,6 +90,18 @@ declare global {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
       [key: string]: any;
     };
+    /** web/src/lib/router/shell-router.ts; untyped from the legacy side. */
+    shellNavigation?: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      [key: string]: any;
+    };
+    /** web/shell-request.js */
+    shellRequest: ((target: unknown, apply?: () => void) => unknown) & { pending: unknown[] };
+    /** web/switch-coordinator.js */
+    switchCoordinator: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      [key: string]: any;
+    };
     /** web/document-safety.js; only the world-bounds notices are typed. */
     documentSafety: {
       worldBounds(page: object, recenter: () => void): void;
