@@ -1081,9 +1081,15 @@
     } catch {}
     const knownFile = library()?.findCloud?.(origin, info.id) || null;
     // Opened from Files (a room link, a listed room): show the editor and its loading cover at once,
-    // under the file's URL (or the room's, until its library file exists).
+    // under the file's URL (or the room's, until its library file exists). Not over Settings: a link
+    // opened there keeps Settings until the room has loaded.
+    const body = document.body.classList;
     const fromHome =
-      own && load && expected === undefined && document.body.classList.contains("files-view");
+      own &&
+      load &&
+      expected === undefined &&
+      body.contains("files-view") &&
+      !body.contains("settings-open");
     if (fromHome)
       window.shellRequest({ view: "/editor/" + encodeURIComponent(knownFile || info.id) }, () =>
         library()?.applyEditor?.(),
