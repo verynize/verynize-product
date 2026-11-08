@@ -112,7 +112,7 @@ export function MemoryView({ api }: { api: SettingsApi }) {
   const { connected: codexConnected } = useCodexConnection();
   const ipc = memoryIpc();
   const [overview, setOverview] = useState<Overview | null>(null);
-  const [text, setText] = useState(agentWorkspace()?.getDefaults?.().instructions ?? "");
+  const [text, setText] = useState(() => agentWorkspace()?.getDefaults?.().instructions ?? "");
 
   const reload = useCallback(async () => {
     if (!ipc) return;

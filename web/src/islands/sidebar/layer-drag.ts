@@ -3,7 +3,7 @@
 // The document change itself is one call to `window.design.moveNodes` (validated, one undo step, world
 // positions kept); this hook only tracks the pointer and the indicator. React re-renders only when the drop
 // target changes, never per pointer move.
-import { useCallback, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 import { design } from "@/lib/bridge";
 import type { TreeNode } from "./hooks";
 
@@ -48,9 +48,12 @@ export function useLayerDrag({
   const [drop, setDrop] = useState<Drop | null>(null);
   const [dragging, setDragging] = useState<string[]>([]);
   const nodesRef = useRef(nodes);
-  nodesRef.current = nodes;
   const onExpandRef = useRef(onExpand);
-  onExpandRef.current = onExpand;
+  // Read only from pointer handlers, so they are synced once the render commits.
+  useLayoutEffect(() => {
+    nodesRef.current = nodes;
+    onExpandRef.current = onExpand;
+  });
 
   const onPointerDown = useCallback(
     (event: ReactPointerEvent<HTMLElement>, id: string) => {

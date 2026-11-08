@@ -1,7 +1,7 @@
 // "@" mentions: typing @ in the composer opens a list of canvas elements (workspace.searchElements); Enter / Tab
 // turns the token into a mention chip (workspace.addMention). Listens on the adopted #project-prompt directly, in the
 // capture phase, so Enter/Escape never reach the legacy handlers while the list is open.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BoxIcon, FrameIcon, ImageIcon, SparklesIcon, SquareIcon, TargetIcon, TypeIcon } from "lucide-react";
 import { Popover, PopoverAnchor, PopoverContent } from "@/components/ui/popover";
 import { legacySet } from "@/lib/bridge";
@@ -25,7 +25,9 @@ export function MentionPopover() {
   const [items, setItems] = useState<ChatMention[]>([]);
   const [active, setActive] = useState(0);
   const live = useRef({ match, items, active });
-  live.current = { match, items, active };
+  useLayoutEffect(() => {
+    live.current = { match, items, active };
+  });
   const dismissed = useRef<number | null>(null);
 
   useEffect(() => {

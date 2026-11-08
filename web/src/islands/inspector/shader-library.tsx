@@ -104,9 +104,8 @@ export function ShaderPicker({
   children: React.ReactNode;
 }) {
   const [query, setQuery] = useState("");
-  useEffect(() => {
-    if (!open) setQuery("");
-  }, [open]);
+  // Closing clears the search (adjusted during render, not in an effect).
+  if (!open && query) setQuery("");
   const presets = useMemo(() => {
     const q = query.trim().toLowerCase();
     return shaderPresets().filter(
@@ -211,7 +210,9 @@ function ParamSlider({
   const ref = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState<number | null>(null);
   const commit = useRef(onCommit);
-  commit.current = onCommit;
+  useLayoutEffect(() => {
+    commit.current = onCommit;
+  });
   // Commit on the native `change` event (pointer release / key press) so a drag is one undo step.
   useEffect(() => {
     const el = ref.current;
@@ -266,16 +267,16 @@ function ShaderOptions({
             onClick={() => setOpen(!open)}
           />
         ) : (
-        <button
-          type="button"
-          id="shader-options-open"
-          aria-expanded={open}
-          className="flex h-6 items-center justify-center gap-1.5 rounded-md bg-input text-xs text-foreground shadow-field hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
-          onClick={() => setOpen(!open)}
-        >
-          <SlidersHorizontal className="size-3.5 text-muted-foreground" aria-hidden />
-          Shader settings
-        </button>
+          <button
+            type="button"
+            id="shader-options-open"
+            aria-expanded={open}
+            className="flex h-6 items-center justify-center gap-1.5 rounded-md bg-input text-xs text-foreground shadow-field hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring"
+            onClick={() => setOpen(!open)}
+          >
+            <SlidersHorizontal className="size-3.5 text-muted-foreground" aria-hidden />
+            Shader settings
+          </button>
         )}
       </PopoverAnchor>
       <PopoverContent

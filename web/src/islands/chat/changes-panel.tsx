@@ -27,6 +27,7 @@ import { ChatHeaderButton, ChatRowButton } from "./controls";
 import type { ChatState } from "./store";
 
 const MAX_RENDERED_LINES = 5000;
+const NO_FILES: ChangedFile[] = [];
 
 type LineKind = "add" | "remove" | "hunk" | "meta" | "context";
 function diffLines(diff: string): { kind: LineKind; text: string }[] {
@@ -225,7 +226,7 @@ function ChangesDialog({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pr, setPr] = useState<PullRequestStatus | null>(null);
-  const files = summary?.files ?? [];
+  const files = summary?.files ?? NO_FILES;
 
   // Opening: refresh, suggest a commit message from the latest request, read the branch's pull request.
   useEffect(() => {

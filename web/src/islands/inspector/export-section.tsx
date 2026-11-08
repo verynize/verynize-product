@@ -5,7 +5,7 @@
 // SVG is offered only when every exported layer is an SVG image; Code exports Tailwind JSX or HTML + CSS.
 // Size and format are Wonder's styled menus (properties-audit G2): ✓ on the current item, separators between the
 // size groups, 152px wide with 24px rows.
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import { Check, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import type { DesignDocument } from "@/lib/bridge";
@@ -96,7 +96,9 @@ function MenuSelect({
                   onSelect={() => onChange(o.value)}
                 >
                   <span className="flex-1">{o.label}</span>
-                  {o.value === value ? <Check className="size-3.5 text-foreground" aria-hidden /> : null}
+                  {o.value === value ? (
+                    <Check className="size-3.5 text-foreground" aria-hidden />
+                  ) : null}
                 </DropdownMenuItem>
               ))}
             </Fragment>
@@ -141,12 +143,15 @@ export function ExportSection({
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [options, setOptions] = useState(false);
-  useEffect(() => {
+  // A different layer starts closed with its own name (adjusted during render, not in an effect).
+  const [shownId, setShownId] = useState(node.id);
+  if (shownId !== node.id) {
+    setShownId(node.id);
     setOpen(false);
     setName(null);
     setStatus("");
     setOptions(false);
-  }, [node.id]);
+  }
   const exported = exportedNodes(doc, selection, scope === "selection");
   const formats = exportFormats(exported.length > 0 && exported.every(isSvgNode));
   // SVG disappears when the selection gains a non-SVG layer: fall back to PNG.
@@ -158,7 +163,7 @@ export function ExportSection({
   const label =
     active === "CODE"
       ? (CODE_FLAVORS.find((f) => f.value === flavor)?.label ?? "Code")
-      : formats.find((f) => f.value === active)!.label;
+      : (formats.find((f) => f.value === active)?.label ?? active);
   const run = async () => {
     setBusy(true);
     setStatus("");

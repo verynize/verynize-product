@@ -280,7 +280,6 @@ export function ColorPicker({
         </div>
       ) : null}
       {tab === "variables" && onToken ? (
-
         <div
           role="listbox"
           aria-label="Colour variables"
@@ -336,6 +335,9 @@ export function ColorPicker({
             role="slider"
             tabIndex={0}
             aria-label="Saturation and brightness"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(hsva.s * 100)}
             aria-valuetext={`Saturation ${Math.round(hsva.s * 100)}%, brightness ${Math.round(hsva.v * 100)}%`}
             className="relative h-60 touch-none rounded-md outline-none focus-visible:ring-1 focus-visible:ring-ring"
             onPointerDown={dragPlane}

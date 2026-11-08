@@ -393,7 +393,7 @@ function MaskRow({
             <div className="flex items-center gap-2">
               <img
                 src={mask.src}
-                alt="Mask image"
+                alt="Mask source"
                 className="size-12 shrink-0 rounded-md bg-muted object-contain"
               />
               <button

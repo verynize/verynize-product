@@ -1,5 +1,5 @@
 // Properties sections (design/wonder 22, 25, 43, 45–46, 55–56).
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   AlignHorizontalDistributeCenter,
   AlignVerticalDistributeCenter,
@@ -283,7 +283,9 @@ function PositionSection({ doc, node, selection }: Props) {
   // ⌘⇧⌥F runs the expand tool (Wonder's shortcut) while the canvas, not a field, has the keyboard.
   // Captured on window so ⌘⇧F (global search) does not also see it.
   const fit = useRef<(() => void) | null>(null);
-  fit.current = fitEnabled ? () => fitToContent(doc, node) : null;
+  useLayoutEffect(() => {
+    fit.current = fitEnabled ? () => fitToContent(doc, node) : null;
+  });
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.code !== "KeyF" || !event.shiftKey || !event.altKey || event.repeat) return;
@@ -334,8 +336,8 @@ function PositionSection({ doc, node, selection }: Props) {
       tools={tools}
     >
       <div className="grid grid-cols-3 gap-2">
-        {ALIGN_GROUPS.map((group, i) => (
-          <ToolGroup key={i} disabled={!alignEnabled}>
+        {ALIGN_GROUPS.map((group) => (
+          <ToolGroup key={group[0]?.id} disabled={!alignEnabled}>
             {group.map((b) => (
               <ToolButton
                 key={b.id}

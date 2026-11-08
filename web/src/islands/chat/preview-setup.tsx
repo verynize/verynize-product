@@ -20,6 +20,9 @@ const preview = () => (window as unknown as {livePreview?: CanvasPreview}).liveP
 /** The chat message a first Start sends; the transcript draws it as an app action (Wonder PS2: purple, logo). */
 export const PREVIEW_SETUP_REQUEST = "Set up the Preview";
 const INTRO_KEY = "verynize.preview-intro";
+// Storage can be blocked (private mode, disabled site data); the intro then just shows for the session.
+const introDismissed = () => { try { return localStorage.getItem(INTRO_KEY) === "dismissed"; } catch { return false; } };
+const dismissIntro = () => { try { localStorage.setItem(INTRO_KEY, "dismissed"); } catch { /* ignore */ } };
 let introUsed = false; // a Start this session hides the intro until the next launch
 const runningDismissed = new Set<string>();
 
@@ -66,7 +69,7 @@ function PreviewNotice({state}: {state: ChatState}) {
   const root = state.activeRoot;
   const {phase} = usePreview(root);
   const [, rerender] = useState(0);
-  const dismissedIntro = localStorage.getItem(INTRO_KEY) === "dismissed";
+  const dismissedIntro = introDismissed();
   if (!root) return null;
   if (state.codeMode) {
     if (phase !== "running" || runningDismissed.has(root)) return null;
@@ -90,7 +93,7 @@ function PreviewNotice({state}: {state: ChatState}) {
     action="Start preview"
     closeLabel="Don’t show this again"
     onAction={() => { introUsed = true; rerender(n => n + 1); void startPreview(state); }}
-    onClose={() => { localStorage.setItem(INTRO_KEY, "dismissed"); rerender(n => n + 1); }}
+    onClose={() => { dismissIntro(); rerender(n => n + 1); }}
   />;
 }
 
@@ -145,8 +148,8 @@ export function PreviewSavedCard({part}: {part: ChatPart}) {
 
 function ProposalCard({proposal, state, onDismiss}: {proposal: PreviewProposal; state: ChatState; onDismiss(): void}) {
   const [edit, setEdit] = useState(false);
-  const [setup, setSetup] = useState(formatCommand(proposal.setup));
-  const [run, setRun] = useState(formatCommand(proposal.command));
+  const [setup, setSetup] = useState(() => formatCommand(proposal.setup));
+  const [run, setRun] = useState(() => formatCommand(proposal.command));
   const [port, setPort] = useState(String(proposal.port));
   const [phase, setPhase] = useState("");
   const [error, setError] = useState("");

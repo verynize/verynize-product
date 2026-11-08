@@ -69,7 +69,7 @@ export function PreviewTabView() {
 }
 
 function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }) {
-  const [path, setPath] = useState(pathOf(tab.url));
+  const [path, setPath] = useState(() => pathOf(tab.url));
   const [mode, setMode] = useState<"navigate" | "capture">("navigate");
   const [error, setError] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -197,7 +197,9 @@ function PreviewTabPanel({ tab, visible }: { tab: PreviewTab; visible: boolean }
             type="button"
             data-pt="publish"
             onClick={() =>
-              void showOnCanvas(tab.frameId).then(() => livePreview()?.openPublish?.(tab.frameId))
+              void perform(() =>
+                showOnCanvas(tab.frameId).then(() => livePreview()?.openPublish?.(tab.frameId)),
+              )
             }
           >
             <Share />

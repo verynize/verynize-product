@@ -140,7 +140,7 @@ const COMPONENTS: Components = {
   input: ({ checked }) => {
     const Icon = checked ? SquareCheckIcon : SquareIcon;
     return (
-      <span role="checkbox" aria-checked={!!checked} aria-disabled="true" className="flex h-5.25 shrink-0 items-center">
+      <span role="checkbox" aria-checked={!!checked} aria-disabled="true" aria-label={checked ? "Done" : "To do"} className="flex h-5.25 shrink-0 items-center">
         <Icon className={checked ? "size-3.5 text-primary-text" : "size-3.5 text-muted-foreground"} aria-hidden="true" />
       </span>
     );

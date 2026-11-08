@@ -139,7 +139,8 @@ export function ConstraintWidget({
     let next: Anchor = edge;
     if (edge !== "center" && event.shiftKey) {
       const other = edge === "start" ? "end" : "start";
-      if (current === other || current === "stretch") next = current === "stretch" ? other : "stretch";
+      if (current === other || current === "stretch")
+        next = current === "stretch" ? other : "stretch";
     }
     apply(selection, { [axis]: next });
   };
@@ -158,7 +159,8 @@ export function ConstraintWidget({
           ? "bg-primary"
           : "bg-subtle-foreground group-hover:bg-foreground-2",
     );
-  const Edge = ({
+  // A render helper, not a component: a component defined here would remount (and drop focus) on every render.
+  const renderEdge = ({
     axis,
     edge,
     label,
@@ -210,24 +212,48 @@ export function ConstraintWidget({
       )}
     >
       {/* 2×12px ticks: horizontal ones 9.5px in from the side, vertical ones 6px from the top/bottom. */}
-      <Edge axis="v" edge="start" label="Pin top" className="inset-x-6 top-0 h-6" bar="h-3 w-0.5" />
-      <Edge axis="v" edge="end" label="Pin bottom" className="inset-x-6 bottom-0 h-6" bar="h-3 w-0.5" />
-      <Edge axis="h" edge="start" label="Pin left" className="inset-y-6 left-0 w-7.75" bar="h-0.5 w-3" />
-      <Edge axis="h" edge="end" label="Pin right" className="inset-y-6 right-0 w-7.75" bar="h-0.5 w-3" />
-      <Edge
-        axis="h"
-        edge="center"
-        label="Center horizontally"
-        className="top-6 bottom-6 left-1/2 w-3 -translate-x-1/2"
-        bar="h-3 w-0.5"
-      />
-      <Edge
-        axis="v"
-        edge="center"
-        label="Center vertically"
-        className="top-1/2 left-7.75 right-7.75 h-3 -translate-y-1/2"
-        bar="h-0.5 w-3"
-      />
+      {renderEdge({
+        axis: "v",
+        edge: "start",
+        label: "Pin top",
+        className: "inset-x-6 top-0 h-6",
+        bar: "h-3 w-0.5",
+      })}
+      {renderEdge({
+        axis: "v",
+        edge: "end",
+        label: "Pin bottom",
+        className: "inset-x-6 bottom-0 h-6",
+        bar: "h-3 w-0.5",
+      })}
+      {renderEdge({
+        axis: "h",
+        edge: "start",
+        label: "Pin left",
+        className: "inset-y-6 left-0 w-7.75",
+        bar: "h-0.5 w-3",
+      })}
+      {renderEdge({
+        axis: "h",
+        edge: "end",
+        label: "Pin right",
+        className: "inset-y-6 right-0 w-7.75",
+        bar: "h-0.5 w-3",
+      })}
+      {renderEdge({
+        axis: "h",
+        edge: "center",
+        label: "Center horizontally",
+        className: "top-6 bottom-6 left-1/2 w-3 -translate-x-1/2",
+        bar: "h-3 w-0.5",
+      })}
+      {renderEdge({
+        axis: "v",
+        edge: "center",
+        label: "Center vertically",
+        className: "top-1/2 left-7.75 right-7.75 h-3 -translate-y-1/2",
+        bar: "h-0.5 w-3",
+      })}
     </div>
   );
 }
