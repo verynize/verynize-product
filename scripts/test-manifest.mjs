@@ -552,6 +552,11 @@ const integrations = integrationFiles.map((name) => {
 });
 
 const ux = [
+  electron("tests/home-first-opening.cjs", "ux", [
+    ...AREA.shell,
+    ...AREA.cloudRenderer,
+    "tests/helpers/home-first-opening.cjs",
+  ]),
   electron("tests/switch-cache.cjs", "ux", [
     ...AREA.shell,
     "web/switch-*.js",

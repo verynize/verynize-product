@@ -442,7 +442,9 @@ app.whenReady().then(async () => {
     win.webContents.on("will-redirect", (event, url) => {
       if (!appProtocol.isAppURL(url)) event.preventDefault();
     });
-    win.loadURL(appProtocol.ENTRY_URL);
+    // A cold-start design link keeps the editor entry; plain launches open Files.
+    const linked = require("./app-preferences.cjs").hasPendingLinks();
+    win.loadURL(linked ? `${appProtocol.ORIGIN}/editor` : appProtocol.ENTRY_URL);
     editorWindows.add(win);
     editorOpened = true;
     win.on("closed", () => editorWindows.delete(win));

@@ -58,6 +58,15 @@ export { hosted };
 /* ---------- Legacy appliers (DOM + body classes only; they never touch history) ---------- */
 
 type LegacyShell = {
+  switchCoordinator?: {
+    getState(): {
+      token: number;
+      kind: string;
+      phase: string;
+      to: { fileKey: string | null };
+    } | null;
+    cancel(token: number): void;
+  };
   fileLibrary?: {
     applyHome?(): void;
     applyEditor?(): void;
@@ -323,6 +332,7 @@ export function request(target: ShellRequest, { replace = false }: { replace?: b
     return true;
   const from = logical();
   const next = resolve(from, target);
+  cancelDepartedFile(next.view);
   applyShell(next);
   if (same(from, next)) return true;
   if (closing) closing.desired = next;
@@ -372,6 +382,7 @@ export function applyLocation(area: ShellArea, location: RenderedLocation) {
   if (area === "/settings") applySettingsLocation(location);
   else {
     const view = location.pathname as ViewPath;
+    cancelDepartedFile(view);
     applyShell({ view, settings: null });
     restoreFile(view);
   }
@@ -382,6 +393,17 @@ export function applyLocation(area: ShellArea, location: RenderedLocation) {
 // a pending open; the library/coordinator checks isCurrent before committing the document.
 const fileLocation = () => history.location.pathname + "|" + (entryState().settingsUnder ?? "");
 let openingFile: { location: string; id: string } | null = null;
+function cancelDepartedFile(view: ViewPath) {
+  const coordinator = legacy().switchCoordinator;
+  const state = coordinator?.getState();
+  if (
+    state?.kind === "file" &&
+    state.to.fileKey &&
+    view !== `/editor/${encodeURIComponent(state.to.fileKey)}`
+  )
+    coordinator?.cancel(state.token);
+}
+
 function restoreFile(view: ViewPath) {
   if (!view.startsWith("/editor")) return;
   const lib = legacy().fileLibrary;
@@ -394,7 +416,7 @@ function restoreFile(view: ViewPath) {
         settingsUnder: path,
       });
     else {
-      // The launch entry stays the launch entry under its canonical URL (code mode restores in its place).
+      // Keep the launch entry identity under its canonical file URL.
       const wasLaunch = isLaunchEntry("/editor");
       commit(path, "replace");
       if (wasLaunch) launch.key = entryState().__TSR_key;
@@ -428,6 +450,14 @@ function restoreFile(view: ViewPath) {
     else commit(canonical, "replace");
     return;
   }
+  // Home clicks already started this load before the destination route rendered.
+  const switching = legacy().switchCoordinator?.getState();
+  if (
+    switching?.kind === "file" &&
+    switching.to.fileKey === file.id &&
+    ["begin", "ready"].includes(switching.phase)
+  )
+    return;
   if (file.id === lib.currentId) return;
   const location = fileLocation();
   if (openingFile?.id === file.id && openingFile.location === location) return;

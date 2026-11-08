@@ -8,6 +8,7 @@
 // settings overlay (settings.tsx), the Files home (index.tsx) and the Code workspace (code.tsx),
 // plus the view under settings.
 import assert from "node:assert/strict";
+import { checkHomeOpening } from "./home-first-opening.cjs";
 import { openStarterFile } from "./web-app.mjs";
 
 const ROOM = "11111111-1111-4111-8111-111111111111";
@@ -92,6 +93,11 @@ export async function checkWebRouter(browser, origin, context = browser) {
     return state();
   };
   const back = () => page.goBack({ waitUntil: "commit" });
+
+  await page.goto(origin + "/");
+  await ready();
+  await expectShell("/");
+  await checkHomeOpening(page, { detached: true });
 
   await page.goto(origin + "/editor");
   await ready();

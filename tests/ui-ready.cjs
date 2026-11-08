@@ -26,6 +26,7 @@ function snapshot() {
     };
   };
   return {
+    home: document.body.classList.contains("files-view"),
     attribute: document.documentElement.dataset.uiReady,
     chrome: document.body.classList.contains("bd-chrome"),
     filesHome: control("files-home"),
@@ -47,11 +48,15 @@ function assertReady(state, when) {
   })) {
     assert.deepEqual(
       control,
-      { count: 1, inDock: false, island: true, visible: true },
+      { count: 1, inDock: false, island: true, visible: name !== "#add-page" || !state.home },
       `${when}: ${name} is the visible island element`,
     );
   }
-  assert.deepEqual(state.dockIds, [], `${when}: no parked legacy element keeps a taken-over id`);
+  assert.deepEqual(
+    state.dockIds.filter((id) => !state.pending.deferred.includes(id)),
+    [],
+    `${when}: no blocking control remains parked`,
+  );
   assert.deepEqual(state.pending.islands, [], `${when}: every island has committed`);
   assert.deepEqual(state.pending.ids, [], `${when}: no takeOver id is pending`);
 }
@@ -89,7 +94,8 @@ function assertReady(state, when) {
     assertReady(launch, "fresh launch");
     await waitForUiReady(page);
     assert.equal(await page.locator("#files-home").isVisible(), true);
-    assert.equal(await page.locator("#add-page").isVisible(), true);
+    assert.equal(await page.locator("#add-page").isVisible(), false);
+    assert.equal(await page.locator("#file-home").isVisible(), true);
 
     // 2. Reload with a listener installed before any script: the event fires exactly once, with the same guarantees.
     await page.addInitScript((source) => {
@@ -107,6 +113,7 @@ function assertReady(state, when) {
     assertReady(events[0], "reload");
 
     // 3. The controls work right away: #add-page adds a page, #files-home opens the Files home.
+    await page.locator(".file-open").first().click();
     const pages = () => page.evaluate(() => window.design.getDocument().pages.length);
     const before = await pages();
     await page.locator("#add-page").click();

@@ -7,6 +7,13 @@
 // Before the router bundle runs, `apply` runs at once and the request is queued (only if it changed the shell); the
 // router folds the queue onto the startup URL, so an early request (settings opened while ui.js loads) is not lost.
 (() => {
+  // Establish Home before app.js first draws the canvas. Explicit editor/room links
+  // retain their editor startup; the router owns subsequent view changes.
+  if (
+    (location.pathname === "/" || location.pathname === "/index.html") &&
+    !/^#(?:room|public)=/.test(location.hash)
+  )
+    document.body.classList.add("files-view");
   const pending = [];
   const shell = () => {
     const body = document.body.classList;

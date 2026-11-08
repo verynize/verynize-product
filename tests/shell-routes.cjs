@@ -73,6 +73,8 @@ const os = require("node:os");
     };
 
     // Code mode is a route. The Design/Code switch and agentWorkspace.setCodeMode request it.
+    await expectShell("/");
+    await page.locator(".file-open").first().click();
     const start = await expectShell("/editor");
     await page.getByRole("radio", { name: "Code" }).click();
     let at = await expectShell("/code");
@@ -232,8 +234,7 @@ const os = require("node:os");
     await page.locator("#settings-back").click();
     await expectShell("/");
 
-    // Code mode is restored on launch (the desktop window opens /editor), in place of the launch entry. A reload of
-    // /editor keeps the URL's view.
+    // Stored code mode must not override an explicit editor URL.
     await page.evaluate(() => {
       localStorage.setItem("verynize-code-mode", "1");
       window.shellNavigation.navigate({ to: "/editor" });
@@ -248,11 +249,11 @@ const os = require("node:os");
     await page.goto("app://verynize/editor");
     await ready();
     const launched = await page.evaluate(() => history.length);
-    at = await expectShell("/code");
-    assert.equal(at.length, launched, "/code replaced the launch entry");
+    at = await expectShell("/editor");
+    assert.equal(at.length, launched, "editor URL retains the launch entry");
     assert.deepEqual(errors, []);
     console.log(
-      "PASS shell routes: /code route (switch, setCodeMode, showHome), settings over code, Back/Forward across home/editor/code/settings, reload on every route, Escape over home closes settings only, requests while closing settings, reload while closing, room fragment through code/settings/reload, pre-router request, code mode restored on launch",
+      "PASS shell routes: /code route (switch, setCodeMode, showHome), settings over code, Back/Forward across home/editor/code/settings, reload on every route, Escape over home closes settings only, requests while closing settings, reload while closing, room fragment through code/settings/reload, pre-router request, explicit editor URL wins over stored code mode",
     );
   } finally {
     await app.close();

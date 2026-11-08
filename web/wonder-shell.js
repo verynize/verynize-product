@@ -51,15 +51,74 @@
   const current=()=>library.files.find(f=>f.id===library.active);
   // Whether the document the editor shows, which is no library file, becomes one now: after a user edit in the editor, or
   // as a signed-out profile's first starter file (not when the page opens a shared room link).
-  function mayFile(){const edits=window.design.editCount?.()??0;if(homeOpen||window.document.body.classList.contains('files-view'))return false;if(!library.seeded&&!library.files.length&&!window.cloudAccount?.get()&&!/^#(?:room|public)=/.test(location.hash))return true;return edits>filedEdits;}
+  function mayFile(){const edits=window.design.editCount?.()??0;if(!library.seeded&&!library.files.length&&!window.cloudAccount?.get()&&!/^#(?:room|public)=/.test(location.hash))return true;if(homeOpen||window.document.body.classList.contains('files-view'))return false;return edits>filedEdits;}
   function sync(document){const selectedId=window.document.querySelector('#canvas .layer.selected')?.dataset.id,selected=document.pages.find(p=>p.id===document.activePage)?.nodes.find(n=>n.id===selectedId);inspector.dataset.kind=selected?.type||'';if(typography)typography.open=selected?.type==='text';title.textContent=document.name||'Untitled';if(saving||window.documentSafety.startupPending(window.design.canUndo()))return;let file=current();if(file?.remoteOnly){if(!window.cloudWorkspace?.isConnected())return;delete file.remoteOnly;}if(file&&blocked.has(file.id))file=null;if(!file){if(!mayFile())return;file={id:uid(),name:document.name,document,updated:Date.now(),folder:null,archived:false};library.files.push(file);library.active=file.id;library.seeded=true;}filedEdits=window.design.editCount?.()??0;const serialized=JSON.stringify(document);if(lastSerialized.get(file.id)===serialized)return;file.name=document.name;file.document=structuredClone(document);window.switchCache.trustLocal(file.document);lastSerialized.set(file.id,serialized);file.updated=Date.now();persist();if(!file.cloud&&window.cloudAccount?.get())queueMicrotask(()=>window.cloudWorkspace?.storeFile?.(file.id).catch(error=>notify(error.message)));if(homeOpen)renderFiles();}
   // showHome/showEditor request a route (web/shell-request.js); the shell router applies it with applyHome/applyEditor.
   function showHome(){window.shellRequest({view:'/'},applyHome);}
   function showEditor(){window.shellRequest({view:'/editor'},applyEditor);}
   function applyHome(){window.switchCoordinator.cancel(window.switchCoordinator.getState()?.token);if(homeOpen)return;homeOpen=true;home.hidden=false;document.body.classList.add('files-view');$('files-home').classList.add('active');renderFiles();}
   function applyEditor(){if(!homeOpen)return;homeOpen=false;home.hidden=true;document.body.classList.remove('files-view');$('files-home').classList.remove('active');}
-  async function openFile(id,options={}){if(library.active===id&&current()&&canSee(current())&&!blocked.has(id)&&options.cloudJoinEpoch===undefined&&!options.preserveNative){showEditor();return id;}const coordinator=window.switchCoordinator;const own=!options.switchToken;const token=options.switchToken||coordinator.begin({kind:'file',from:{fileKey:library.active,pageId:window.design.getView().page},to:{fileKey:id,pageId:library.files.find(file=>file.id===id)?.document?.activePage??null}});try{const result=await openFileCore(id,{...options,switchToken:token,isCurrent:()=>coordinator.getState()?.token===token&&(!options.isCurrent||options.isCurrent())});if(own&&coordinator.getState()?.info?.freshness!=='confirmed'){coordinator.rendered(token,{fileKey:id,pageId:window.design.getView().page,freshness:'confirmed'});}return result;}catch(error){coordinator.fail(token,error);throw error;}finally{if(own)coordinator.finish(token);}}
-  async function openFileCore(id,options={}){const file=library.files.find(f=>f.id===id);if(!file)return;if(!canSee(file))throw Error('Sign in to the account that owns this file.');if(file.cloud&&!file.cloud.detached&&options.cloudJoinEpoch===undefined){await window.cloudWorkspace.openRoom({server:file.cloud.server,id:file.cloud.roomId,token:file.cloud.token,switchToken:options.switchToken});showEditor();return file.id;}const invalid=window.switchCache.isTrustedLocal(file.document)?null:window.documentSafety.check(file.document);if(invalid){blocked.add(file.id);window.documentSafety.reportOpenFailure({document:file.document,source:'library',kept:'It stays in your files unchanged.'});emit();throw Error('Cannot open “'+file.name+'”: '+invalid.error)}if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');await window.documentLifecycle?.prepareSwitch(options);window.switchCoordinator.phase(options.switchToken,'flush');if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');saving=true;const previous=library.active;try{library.active=file.id;delete file.remoteOnly;window.documentSafety.withSource({source:'library',backup:true},()=>window.design.setDocument(file.document));if(!file.cloud&&!window.switchCache.isTrustedLocal(file.document)){file.document=window.design.getDocument();window.switchCache.trustLocal(file.document);}blocked.delete(file.id);title.textContent=file.name;persist();showEditor();}catch(error){library.active=previous;throw error;}finally{saving=false;}
+  async function openFile(id, options = {}) {
+    const file = library.files.find((file) => file.id === id);
+    if (!file) return;
+    const coordinator = window.switchCoordinator;
+    const own = !options.switchToken;
+    const fromHome = homeOpen;
+    const alreadyOpen =
+      library.active === id &&
+      canSee(file) &&
+      !blocked.has(id) &&
+      !file.remoteOnly &&
+      (!file.cloud || file.cloud.detached || window.cloudWorkspace?.room()?.fileId === id) &&
+      options.cloudJoinEpoch === undefined &&
+      !options.preserveNative;
+    if (alreadyOpen && !fromHome) {
+      showEditor();
+      return id;
+    }
+    // Home selects the destination before storage/network work. The router recognizes this
+    // coordinator token and does not start a second open when it renders the new URL.
+    if (own && fromHome && !options.isCurrent)
+      window.shellRequest({ view: "/editor/" + encodeURIComponent(id) }, applyEditor);
+    const token =
+      options.switchToken ||
+      coordinator.begin({
+        kind: "file",
+        reason: fromHome ? "home" : undefined,
+        from: { fileKey: library.active, pageId: window.design.getView().page },
+        to: { fileKey: id, pageId: file.document?.activePage ?? null },
+      });
+    const isCurrent = () =>
+      coordinator.getState()?.token === token &&
+      !["cancel", "fail", "end"].includes(coordinator.getState()?.phase) &&
+      (!options.isCurrent || options.isCurrent());
+    try {
+      // Give the destination tab and cover a paint before synchronous document work.
+      if (own && fromHome) await coordinator.paint();
+      if (!isCurrent()) return;
+      const result = alreadyOpen
+        ? (showEditor(), id)
+        : await openFileCore(id, { ...options, switchToken: token, isCurrent });
+      if (own && isCurrent() && coordinator.getState()?.info?.freshness !== "confirmed")
+        coordinator.rendered(token, {
+          fileKey: id,
+          pageId: window.design.getView().page,
+          freshness: "confirmed",
+        });
+      return result;
+    } catch (error) {
+      const active =
+        coordinator.getState()?.token === token &&
+        coordinator.getState()?.phase !== "cancel" &&
+        (!options.isCurrent || options.isCurrent());
+      coordinator.fail(token, error);
+      if (own && active && fromHome) showHome();
+      throw error;
+    } finally {
+      if (own) coordinator.finish(token);
+    }
+  }
+  async function openFileCore(id,options={}){const file=library.files.find(f=>f.id===id);if(!file)return;if(!canSee(file))throw Error('Sign in to the account that owns this file.');if(file.cloud&&!file.cloud.detached&&options.cloudJoinEpoch===undefined){await window.cloudWorkspace.openRoom({server:file.cloud.server,id:file.cloud.roomId,token:file.cloud.token,switchToken:options.switchToken});if(!options.isCurrent||options.isCurrent())showEditor();return file.id;}const invalid=window.switchCache.isTrustedLocal(file.document)?null:window.documentSafety.check(file.document);if(invalid){blocked.add(file.id);window.documentSafety.reportOpenFailure({document:file.document,source:'library',kept:'It stays in your files unchanged.'});emit();throw Error('Cannot open “'+file.name+'”: '+invalid.error)}if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');await window.documentLifecycle?.prepareSwitch(options);window.switchCoordinator.phase(options.switchToken,'flush');if(options.isCurrent&&!options.isCurrent())throw Error('Document switch canceled');saving=true;const previous=library.active;try{library.active=file.id;delete file.remoteOnly;window.documentSafety.withSource({source:'library',backup:true},()=>window.design.setDocument(file.document));if(!file.cloud&&!window.switchCache.isTrustedLocal(file.document)){file.document=window.design.getDocument();window.switchCache.trustLocal(file.document);}blocked.delete(file.id);title.textContent=file.name;persist();showEditor();}catch(error){library.active=previous;throw error;}finally{saving=false;}
    // Cloud-backed files (file.cloud = {server,roomId,token?,role?,detached?}) reconnect to their room: web/cloud-panel.js listens.
    window.dispatchEvent(new CustomEvent('library-file-opened',{detail:{id:file.id,cloud:file.cloud?{...file.cloud}:null,cloudJoinEpoch:options.cloudJoinEpoch}}));return file.id;}
   async function createFile(){const name=await window.askText('Name your file','Untitled');if(!name?.trim())return;const pageId=uid(),document={version:2,name:name.trim(),activePage:pageId,pages:[{id:pageId,name:'Page 1',nodes:[]}],tokens:{}};const file={id:uid(),name:document.name,document,updated:Date.now(),folder,archived:false};library.files.push(file);await created(file.id);await openFile(file.id);}
@@ -104,7 +163,7 @@
   function profile(){const preferences=window.appPreferences?.get?.()||{};const display=preferences.displayName||preferences.name||'Personal workspace';refs.profile.querySelector('span:nth-child(2)').textContent=display;}
   window.addEventListener('design-publication-changed',event=>{const file=current();if(!file)return;if(event.detail?.published)file.publication={url:event.detail.url,publicId:event.detail.publicId,revision:event.detail.revision};else delete file.publication;persist();if(homeOpen)renderFiles();});
   window.addEventListener('app-preferences-changed',profile);profile();if(window.documentSafety.startupFailed()&&library.active)blocked.add(library.active);sync(window.design.getDocument());window.design.subscribe(()=>{if(!saving)sync(window.design.getDocument());});
-  window.fileLibrary={createFromDocument:async (document,options={})=>{const doc=structuredClone(document),file={id:uid(),name:doc.name,document:doc,updated:Date.now(),folder,archived:false};if(options.cloud){file.cloud={...options.cloud};const meta=Object.fromEntries(window.accountStore?.entries('file:')||[])[file.cloud.roomId];if(meta){file.folder=meta.folder;file.archived=!!meta.archived;}}library.files.push(file);try{if(!options.cloud)await created(file.id);await openFile(file.id,options);return file.id;}catch(error){if(!file.cloud)library.files=library.files.filter(f=>f!==file);persist();if(homeOpen)renderFiles();throw error;}},openNative:async ({document,path})=>{const invalid=window.documentSafety.check(document);if(invalid){window.documentSafety.reportOpenFailure({document,source:'native',name:String(path).split('/').pop(),kept:'The file was not changed.'});throw Error(invalid.error)}let file=library.files.find(f=>f.nativePath===path);if(!file){file={id:uid(),name:document.name,document:structuredClone(document),nativePath:path,updated:Date.now(),folder:null,archived:false};library.files.push(file);}else{file.document=structuredClone(document);file.name=document.name;}if(!file.cloud)await created(file.id);return openFile(file.id,{preserveNative:true});},setNativePath:path=>{const file=current();if(file){file.nativePath=path;persist();}},get currentId(){return library.active;},showHome,showEditor,applyHome,applyEditor,list:()=>library.files.filter(canSee).map(f=>{const copy=structuredClone(f),invalid=window.documentSafety.check(f.document);if(invalid)copy.invalid=invalid;return copy}),open:openFile,create:createFile,
+  window.fileLibrary={createFromDocument:async (document,options={})=>{const doc=structuredClone(document),file={id:uid(),name:doc.name,document:doc,updated:Date.now(),folder,archived:false};if(options.cloud){file.cloud={...options.cloud};const meta=Object.fromEntries(window.accountStore?.entries('file:')||[])[file.cloud.roomId];if(meta){file.folder=meta.folder;file.archived=!!meta.archived;}}library.files.push(file);try{if(!options.cloud)await created(file.id);await openFile(file.id,options);return file.id;}catch(error){if(!file.cloud)library.files=library.files.filter(f=>f!==file);persist();if(homeOpen)renderFiles();throw error;}},openNative:async ({document,path})=>{const invalid=window.documentSafety.check(document);if(invalid){window.documentSafety.reportOpenFailure({document,source:'native',name:String(path).split('/').pop(),kept:'The file was not changed.'});throw Error(invalid.error)}let file=library.files.find(f=>f.nativePath===path);if(!file){file={id:uid(),name:document.name,document:structuredClone(document),nativePath:path,updated:Date.now(),folder:null,archived:false};library.files.push(file);}else{file.document=structuredClone(document);file.name=document.name;}if(!file.cloud)await created(file.id);return openFile(file.id,{preserveNative:true});},setNativePath:path=>{const file=current();if(file){file.nativePath=path;persist();}},get currentId(){return library.active;},showHome,showEditor,applyHome,applyEditor,list:()=>library.files.filter(canSee).map(f=>{const copy=structuredClone(f),invalid=window.documentSafety.check(f.document);if(invalid)copy.invalid=invalid;return copy}),open:openFile,openRoomFile:room=>{const file=reference('room:'+room.id);if(!file)return Promise.reject(Error('Sign in to open this file.'));file.name=file.document.name=room.title;return openFile(file.id);},create:createFile,
     // Title-bar file tabs and the file switcher (chrome island): names without cloning documents.
     summaries:()=>library.files.filter(canSee).map(f=>({id:f.id,name:f.name,updated:f.updated,archived:!!f.archived})),
     // Used by the React home island.

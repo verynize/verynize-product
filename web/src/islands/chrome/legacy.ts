@@ -25,14 +25,32 @@ export const MENU_IDS = [
   "shell-settings",
 ] as const;
 
-export const ZOOM_IDS = ["zoom-in", "zoom-out", "zoom-fit", "zoom-reset", "saved-views-open"] as const;
+export const ZOOM_IDS = [
+  "zoom-in",
+  "zoom-out",
+  "zoom-fit",
+  "zoom-reset",
+  "saved-views-open",
+] as const;
 
 // Not `eyedropper-tool` / `add-ellipse`: the Wonder toolbar has no such buttons, so no island element would ever
 // claim them (they would hold back the UI-ready signal); canvas-interactions.js already creates them `hidden`.
-export const TOOL_IDS = ["select-tool", "scale-tool", "pan-tool", "add-frame", "add-shader", "text"] as const;
+export const TOOL_IDS = [
+  "select-tool",
+  "scale-tool",
+  "pan-tool",
+  "add-frame",
+  "add-shader",
+  "text",
+] as const;
 
-const CHROME_IDS = ["files-home", "document-name", "shell-new-file", "shell-search", "shell-chat"] as const;
-
+const CHROME_IDS = [
+  "files-home",
+  "document-name",
+  "shell-new-file",
+  "shell-search",
+  "shell-chat",
+] as const;
 
 let initialised = false;
 export let initialSnap = true;
@@ -42,12 +60,18 @@ export function initLegacy() {
   if (initialised) return;
   initialised = true;
   initialSnap = (document.getElementById("snap") as HTMLInputElement | null)?.checked !== false;
-  for (const id of [...MENU_IDS, ...ZOOM_IDS, ...TOOL_IDS, ...CHROME_IDS, "icon-kind", "snap"]) takeOver(id);
+  for (const id of [...MENU_IDS, ...ZOOM_IDS, ...CHROME_IDS, "icon-kind", "snap"]) takeOver(id);
+  // The toolbar only mounts in the editor; Home must be able to report UI readiness.
+  for (const id of TOOL_IDS) takeOver(id, { deferred: true });
   // The emptied legacy toolbar (wonder-shell.js) is `position:fixed` and nudged right by `agent-chat-open` rules, so it
   // showed as a stray pill over the panels; park it and hand `#canvas-toolbar` to the island toolbar.
-  takeOver("canvas-toolbar");
+  takeOver("canvas-toolbar", { deferred: true });
   const header = document.querySelector<HTMLElement>("header.app-chrome");
-  hideLegacy(header, document.querySelector("#workspace > .canvas-title"), document.querySelector("#workspace > footer"));
+  hideLegacy(
+    header,
+    document.querySelector("#workspace > .canvas-title"),
+    document.querySelector("#workspace > footer"),
+  );
 }
 
 /** Run a legacy command. Legacy render() keeps writing `disabled` onto whatever element owns the id now, so the

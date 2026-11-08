@@ -4,6 +4,7 @@ import "./switch-loading.css";
 
 type SwitchState = {
   token: number;
+  reason?: string;
   kind: "file" | "page";
   phase: "begin" | "ready" | "end" | "fail" | "cancel";
 };
@@ -83,7 +84,8 @@ export function SwitchLoading() {
       } catch {
         /* Storage can be unavailable in restricted contexts. */
       }
-      delayTimer = setTimeout(() => show(state.kind), delay);
+      if (state.kind === "file" && state.reason === "home") show(state.kind);
+      else delayTimer = setTimeout(() => show(state.kind), delay);
       safetyTimer = setTimeout(() => clear(), 30000);
     };
     const onChange = (event: Event) => update((event as CustomEvent<SwitchState>).detail);
@@ -110,7 +112,8 @@ export function SwitchLoading() {
     };
     const navigation = new MutationObserver(() => {
       if (
-        document.body.classList.contains("files-view") ||
+        (document.body.classList.contains("files-view") &&
+          !location.pathname.startsWith("/editor/")) ||
         document.body.classList.contains("code-mode")
       )
         clear(true);

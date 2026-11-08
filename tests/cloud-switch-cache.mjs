@@ -47,10 +47,28 @@ try {
   delete env.ELECTRON_RUN_AS_NODE;
   for (const name of ["a", "b"])
     apps.push(
-      await _electron.launch({ env, args: [".", `--user-data-dir=${path.join(dir, name)}`] }),
+      await _electron.launch({
+        env,
+        args: [
+          ".",
+          `--user-data-dir=${path.join(dir, name)}`,
+          ...(name === "a"
+            ? [
+                `verynize://join?invite=${encodeURIComponent(`${server}/#room=${room.id}&token=${room.token}`)}`,
+              ]
+            : []),
+        ],
+      }),
     );
   const [a, b] = await Promise.all(apps.map((app) => app.firstWindow()));
   for (const page of [a, b]) page.setDefaultTimeout(20000);
+  await waitForUiReady(a);
+  await a.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, room.id);
+  assert.equal(
+    await a.evaluate(() => document.body.classList.contains("files-view")),
+    false,
+    "a cold-start design link opens its editor without a Home click",
+  );
   const cold = [];
   for (const p of [a, b]) {
     await waitForUiReady(p);
@@ -83,6 +101,21 @@ try {
         });
     });
   });
+  await b.evaluate(() => {
+    window.fileLibrary.showHome();
+    window.__cloudOpeningPaint = null;
+    window.addEventListener("switch-loading-change", function observe(event) {
+      if (event.detail.phase !== "begin" || event.detail.reason !== "home") return;
+      window.removeEventListener("switch-loading-change", observe);
+      requestAnimationFrame(() => {
+        window.__cloudOpeningPaint = {
+          home: document.body.classList.contains("files-view"),
+          logo: getComputedStyle(document.getElementById("switch-loading-logo")).display,
+          document: window.design.getDocument().name,
+        };
+      });
+    });
+  });
   const timing = await b.evaluate(
     async (info) => {
       const start = performance.now();
@@ -93,6 +126,15 @@ try {
   );
   await b.waitForFunction(
     () => window.design.getDocument().pages[0].nodes[0].name === "Remote while away",
+  );
+  assert.deepEqual(
+    await b.evaluate(() => window.__cloudOpeningPaint),
+    {
+      home: false,
+      logo: "flex",
+      document: "Local",
+    },
+    "cloud Home opening paints the editor logo before fetching/replacing the document",
   );
   const observations = await b.evaluate(() => window.cacheObservations);
   assert.ok(
@@ -166,6 +208,8 @@ try {
   const recovered = await restarted.firstWindow();
   await waitForUiReady(recovered);
   recovered.setDefaultTimeout(20000);
+  assert.equal(await recovered.locator("#file-home").isVisible(), true);
+  await recovered.locator(`#file-home [data-room-id="${room.id}"] .file-open`).click();
   await recovered.waitForFunction(
     () => window.cloudWorkspace.isConnected() && window.cloudWorkspace.pendingCount() === 0,
   );

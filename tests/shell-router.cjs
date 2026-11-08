@@ -29,8 +29,6 @@ const os = require("node:os");
         );
       }, path);
     };
-    await expectView("/editor");
-    await page.locator("#files-home").click();
     await expectView("/");
     await page.locator(".file-open").first().click();
     await expectView("/editor");

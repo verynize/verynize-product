@@ -85,6 +85,7 @@ try {
 
   // 1. Create a room from the open file: that file becomes the room's file.
   let { app, page } = await launch("a");
+  await page.locator(".file-open").first().click();
   await signIn(page);
   const fileId = await page.evaluate(() => window.fileLibrary.currentId);
   const textId = await page.evaluate(() =>
@@ -100,7 +101,7 @@ try {
   await page.evaluate(() => window.design.addNode("rectangle", { name: "online-1" }));
   await synced(page);
 
-  // 2. Restart the app: the file reopens connected to the same room, with no new copy.
+  // 2. Restart opens Home; selecting the retained file reconnects without a new copy.
   await waitForAsync(
     page,
     async ({ server, roomId }) => {
@@ -111,6 +112,9 @@ try {
   );
   await quit(app);
   ({ app, page } = await launch("a"));
+  assert.equal(await page.locator("#file-home").isVisible(), true);
+  assert.equal(await room(page), null, "Home does not reconnect the active room on launch");
+  await page.locator(`#file-home [data-room-id="${roomId}"] .file-open`).click();
   await page.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, roomId);
   await synced(page);
   assert.equal(await page.evaluate(() => window.fileLibrary.currentId), fileId);
@@ -171,7 +175,25 @@ try {
   assert.match(await card(shared.id).textContent(), /Viewer/);
   assert.match(await card(roomId).textContent(), /Owner/);
   assert.equal(await card(roomId).count(), 1, "the local cloud file and its room are one card");
+  await page.evaluate(() => {
+    window.__remoteOpeningPaint = null;
+    window.addEventListener("switch-loading-change", function observe(event) {
+      if (event.detail.phase !== "begin" || event.detail.reason !== "home") return;
+      window.removeEventListener("switch-loading-change", observe);
+      requestAnimationFrame(() => {
+        window.__remoteOpeningPaint = {
+          home: document.body.classList.contains("files-view"),
+          logo: getComputedStyle(document.getElementById("switch-loading-logo")).display,
+        };
+      });
+    });
+  });
   await card(plan.id).locator(".file-open").click();
+  await page.waitForFunction(() => window.__remoteOpeningPaint !== null);
+  assert.deepEqual(await page.evaluate(() => window.__remoteOpeningPaint), {
+    home: false,
+    logo: "flex",
+  });
   await page.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, plan.id);
   assert.equal(await page.evaluate(() => window.design.getDocument().name), "Workspace plan");
   assert.equal((await files(page)).length, localCount + 1);
@@ -265,6 +287,9 @@ try {
   });
   await app.close();
   ({ app, page } = await launch("a"));
+  assert.equal(await page.locator("#file-home").isVisible(), true);
+  assert.equal(await room(page), null, "Home does not reconnect the active room on launch");
+  await page.locator(`#file-home [data-room-id="${roomId}"] .file-open`).click();
   await page.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, roomId);
   await page.waitForFunction(
     () =>

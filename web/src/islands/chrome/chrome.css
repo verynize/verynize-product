@@ -176,3 +176,9 @@ body.bd-chrome.chat-sidebar-open.agent-chat-open:not(.code-mode) #file-home {
 #find-layers-spotlight[data-fits] {
   box-shadow: 0 0 0 100vmax var(--color-find-scrim);
 }
+
+/* Home owns the opening surface, including the interval before its island mounts.
+   Keep editor geometry measurable without exposing the previous document/chrome. */
+body.files-view > main {
+  visibility: hidden;
+}

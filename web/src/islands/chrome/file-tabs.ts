@@ -60,6 +60,7 @@ function update() {
   let next = ids.filter((id) => files.has(id));
   if (currentId && currentId !== closedShown && files.has(currentId) && !next.includes(currentId))
     next = [...next, currentId];
+  if (pendingId && files.has(pendingId) && !next.includes(pendingId)) next.push(pendingId);
   if (next.join() !== ids.join()) {
     ids = next;
     save();

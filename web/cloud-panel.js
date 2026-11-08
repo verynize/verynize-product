@@ -1160,7 +1160,8 @@
     if (
       epoch !== generation ||
       requestId !== joinRequest ||
-      window.switchCoordinator.getState()?.token !== switchToken
+      window.switchCoordinator.getState()?.token !== switchToken ||
+      ["cancel", "fail", "end"].includes(window.switchCoordinator.getState()?.phase)
     )
       return;
     let current = fetched.value,
@@ -1352,6 +1353,9 @@
   new MutationObserver(() => {
     if (!reconnectPending || editorHidden()) return;
     reconnectPending = false;
+    // A Home click owns the destination load; do not reconnect the outgoing room.
+    const switching = window.switchCoordinator.getState();
+    if (switching?.kind === "file" && ["begin", "ready"].includes(switching.phase)) return;
     reconnectOpenFile();
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("DOMContentLoaded", () => {
