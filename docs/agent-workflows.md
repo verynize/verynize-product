@@ -1,6 +1,6 @@
 # Local agent workspace
 
-The chat panel (docked transcript, model picker, access levels, attachments and quick chats) runs the agents installed on this Mac with their existing accounts. The behavior follows `docs/wonder-ai-mcp-spec.md` §2; the code and all prompt text are our own.
+The chat panel (docked transcript, model picker, access levels, attachments and quick chats) runs local agent runtimes. Claude can use the machine’s Claude Code login; Codex uses Verynize’s separate Sign in with ChatGPT connection, described below. The behavior follows `docs/wonder-ai-mcp-spec.md` §2; the code and all prompt text are our own.
 
 ## Runtime
 

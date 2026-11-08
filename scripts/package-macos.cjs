@@ -5,7 +5,8 @@ const { execFileSync } = require("node:child_process");
   if (process.platform !== "darwin") throw Error("This packaging script targets macOS");
   const root = path.resolve(__dirname, ".."),
     target = path.join(root, "dist", "Verynize.app");
-  execFileSync(process.execPath, [path.join(root, "scripts/build-integrations.mjs")], {
+  // build-ui also builds the integrations. Never package a stale developer bundle.
+  execFileSync(process.execPath, [path.join(root, "scripts/build-ui.cjs")], {
     cwd: root,
     stdio: "inherit",
   });

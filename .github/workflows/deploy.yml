@@ -8,7 +8,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.repository == 'AdamAbd/verynize-product' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    if: github.repository == 'verynize/verynize-product' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 20
