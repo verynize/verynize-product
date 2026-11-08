@@ -257,9 +257,24 @@ try {
   };
   await wiggle(b, 420, 380);
   const cursor = a.locator(".collaborator-cursor");
-  await a.waitForFunction(() =>
-    /Olive Other/.test(document.querySelector(".collaborator-cursor")?.textContent || ""),
-  );
+  await a
+    .waitForFunction(() =>
+      /Olive Other/.test(document.querySelector(".collaborator-cursor")?.textContent || ""),
+    )
+    .catch(async (error) => {
+      // Name what kept B's cursor from reaching A (a pending switch blocks canvas pointer events).
+      const probe = () => ({
+        path: location.pathname,
+        body: document.body.className,
+        workspace: { ...document.getElementById("workspace")?.dataset },
+        switch: window.switchCoordinator?.getState?.(),
+        focus: document.hasFocus(),
+        hidden: document.hidden,
+        people: window.cloudPresence?.snapshot?.().people?.length,
+      });
+      console.error("cursor wait failed", JSON.stringify({ a: await a.evaluate(probe), b: await b.evaluate(probe) }));
+      throw error;
+    });
   assert.doesNotMatch(await cursor.first().textContent(), /Designer/);
   const peerColor = await cursor.first().evaluate((el) => el.style.getPropertyValue("--peer"));
   assert.match(peerColor, /^var\(--peer-[1-8]\)$/);
