@@ -16,7 +16,7 @@ Runner references: [Instabox CI](https://instabox.sh/docs/ci), [Blacksmith runne
 
 ## Setup performance
 
-Test jobs use a depth-one sparse checkout that excludes `design/` reference screenshots (about 423 MiB at the time of setup). Source, hidden files, docs, eval and test fixtures remain available. PR jobs run `scripts/ci-fetch-history.mjs` to fetch the exact base/head commits with filtered blobs, deepen ancestry until a merge base is available, and fall back to filtered full history for long-lived branches. Quality fetches only the base commit for its format diff. Fetch credentials are scoped to those git subprocesses and are not stored in repository config. Non-PR full suites need no extra history. The identity workflow retains its full checkout because it inspects historical blobs and images.
+Test jobs use a depth-one sparse checkout that excludes `design/` reference screenshots (about 423 MiB at the time of setup). Source, hidden files, docs, eval and test fixtures remain available. PR jobs run `scripts/ci-fetch-history.mjs` to fetch the exact base/head commits with filtered blobs, deepen ancestry until a merge base is available, and fall back to filtered full history for long-lived branches. Fetch credentials are scoped to those git subprocesses and are not stored in repository config. Non-PR full suites need no extra history. The identity workflow retains its full checkout because it inspects historical blobs and images.
 
 The local `setup-node-deps` action restores npm's download cache, including a fallback to compatible caches from previous lockfiles, and installs with `npm ci --prefer-offline --no-audit --no-fund`. Lockfile verification and lifecycle scripts remain enabled; `node_modules` is rebuilt rather than cached. Each job records cache status, versions, elapsed install time and a timing-only artifact, so a slow cold install can be diagnosed without uploading debug logs.
 
@@ -46,7 +46,7 @@ feature/*  --PR-->  staging  --PR-->  main
 
 `tests.yml` jobs:
 
-- `quality`: `npm ci`, `build:ui`, `check`, `lint`, `typecheck:ui`, format check of files the PR adds (the existing tree predates the formatter).
+- `quality`: `npm ci`, `build:ui`, `check`, `lint`, `typecheck:ui`, `typecheck:ratchet`, `format:check` over the whole checked-out tree.
 - `plan`: `node scripts/run-tests.mjs --ci-event --list` per lane. It counts the selected tests and builds the Electron shard matrix: about 20 Electron tests per shard, at most 4. The runner imports only Node built-ins, so this job skips `npm ci`.
 - `node + cloud`: `--lane node --lane cloud`. No display is needed. Playwright Chromium is installed only when `tests/web-*` is selected.
 - `electron (i/n)` (matrix): `--lane electron --shard i/n`. The job installs the Electron system libraries, `xvfb`, Mesa (software WebGL), `zsh` (terminal tests), `poppler-utils` (`pdftoppm`, PDF export check), `fonts-inter` (made fontconfig's `system-ui`/`Sans` font, close to macOS SF metrics, so text-layout tests wrap as on macOS) and a build toolchain for `node-pty`, then downloads the Electron binary (`node node_modules/electron/install.js`). The runner wraps each test in `xvfb-run -a -s "-screen 0 3840x2160x24"` when `DISPLAY` is unset. On Linux CI `desktop/main.cjs` adds `--force-device-scale-factor=2` and overlay scrollbars (macOS geometry), `--disable-gpu` (software compositing) and `--enable-unsafe-swiftshader` (WebGL through SwiftShader). Do not composite through SwiftShader (`--use-angle=swiftshader`): clicks into out-of-process iframes get lost and frames lag.
