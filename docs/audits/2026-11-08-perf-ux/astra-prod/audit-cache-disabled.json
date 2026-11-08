@@ -1,0 +1,228 @@
+{
+  "audit": {
+    "start": 18575.300000000047,
+    "longTasks": [],
+    "events": [
+      {
+        "name": "pointerdown",
+        "start": 18819.300000000047,
+        "duration": 40,
+        "processing": 0.40000000002328306
+      },
+      {
+        "name": "mousedown",
+        "start": 18819.70000000007,
+        "duration": 40,
+        "processing": 0
+      },
+      {
+        "name": "pointerup",
+        "start": 18819.70000000007,
+        "duration": 40,
+        "processing": 0.39999999990686774
+      },
+      {
+        "name": "mouseup",
+        "start": 18820.099999999977,
+        "duration": 32,
+        "processing": 0.10000000009313226
+      },
+      {
+        "name": "click",
+        "start": 18820.20000000007,
+        "duration": 32,
+        "processing": 9.899999999906868
+      }
+    ],
+    "lcp": [
+      {
+        "start": 892,
+        "size": 8787
+      }
+    ],
+    "ws": [
+      {
+        "type": "open",
+        "start": 20224.099999999977,
+        "duration": 1392
+      },
+      {
+        "type": "send",
+        "time": 21616.70000000007,
+        "bytes": 95
+      },
+      {
+        "type": "receive",
+        "time": 21617.400000000023,
+        "bytes": 118
+      },
+      {
+        "type": "send",
+        "time": 21618.599999999977,
+        "bytes": 78
+      },
+      {
+        "type": "receive",
+        "time": 21620.5,
+        "bytes": 155
+      },
+      {
+        "type": "receive",
+        "time": 21695.70000000007,
+        "bytes": 189
+      },
+      {
+        "type": "receive",
+        "time": 21697.400000000023,
+        "bytes": 162
+      },
+      {
+        "type": "send",
+        "time": 21743.300000000047,
+        "bytes": 95
+      },
+      {
+        "type": "receive",
+        "time": 21819.900000000023,
+        "bytes": 189
+      }
+    ],
+    "frames": []
+  },
+  "navigation": [
+    {
+      "ttfb": 75.59999999997672,
+      "responseStart": 79.30000000004657,
+      "domContentLoaded": 164.40000000002328,
+      "load": 273.0999999999767,
+      "transferSize": 1359,
+      "encodedBodySize": 1059
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 508
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 892
+    }
+  ],
+  "resources": [
+    {
+      "path": "/assets/editor_._fileId-DW-g8J60.js",
+      "type": "script",
+      "start": 18830,
+      "duration": 216.5,
+      "ttfb": 208.70000000006985,
+      "transfer": 583,
+      "encoded": 283,
+      "decoded": 447
+    },
+    {
+      "path": "/api/rooms/[id]",
+      "type": "fetch",
+      "start": 18838,
+      "duration": 1354.9000000000233,
+      "ttfb": 1331.4000000000233,
+      "transfer": 22717,
+      "encoded": 22417,
+      "decoded": 3048940
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 18960.900000000023,
+      "duration": 609,
+      "ttfb": 295.5,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/cdn-cgi/rum",
+      "type": "beacon",
+      "start": 19093.099999999977,
+      "duration": 42.20000000006985,
+      "ttfb": 38,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/cdn-cgi/rum",
+      "type": "xmlhttprequest",
+      "start": 19093.300000000047,
+      "duration": 41.79999999993015,
+      "ttfb": 38.40000000002328,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 20214,
+      "duration": 290.30000000004657,
+      "ttfb": 287.89999999990687,
+      "transfer": 712,
+      "encoded": 412,
+      "decoded": 625
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 20224.599999999977,
+      "duration": 800.3000000000466,
+      "ttfb": 795.1999999999534,
+      "transfer": 712,
+      "encoded": 412,
+      "decoded": 625
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 21962,
+      "duration": 532,
+      "ttfb": 318.29999999993015,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 24962.599999999977,
+      "duration": 1128.1000000000931,
+      "ttfb": 909,
+      "transfer": 556235,
+      "encoded": 555935,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 27962.099999999977,
+      "duration": 575.3000000000466,
+      "ttfb": 283.29999999993015,
+      "transfer": 556371,
+      "encoded": 556071,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 30959.400000000023,
+      "duration": 586.1999999999534,
+      "ttfb": 262.9000000000233,
+      "transfer": 556801,
+      "encoded": 556501,
+      "decoded": 4083883
+    }
+  ],
+  "heap": {
+    "used": 47682683,
+    "total": 62632815
+  }
+}

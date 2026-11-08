@@ -1,0 +1,160 @@
+{
+  "audit": {
+    "start": 253640,
+    "longTasks": [
+      {
+        "start": 253639.90000000014,
+        "duration": 490
+      },
+      {
+        "start": 254130.5,
+        "duration": 117
+      },
+      {
+        "start": 253639.90000000014,
+        "duration": 490
+      },
+      {
+        "start": 254130.5,
+        "duration": 117
+      },
+      {
+        "start": 254257.5,
+        "duration": 61
+      },
+      {
+        "start": 254257.5,
+        "duration": 61
+      },
+      {
+        "start": 255355.5,
+        "duration": 1298
+      },
+      {
+        "start": 255355.5,
+        "duration": 1298
+      }
+    ],
+    "events": [],
+    "lcp": [
+      {
+        "start": 2800,
+        "size": 8787
+      }
+    ],
+    "ws": [],
+    "frames": [],
+    "click": 253640.1000000001,
+    "nodes": [
+      3
+    ],
+    "observedReadyAt": 258703.30000000005,
+    "domNodes": 2801
+  },
+  "navigation": [
+    {
+      "ttfb": 569.3000000000466,
+      "responseStart": 1250.5,
+      "domContentLoaded": 1376.6999999999534,
+      "load": 1463.1999999999534,
+      "transferSize": 1359,
+      "encodedBodySize": 1059
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 1852
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 2800
+    }
+  ],
+  "resources": [
+    {
+      "path": "/api/rooms/[id]",
+      "type": "fetch",
+      "start": 254318.69999999995,
+      "duration": 1007.7000000001863,
+      "ttfb": 985.4000000001397,
+      "transfer": 48681,
+      "encoded": 48381,
+      "decoded": 5629184
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 255095.1000000001,
+      "duration": 1608.3999999999069,
+      "ttfb": 1195.8000000000466,
+      "transfer": 557121,
+      "encoded": 556821,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 256639,
+      "duration": 458.30000000004657,
+      "ttfb": 454.19999999995343,
+      "transfer": 712,
+      "encoded": 412,
+      "decoded": 625
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 256644,
+      "duration": 963,
+      "ttfb": 509.30000000004657,
+      "transfer": 712,
+      "encoded": 412,
+      "decoded": 625
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 258095.30000000005,
+      "duration": 1220.5,
+      "ttfb": 702.7000000001863,
+      "transfer": 556030,
+      "encoded": 555730,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 261094.1000000001,
+      "duration": 1453.3999999999069,
+      "ttfb": 676,
+      "transfer": 556325,
+      "encoded": 556025,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 264094.80000000005,
+      "duration": 1403.6000000000931,
+      "ttfb": 722.8000000000466,
+      "transfer": 556156,
+      "encoded": 555856,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 267095.5,
+      "duration": 925.5,
+      "ttfb": 683.6000000000931,
+      "transfer": 556429,
+      "encoded": 556129,
+      "decoded": 4083883
+    }
+  ],
+  "heap": {
+    "used": 382840296,
+    "total": 747050420
+  }
+}

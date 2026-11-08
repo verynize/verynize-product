@@ -1,0 +1,22 @@
+{
+  "headers": [
+    {
+      "path": "/assets/index-Dpo3UJ4v.js",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "encoding": "zstd"
+    },
+    {
+      "path": "/app.js",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "encoding": "zstd"
+    },
+    {
+      "path": "/style.css",
+      "status": 200,
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "encoding": "zstd"
+    }
+  ]
+}

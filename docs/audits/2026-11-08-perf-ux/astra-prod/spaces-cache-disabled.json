@@ -1,0 +1,381 @@
+{
+  "audit": {
+    "start": 10482.300000000047,
+    "longTasks": [
+      {
+        "start": 11785,
+        "duration": 52
+      },
+      {
+        "start": 15453.699999999953,
+        "duration": 1103
+      },
+      {
+        "start": 17245.800000000047,
+        "duration": 252
+      }
+    ],
+    "events": [],
+    "lcp": [
+      {
+        "start": 1280,
+        "size": 8787
+      }
+    ],
+    "ws": [],
+    "frames": [],
+    "click": 10482.300000000047,
+    "nodes": [
+      7699,
+      0
+    ],
+    "observedReadyAt": 16731.40000000014,
+    "domNodes": 14647
+  },
+  "navigation": [
+    {
+      "ttfb": 170.5,
+      "responseStart": 210.69999999995343,
+      "domContentLoaded": 545.1999999999534,
+      "load": 581.5,
+      "transferSize": 1359,
+      "encodedBodySize": 1059
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 764
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 1280
+    }
+  ],
+  "resources": [
+    {
+      "path": "/assets/editor_._fileId-DW-g8J60.js",
+      "type": "script",
+      "start": 10494.800000000047,
+      "duration": 84.69999999995343,
+      "ttfb": 79.89999999990687,
+      "transfer": 583,
+      "encoded": 283,
+      "decoded": 447
+    },
+    {
+      "path": "/api/rooms/[id]",
+      "type": "fetch",
+      "start": 10503,
+      "duration": 1281.6000000000931,
+      "ttfb": 1095.5,
+      "transfer": 430567,
+      "encoded": 430267,
+      "decoded": 6692835
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 10610.300000000047,
+      "duration": 434.80000000004657,
+      "ttfb": 231.60000000009313,
+      "transfer": 556847,
+      "encoded": 556547,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 11847.199999999953,
+      "duration": 199.70000000018626,
+      "ttfb": 198.5,
+      "transfer": 644,
+      "encoded": 344,
+      "decoded": 486
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 11850,
+      "duration": 590.9000000001397,
+      "ttfb": 587.5,
+      "transfer": 644,
+      "encoded": 344,
+      "decoded": 486
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 13603.800000000047,
+      "duration": 483.5,
+      "ttfb": 266,
+      "transfer": 556295,
+      "encoded": 555995,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.300000000047,
+      "duration": 1422.3999999999069,
+      "ttfb": 1255.6000000000931,
+      "transfer": 52513,
+      "encoded": 52213,
+      "decoded": 52213
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.5,
+      "duration": 2144.1999999999534,
+      "ttfb": 603.3000000000466,
+      "transfer": 94176,
+      "encoded": 93876,
+      "decoded": 93876
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 560.9000000001397,
+      "ttfb": 209,
+      "transfer": 90910,
+      "encoded": 90610,
+      "decoded": 90610
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 2328.7000000001863,
+      "ttfb": 264.9000000001397,
+      "transfer": 95426,
+      "encoded": 95126,
+      "decoded": 95126
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 2800.100000000093,
+      "ttfb": 264.80000000004657,
+      "transfer": 123837,
+      "encoded": 123537,
+      "decoded": 123537
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16037,
+      "duration": 2340.4000000001397,
+      "ttfb": 278.60000000009313,
+      "transfer": 99372,
+      "encoded": 99072,
+      "decoded": 99072
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.100000000093,
+      "duration": 2814,
+      "ttfb": 1314,
+      "transfer": 88994,
+      "encoded": 88694,
+      "decoded": 88694
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.300000000047,
+      "duration": 2761.100000000093,
+      "ttfb": 309.19999999995343,
+      "transfer": 86959,
+      "encoded": 86659,
+      "decoded": 86659
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.40000000014,
+      "duration": 2454.5999999998603,
+      "ttfb": 1311.8999999999069,
+      "transfer": 91047,
+      "encoded": 90747,
+      "decoded": 90747
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.5,
+      "duration": 528.6000000000931,
+      "ttfb": 186.0999999998603,
+      "transfer": 87514,
+      "encoded": 87214,
+      "decoded": 87214
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.699999999953,
+      "duration": 2022.4000000001397,
+      "ttfb": 608.8999999999069,
+      "transfer": 87459,
+      "encoded": 87159,
+      "decoded": 87159
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.800000000047,
+      "duration": 2405,
+      "ttfb": 609.4000000001397,
+      "transfer": 94885,
+      "encoded": 94585,
+      "decoded": 94585
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061,
+      "duration": 1135.1000000000931,
+      "ttfb": 375.19999999995343,
+      "transfer": 82198,
+      "encoded": 81898,
+      "decoded": 81898
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.100000000093,
+      "duration": 1313.0999999998603,
+      "ttfb": 434.5999999998603,
+      "transfer": 81145,
+      "encoded": 80845,
+      "decoded": 80845
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.600000000093,
+      "duration": 844.6999999999534,
+      "ttfb": 476.30000000004657,
+      "transfer": 82314,
+      "encoded": 82014,
+      "decoded": 82014
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.600000000093,
+      "duration": 2230.899999999907,
+      "ttfb": 724,
+      "transfer": 76278,
+      "encoded": 75978,
+      "decoded": 75978
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 265.19999999995343,
+      "ttfb": 147.29999999981374,
+      "transfer": 83030,
+      "encoded": 82730,
+      "decoded": 82730
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 620.9000000001397,
+      "ttfb": 179.9000000001397,
+      "transfer": 103814,
+      "encoded": 103514,
+      "decoded": 103514
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 2261.1999999999534,
+      "ttfb": 775.7000000001863,
+      "transfer": 54292,
+      "encoded": 53992,
+      "decoded": 53992
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 2316.8000000000466,
+      "ttfb": 505.9000000001397,
+      "transfer": 163944,
+      "encoded": 163644,
+      "decoded": 163644
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.600000000093,
+      "duration": 2239.8000000000466,
+      "ttfb": 782.0999999998603,
+      "transfer": 67550,
+      "encoded": 67250,
+      "decoded": 67250
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.800000000047,
+      "duration": 1928.1999999999534,
+      "ttfb": 1545.8999999999069,
+      "transfer": 74411,
+      "encoded": 74111,
+      "decoded": 74111
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.199999999953,
+      "duration": 2169.100000000093,
+      "ttfb": 1670.8000000000466,
+      "transfer": 103207,
+      "encoded": 102907,
+      "decoded": 102907
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16532.300000000047,
+      "duration": 764.1999999999534,
+      "ttfb": 506.79999999981374,
+      "transfer": 35009,
+      "encoded": 34709,
+      "decoded": 34709
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16532.5,
+      "duration": 1279.3000000000466,
+      "ttfb": 1182.2000000001863,
+      "transfer": 6669,
+      "encoded": 6369,
+      "decoded": 6369
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16535,
+      "duration": 1275.1999999999534,
+      "ttfb": 1182.2999999998137,
+      "transfer": 3175,
+      "encoded": 2875,
+      "decoded": 2875
+    }
+  ],
+  "heap": {
+    "used": 138182486,
+    "total": 217885142
+  }
+}

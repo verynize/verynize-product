@@ -1,0 +1,8 @@
+{
+  "harExported": false,
+  "heapSnapshotExported": false,
+  "traceScreenshotsExcluded": true,
+  "traceBodiesAndAuthFieldsRemoved": true,
+  "embeddedDataStringsRemoved": 134,
+  "note": "URLs lose query/fragment; room/org/editor IDs and emails redacted; screenshots cropped to DevTools only."
+}

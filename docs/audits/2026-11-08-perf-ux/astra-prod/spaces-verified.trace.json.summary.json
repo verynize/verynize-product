@@ -1,0 +1,170 @@
+{
+  "trace": "spaces-verified.trace.json.gz",
+  "mainThreads": [
+    [
+      14750,
+      49495
+    ]
+  ],
+  "longTasks": {
+    "count": 17,
+    "maxMs": 11185.752,
+    "totalMs": 19173.18
+  },
+  "eventTotalsMs": {
+    "v8.callFunction": 28284.206000000653,
+    "RunTask": 20531.100000015776,
+    "v8::Debugger::AsyncTaskRun": 16836.296999999966,
+    "RunMicrotasks": 14481.779999999992,
+    "FunctionCall": 13799.515000000407,
+    "PageAnimator::serviceScriptedAnimations": 13697.245999999994,
+    "FireAnimationFrame": 13663.640000000001,
+    "TimerFire": 2600.582000000001,
+    "Commit": 1180.0380000000002,
+    "UpdateLayoutTree": 1061.816,
+    "V8.GCIncrementalMarking": 762.8050000000068,
+    "V8.GC_MC_INCREMENTAL": 760.362000000013,
+    "MinorGC": 604.883,
+    "V8.GCScavenger": 600.1259999999997,
+    "V8.GC_SCAVENGER": 596.6549999999997,
+    "V8.GC_SCAVENGER_SCAVENGE": 594.6790000000002,
+    "FireIdleCallback": 561.942,
+    "V8.GC_SCAVENGER_SCAVENGE_PARALLEL_PHASE": 398.1229999999999,
+    "V8.GC_SCAVENGER_SCAVENGE_PARALLEL": 347.63500000000016,
+    "V8.StackGuard": 291.9799999999992
+  },
+  "bottomUpSampleSelfMs": {
+    "o @ legacy-ui-CXHsJAu3.js": 3184.0320000000065,
+    "(anonymous) @ legacy-ui-CXHsJAu3.js": 2452.5689999999804,
+    "(garbage collector) @ ": 1636.3439999999973,
+    "a @ legacy-ui-CXHsJAu3.js": 1319.0389999999811,
+    "render @ app.js": 1257.8709999999865,
+    "getDocument @ app.js": 1189.4519999999939,
+    "measureHostInstance @ installHook.js": 787.0199999999878,
+    "OO @ legacy-ui-CXHsJAu3.js": 578.8309999999864,
+    "walk @ storage-limits.js": 336.1749999999968,
+    "get offsetWidth @ ": 275.1369999999993,
+    "setAttribute @ ": 235.77700000000016,
+    "draw @ canvas-render.js": 230.36499999999998,
+    "setProperty @ ": 193.66600000000005,
+    "(anonymous) @ account-step-DjTwgSPb.js": 182.34200000000027,
+    "appendChild @ ": 135.04299999999984,
+    "getBoundingClientRect @ ": 128.77800000000008,
+    "sharedSize @ storage-limits.js": 125.22000000000011,
+    "getTypeSymbol @ installHook.js": 106.95499999999998,
+    "shared @ cloud-panel.js": 98.30300000000007,
+    "za @ account-step-DjTwgSPb.js": 96.25000000000006,
+    "start @ canvas-render.js": 88.65000000000002,
+    "Ll @ index-Dpo3UJ4v.js": 85.98700000000002,
+    "addEventListener @ ": 84.55000000000007,
+    "remove @ ": 75.36200000000001,
+    "(anonymous) @ installHook.js": 72.95400000000001
+  },
+  "frameEventCounts": {
+    "BeginFrame": 1142,
+    "DrawFrame": 6,
+    "DroppedFrame": 421
+  },
+  "marks": [
+    {
+      "name": "spaces-select-1000-start",
+      "ph": "I",
+      "ts": 1819534579
+    },
+    {
+      "name": "spaces-select-1000-end",
+      "ph": "I",
+      "ts": 1821525692
+    },
+    {
+      "name": "spaces-select-all-start",
+      "ph": "I",
+      "ts": 1821525801
+    },
+    {
+      "name": "spaces-select-all-end",
+      "ph": "I",
+      "ts": 1833842254
+    },
+    {
+      "name": "spaces-clear-selection-start",
+      "ph": "I",
+      "ts": 1833842307
+    },
+    {
+      "name": "spaces-clear-selection-end",
+      "ph": "I",
+      "ts": 1837568427
+    },
+    {
+      "name": "spaces-pan-start",
+      "ph": "I",
+      "ts": 1837568513
+    },
+    {
+      "name": "spaces-pan-end",
+      "ph": "I",
+      "ts": 1838232016
+    },
+    {
+      "name": "spaces-zoom-start",
+      "ph": "I",
+      "ts": 1838232168
+    },
+    {
+      "name": "spaces-zoom-end",
+      "ph": "I",
+      "ts": 1838356225
+    },
+    {
+      "name": "spaces-select-1000",
+      "ph": "b",
+      "ts": 1819534579
+    },
+    {
+      "name": "spaces-select-1000",
+      "ph": "e",
+      "ts": 1821525692
+    },
+    {
+      "name": "spaces-select-all",
+      "ph": "b",
+      "ts": 1821525801
+    },
+    {
+      "name": "spaces-select-all",
+      "ph": "e",
+      "ts": 1833842254
+    },
+    {
+      "name": "spaces-clear-selection",
+      "ph": "b",
+      "ts": 1833842307
+    },
+    {
+      "name": "spaces-clear-selection",
+      "ph": "e",
+      "ts": 1837568427
+    },
+    {
+      "name": "spaces-pan",
+      "ph": "b",
+      "ts": 1837568513
+    },
+    {
+      "name": "spaces-pan",
+      "ph": "e",
+      "ts": 1838232016
+    },
+    {
+      "name": "spaces-zoom",
+      "ph": "b",
+      "ts": 1838232168
+    },
+    {
+      "name": "spaces-zoom",
+      "ph": "e",
+      "ts": 1838356225
+    }
+  ]
+}

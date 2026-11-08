@@ -1,0 +1,94 @@
+{
+  "trace": "spaces-selection.trace.json.gz",
+  "mainThreads": [
+    [
+      2857,
+      16408
+    ]
+  ],
+  "longTasks": {
+    "count": 6,
+    "maxMs": 1906.814,
+    "totalMs": 2937.76
+  },
+  "eventTotalsMs": {
+    "v8.callFunction": 3329.2300000000173,
+    "RunTask": 3053.8709999999933,
+    "FunctionCall": 2549.373999999993,
+    "v8::Debugger::AsyncTaskRun": 2060.694000000006,
+    "TimerFire": 2054.655,
+    "RunMicrotasks": 778.455,
+    "UpdateLayoutTree": 426.647,
+    "V8.StackGuard": 306.65099999999904,
+    "V8.HandleInterrupts": 306.2159999999982,
+    "EvaluateScript": 247.26000000000002,
+    "V8.InvokeApiInterruptCallbacks": 244.70600000000002,
+    "CpuProfiler::StartProfiling": 241.155,
+    "Commit": 125.054,
+    "MinorGC": 124.32299999999995,
+    "V8.GCScavenger": 122.93500000000002,
+    "V8.GC_SCAVENGER": 121.71300000000004,
+    "V8.GC_SCAVENGER_SCAVENGE": 121.17600000000004,
+    "Layout": 90.40899999999999,
+    "LocalFrameView::performLayout": 83.419,
+    "V8.GC_SCAVENGER_SCAVENGE_PARALLEL_PHASE": 81.62700000000008
+  },
+  "bottomUpSampleSelfMs": {
+    "o @ legacy-ui-CXHsJAu3.js": 2493.7880000000023,
+    "(anonymous) @ legacy-ui-CXHsJAu3.js": 1799.0429999999785,
+    "render @ app.js": 849.6319999999914,
+    "OO @ legacy-ui-CXHsJAu3.js": 557.6939999999897,
+    "getDocument @ app.js": 549.7160000000007,
+    "a @ legacy-ui-CXHsJAu3.js": 406.2159999999933,
+    "get offsetWidth @ ": 259.45999999999964,
+    "(garbage collector) @ ": 189.53899999999945,
+    "getBoundingClientRect @ ": 136.1380000000001,
+    "draw @ canvas-render.js": 135.973,
+    "setProperty @ ": 128.88000000000002,
+    "shared @ cloud-panel.js": 86.6890000000001,
+    "measureHostInstance @ installHook.js": 77.40900000000013,
+    "start @ canvas-render.js": 63.96400000000001,
+    "get scrollHeight @ ": 60.05300000000011,
+    "append @ ": 55.810000000000024,
+    "sync @ wonder-shell.js": 53.366000000000035,
+    "Loe @ legacy-ui-CXHsJAu3.js": 34.59800000000003,
+    "removeAttribute @ ": 33.609,
+    "setAttribute @ ": 32.55500000000001,
+    "snapshot @ canvas-render.js": 29.49300000000001,
+    "visit @ canvas-render.js": 28.524000000000008,
+    "moveBefore @ ": 24.994000000000014,
+    "createElement @ ": 24.060999999999996,
+    "appendChild @ ": 22.604999999999997
+  },
+  "frameEventCounts": {
+    "BeginFrame": 540,
+    "DrawFrame": 1
+  },
+  "marks": [
+    {
+      "name": "spaces-select-1000-start",
+      "ph": "I",
+      "ts": 1395023741
+    },
+    {
+      "name": "spaces-select-1000-end",
+      "ph": "I",
+      "ts": 1397798338
+    },
+    {
+      "name": "spaces-select-all-start",
+      "ph": "I",
+      "ts": 1397798412
+    },
+    {
+      "name": "spaces-select-1000",
+      "ph": "b",
+      "ts": 1395023741
+    },
+    {
+      "name": "spaces-select-1000",
+      "ph": "e",
+      "ts": 1397798338
+    }
+  ]
+}

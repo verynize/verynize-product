@@ -1,0 +1,235 @@
+# Verynize renderer and interaction audit
+
+Research date: 2026-11-08. Read-only audit of checkout `2630c307c834bae2d61b2dc1b42689397c3f3e0d`. No repository edits, commits, deployments, cap bypasses, or account creation. Artifacts are in `astra/` beside this report. Numbers labeled **fresh** were measured during this audit; **historical** numbers come from the repository; **vendor claims** are not independently validated. Estimates/recommendations are explicitly identified.
+
+## Executive finding
+
+Keep ADR-001's DOM-first direction. Wonder's current comparison pages explicitly position **Wonder as HTML/CSS**, **Paper as HTML/CSS**, **pen.dev as WebGL**, and **Figma as WebGPU/WebGL**. They do not provide evidence that Wonder uses a WebGPU scene renderer or achieves any particular node-count/frame-rate target. Verynize already has a keyed DOM renderer and substantial gesture optimizations; the next plan should target remaining commit, selection, and large-document costs rather than repeat already-landed fixes.
+
+## Access and methodology
+
+Read `CLAUDE.md`, `docs/canvas-performance/` (particularly ADR-001, integration results, node-cap idle rerun, drag-scale and renderer-options), and `eval/canvas-perf/` harness code/results before testing. The current source supersedes historical limit descriptions.
+
+The requested `agent-browser skills get core` was run before CLI browser use. Session rules required trying the shared preview browser first. It could read Wonder but screenshot capture failed twice with `Preview automation snapshot timed out after 15000ms.` Closed that tab and switched to named agent-browser sessions. Wonder screenshots were captured through agent-browser. The deployed app was inspected in a fresh browser and the owner's existing Default Chrome profile; both showed sign-in, with no usable `window.design`. No other person's profile was accessed. Only boolean authentication state was inspected in the owner profile; no account text, tokens, emails or avatars were captured. Both browser sessions were closed before local benchmarks. Later public-source sessions were also closed; final `agent-browser session list` reported no active sessions.
+
+Therefore **deployed editor performance is blocked by authentication**. Login-page loading is measured separately below and must not be called editor startup. Local fallback uses the existing real-Electron harness and the already-built UI bundle; it does not rebuild or change repo files. Bundle hashes/lengths are in `astra/source-provenance.json`; build freshness against every source file is not independently proven. The harness uses fresh temporary profiles, synthetic data only, production public APIs and handlers. All benchmarks launched by this audit run sequentially. Other applications remain running; per-run load is recorded, so this is not a certified idle-machine benchmark.
+
+## Wonder: vendor claims observed, not comparative verification
+
+Sources visited: [comparison index](https://wonder.design/compare), [Paper comparison](https://wonder.design/compare/paper), [pen.dev comparison](https://wonder.design/compare/pen), [Figma comparison](https://wonder.design/compare/figma), [roadmap](https://wonder.design/roadmap), [docs introduction](https://wonder.design/docs/what-is-wonder), [Design is code](https://wonder.design/docs/design-is-code), [blog index](https://wonder.design/blog), and [November 6 engineering-workflow post](https://wonder.design/blog/an-ide-for-engineers-who-care-about-design).
+
+| Topic | What Wonder says | Interpretation / missing evidence |
+|---|---|---|
+| Renderer | Wonder uses browser HTML/CSS, native CSS effects, Flex/Grid/Block/Inline layout. Paper also HTML/CSS; pen.dev WebGL; Figma WebGPU/WebGL. | Vendor architecture descriptions, not a runtime profiler result. The “WebGPU canvas” comparison heading describes Figma, not Wonder. |
+| Fidelity | Agents write HTML/CSS directly; visual output corresponds to code; exact CSS/Tailwind export is advertised. | No pixel-diff corpus, cross-browser font test, export fidelity percentage, or unsupported-CSS accounting supplied. |
+| Performance | Workflow speed: reduce handoff/recreation and keep design/code/agent context together. | No FPS, frame budget, input latency, hardware specification, loading benchmark, or memory benchmark found on the inspected pages. “Faster to ship” is not rendering throughput. |
+| Size / node limits | Free tier: 3,000 AI-generated layers per week. | A usage allowance, **not** 3,000 nodes per document. No maximum file bytes, page nodes, total nodes, or “unlimited document capacity” claim found. Absence on these pages is not proof that no limits exist elsewhere. |
+| Collaboration | Live collaboration for Wonder, Paper and Figma; unavailable for pen.dev according to Wonder's table. Roadmap marks real-time editing with shared cursors/presence shipped. | The November 6 post qualifies shared editing as Pro. No protocol, CRDT/OT design, participant ceiling, sync-latency SLA or conflict benchmark is disclosed. Competitor availability is Wonder's characterization, not independently audited. |
+| Paper contrast | External local MCP agent versus Wonder's in-app Claude/Codex, remote/headless MCP, parallel agents, repo context and live previews. Both have rich text, tokens and Figma paste. Wonder advertises more layout/control options and 1,000+ shader presets versus Paper's 30+. | Shader preset count does not identify the whole-scene renderer. Paper comments available; Wonder comments/components in progress. |
+| pen.dev / Pencil contrast | Agent output translated into .pen objects; Flex-style/absolute layouts, embedded web pages and effects recreated in CSS, versus Wonder's direct HTML/CSS. | Current page calls the product pen.dev; do not silently generalize its claims to every product called Pencil. |
+| Figma contrast | Figma layers/Auto Layout and code-layer beta versus Wonder's direct CSS and live-app preview. Figma canvas writing is described as beta, with no built-in Claude/Codex chat or exact-code export in this table. | This is competitive marketing, not an exhaustive audit of Figma's export/plugins/APIs. |
+| Plans | Wonder $20/editor/month; Paper $20/editor/month; pen.dev $20/user/month; Figma $20/Full seat/month, monthly billing. Paper free 100 MCP calls/week; pen.dev five agent days/month; Figma 500 AI credits/month with 150/day. | Snapshot of the comparison pages, not verified current competitor pricing. AI quotas are unrelated to renderer capacity. |
+
+No linked renderer-engineering deep dive was found in the inspected docs/blog navigation. The November 6 post is about the agent/repository workflow. Roadmap currently labels code components, advanced sharing and comments in progress; shared previews early access; cloud agents planned. Do not equate broad documentation language with all roadmap items shipped.
+
+Key screenshots (public comparison table sections only, no community avatars/account data):
+
+- [Wonder vs Figma](astra/wonder-figma-table.png)
+- [Wonder vs pen.dev](astra/wonder-pen-table.png)
+- [Wonder vs Paper](astra/wonder-paper-table.png)
+
+## Limits verified in current source
+
+| Boundary | Actual checked limit | Source / implication |
+|---|---|---|
+| Desktop HTML source/file | 5 × 1024² bytes (5 MiB), although UI says “5 MB” | `desktop/html-import.cjs:9`, `importSource`, `importFile`. Input-byte guard, not renderer capacity. |
+| HTML parser | 5,000,000 JavaScript string code units | `integrations/codec-html.mjs:183`. Distinct from UTF-8 bytes; raising only the desktop cap leaves this gate. |
+| Headless stored document | 20 MiB | `integrations/design-store.mjs:9`. Serialized document limit. |
+| Shared document/page | 20 MiB each; metadata 2 MiB; request/message envelope 21 MiB | `web/room-limits.js`. Historical documentation saying 2 MiB pages is superseded by current source. |
+| Nodes | 10,000/page; 50,000/document | `web/document-core.js:25`. Current schema, no override in this audit. |
+| Room assets | 20 MiB/asset; binaries normally externalized above 8 KiB; SVG inline threshold 256 KiB | `web/storage-limits.js`. Sharing counts externalizable binaries as asset URLs; this does not guarantee a large native inline-asset file passes the headless store's raw-byte cap. |
+
+Capacity UX should report which boundary failed, actual versus allowed values, and a relevant remedy (split pages for page nodes, split documents for total nodes/bytes, externalize or resize assets for bytes). A 20 MiB limit cannot be inferred to permit 50K arbitrary nodes. Do not truncate content or overwrite rejected documents.
+
+## Renderer comparison: engineering assessment, not guaranteed FPS
+
+A 60 Hz display gives 16.67 ms for a complete frame; 120 Hz gives 8.33 ms. Node count alone cannot determine a frame budget: visible area, glyphs, effects, nesting, changes, culling, cache policy, DPR and presentation all matter. “100K total offscreen objects” is not “100K visible richly styled objects.” Numbers below must be read with their fixture/method; no universal 1K/10K/100K guarantee is defensible.
+
+| Approach | Text and editing | Hit testing / application work | HTML/Tailwind export fidelity | Migration cost for Verynize (opinion) |
+|---|---|---|---|---|
+| Retained HTML/CSS DOM | Browser shaping, wrapping, fallback fonts, mixed runs, bidi, emoji and contenteditable/IME remain available. Fractional zoom and platform raster differences still need testing. | Browser handles element hit testing, but mounted size, style/layout invalidation, overlays and app-level selection can dominate. Use indexes, dirty nodes, culling and batched geometry. | Closest to existing export medium. Same DOM renderer does not prove the codec supports all CSS or identical exported pixels. | **Lowest.** Continue keyed renderer, isolate model commits from presentation, narrow subscriptions. Do not restore full rebuilds or move the canvas into React. |
+| Canvas2D / retained tiles | `fillText` provides browser text painting but not a complete CSS rich-text layout/editor. DOM text editing overlay and cached layout/line boxes needed; text raster buckets can blur during zoom. | Explicit spatial index, transformed hit testing, clipping/occlusion, picking, invalidation and accessibility tree. Canvas2D can be accelerated; “Canvas2D = CPU only” is inaccurate. | CSS layout/effects must be emulated or captured. Prefer temporary overview tiles with settled DOM detail/export. | **Medium** for optional overview; **high** for full replacement. Existing off-by-default tile code is a starting point, not proof of a production win. |
+| WebGL: PixiJS, regl, custom | Text usually textures/atlases or specialized glyph rendering; shaping, rich runs, font fallback, caret metrics and IME remain separate concerns. BitmapText is not a full contenteditable replacement. | Scene graph/index and picking needed. Pixi provides substantial scene/event machinery; regl is a draw-command abstraction, leaving editor architecture to the team. GPU drawing does not remove cloning, validation, persistence or inspector costs. | A second painter must reproduce CSS masks, gradients, filters, clipping, blend/compositing and layout. DOM overlays still needed for live iframes and editing. | **High** with Pixi; **very high** custom/regl. Figma's renderer is evidence that this architecture is possible, not a reusable implementation or evidence of low migration cost. |
+| WebGPU + WebGL fallback | Same text/layout/editor obligations as WebGL. Compute-friendly vector rasterization can change draw economics; it does not supply browser CSS semantics. | Two backend paths, device/context loss, adapter checks, pipeline/shader work, resource lifetimes and quality parity to maintain. | Same dual-renderer fidelity burden; explicitly test both paths against settled HTML export. | **Very high** for a product cutover. Use a renderer interface only after bounded application costs and matched-quality evidence justify the backend. |
+| Vello / CanvasKit variants | Vello provides vector/glyph rendering, not a browser editor. CanvasKit can include SkParagraph, ICU and HarfBuzz; font loading and browser-equivalent CSS line layout remain integration work. | Rust/WASM or Skia integration, WASM heap/resource lifecycle, scene encoding and editing/picking remain app responsibilities. | Neither is a drop-in HTML/CSS layout engine; “Skia is used by browsers” does not make CanvasKit output automatically CSS-identical. | **Very high** full migration. Evaluate in isolated prototypes with multilingual text and effect fixtures before selecting one. |
+
+Current primary-source documentation checked through Context7 (resolve-library-id then focused queries):
+
+- [Pixi renderer guide](https://github.com/pixijs/pixijs.com/blob/main/docs/guides/components/renderers/index.md): recommends WebGL for production; WebGPU is feature-complete but still affected by browser implementation differences. Automatic renderer detection prioritizes WebGL in the returned docs. Do not assume the default is WebGPU or a Canvas2D fallback is universally available in a given version.
+- [Vello architecture](https://github.com/linebender/vello/blob/main/ARCHITECTURE.md): distinguish compute-centric Vello from the sparse-strip CPU/GPU family. Current `vello_gpu` has wgpu and WebGL2 paths using vertex/fragment rendering. [Browser build instructions](https://github.com/linebender/vello/blob/main/vello_tests/web/README.md) list CPU, GPU-WebGL and GPU-wgpu modules. Historical “Vello requires compute/WebGPU” statements do not describe every current variant. A fallback still requires selecting/integrating those variants; it is not automatic browser CSS fallback.
+- [CanvasKit build](https://github.com/google/skia/blob/main/modules/canvaskit/compile.sh): default Ganesh/WebGL, CPU-only option, and separate Graphite/WebGPU build option; full shaping includes ICU/HarfBuzz and Paragraph. These are build/backend options, not proof that one deployed binary transparently switches among all of them.
+- [WebGPU adapter handling](https://developer.mozilla.org/en-US/docs/Web/API/GPU/requestAdapter): feature presence does not guarantee a usable adapter. Handle absent adapters, device loss and software fallback separately. Compatibility mode is not identical to shipping a separate WebGL renderer.
+
+Regl-specific documentation limitation: two Context7 searches did not resolve the WebGL library (one returned the unrelated Regle validation library, which was rejected). The official-site browser attempt failed with a wedged blank page; it was closed. Regl is included only as an architectural option, with no version-specific capability or measured-performance claim. Agent-reach update checking was unavailable because neither `agent-reach` nor `conda` is installed; no installation was attempted.
+
+**Support assessment:** DOM and Canvas2D are the broadest browser baseline for Electron and Safari. WebGL also offers a broad baseline but GPU availability/context loss remain runtime concerns. Electron's Chromium version can be pinned, but hardware/driver support cannot be assumed from its version alone. For WebGPU, explicitly check the target Safari/OS matrix and runtime adapters, and maintain a tested WebGL/DOM fallback for unsupported machines. This audit does not claim that Safari lacks WebGPU, nor does it validate a Safari GPU performance result. Primary verification: [WebKit Safari 26.0 release notes](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/) explicitly announce shipping WebGPU on macOS, iOS, iPadOS and visionOS. Thus “Safari has no WebGPU” is outdated. Older Safari targets still need fallback. [Figma’s September 2025 engineering post](https://www.figma.com/blog/figma-rendering-powered-by-webgpu/) confirms its WebGPU backend and the need to retain WebGL compatibility; it describes a substantial graphics-interface migration, not a drop-in renderer swap. Both pages were read through agent-browser.
+
+## Historical evidence retained with qualifications
+
+ADR-001 (`docs/canvas-performance/adr-001-defer-gpu-renderer.md`) remains relevant, but its pre-fix product numbers must not be presented as the current app. The November 6 **idle rerun** at the end of `node-cap-2026-11-06.md` supersedes that document's earlier provisional 5K/page and contended results: 10K/page was accepted with zoom frame p95 ~34 ms; 20K single-page ~52 ms; 50K across 5K-node pages had zoom frame p95 ~17 ms but edit sync ~1.86 s. This points toward whole-document commit work even when visible-page rendering is responsive.
+
+The November 4 isolated prototypes at 100K (five sequential runs, **vsync disabled**, not production) reported pan p95 B/C/Dgpu = 5.6/3.0/24.5 ms and zoom = 62.4/13.8/71.6 ms, where B = optimized DOM, C = Canvas2D tiles, Dgpu = Pixi WebGPU. They are rAF intervals under an uncapped prototype, not presented-frame timings. Vsync-on sanity checks were slower; incomplete tiles and different LOD policies prevent a simple “fastest renderer” verdict.
+
+Historical settled-screen RGB pixel differences against the DOM reference were B 0%, C 0.79%, Pixi 3.36%, hybrid DOM-layout/GPU 0.63%, using a >32/255 channel threshold on one fixture. This is **not** an export-fidelity guarantee, a text-quality score, an alpha check, or proof about every implementation. The GPU prototype's full-detail thumbnail construction and eviction policy inflated fit-all work and memory. A better GPU cache policy could change its ranking, by an unmeasured amount.
+
+## Fresh measurements: deployed login and local product
+
+### Deployed login page only
+
+One fresh agent-browser navigation, HeadlessChrome 156, DPR 1; no throttling configured. TTFB from navigation start **551.0 ms**, request-to-first-byte **455.4 ms**, DOMContentLoaded **709.9 ms**, load event **748.7 ms**, FCP **1,676 ms**, buffered LCP **1,676 ms** (5,056-pixel content entry). The later FCP/LCP despite an earlier load event reflects client-rendered sign-in content. These are one-run observations, not field Core Web Vitals or cold-editor timings. Cache was not explicitly disabled and no network attribution trace was taken.
+
+| JavaScript resource | Encoded bytes | Decoded bytes |
+|---|---:|---:|
+| `/assets/index-Dpo3UJ4v.js` | 172,143 | 511,806 |
+| `/assets/react-BzYqJA6g.js` | 3,599 | 8,885 |
+| `/assets/ui-CFIVG3HJ.js` | 611 | 1,055 |
+| `/assets/_editor-TYko6RO7.js` | 4,477 | 14,119 |
+| `/assets/_editor-BBZSFCo1.js` | 341 | 527 |
+| `/assets/web-auth-CF_m53Gc.js` | 711 | 1,222 |
+| `/assets/web-session-TY5upGZ9.js` | 1,624 | 3,704 |
+| `/assets/web-sign-in-Cr9X24Ih.js` | 1,518 | 2,906 |
+| `/assets/account-step-DjTwgSPb.js` | 40,145 | 128,647 |
+
+Total observed first-party `.js` resources: **225,169 encoded bytes / 672,871 decoded bytes**. Resource Timing sizes are HTTP body sizes, not installed-app size. A cross-origin Cloudflare beacon reports zero sizes (not proof it was free); it is excluded. Raw sanitized paths/timings: [web-login-load.json](astra/web-login-load.json). The local `web/dist/ui.js` is 2,003,599 bytes on disk; it is not the deployed route bundle and should not be substituted for the table.
+
+### Local Electron, three sequential repeats per size
+
+Apple M1, 8 logical CPUs, 8 GiB RAM; Electron **45.2.3 / Chromium 156.0.8078.80**, unlike the historical Electron 42/Chromium 148 runs. Per-run one-minute loads **4.44–7.86**. All synthetic nodes on one page: 10% frames (nested), 65% rectangles, 20% text, 5% embedded SVG images. Most content is offscreen at 100%; fixtures are not a dense-fit-all or real imported-design corpus. No schema cap bypass. Three repeats give descriptive medians; operation p95 is just the largest of three.
+
+| Nodes | Document load fence, median ms | Edit sync, median ms | Edit fence, median ms | All-node selection sync, median ms | All-node selection fence, median ms (range) | Heap after selection, MiB | Connected elements after selection |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1,000 | 150.5 | 49.3 | 81.7 | 173.5 | 837.2 (791.1–948.4) | 132.7 | 41,353 |
+| 5,000 | 609.2 | 217.5 | 253.7 | 1786.6 | 6327.3 (5980.9–6446.4) | 575.8 | 198,339 |
+| 10,000 | 1279.5 | 436.0 | 489.6 | 6237.8 | 18862.6 (18850.7–19109.0) | 1131.1 | 394,575 |
+
+**Critical semantics:** load excludes app startup and driver serialization. “Fence” is a zero-delay task plus two rAF callbacks, a paint opportunity, **not exact presented pixels**. Selection explicitly selects every page node, including ancestors and descendants; keyboard Select All is scoped and was not benchmarked. Heap is live CDP JS heap with undo/detached objects and all-node selection, no forced GC; not RSS, GPU memory or baseline scene-only memory. Connected elements include app/sidebar/inspector/selection UI, not just canvas layers. At 10K, all-node selection expands the connected DOM to **394,575 elements** and live heap to roughly **1.10 GiB**. This strongly motivates isolating and bounding selection UI work; it is not a claim that 10K canvas nodes inherently require that much memory.
+
+| Nodes | Gesture | Handler p50 / p95, ms | rAF interval p50 / p95, ms | Intervals >25 ms, median % |
+|---:|---|---:|---:|---:|
+| 1,000 | pan | 0.7 / 1.1 | 16.7 / 17.3 | 0.00 |
+| 1,000 | zoom | 1.7 / 1.9 | 16.7 / 17.3 | 0.00 |
+| 1,000 | drag | 0.9 / 1.3 | 16.7 / 16.8 | 0.00 |
+| 5,000 | pan | 1.0 / 1.3 | 16.7 / 17.6 | 1.71 |
+| 5,000 | zoom | 5.8 / 6.5 | 16.7 / 17.6 | 1.69 |
+| 5,000 | drag | 0.9 / 1.1 | 16.7 / 17.6 | 3.51 |
+| 10,000 | pan | 1.4 / 1.8 | 16.7 / 17.5 | 2.80 |
+| 10,000 | zoom | 10.2 / 12.1 | 16.7 / 34.2 | 14.58 |
+| 10,000 | drag | 1.1 / 1.4 | 16.7 / 33.8 | 6.00 |
+
+The >25 ms statistic is a **late-rAF proxy**, not compositor dropped-frame count. Using >16.7 ms would misclassify normal timestamp jitter. True presented/dropped frames, checkerboarding, blank/stale visible area and input-to-photon latency were not captured. Motion dispatches one synthetic event per rAF for two seconds through production handlers; it excludes OS input delivery/coalescing. All reported motion states changed. Very slow runs can execute fewer inputs. Drag interval/handler summaries do not fully describe pointerup commit latency.
+
+### Trace attribution
+
+Separate instrumented runs retain CDP traces and CPU profiles (`astra/profile-{size}-{edit,pan,zoom,selectAll}.json.gz`). Timing samples above exclude profiling. At 10K, the selection profiling pass took 21.36 s to the fence and accumulated **7.40 s UpdateLayoutTree**, **0.414 s Layout**, and **0.113 s Paint**. CPU samples include **5.68 s attributed to getBoundingClientRect** and many minified `ui.js` functions. At 5K, UpdateLayoutTree was 1.82 s versus Paint 0.027 s. These observations point toward selection-dependent style/geometry and UI work; exact owners of minified frames require source maps or narrower instrumentation before implementation.
+
+In the 10K edit trace, sampled `render`, `updateNodes`, document clones, `storage-limits` traversal/serialization and library `sync` appear, while Layout is zero and Paint totals ~25 ms. Current `web/app.js:507` still clones the entire document separately for each subscriber accepting an argument; `getDocument` clones again. This corroborates a commit-path investigation. CPU profiles include profiler startup and task overhead; nested event totals overlap. Do not sum totals into percentages or treat the entire `RunTask` total as operation CPU.
+
+### Long tasks, separate marked trace pass
+
+One extra instrumented pass per size. Explicit trace marks surround each operation. Count outer renderer-main-thread `RunTask` intervals overlapping that window, clipped to the marks, with >50 ms overlap. This includes the initial synchronous selection task; it is a trace-derived long-task measure, not field TBT. Observer-only counts in `longtasks.json` exclude a caller task that began before the in-page start timestamp, so use this marked trace summary for whole-operation comparisons. Instrumentation changes timings.
+
+| Nodes | Operation | Tasks >50 ms | Longest overlap, ms | Total overlap in those tasks, ms |
+|---:|---|---:|---:|---:|
+| 1,000 | pan | 0 | 0.0 | 0.0 |
+| 1,000 | zoom | 0 | 0.0 | 0.0 |
+| 1,000 | drag | 1 | 65.0 | 65.0 |
+| 1,000 | selectAll | 3 | 383.6 | 819.0 |
+| 5,000 | pan | 1 | 62.6 | 62.6 |
+| 5,000 | zoom | 1 | 65.4 | 65.4 |
+| 5,000 | drag | 2 | 253.2 | 321.3 |
+| 5,000 | selectAll | 4 | 3333.2 | 5467.5 |
+| 10,000 | pan | 3 | 125.3 | 265.0 |
+| 10,000 | zoom | 2 | 129.0 | 207.1 |
+| 10,000 | drag | 5 | 494.0 | 863.6 |
+| 10,000 | selectAll | 3 | 13203.3 | 18771.1 |
+
+Raw: [marked trace summary](astra/longtasks-trace-summary.json), [observer and gesture data](astra/longtasks.json), `astra/interaction-{1000,5000,10000}.trace.json.gz`. These gzip files can be decompressed for Chrome DevTools/Perfetto. Background save/storage work falling within a gesture window counts; it is part of the observed user-visible stall, not necessarily the wheel handler itself.
+
+## Fresh standalone renderer experiment (scratch copy)
+
+Rather than invent a rectangles-only renderer, reused the existing small standalone mixed rectangle/text/image/effect prototypes in a scratch copy. This preserves the repository’s scene/culling/LOD machinery and is more relevant than a single batched draw call, but remains **outside the product**. One run per cell, Chrome 156.0.8078.80, 1440×900 CSS px, DPR 2, vsync enabled, PixiJS 8.22.0. Pan/zoom target 60 samples and drag 40, with a 5-second phase budget; fit-all has its separate 20-second settling budget. Actual GPU backend names were `webgl` and `webgpu`. The existing harness supplies `--enable-unsafe-webgpu`; this proves experiment availability, not flag-free deployment eligibility.
+
+Load averages rose from ~5.4 to **38.1** during the sweep. No benchmarks launched by this audit overlapped, but the host was not isolated; lightweight artifact inspection/privacy scanning also occurred during the final GPU run. These single-run observations are **not a controlled backend ranking or crossover estimate**. Pan/zoom rAF numbers are not presented-frame latency.
+
+| Requested nodes | Strategy | First-frame fence ms | Pan p95 ms | Zoom p95 ms | Zoom intervals >25 ms | Drag p95 ms | Fit-all settle ms / complete | JS heap MiB |
+|---:|---|---:|---:|---:|---:|---:|---:|---:|
+| 1,000 | Optimized DOM | 34.5 | 18.6 | 18.2 | 1.7% | 18.7 | 33.5 / True | 4.1 |
+| 1,000 | Canvas2D tiles | 37.0 | 18.6 | 18.6 | 0.0% | 18.6 | 34.2 / True | 4.5 |
+| 1,000 | Pixi WebGL | 960.2 | 18.1 | 18.6 | 1.7% | 18.6 | 33.3 / True | 22.8 |
+| 1,000 | Pixi WebGPU | 266.2 | 18.6 | 18.6 | 1.7% | 18.5 | 34.5 / True | 23.2 |
+| 10,000 | Optimized DOM | 24.2 | 18.5 | 33.3 | 6.7% | 18.6 | 169.6 / True | 9.9 |
+| 10,000 | Canvas2D tiles | 49.9 | 18.3 | 18.7 | 5.0% | 18.6 | 140.9 / True | 9.7 |
+| 10,000 | Pixi WebGL | 384.3 | 18.7 | 50.7 | 21.7% | 18.6 | 289.3 / True | 199.0 |
+| 10,000 | Pixi WebGPU | 310.1 | 18.3 | 35.2 | 13.3% | 18.0 | 267.2 / True | 196.3 |
+| 100,000 | Optimized DOM | 38.0 | 18.6 | 81.3 | 63.3% | 18.2 | 3027.7 / True | 62.3 |
+| 100,000 | Canvas2D tiles | 78.1 | 18.5 | 34.2 | 21.7% | 18.6 | 587.7 / True | 61.0 |
+| 100,000 | Pixi WebGL | 542.2 | 33.2 | 66.6 | 66.7% | 16.8 | 16655.9 / True | 1107.4 |
+| 100,000 | Pixi WebGPU | 303.4 | 18.4 | 66.7 | 65.0% | 18.0 | 17318.7 / True | 1114.3 |
+
+**Expected budget assessment, explicitly an inference:** At 1K these optimized prototypes mostly hit the display cadence; their measured p95 around 18–19 ms includes timing jitter. At 10K, pan remains near cadence for all four, while observed zoom p95 is ~19–51 ms depending on backend and load. At 100K, none of these exact implementations establishes a complete 60 Hz zoom guarantee: DOM ~81 ms, tiles ~34 ms, both GPU variants ~67 ms. Plan to budget culling/LOD/refinement and all application work regardless of backend. These are conditional observations, not universal backend limits; no fresh Vello, CanvasKit, regl/custom or Safari timing was measured.
+
+| Requested nodes | Strategy | Mean incomplete tile/board fraction during zoom | Any pan/zoom/drag phase truncated? |
+|---:|---|---:|---|
+| 1,000 | Optimized DOM | not instrumented | False |
+| 1,000 | Canvas2D tiles | 3.5% | False |
+| 1,000 | Pixi WebGL | 0.0% | False |
+| 1,000 | Pixi WebGPU | 0.0% | False |
+| 10,000 | Optimized DOM | not instrumented | False |
+| 10,000 | Canvas2D tiles | 17.1% | False |
+| 10,000 | Pixi WebGL | 6.3% | False |
+| 10,000 | Pixi WebGPU | 5.3% | False |
+| 100,000 | Optimized DOM | not instrumented | False |
+| 100,000 | Canvas2D tiles | 49.8% | False |
+| 100,000 | Pixi WebGL | 39.7% | False |
+| 100,000 | Pixi WebGPU | 41.3% | False |
+
+Incomplete fraction counts tiles/boards, **not screen area**, and differs across strategies. Missing DOM instrumentation must not become 0%. First-frame/fit-all settling waits are strategy/rAF fences, not complete-pixel validation. DOM can still checkerboard without reporting it. The prototype excludes selection UI, persistence, validation, undo, collaboration, real editing overlays and application hit-testing. JS heap is a post-traversal sample; browser runner reports no process RSS, and texture estimates are not peak GPU residency. GPU thumbnail policy eagerly builds detailed boards, penalizing fit-all; this is an implementation choice, not a WebGL/WebGPU lower bound. No new fidelity audit was run, so fast timings cannot establish matched quality.
+
+Raw [prototype results](astra/prototypes-fresh.json) include version, per-cell load, sample counts, backend and memory fields. [Selection latency chart](astra/selection-latency.html) visualizes the separate **product** result, not these prototypes.
+
+## Reproducibility and evidence gaps
+
+From the repo root, with the existing UI build and installed dependencies, the fresh baseline command was:
+
+```sh
+node eval/canvas-perf/bench-verynize.cjs --sizes 1000,5000,10000 --runs 3 --output /ABSOLUTE/SCRATCHPAD/audit/astra/local-product.json
+```
+
+Replace the placeholder with the supplied scratchpad. This writes results/traces there, not into the repository. `astra/measure-longtasks.cjs` is the separate temporary instrumented pass; it imports the production fixture and renderer harness by absolute path and saves only scratchpad artifacts. `astra/bench-prototypes.cjs` and `astra/prototypes/` are scratch copies of the existing standalone prototype, with module-resolution paths adjusted to this checkout; dependency installation is confined to the scratch copy. It was run with:
+
+```sh
+node /ABSOLUTE/SCRATCHPAD/audit/astra/bench-prototypes.cjs --browser chrome --vsync --sizes 1000,10000,100000 --runs 1 --strategies B,C,D,Dgpu --budget 5000 --out /ABSOLUTE/SCRATCHPAD/audit/astra/prototypes-fresh.json
+```
+
+Repository `git status --porcelain` and `git diff --stat` are empty after the audit. Artifact links were checked; screenshots were visually checked for private data, and JSON/trace artifacts had no email, bearer-token-value or JWT-pattern matches. The temporary prototype HTTP server is created by the harness and closed on completion. Each Chrome/Electron instance is closed by the harness. No owner documents are used. No private account screenshots or stored credentials are included. Trace artifacts contain synthetic application state and local source URLs; they have not been uploaded anywhere.
+
+Open evidence gaps: authenticated production editor startup/interaction, cold/warm repeat distributions, real imported documents with fonts/images/effects, scoped keyboard selection, hardware input-to-presented latency, true dropped compositor frames, complete visible-area timing, RSS/GPU peak and post-eviction memory, Safari performance, and current export fidelity across languages and zoom levels. No fresh 100K **product** run was attempted because the current page/document caps prohibit it. Prototype 100K must never be substituted for that missing product result. The recommendation does not require inventing those numbers.
+
+## Prioritized recommendation
+
+### Next two weeks: address demonstrated stalls and make limits understandable
+
+1. **P0 — Bound selection UI and geometry work.** Investigate the 0.84 → 6.33 → 18.86 second all-node selection fences at 1K/5K/10K, the 394,575 connected elements at 10K, and the marked 13.2-second selection task. Instrument canvas selection chrome, sidebar expansion, inspector rows and style reads separately. Virtualize only the tree/inspector rows that need it; avoid mounting per-node controls for every selected descendant. Compute shared properties/union bounds with indexes and batched reads; avoid automatically expanding all descendants merely to acknowledge selection. Preserve real selection IDs, group editing, clipped/hidden-layer behavior, keyboard navigation and accessibility. Show a count/union immediately, then progressively fill expensive detail. **Do not silently select fewer nodes or use a spinner as the performance fix.** Proposed first milestone: 2K all-node sync <500 ms (existing budget), then 5K fence <1 s and no >100 ms selection task; these latter thresholds are product targets, not measured achievements.
+2. **P0 — Reduce commit-wide cloning, serialization and persistence.** Audit mutation expectations of subscribers before replacing per-subscriber whole-document clones with a shared immutable/revisioned snapshot or narrow page/node selectors. Separate camera/selection notifications from document commits; push file-library persistence and storage metering behind debounced idle work with a maximum save latency, coalesce repeated saves, and retain explicit “saved/saving/failed” status. Optimize dirty-page validation/index maintenance without weakening validation or save durability. Evidence: 10K edit sync 436 ms, render sync 299 ms, storage/clone functions in profiles, and historical 50K split-page edits ~1.86 s despite responsive motion. Protect one-step undo and final drag position. Proposed goal: restore <16 ms sync edits at 1K (existing budget), reduce 10K edit sync by at least 50%, and eliminate drag-release tasks >100 ms on this fixture.
+3. **P1 — Separate capacity policy from rendering capacity.** Keep the current 10K/page, 50K/document and 20 MiB limits while measuring the above changes. Add/verify preflight reporting for source bytes, parser characters, output bytes and node counts; do not conflate “5 MB HTML import” with document storage. Show actionable split-page/document and asset-size remedies before destructive/import work, retain original data on rejection, and clarify MB versus MiB. Verify whether existing large-binary externalization runs on the path that failed; it already exists for room sharing, so do not propose it as entirely new functionality. If customers need larger imports now, first isolate parsing into cancellable staged/worker work and establish bounded memory/validated output, then coordinate every relevant cap. Merely raising constants is not the fix.
+4. **P1 — Improve loading and interaction observability.** Add authenticated web startup measurements before optimizing the 2 MB local UI bundle as though it were the deployed route. Measure a visible “editor ready” milestone, font/image completion and document paint, not just `load`. Keep pan/zoom available during deferred nonessential panel work. The measured login page reaches FCP/LCP at 1.676 s despite load at 0.749 s; route JS decoding and client render deserve a separate trace, but this single sample does not establish the bottleneck. Add pointerup/commit and late-rAF metrics to the performance harness; prefer >25 ms intervals over >16.7 ms timestamp-jitter counts, while adding real presentation/completeness instrumentation.
+
+Validate fixes sequentially on an otherwise idle M1, five repeats with pinned runtime/DPR, identical seed and trajectories, plus a real design corpus. Keep correctness checks for snapping/reparent/Alt-drag/undo, IME/mixed text, culling and shared documents. Do not compare current Electron 45 directly to the old Electron 42 baseline and attribute all differences to code. No broad GPU migration or default tile enablement is warranted within these two weeks.
+
+### Next quarter: remove document-scale work and establish a renderer decision gate
+
+1. **P0 — Revisioned incremental document architecture.** Invest in dirty-node/page updates, shared snapshots, patch-based or page-scoped undo, bounded caches, staged import and page-lazy loading. Preserve JSON/schema/HTML codec as canonical contracts; presentation should consume changes rather than drive persistence and all subscribers. Target O(changed nodes + visible UI) work for an ordinary edit. This directly addresses measured costs that every renderer would inherit.
+2. **P1 — Complete a DOM + optional overview experiment only where needed.** Keep settled DOM for text/IME, native CSS and iframe previews. Evaluate existing off-by-default tiles against optimized DOM on identical 10K and realistic larger split-page scenes. Report blank/stale/coarse visible-area duration and handoff fidelity; fast callbacks with missing tiles are not a smooth complete viewport. Existing renderer prototype results justify investigation, not automatic enablement.
+3. **P1 — Build matched-quality renderer evidence before selecting a GPU backend.** If residual traces show rendering/hit-testing dominates after application fixes, compare retained DOM, tiles, Pixi WebGL/WebGPU and a carefully selected Vello/CanvasKit variant with equal culling, LOD, text, cache limits and trajectories. Include multilingual rich text/emoji, masks/filters, large images, live previews and 100K *visible* stress cases separately from 100K total objects. Include Safari 26+ plus an older fallback target, GPU/context loss, peak RSS/heap/texture estimates, eviction cycles, and exact HTML export at settled 100%. Keep ADR-001's ≥20% presented-frame improvement and bounded-memory/matched-quality gates; do not reinterpret one-run toy results as satisfying them. Reopen the ADR only after those gates or a concrete shader-heavy workload justify the cost.
+
+**Priority order: selection stalls → commit/save/undo scale → clear capacity/import UX → instrumented overview/rendering evaluation.** Current evidence supports keeping DOM, not a renderer rewrite, as the fastest path to a noticeably smoother Verynize.

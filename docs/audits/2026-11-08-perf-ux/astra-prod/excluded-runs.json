@@ -1,0 +1,6 @@
+{
+  "spaces-complete": "Excluded: renderer process changed and no action marks. JSON copied previous clipboard result before sentinel safeguard.",
+  "spaces-selection": "Partial trace only: ends during all-node selection. Observer timing result in spaces-interactions.json continues to completion.",
+  "audit-physical": "Initial shortcut delivery was not verified; no claim of a completed Cmd+A benchmark.",
+  "audit-selection": "Node count changed from initial 4903 to observed 904; not controlled large-document benchmark."
+}

@@ -1,0 +1,69 @@
+{
+  "trace": "audit-small.trace.json.gz",
+  "mainThreads": [
+    [
+      14750,
+      49495
+    ]
+  ],
+  "longTasks": {
+    "count": 1,
+    "maxMs": 261.236,
+    "totalMs": 261.236
+  },
+  "eventTotalsMs": {
+    "RunTask": 800.5499999995704,
+    "V8.StackGuard": 262.38799999999986,
+    "V8.HandleInterrupts": 262.3139999999998,
+    "EvaluateScript": 261.215,
+    "V8.InvokeApiInterruptCallbacks": 260.31699999999995,
+    "CpuProfiler::StartProfiling": 260.254,
+    "v8.callFunction": 142.6519999999997,
+    "FunctionCall": 105.06600000000049,
+    "WidgetBaseInputHandler::OnHandleInputEvent": 92.59100000000002,
+    "WebFrameWidgetImpl::HandleInputEvent": 91.71999999999998,
+    "EventDispatch": 84.582,
+    "V8.GCIncrementalMarking": 60.67000000000008,
+    "V8.GC_MC_INCREMENTAL": 59.97300000000002,
+    "RunMicrotasks": 34.692000000000014,
+    "UpdateLayoutTree": 25.082000000000004,
+    "v8::Debugger::AsyncTaskRun": 22.86900000000001,
+    "V8.GC_MC_INCREMENTAL_EMBEDDER_TRACING": 19.12899999999995,
+    "Paint": 18.940000000000005,
+    "CppGC.IncrementalMark": 18.886000000000006,
+    "CppGC.MarkTransitiveClosureWithDeadline": 18.076000000000043
+  },
+  "bottomUpSampleSelfMs": {
+    "(garbage collector) @ ": 80.04200000000002,
+    "getBoundingClientRect @ ": 17.219999999999995,
+    "set textContent @ ": 10.664,
+    "draw @ selection-chrome.js": 4.865999999999998,
+    "measureHostInstance @ installHook.js": 4.396000000000001,
+    "clearTimeout @ ": 4.066999999999999,
+    "replaceChildren @ ": 2.9589999999999996,
+    "remove @ ": 2.658999999999998,
+    "send @ ": 2.4170000000000003,
+    "fetch @ ": 2.1740000000000004,
+    "bounds @ canvas-render.js": 1.501,
+    "(anonymous) @ legacy-ui-CXHsJAu3.js": 1.4460000000000002,
+    "set value @ ": 1.434,
+    "requestAnimationFrame @ ": 1.3890000000000002,
+    "(anonymous) @ account-step-DjTwgSPb.js": 1.3519999999999999,
+    "follow @ canvas-interactions.js": 1.3010000000000002,
+    "(anonymous) @ canvas-interactions.js": 1.1420000000000001,
+    "setAttribute @ ": 1.1380000000000001,
+    "querySelectorAll @ ": 0.9780000000000001,
+    "Ar @ account-step-DjTwgSPb.js": 0.895,
+    "append @ ": 0.8900000000000001,
+    "op @ index-Dpo3UJ4v.js": 0.89,
+    "getDocument @ app.js": 0.8050000000000002,
+    "rs @ index-Dpo3UJ4v.js": 0.791,
+    "request @ account-store.js": 0.7050000000000001
+  },
+  "frameEventCounts": {
+    "BeginFrame": 153,
+    "DrawFrame": 67,
+    "DroppedFrame": 1
+  },
+  "marks": []
+}
