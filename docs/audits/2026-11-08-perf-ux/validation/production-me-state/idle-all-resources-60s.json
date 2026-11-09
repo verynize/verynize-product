@@ -1,0 +1,22 @@
+{
+  "window_ms": 60100,
+  "note": "all PerformanceResourceTiming entries in a separate 60 s foreground idle window",
+  "byPath": {
+    "/api/me/state": {
+      "n": 19,
+      "transfer": 10572273,
+      "dec": 77602479
+    },
+    "/api/orgs/<org>/rooms": {
+      "n": 18,
+      "transfer": 18036,
+      "dec": 33228
+    },
+    "/api/me/rooms": {
+      "n": 18,
+      "transfer": 18684,
+      "dec": 54288
+    }
+  },
+  "websocketEntries": 0
+}

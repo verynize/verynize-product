@@ -1,0 +1,64 @@
+# curl -sI https://verynize.gayaloo.app<path> (2026-11-09, unauthenticated, Accept-Encoding: zstd, br, gzip)
+== /assets/index-Dpo3UJ4v.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"ae2e4c33cfb3b30359ad7eec90755699"
+content-encoding: zstd
+== /assets/_editor-TYko6RO7.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"1e9972c67cc6c48c27272f6917cc305e"
+content-encoding: zstd
+== /assets/react-BzYqJA6g.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"9141d799aa03662a220608125a0444fc"
+content-encoding: zstd
+== /assets/ui-CFIVG3HJ.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"93acff0ea5aa8b3802688dd742d546a7"
+content-encoding: zstd
+== /assets/legacy-ui-CXHsJAu3.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"b17ed54fb84048a85c36db6ca2b9b4bf"
+content-encoding: zstd
+== /app.js
+HTTP/2 200 
+content-type: text/javascript
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"d2ff7c3d320f7422c4a82c49bd26a75a"
+content-encoding: zstd
+== /style.css
+HTTP/2 200 
+content-type: text/css
+cf-cache-status: HIT
+cache-control: public, max-age=0, must-revalidate
+etag: W/"a887b5e4a1ecdc32537e1d614c61cc4a"
+content-encoding: zstd
+== /_headers
+HTTP/2 404 
+content-type: text/html; charset=utf-8
+content-encoding: zstd
+== conditional GET legacy-ui with If-None-Match (etag di atas)
+status 304
+== legacy-ui size: decoded (identity) / zstd / br bytes
+1577689
+446412
+446068
+== GET /api/me/state tanpa sesi
+HTTP/2 401 
+content-type: application/json
+cache-control: no-store

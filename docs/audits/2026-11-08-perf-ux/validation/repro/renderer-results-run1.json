@@ -1,0 +1,1989 @@
+{
+  "date": "2026-11-08T22:07:12.145Z",
+  "commit": "2630c307c834bae2d61b2dc1b42689397c3f3e0d",
+  "node": "v26.13.0",
+  "machine": {
+    "cpu": "Apple M1",
+    "logicalCpus": 8,
+    "ramGiB": 8,
+    "loadAverage": [1.8, 12.1, 11.5],
+    "macos": "27.2"
+  },
+  "sizes": [
+    {
+      "n": 1000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.8, 12.1, 11.5],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 222809,
+      "load": {
+        "syncMs": 80.20000000006985,
+        "paintFenceMs": 127.90000000002328
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!saving) sync(window.design.getDocument()); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{Jm=e;let t=window.design.getSelection();t.join()!==Ym.join()&&(Ym=t),Xm.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 6.399999999906868,
+        "minMs": 5.300000000046566,
+        "maxMs": 8.5
+      },
+      "editAttribution": {
+        "syncMs": 45.699999999953434,
+        "fenceMs": 71.59999999997672,
+        "sync": {
+          "clones": 10,
+          "cloneMs": 27.80000000016298,
+          "stringifyBig": 4,
+          "stringifyMs": 2.900000000023283,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 620049,
+              "ms": 0.40000000002328306
+            }
+          ],
+          "rects": 0
+        },
+        "fence": {
+          "clones": 10,
+          "cloneMs": 27.80000000016298,
+          "stringifyBig": 5,
+          "stringifyMs": 4.700000000069849,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 620049,
+              "ms": 0.40000000002328306
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 619809,
+              "ms": 0.40000000002328306
+            }
+          ],
+          "rects": 0
+        },
+        "all": {
+          "clones": 14,
+          "cloneMs": 55.4000000001397,
+          "stringifyBig": 7,
+          "stringifyMs": 19.9000000001397,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 620049,
+              "ms": 0.40000000002328306
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 619809,
+              "ms": 0.40000000002328306
+            }
+          ],
+          "rects": 0
+        },
+        "syncSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)"
+        ],
+        "syncStringifySites": [
+          "Object.updateNodes (app.js:1206:25) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "sync (wonder-shell.js:270:29) <- wonder-shell.js:892:18",
+          "persist (wonder-shell.js:199:43) <- sync (wonder-shell.js:277:5)",
+          "dist/ui.js:59:172752 <- render (app.js:507:7)"
+        ],
+        "deferredSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "Object.getDocument (app.js:1333:22) <- agent-bridge.js:115:47",
+          "wonder-shell.js:973:22 <- Array.map (<anonymous>)",
+          "Object.check (document-safety.js:360:30) <- wonder-shell.js:974:43",
+          "Object.getDocument (app.js:1333:22) <- flush (version-history.js:230:26)"
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 75.59999999997672,
+          "fenceMs": 108.09999999997672,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 45.10000000009313,
+            "stringifyBig": 4,
+            "stringifyMs": 7.299999999930151,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 45.10000000009313,
+            "stringifyBig": 5,
+            "stringifyMs": 9.399999999906868,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 67.10000000009313,
+            "stringifyBig": 7,
+            "stringifyMs": 15.899999999906868,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 42.5,
+          "fenceMs": 64,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 29.199999999953434,
+            "stringifyBig": 4,
+            "stringifyMs": 2.6000000000931323,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 29.199999999953434,
+            "stringifyBig": 5,
+            "stringifyMs": 4.500000000116415,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.19999999995343387
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 39.60000000009313,
+            "stringifyBig": 7,
+            "stringifyMs": 9.000000000116415,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.19999999995343387
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 75.5,
+          "fenceMs": 109.09999999997672,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 46.49999999976717,
+            "stringifyBig": 4,
+            "stringifyMs": 7.900000000256114,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.2999999999301508
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 46.49999999976717,
+            "stringifyBig": 5,
+            "stringifyMs": 10.100000000209548,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.2999999999301508
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000002328306
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 77.0999999998603,
+            "stringifyBig": 7,
+            "stringifyMs": 25.100000000209548,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.2999999999301508
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000002328306
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 74.40000000002328,
+          "fenceMs": 110,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 45.40000000002328,
+            "stringifyBig": 4,
+            "stringifyMs": 7.200000000069849,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 45.40000000002328,
+            "stringifyBig": 5,
+            "stringifyMs": 9.500000000116415,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.19999999995343387
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 77.29999999993015,
+            "stringifyBig": 7,
+            "stringifyMs": 22.500000000116415,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.19999999995343387
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 75.20000000006985,
+          "fenceMs": 112.10000000009313,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 45.70000000006985,
+            "stringifyBig": 4,
+            "stringifyMs": 7.300000000046566,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 45.70000000006985,
+            "stringifyBig": 5,
+            "stringifyMs": 9.599999999976717,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 67.5,
+            "stringifyBig": 7,
+            "stringifyMs": 18.5,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.30000000004656613
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 76.30000000004657,
+          "fenceMs": 106.09999999997672,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 46.300000000046566,
+            "stringifyBig": 4,
+            "stringifyMs": 7.699999999953434,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 46.300000000046566,
+            "stringifyBig": 5,
+            "stringifyMs": 9.900000000023283,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.2999999999301508
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 63.800000000046566,
+            "stringifyBig": 7,
+            "stringifyMs": 21.100000000093132,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.2999999999301508
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 76.19999999995343,
+          "fenceMs": 107.90000000002328,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 45.69999999983702,
+            "stringifyBig": 4,
+            "stringifyMs": 7.700000000069849,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.39999999990686774
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 45.69999999983702,
+            "stringifyBig": 5,
+            "stringifyMs": 9.600000000093132,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.39999999990686774
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 65.09999999974389,
+            "stringifyBig": 7,
+            "stringifyMs": 19.599999999976717,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 620049,
+                "ms": 0.39999999990686774
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.30000000004656613
+              }
+            ],
+            "rects": 0
+          }
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 75.2,
+        "fenceMsMedian": 107.9,
+        "syncMsRange": [42.5, 76.3],
+        "syncClones": 10,
+        "syncCloneMs": 45.7,
+        "fenceClones": 10,
+        "fenceCloneMs": 45.7,
+        "allClones": 14,
+        "allCloneMs": 65.1,
+        "syncStringifyBig": 4,
+        "syncStringifyMs": 7.3,
+        "allStringifyBig": 7,
+        "allStringifyMs": 19.6,
+        "setItemsSync": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 620049,
+            "ms": 0.30000000004656613
+          }
+        ],
+        "setItemsAll": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 620049,
+            "ms": 0.30000000004656613
+          },
+          {
+            "key": "verynize-v2",
+            "chars": 619809,
+            "ms": 0.19999999995343387
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 120,
+          "changed": true,
+          "handlerP50": 0.8,
+          "handlerP95": 1.1,
+          "rafP50": 16.7,
+          "rafP95": 16.7,
+          "over25Pct": 0
+        },
+        "zoom": {
+          "events": 120,
+          "changed": true,
+          "handlerP50": 1.7,
+          "handlerP95": 2,
+          "rafP50": 16.7,
+          "rafP95": 16.8,
+          "over25Pct": 0
+        }
+      },
+      "heapBeforeSelect": 44931080,
+      "elementsBeforeSelect": 4082,
+      "selectAll": {
+        "syncMs": 170.39999999990687,
+        "paintFenceMs": 776,
+        "clones": 10,
+        "cloneMs": 28.899999999906868,
+        "stringifyBig": 3,
+        "stringifyMs": 2.199999999953434,
+        "setItem": [
+          {
+            "key": "verynize-v2",
+            "chars": 619809,
+            "ms": 0.5
+          }
+        ],
+        "rects": 100
+      },
+      "heapAfterSelect": 137858984,
+      "domCounters": {
+        "documents": 4,
+        "nodes": 51455,
+        "jsEventListeners": 16521
+      },
+      "connected": {
+        "elements": 41353,
+        "canvasLayers": 1000,
+        "selectionBoxes": 1000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.7, 11.2, 11.2],
+        "macos": "27.2"
+      }
+    },
+    {
+      "n": 5000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.7, 11.2, 11.2],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 1127779,
+      "load": {
+        "syncMs": 374.19999999995343,
+        "paintFenceMs": 599.5999999999767
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!saving) sync(window.design.getDocument()); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{Jm=e;let t=window.design.getSelection();t.join()!==Ym.join()&&(Ym=t),Xm.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 18.199999999953434,
+        "minMs": 15,
+        "maxMs": 35.40000000002328
+      },
+      "editAttribution": {
+        "syncMs": 220.10000000009313,
+        "fenceMs": 252.90000000002328,
+        "sync": {
+          "clones": 10,
+          "cloneMs": 148.89999999990687,
+          "stringifyBig": 4,
+          "stringifyMs": 13.900000000139698,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 4
+            }
+          ],
+          "rects": 0
+        },
+        "fence": {
+          "clones": 10,
+          "cloneMs": 148.89999999990687,
+          "stringifyBig": 5,
+          "stringifyMs": 23.20000000006985,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 4
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 2.799999999930151
+            }
+          ],
+          "rects": 0
+        },
+        "all": {
+          "clones": 14,
+          "cloneMs": 224,
+          "stringifyBig": 7,
+          "stringifyMs": 73.10000000009313,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 4
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 2.799999999930151
+            }
+          ],
+          "rects": 0
+        },
+        "syncSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)"
+        ],
+        "syncStringifySites": [
+          "Object.updateNodes (app.js:1206:25) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "sync (wonder-shell.js:270:29) <- wonder-shell.js:892:18",
+          "persist (wonder-shell.js:199:43) <- sync (wonder-shell.js:277:5)",
+          "dist/ui.js:59:172752 <- render (app.js:507:7)"
+        ],
+        "deferredSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "Object.getDocument (app.js:1333:22) <- agent-bridge.js:115:47",
+          "wonder-shell.js:973:22 <- Array.map (<anonymous>)",
+          "Object.check (document-safety.js:360:30) <- wonder-shell.js:974:43",
+          "Object.getDocument (app.js:1333:22) <- flush (version-history.js:230:26)"
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 241.5,
+          "fenceMs": 274.4000000000233,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 155.69999999995343,
+            "stringifyBig": 4,
+            "stringifyMs": 28.5,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 3.099999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 155.69999999995343,
+            "stringifyBig": 4,
+            "stringifyMs": 28.5,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 3.099999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 232.5,
+            "stringifyBig": 7,
+            "stringifyMs": 87.30000000004657,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 3.099999999976717
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.300000000046566
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 238.5,
+          "fenceMs": 274.5999999999767,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 154.60000000009313,
+            "stringifyBig": 4,
+            "stringifyMs": 28.400000000023283,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 154.60000000009313,
+            "stringifyBig": 5,
+            "stringifyMs": 37.40000000002328,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.5
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 232.40000000002328,
+            "stringifyBig": 7,
+            "stringifyMs": 86,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.5
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 238.19999999995343,
+          "fenceMs": 274.0999999999767,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 154.70000000006985,
+            "stringifyBig": 4,
+            "stringifyMs": 28.19999999983702,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 154.70000000006985,
+            "stringifyBig": 5,
+            "stringifyMs": 37.799999999813735,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.300000000046566
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 230.60000000009313,
+            "stringifyBig": 7,
+            "stringifyMs": 87.89999999979045,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.300000000046566
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 237.30000000004657,
+          "fenceMs": 275.20000000006985,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 154.90000000002328,
+            "stringifyBig": 4,
+            "stringifyMs": 28.600000000093132,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 154.90000000002328,
+            "stringifyBig": 5,
+            "stringifyMs": 37.40000000002328,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.1000000000931323
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 233.40000000002328,
+            "stringifyBig": 7,
+            "stringifyMs": 66.59999999997672,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.1000000000931323
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 225.90000000002328,
+          "fenceMs": 261.80000000004657,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 156.60000000020955,
+            "stringifyBig": 4,
+            "stringifyMs": 15.79999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 4.5
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 156.60000000020955,
+            "stringifyBig": 5,
+            "stringifyMs": 25.29999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 4.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.599999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 207.4000000002561,
+            "stringifyBig": 7,
+            "stringifyMs": 70.70000000006985,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 4.5
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.599999999976717
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 238.5,
+          "fenceMs": 276.19999999995343,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 155.39999999990687,
+            "stringifyBig": 4,
+            "stringifyMs": 28.199999999953434,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 155.39999999990687,
+            "stringifyBig": 5,
+            "stringifyMs": 37.40000000002328,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.099999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 232.79999999993015,
+            "stringifyBig": 7,
+            "stringifyMs": 65.10000000009313,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.3999999999068677
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.099999999976717
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 209.90000000002328,
+          "fenceMs": 249.90000000002328,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 150.09999999997672,
+            "stringifyBig": 4,
+            "stringifyMs": 13.599999999976717,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 150.09999999997672,
+            "stringifyBig": 5,
+            "stringifyMs": 22.699999999953434,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.400000000023283
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 201.69999999995343,
+            "stringifyBig": 7,
+            "stringifyMs": 69.40000000002328,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.400000000023283
+              }
+            ],
+            "rects": 0
+          }
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 237.3,
+        "fenceMsMedian": 274.1,
+        "syncMsRange": [209.9, 238.5],
+        "syncClones": 10,
+        "syncCloneMs": 154.7,
+        "fenceClones": 10,
+        "fenceCloneMs": 154.7,
+        "allClones": 14,
+        "allCloneMs": 230.6,
+        "syncStringifyBig": 4,
+        "syncStringifyMs": 28.2,
+        "allStringifyBig": 7,
+        "allStringifyMs": 69.4,
+        "setItemsSync": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 3113019,
+            "ms": 2.5
+          }
+        ],
+        "setItemsAll": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 3113019,
+            "ms": 2.5
+          },
+          {
+            "key": "verynize-v2",
+            "chars": 3112779,
+            "ms": 2.5
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 119,
+          "changed": true,
+          "handlerP50": 1.1,
+          "handlerP95": 1.3,
+          "rafP50": 16.7,
+          "rafP95": 16.8,
+          "over25Pct": 1.7
+        },
+        "zoom": {
+          "events": 117,
+          "changed": true,
+          "handlerP50": 5.7,
+          "handlerP95": 6,
+          "rafP50": 16.7,
+          "rafP95": 18,
+          "over25Pct": 1.7
+        }
+      },
+      "heapBeforeSelect": 94149992,
+      "elementsBeforeSelect": 14082,
+      "selectAll": {
+        "syncMs": 1715.7000000000698,
+        "paintFenceMs": 5227.800000000047,
+        "clones": 13,
+        "cloneMs": 193.4000000001397,
+        "stringifyBig": 3,
+        "stringifyMs": 11.900000000023283,
+        "setItem": [
+          {
+            "key": "verynize-v2",
+            "chars": 3112779,
+            "ms": 2.1000000000931323
+          }
+        ],
+        "rects": 500
+      },
+      "heapAfterSelect": 616286572,
+      "domCounters": {
+        "documents": 505,
+        "nodes": 272286,
+        "jsEventListeners": 65891
+      },
+      "connected": {
+        "elements": 198339,
+        "canvasLayers": 5000,
+        "selectionBoxes": 5000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.6, 10.4, 10.9],
+        "macos": "27.2"
+      }
+    },
+    {
+      "n": 10000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.6, 10.4, 10.9],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 2259180,
+      "load": {
+        "syncMs": 699,
+        "paintFenceMs": 1164
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!saving) sync(window.design.getDocument()); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{Jm=e;let t=window.design.getSelection();t.join()!==Ym.join()&&(Ym=t),Xm.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 30,
+        "minMs": 28.79999999993015,
+        "maxMs": 55.5
+      },
+      "editAttribution": {
+        "syncMs": 418.89999999990687,
+        "fenceMs": 462.39999999990687,
+        "sync": {
+          "clones": 10,
+          "cloneMs": 287.29999999993015,
+          "stringifyBig": 4,
+          "stringifyMs": 26.300000000046566,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 6229421,
+              "ms": 4.599999999976717
+            }
+          ],
+          "rects": 0
+        },
+        "fence": {
+          "clones": 10,
+          "cloneMs": 287.29999999993015,
+          "stringifyBig": 5,
+          "stringifyMs": 44.70000000006985,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 6229421,
+              "ms": 4.599999999976717
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 6229180,
+              "ms": 4.5
+            }
+          ],
+          "rects": 0
+        },
+        "all": {
+          "clones": 14,
+          "cloneMs": 452.79999999981374,
+          "stringifyBig": 7,
+          "stringifyMs": 94.59999999997672,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 6229421,
+              "ms": 4.599999999976717
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 6229180,
+              "ms": 4.5
+            }
+          ],
+          "rects": 0
+        },
+        "syncSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)"
+        ],
+        "syncStringifySites": [
+          "Object.updateNodes (app.js:1206:25) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "sync (wonder-shell.js:270:29) <- wonder-shell.js:892:18",
+          "persist (wonder-shell.js:199:43) <- sync (wonder-shell.js:277:5)",
+          "dist/ui.js:59:172752 <- render (app.js:507:7)"
+        ],
+        "deferredSites": [
+          "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+          "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+          "Object.getDocument (app.js:1333:22) <- agent-bridge.js:115:47",
+          "wonder-shell.js:973:22 <- Array.map (<anonymous>)",
+          "Object.check (document-safety.js:360:30) <- wonder-shell.js:974:43",
+          "Object.getDocument (app.js:1333:22) <- flush (version-history.js:230:26)"
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 449.69999999995343,
+          "fenceMs": 498.4000000000233,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 298.89999999990687,
+            "stringifyBig": 4,
+            "stringifyMs": 49.300000000046566,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 298.89999999990687,
+            "stringifyBig": 5,
+            "stringifyMs": 67.69999999995343,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.700000000069849
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 463.0999999998603,
+            "stringifyBig": 7,
+            "stringifyMs": 117,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.700000000069849
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 448.69999999995343,
+          "fenceMs": 494.5999999999767,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 296.70000000018626,
+            "stringifyBig": 4,
+            "stringifyMs": 50.29999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 296.70000000018626,
+            "stringifyBig": 5,
+            "stringifyMs": 68.79999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.5
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 456.300000000163,
+            "stringifyBig": 7,
+            "stringifyMs": 117.89999999990687,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.5
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 442.0999999999767,
+          "fenceMs": 486.0999999999767,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 295.699999999837,
+            "stringifyBig": 4,
+            "stringifyMs": 50.199999999953434,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 295.699999999837,
+            "stringifyBig": 5,
+            "stringifyMs": 67.79999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 429.6999999997206,
+            "stringifyBig": 7,
+            "stringifyMs": 116.80000000004657,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 444,
+          "fenceMs": 489.29999999993015,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 296.10000000009313,
+            "stringifyBig": 4,
+            "stringifyMs": 50.89999999990687,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 296.10000000009313,
+            "stringifyBig": 5,
+            "stringifyMs": 68.69999999983702,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 463.5000000001164,
+            "stringifyBig": 7,
+            "stringifyMs": 118.29999999993015,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.900000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 444.4000000000233,
+          "fenceMs": 490.0999999999767,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 299.99999999976717,
+            "stringifyBig": 4,
+            "stringifyMs": 50.10000000009313,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 299.99999999976717,
+            "stringifyBig": 5,
+            "stringifyMs": 68,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.600000000093132
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 467.49999999965075,
+            "stringifyBig": 7,
+            "stringifyMs": 117.59999999997672,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.600000000093132
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 443,
+          "fenceMs": 487.79999999993015,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 299.00000000023283,
+            "stringifyBig": 4,
+            "stringifyMs": 50.099999999743886,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6.600000000093132
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 299.00000000023283,
+            "stringifyBig": 5,
+            "stringifyMs": 67.79999999981374,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6.600000000093132
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.299999999930151
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 438.3000000002794,
+            "stringifyBig": 7,
+            "stringifyMs": 117.29999999969732,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 6.600000000093132
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.299999999930151
+              }
+            ],
+            "rects": 0
+          }
+        },
+        {
+          "syncMs": 425.0999999999767,
+          "fenceMs": 471.89999999990687,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 301.89999999979045,
+            "stringifyBig": 4,
+            "stringifyMs": 27.099999999976717,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              }
+            ],
+            "rects": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 301.89999999979045,
+            "stringifyBig": 5,
+            "stringifyMs": 45.89999999990687,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.800000000046566
+              }
+            ],
+            "rects": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 411.49999999976717,
+            "stringifyBig": 7,
+            "stringifyMs": 95.39999999990687,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 6229421,
+                "ms": 4.599999999976717
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.800000000046566
+              }
+            ],
+            "rects": 0
+          }
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 443,
+        "fenceMsMedian": 487.8,
+        "syncMsRange": [425.1, 448.7],
+        "syncClones": 10,
+        "syncCloneMs": 296.7,
+        "fenceClones": 10,
+        "fenceCloneMs": 296.7,
+        "allClones": 14,
+        "allCloneMs": 438.3,
+        "syncStringifyBig": 4,
+        "syncStringifyMs": 50.1,
+        "allStringifyBig": 7,
+        "allStringifyMs": 117.3,
+        "setItemsSync": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 6229421,
+            "ms": 4.599999999976717
+          }
+        ],
+        "setItemsAll": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 6229421,
+            "ms": 4.599999999976717
+          },
+          {
+            "key": "verynize-v2",
+            "chars": 6229180,
+            "ms": 4.5
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 112,
+          "changed": true,
+          "handlerP50": 1.4,
+          "handlerP95": 1.5,
+          "rafP50": 16.7,
+          "rafP95": 17,
+          "over25Pct": 2.7
+        },
+        "zoom": {
+          "events": 93,
+          "changed": true,
+          "handlerP50": 10,
+          "handlerP95": 11.7,
+          "rafP50": 16.7,
+          "rafP95": 33.4,
+          "over25Pct": 17
+        }
+      },
+      "heapBeforeSelect": 207827308,
+      "elementsBeforeSelect": 26582,
+      "selectAll": {
+        "syncMs": 5855.5,
+        "paintFenceMs": 16585.300000000047,
+        "clones": 13,
+        "cloneMs": 402.4000000001397,
+        "stringifyBig": 3,
+        "stringifyMs": 24.900000000023283,
+        "setItem": [
+          {
+            "key": "verynize-v2",
+            "chars": 6229180,
+            "ms": 10.599999999976717
+          }
+        ],
+        "rects": 1000
+      },
+      "heapAfterSelect": 1202906908,
+      "domCounters": {
+        "documents": 4,
+        "nodes": 472040,
+        "jsEventListeners": 127637
+      },
+      "connected": {
+        "elements": 394575,
+        "canvasLayers": 10000,
+        "selectionBoxes": 10000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [2.2, 9.3, 10.5],
+        "macos": "27.2"
+      }
+    }
+  ]
+}

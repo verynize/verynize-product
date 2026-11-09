@@ -1,0 +1,109 @@
+{
+  "source": "derived from ../../astra-prod/*.json (2026-11-08 authenticated capture); only counts, timings, sizes",
+  "files": {
+    "files-cache-disabled.json": {
+      "me_state_calls": 9,
+      "span_ms": 20527,
+      "gaps_ms": [1372, 1154, 3001, 3000, 3000, 3000, 3000, 3001],
+      "gaps_within_2900_3100": 6,
+      "encoded_bytes_min_max": [555967, 556739],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 0,
+      "room_snapshot": []
+    },
+    "files-warm.json": {
+      "me_state_calls": 3,
+      "span_ms": 2848,
+      "gaps_ms": [983, 1865],
+      "gaps_within_2900_3100": 0,
+      "encoded_bytes_min_max": [555840, 556655],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 0,
+      "room_snapshot": []
+    },
+    "spaces-cache-disabled.json": {
+      "me_state_calls": 2,
+      "span_ms": 2994,
+      "gaps_ms": [2994],
+      "gaps_within_2900_3100": 1,
+      "encoded_bytes_min_max": [555995, 556547],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 2,
+      "room_snapshot": [
+        {
+          "encoded": 430267,
+          "decoded": 6692835
+        }
+      ]
+    },
+    "spaces-verified.json": {
+      "me_state_calls": 34,
+      "span_ms": 113738,
+      "gaps_ms": [
+        2737, 3001, 3000, 3000, 3001, 3000, 2999, 3001, 2999, 3001, 3028, 2971, 2998, 3000, 4091,
+        17050, 2860, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3001, 2999, 3002, 3000, 2999, 3000,
+        2999, 3001, 2999
+      ],
+      "gaps_within_2900_3100": 29,
+      "encoded_bytes_min_max": [555716, 556753],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 0,
+      "room_snapshot": []
+    },
+    "audit-selection.json": {
+      "me_state_calls": 132,
+      "span_ms": 395999,
+      "gaps_ms": [
+        3001, 3001, 3000, 2997, 3002, 3000, 3000, 2999, 3002, 3000, 3000, 3000, 2998, 3000, 3000,
+        3000, 3834, 2166, 3001, 3000, 3000, 3000, 2999, 3001, 3000, 3002, 2999, 3000, 3000, 3000,
+        3046, 2953, 3001, 2999, 3000, 3000, 3000, 2999, 3001, 3000, 3000, 3000, 6004, 2996, 3000,
+        2998, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3002, 3000, 2999,
+        3000, 3000, 3000, 2999, 3000, 3000, 3000, 2999, 3000, 3001, 3000, 3000, 3000, 3000, 3000,
+        3000, 3000, 3000, 3000, 3000, 3000, 3000, 3003, 2998, 3000, 3000, 2999, 3000, 3001, 2999,
+        3001, 3000, 3000, 3000, 2999, 3001, 3000, 2999, 3000, 3000, 3000, 3000, 3000, 3001, 2998,
+        2999, 3000, 3000, 3000, 3000, 3170, 2830, 3000, 3000, 3000, 2298, 3702, 3004, 2997, 3000,
+        2999, 3000, 3000, 3000, 3000, 2999, 3002, 3000, 3000, 3000, 2999
+      ],
+      "gaps_within_2900_3100": 124,
+      "encoded_bytes_min_max": [555658, 556983],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 2,
+      "room_snapshot": [
+        {
+          "encoded": 22417,
+          "decoded": 3048940
+        }
+      ]
+    },
+    "audit-cache-disabled.json": {
+      "me_state_calls": 5,
+      "span_ms": 11998,
+      "gaps_ms": [3001, 3001, 3000, 2997],
+      "gaps_within_2900_3100": 4,
+      "encoded_bytes_min_max": [555935, 556501],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 2,
+      "room_snapshot": [
+        {
+          "encoded": 22417,
+          "decoded": 3048940
+        }
+      ]
+    },
+    "audit-warm.json": {
+      "me_state_calls": 5,
+      "span_ms": 12000,
+      "gaps_ms": [3000, 2999, 3001, 3001],
+      "gaps_within_2900_3100": 4,
+      "encoded_bytes_min_max": [555730, 556821],
+      "decoded_bytes_set": [4083883],
+      "access_calls": 2,
+      "room_snapshot": [
+        {
+          "encoded": 48381,
+          "decoded": 5629184
+        }
+      ]
+    }
+  }
+}

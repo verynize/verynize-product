@@ -1,0 +1,25 @@
+{
+  "note": "synthetic window 'online' event dispatched at t=0, ~1.2 s after an interval GET",
+  "requests": [
+    {
+      "t_ms": -1212,
+      "path": "/api/me/state",
+      "status": 200
+    },
+    {
+      "t_ms": -448,
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200
+    },
+    {
+      "t_ms": -448,
+      "path": "/api/me/rooms",
+      "status": 200
+    },
+    {
+      "t_ms": 0,
+      "path": "/api/me/state",
+      "status": 200
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "audit": {
+    "start": 103591.6000000001,
+    "longTasks": [
+      {
+        "start": 103591.30000000005,
+        "duration": 117
+      },
+      {
+        "start": 108634.6000000001,
+        "duration": 91
+      }
+    ],
+    "events": [],
+    "lcp": [
+      {
+        "start": 2800,
+        "size": 8787
+      }
+    ],
+    "ws": [],
+    "frames": [],
+    "click": 103591.6000000001,
+    "nodes": [7699, 8551],
+    "observedReadyAt": 108725.40000000014,
+    "domNodes": 14651
+  },
+  "navigation": [
+    {
+      "ttfb": 569.3000000000466,
+      "responseStart": 1250.5,
+      "domContentLoaded": 1376.6999999999534,
+      "load": 1463.1999999999534,
+      "transferSize": 1359,
+      "encodedBodySize": 1059
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 1852
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 2800
+    }
+  ],
+  "resources": [
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 102357.1000000001,
+      "duration": 1236.1999999999534,
+      "ttfb": 700.4000000001397,
+      "transfer": 556371,
+      "encoded": 556071,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 105094.1000000001,
+      "duration": 894.8999999999069,
+      "ttfb": 665.4000000001397,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 108094.80000000005,
+      "duration": 725.8999999999069,
+      "ttfb": 517.8000000000466,
+      "transfer": 556780,
+      "encoded": 556480,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 111094.40000000014,
+      "duration": 1004.2999999998137,
+      "ttfb": 789.9000000001397,
+      "transfer": 556322,
+      "encoded": 556022,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 114094.30000000005,
+      "duration": 864.5,
+      "ttfb": 589.1999999999534,
+      "transfer": 556909,
+      "encoded": 556609,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 117095,
+      "duration": 1033.1000000000931,
+      "ttfb": 756.3000000000466,
+      "transfer": 556325,
+      "encoded": 556025,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 120095.19999999995,
+      "duration": 1148.1000000000931,
+      "ttfb": 922.1000000000931,
+      "transfer": 556277,
+      "encoded": 555977,
+      "decoded": 4083883
+    }
+  ],
+  "heap": {
+    "used": 247659631,
+    "total": 258764227
+  }
+}

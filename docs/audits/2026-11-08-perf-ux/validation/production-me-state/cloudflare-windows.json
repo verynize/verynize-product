@@ -1,0 +1,48 @@
+{
+  "source": "cf o11y telemetry query --preview, same filters as cloudflare-7d-current.json, grouped by method + response status; status 0 = absent (not an HTTP code)",
+  "sol_window": {
+    "requested_utc": ["2026-11-01T15:30:26.887Z", "2026-11-08T15:30:26.887Z"],
+    "effective_from_ms": 1793573420663,
+    "note": "oldest edge clamped by retention to ~2026-11-02T13:30Z",
+    "GET_200": 9648,
+    "GET_0": 9,
+    "PUT_200": 154,
+    "PUT_413": 21,
+    "PUT_0": 1,
+    "OPTIONS_204": 3923
+  },
+  "current_7d_split_by_path": {
+    "window_ms": [1793573382576, 1794178180001],
+    "GET /api/me/state 200": 10122,
+    "GET /api/me/state 0": 11,
+    "GET /api/me/state 401": 2,
+    "PUT /api/me/state/<key> 200": 157,
+    "PUT /api/me/state/<key> 413": 21,
+    "PUT /api/me/state/<key> 0": 1,
+    "OPTIONS /api/me/state 204": 4005,
+    "OPTIONS /api/me/state/<key> 204": 96
+  },
+  "daily_24h_buckets_from_2026-11-01T22:49Z": [
+    { "day": 0, "GET_200": 0, "PUT_200": 0, "OPTIONS_204": 0 },
+    { "day": 1, "GET_200": 53, "PUT_200": 31, "PUT_413": 21, "OPTIONS_204": 15 },
+    { "day": 2, "GET_200": 0, "PUT_200": 0, "OPTIONS_204": 0 },
+    { "day": 3, "GET_200": 159, "PUT_200": 8, "OPTIONS_204": 87 },
+    { "day": 4, "GET_200": 1739, "PUT_200": 70, "OPTIONS_204": 810 },
+    { "day": 5, "GET_200": 2946, "PUT_200": 36, "OPTIONS_204": 1218 },
+    {
+      "day": 6,
+      "GET_200": 5225,
+      "PUT_200": 12,
+      "OPTIONS_204": 1971,
+      "note": "includes this measurement session"
+    }
+  ],
+  "measurement_session_window": {
+    "from_ms": 1794177700000,
+    "to_ms": 1794178180001,
+    "GET_200": 268,
+    "GET_0": 1,
+    "OPTIONS_204": 80,
+    "note": "probe browser + the user's own open tab + any desktop client polling concurrently"
+  }
+}

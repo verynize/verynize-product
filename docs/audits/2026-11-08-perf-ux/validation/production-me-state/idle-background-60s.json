@@ -1,0 +1,395 @@
+{
+  "window_ms": 79922,
+  "writes_blocked": 0,
+  "events": [
+    {
+      "t_ms": 23,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 23,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 66377,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 66378,
+      "event": "focus",
+      "hidden": false
+    }
+  ],
+  "requests": [
+    {
+      "t_ms": 66378,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 945,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 66378,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 946,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 66378,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 1072,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 69513,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 601,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 70326,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 152,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 70326,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 702,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 72512,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 331,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 74032,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 590,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 74033,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 129,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 75512,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 211,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 77625,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 154,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 77626,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 381,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 78512,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 208,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    }
+  ],
+  "resource_timing": [
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 944,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 66378
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 946,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 66378
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 1266,
+      "transfer": 556124,
+      "enc": 555824,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 66378
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 701,
+      "transfer": 556609,
+      "enc": 556309,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 69514
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 152,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 70326
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 701,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 70326
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 453,
+      "transfer": 556623,
+      "enc": 556323,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 72512
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 589,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 74033
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 128,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 74033
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 315,
+      "transfer": 557124,
+      "enc": 556824,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 75513
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 153,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 77625
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 381,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 77626
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 369,
+      "transfer": 556309,
+      "enc": 556009,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 78512
+    }
+  ],
+  "note": "tab hidden from t_ms\u224823 to t_ms\u224866377 (another tab active); requests after that are the return to foreground"
+}

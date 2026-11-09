@@ -1,0 +1,569 @@
+{
+  "date": "2026-11-08T22:14:37.676Z",
+  "commit": "2630c307c834bae2d61b2dc1b42689397c3f3e0d",
+  "node": "v26.13.0",
+  "machine": {
+    "cpu": "Apple M1",
+    "logicalCpus": 8,
+    "ramGiB": 8,
+    "loadAverage": [1.6, 4.5, 7.8],
+    "macos": "27.2"
+  },
+  "sizes": [
+    {
+      "n": 5000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [1.6, 4.5, 7.8],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 1127779,
+      "load": {
+        "syncMs": 357.4000000000233,
+        "paintFenceMs": 565.9000000000233
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!saving) sync(window.design.getDocument()); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{Jm=e;let t=window.design.getSelection();t.join()!==Ym.join()&&(Ym=t),Xm.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 18.099999999976717,
+        "minMs": 15.79999999993015,
+        "maxMs": 35
+      },
+      "editAttribution": {
+        "syncMs": 211.10000000009313,
+        "fenceMs": 244.80000000004657,
+        "sync": {
+          "clones": 10,
+          "cloneMs": 143.50000000011642,
+          "stringifyBig": 4,
+          "stringifyMs": 13.399999999906868,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 2.400000000023283
+            }
+          ],
+          "rects": 0,
+          "rectMs": 0,
+          "rectSites": {}
+        },
+        "fence": {
+          "clones": 10,
+          "cloneMs": 143.50000000011642,
+          "stringifyBig": 5,
+          "stringifyMs": 22.79999999993015,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 2.400000000023283
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 2.1000000000931323
+            }
+          ],
+          "rects": 0,
+          "rectMs": 0,
+          "rectSites": {}
+        },
+        "all": {
+          "clones": 14,
+          "cloneMs": 220.60000000020955,
+          "stringifyBig": 7,
+          "stringifyMs": 73.5,
+          "setItem": [
+            {
+              "key": "verynize-library-v1",
+              "chars": 3113019,
+              "ms": 2.400000000023283
+            },
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 2.1000000000931323
+            }
+          ],
+          "rects": 0,
+          "rectMs": 0,
+          "rectSites": {}
+        },
+        "syncSites": [
+          {
+            "site": "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+            "kind": "document",
+            "ms": 14.900000000023283
+          },
+          {
+            "site": "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+            "kind": "document",
+            "ms": 14.79999999993015
+          },
+          {
+            "site": "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+            "kind": "document",
+            "ms": 10.599999999976717
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 15
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.600000000093132
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.699999999953434
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 15.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.70000000006985
+          }
+        ],
+        "syncStringifySites": [
+          "Object.updateNodes (app.js:1206:25) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+          "sync (wonder-shell.js:270:29) <- wonder-shell.js:892:18",
+          "persist (wonder-shell.js:199:43) <- sync (wonder-shell.js:277:5)",
+          "dist/ui.js:59:172752 <- render (app.js:507:7)"
+        ],
+        "deferredSites": [
+          {
+            "site": "Object.updateNodes (app.js:1213:16) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+            "kind": "document",
+            "ms": 14.900000000023283
+          },
+          {
+            "site": "Object.getDocument (app.js:1333:22) <- wonder-shell.js:892:37",
+            "kind": "document",
+            "ms": 14.79999999993015
+          },
+          {
+            "site": "sync (wonder-shell.js:273:21) <- wonder-shell.js:892:18",
+            "kind": "document",
+            "ms": 10.599999999976717
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 15
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.600000000093132
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.699999999953434
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 15.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.400000000023283
+          },
+          {
+            "site": "render (app.js:507:22) <- Object.updateNodes (app.js:1223:5)",
+            "kind": "document",
+            "ms": 14.70000000006985
+          },
+          {
+            "site": "Object.getDocument (app.js:1333:22) <- agent-bridge.js:115:47",
+            "kind": "document",
+            "ms": 40.800000000046566
+          },
+          {
+            "site": "wonder-shell.js:973:22 <- Array.map (<anonymous>)",
+            "kind": "file",
+            "ms": 10.800000000046566
+          },
+          {
+            "site": "Object.check (document-safety.js:360:30) <- wonder-shell.js:974:43",
+            "kind": "document",
+            "ms": 10.599999999976717
+          },
+          {
+            "site": "Object.getDocument (app.js:1333:22) <- flush (version-history.js:230:26)",
+            "kind": "document",
+            "ms": 14.900000000023283
+          }
+        ],
+        "allStringifySites": [
+          {
+            "site": "Object.updateNodes (app.js:1206:25) <- eval (eval at evaluate (:370:30), <anonymous>:7:21)",
+            "chars": 3112779,
+            "ms": 9.100000000093132
+          },
+          {
+            "site": "sync (wonder-shell.js:270:29) <- wonder-shell.js:892:18",
+            "chars": 3112779,
+            "ms": 1.8999999999068677
+          },
+          {
+            "site": "persist (wonder-shell.js:199:43) <- sync (wonder-shell.js:277:5)",
+            "chars": 3113019,
+            "ms": 2
+          },
+          {
+            "site": "dist/ui.js:59:172752 <- render (app.js:507:7)",
+            "chars": 534976,
+            "ms": 0.39999999990686774
+          },
+          {
+            "site": "persist (app.js:156:46)",
+            "chars": 3112779,
+            "ms": 9.400000000023283
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- storage-limits.js:164:14",
+            "chars": 3112702,
+            "ms": 36
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- measure (storage-limits.js:176:14)",
+            "chars": 3112779,
+            "ms": 14.70000000006985
+          }
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 237.19999999995343,
+          "fenceMs": 274,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 153.5999999998603,
+            "stringifyBig": 4,
+            "stringifyMs": 27.400000000023283,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 153.5999999998603,
+            "stringifyBig": 4,
+            "stringifyMs": 27.400000000023283,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 233.29999999993015,
+            "stringifyBig": 7,
+            "stringifyMs": 87.89999999990687,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.400000000023283
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.200000000069849
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          }
+        },
+        {
+          "syncMs": 237.30000000004657,
+          "fenceMs": 274.30000000004657,
+          "sync": {
+            "clones": 10,
+            "cloneMs": 155,
+            "stringifyBig": 4,
+            "stringifyMs": 28.199999999953434,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.1000000000931323
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          },
+          "fence": {
+            "clones": 10,
+            "cloneMs": 155,
+            "stringifyBig": 5,
+            "stringifyMs": 37.5,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.1000000000931323
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.099999999976717
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          },
+          "all": {
+            "clones": 14,
+            "cloneMs": 217.80000000004657,
+            "stringifyBig": 7,
+            "stringifyMs": 82.69999999995343,
+            "setItem": [
+              {
+                "key": "verynize-library-v1",
+                "chars": 3113019,
+                "ms": 2.1000000000931323
+              },
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.099999999976717
+              }
+            ],
+            "rects": 0,
+            "rectMs": 0
+          }
+        }
+      ],
+      "cleanEdits": [
+        {
+          "syncMs": 235.69999999995343,
+          "fenceMs": 273.69999999995343
+        },
+        {
+          "syncMs": 238,
+          "fenceMs": 276.4000000000233
+        },
+        {
+          "syncMs": 240.19999999995343,
+          "fenceMs": 274
+        },
+        {
+          "syncMs": 234.79999999993015,
+          "fenceMs": 262.69999999995343
+        },
+        {
+          "syncMs": 203.40000000002328,
+          "fenceMs": 229.40000000002328
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 237.3,
+        "fenceMsMedian": 274.3,
+        "syncMsRange": [237.3, 237.3],
+        "syncClones": 10,
+        "syncCloneMs": 155,
+        "fenceClones": 10,
+        "fenceCloneMs": 155,
+        "allClones": 14,
+        "allCloneMs": 217.8,
+        "syncStringifyBig": 4,
+        "syncStringifyMs": 28.2,
+        "allStringifyBig": 7,
+        "allStringifyMs": 82.7,
+        "cleanSyncMsMedian": 235.7,
+        "cleanFenceMsMedian": 273.7,
+        "setItemsSync": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 3113019,
+            "ms": 2.1000000000931323
+          }
+        ],
+        "setItemsAll": [
+          {
+            "key": "verynize-library-v1",
+            "chars": 3113019,
+            "ms": 2.1000000000931323
+          },
+          {
+            "key": "verynize-v2",
+            "chars": 3112779,
+            "ms": 2.099999999976717
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 119,
+          "changed": true,
+          "handlerP50": 1.1,
+          "handlerP95": 1.3,
+          "rafP50": 16.7,
+          "rafP95": 18.7,
+          "over25Pct": 2.5
+        },
+        "zoom": {
+          "events": 116,
+          "changed": true,
+          "handlerP50": 5.7,
+          "handlerP95": 5.9,
+          "rafP50": 16.7,
+          "rafP95": 18.7,
+          "over25Pct": 1.7
+        }
+      },
+      "heapBeforeSelect": 119184332,
+      "elementsBeforeSelect": 14082,
+      "selectAll": {
+        "syncMs": 1774.2000000000698,
+        "paintFenceMs": 5919.70000000007,
+        "clones": 13,
+        "cloneMs": 193.00000000023283,
+        "stringifyBig": 3,
+        "stringifyMs": 11.900000000023283,
+        "setItem": [
+          {
+            "key": "verynize-v2",
+            "chars": 3112778,
+            "ms": 2.900000000023283
+          }
+        ],
+        "rects": 500,
+        "rectMs": 1397.9000000001397,
+        "rectSites": {
+          "Object.worldRect (canvas-interactions.js:693:20) <- selection-chrome.js:320:27": {
+            "calls": 250,
+            "ms": 1397.6999999999534
+          },
+          "viewport (canvas-interactions.js:626:33) <- Object.worldRect (canvas-interactions.js:695:17)": {
+            "calls": 250,
+            "ms": 0.20000000018626451
+          }
+        }
+      },
+      "heapAfterSelect": 619524928,
+      "domCounters": {
+        "documents": 3,
+        "nodes": 238431,
+        "jsEventListeners": 64583
+      },
+      "connected": {
+        "elements": 198339,
+        "canvasLayers": 5000,
+        "selectionBoxes": 5000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [2, 4.3, 7.6],
+        "macos": "27.2"
+      }
+    }
+  ]
+}
