@@ -602,6 +602,11 @@ const ux = [
     ...AREA.shell,
     "web/cloud-panel.js",
   ]),
+  electron("tests/library-unload-persistence.cjs", "ux", [
+    ...AREA.document,
+    ...AREA.shell,
+    "web/library-storage.js",
+  ]),
   electron("tests/cloud-async.cjs", "ux", AREA.cloudRenderer),
   electron("tests/shell-router.cjs", "ux", [...AREA.shell, ...AREA.cloudRenderer]),
   electron("tests/settings-route.cjs", "ux", [...AREA.settings, ...AREA.shell]),
