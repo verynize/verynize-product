@@ -736,6 +736,11 @@ const e2eCloud = [
     "web/wonder-shell.js",
   ]),
   electron("tests/cloud-desktop.mjs", "e2e-cloud", AREA.cloudRenderer),
+  electron("tests/cloud-undo-after-leave.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/remote-apply.js",
+    "web/commit-state.js",
+  ]),
   electron("tests/cloud-gesture-remote.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
     "web/remote-apply.js",
