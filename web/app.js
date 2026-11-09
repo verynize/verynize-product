@@ -1342,6 +1342,27 @@ window.verynize = {
     selection.clear();
     render();
   },
+  /* Collaborators' edits (web/remote-apply.js, from web/cloud-panel.js): patched in node by node with no undo step,
+     keeping unchanged nodes, the selection and the nodes a gesture in progress holds. Returns the held ids. */
+  applyRemote: (d) => {
+    const held = window.remoteApply.held(design, selection, worldGesture);
+    design = window.remoteApply.patch(design, window.documentSafety.load(d), held);
+    selection = new Set([...selection].filter((id) => window.VerynizeNodeIndex.find(nodes(), id)));
+    scheduleWorldNotice();
+    render();
+    return held;
+  },
+  gesturing: () => worldGesture,
+  /* The live nodes a pointer gesture holds (read only), or null outside one. */
+  gestureNodes: () =>
+    worldGesture
+      ? {
+          page: design.activePage,
+          nodes: [...window.remoteApply.held(design, selection, true)]
+            .map((id) => window.VerynizeNodeIndex.find(nodes(), id))
+            .filter(Boolean),
+        }
+      : null,
   exportHTML,
   subscribe: (fn) => {
     subscribers.add(fn);
