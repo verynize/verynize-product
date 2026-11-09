@@ -3,14 +3,14 @@
 // Usage: ISLAND=ui vp build -c vite.renderer.config.ts builds the combined bundle (`npm run build:ui`);
 // ISLAND=<area> builds one island alone for development. ISLAND=telemetry builds web/src/telemetry.ts, the crash-report
 // bootstrap web/index.html loads before every legacy script (`npm run build:ui` builds it with ui).
-// Source maps: none, unless SENTRY_AUTH_TOKEN is set; then hidden maps are uploaded to verynize-desktop and deleted,
+// Source maps: none, unless a release build (VERYNIZE_RELEASE_BUILD=1 from scripts/env.mjs) has SENTRY_AUTH_TOKEN; then hidden maps are uploaded to verynize-desktop and deleted,
 // so web/dist (served by app://verynize and copied into the packaged app) never contains a .map file.
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite-plus";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { readFileSync } from "node:fs";
-import { sourceMapUpload } from "./web-start/build/telemetry.mjs";
+import { releaseBuild, sourceMapUpload } from "./web-start/build/telemetry.mjs";
 
 const island = process.env.ISLAND;
 if (!island) throw new Error("Set ISLAND=<name> (see web/src/islands)");
@@ -19,7 +19,7 @@ const entries: Record<string, string> = {
   telemetry: "./web/src/telemetry.ts",
 };
 const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
-const upload = !!process.env.SENTRY_AUTH_TOKEN;
+const upload = releaseBuild() && !!process.env.SENTRY_AUTH_TOKEN;
 
 export default defineConfig({
   plugins: [

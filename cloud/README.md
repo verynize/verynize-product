@@ -80,7 +80,15 @@ connection. Rejected edits stay on this device and retry after corrections or re
 
 `web/account-store.js` synchronizes private account records through:
 
-- `GET /api/me/state`: `{items: [{key, value, revision}], account}` for the authenticated account.
+- `GET /api/me/state`: `{items: [{key, value, revision}], account, cursor}` for the authenticated account
+  (the whole snapshot, transcripts included; older clients use it).
+- `GET /api/me/state?chats=summary[&since=<cursor>]`: the same without transcripts: chat records are
+  `{key, revision, summary}` (the chat's fields but `messages`, plus `count`). With `since`, only records
+  written after that cursor, deletions as `value: null`. `cursor` only grows per account (each write's
+  `updatedAt` is `max(now, latest + 1)`). Responses carry an `ETag`; a matching `If-None-Match` returns 304.
+- `GET /api/me/state/:key`: `{item}` with its full value (a transcript when a chat opens), 404 when absent.
+  Summaries are internal `@summary:chat:<id>` rows written in the same transaction as the chat; chats
+  saved before them are summarised on first read.
 - `PUT /api/me/state/:key`: `{value, revision}`; `value` is a JSON string or `null` (a tombstone),
   and revision zero means create. A stale revision returns 409. Values are limited to 20 MiB of UTF-8 JSON (the request allows 40 MiB plus envelope overhead for double JSON escaping). Large records are split into internal `@chunk:` rows in the same table and committed atomically with the revision check. Reads return the original value; chunks are private implementation details and are reclaimed on replacement or deletion. Existing records remain readable without a schema migration.
 - Keys are `preference:*`, `agent-default:*`, `chat:*`, `draft:*`, `folder:*`, and `file:*`.
@@ -90,7 +98,8 @@ connection. Rejected edits stay on this device and retry after corrections or re
 Migration `0009_account_state.sql` adds the account-scoped table in the shared database
 (D1 on Workers, the existing SQLite/libSQL adapter on Node/Vercel). Legacy preferences,
 transcripts and drafts are removed from localStorage only after acknowledgement. The client
-polls while visible and refreshes on focus/reconnection. Session credentials and room references
+reads the change feed every 30 s while the window is visible and focused (doubling up to 5 minutes while
+nothing changes), and on focus/reconnection; saves need no read afterwards. Session credentials and room references
 stay on the device. Provider process sessions, local repository paths, custom sound files and
 OS permissions remain device-specific; shared transcripts seed a new provider session when needed.
 

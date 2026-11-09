@@ -1,8 +1,8 @@
 // Desktop crash reports (desktop/telemetry.cjs, desktop/preload.cjs, web/src/telemetry.ts, Settings › Preferences ›
 // Privacy) against a local ingest server standing in for Sentry (a loopback DSN: automated runs never report
 // anywhere else). Off by default: errors in main and renderer send nothing. Opting in takes effect after a restart;
-// then both processes' errors arrive, with emails, home paths, the username and tokens scrubbed. Opting out stops
-// sending at once.
+// then both processes' errors arrive, with emails, home paths, the username and tokens scrubbed, and a crashed render
+// window becomes an event. Opting out stops sending at once. Outside automated runs, the user is asked once after setup.
 const { _electron: electron } = require("@playwright/test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
@@ -129,13 +129,42 @@ async function raiseErrors(app, page, home, tag) {
   delete env.SENTRY_ENVIRONMENT;
   let session;
   try {
+    // 0. The one-time question after first-run setup (not in automated runs: VERYNIZE_SKIP_ONBOARDING).
+    const interactive = { ...env };
+    delete interactive.VERYNIZE_SKIP_ONBOARDING;
+    for (const choice of ["deny", "allow"]) {
+      const asked = path.join(dir, `profile-ask-${choice}`);
+      session = await launch(asked, interactive);
+      await session.page.locator("#onboarding").waitFor();
+      assert.equal(await session.page.locator("#telemetry-prompt").count(), 0, "not during setup");
+      await session.page.evaluate(() => localStorage.setItem("verynize.onboarding", "done"));
+      await session.page.reload();
+      await waitForUiReady(session.page);
+      await session.page.locator("#telemetry-prompt").waitFor();
+      await session.page.locator(`#telemetry-prompt-${choice}`).click();
+      await session.page.locator("#telemetry-prompt").waitFor({ state: "detached" });
+      assert.equal(
+        JSON.parse(await fs.readFile(path.join(asked, "telemetry.json"), "utf8")).enabled,
+        choice === "allow",
+      );
+      await session.page.reload();
+      await waitForUiReady(session.page);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      assert.equal(await session.page.locator("#telemetry-prompt").count(), 0, "asked once");
+      await session.app.close();
+      session = null;
+    }
+    assert.deepEqual(ingest.envelopes, [], "answering sends nothing in that session");
+
     // 1. Default: off. Errors in both processes send nothing.
     session = await launch(profile, env);
+    assert.equal(await session.page.locator("#telemetry-prompt").count(), 0);
     assert.deepEqual(await session.page.evaluate(() => window.desktop.telemetry.get()), {
       enabled: false,
       active: false,
       available: true,
       restartRequired: false,
+      asked: false,
     });
     assert.equal(await session.page.evaluate(() => window.verynizePlatform.can("telemetry")), true);
     await raiseErrors(session.app, session.page, home, "off");
@@ -183,7 +212,42 @@ async function raiseErrors(app, page, home, tag) {
       assert.match(messageOf(event), /\/Users\/<user>\/Designs/);
       assert.match(messageOf(event), /token=<redacted>/);
     }
+    // Process loss: a crashed render window is an event named `render` with its reason; its page and dump stay home.
+    await session.app.evaluate(async ({ BrowserWindow }) => {
+      const win = new BrowserWindow({
+        show: false,
+        webPreferences: { partition: "render-telemetry-test" },
+      });
+      win.webContents.session.protocol.handle(
+        "verynize-render",
+        () =>
+          new Response("<p>render window copy</p>", { headers: { "content-type": "text/html" } }),
+      );
+      await win.loadURL("verynize-render://document/");
+      win.webContents.forcefullyCrashRenderer();
+    });
+    const textOf = (event) =>
+      typeof event.message === "string" ? event.message : (event.message?.formatted ?? "");
+    const lost = () =>
+      events(ingest.envelopes).find((event) =>
+        /^'render' process exited with '(crashed|killed)'$/.test(textOf(event)),
+      );
+    await waitFor(() => lost(), "the render window's crash event");
+    assert.equal(lost().contexts?.electron?.crashed_process, "render");
+    // forcefullyCrashRenderer() reports `killed` on macOS and `crashed` elsewhere: both are events now.
+    assert.match(lost().contexts?.electron?.reason, /^(crashed|killed)$/);
+    assert.equal(typeof lost().contexts.electron.exit_code, "number");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    assert.ok(
+      !events(ingest.envelopes).some(
+        (event) =>
+          event.tags?.["event.process"] === "render" &&
+          event.tags?.["event.environment"] === "native",
+      ),
+      "no native dump of a render window",
+    );
     const raw = ingest.envelopes.join("\n");
+    assert.ok(!raw.includes("render window copy"), "the render page's content never leaves");
     const forbidden = ["alice@example.dev", "/Users/alice", home, REAL_HOME, "abcd1234efgh"];
     if (REAL_USER.length >= 5) forbidden.push(REAL_USER);
     for (const value of forbidden) assert.ok(!raw.includes(value), `no envelope contains ${value}`);

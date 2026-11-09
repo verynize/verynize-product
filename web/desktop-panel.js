@@ -753,7 +753,19 @@
       else renderHistory();
     });
   };
+  // Signed in, saved chats arrive as summaries (`unloaded`, no messages): the transcript is fetched when the chat
+  // opens, and account-store-changed then reloads the list with it.
+  const fetchTranscript = (chat) => {
+    if (!chat?.unloaded) return Promise.resolve(chat);
+    return Promise.resolve(window.accountStore?.load("chat:" + chat.id)).then(() => {
+      const loaded = conversations.find((c) => c.id === chat.id);
+      if (!loaded || loaded.unloaded)
+        throw Error("This chat could not be loaded. Check the connection and try again.");
+      return loaded;
+    });
+  };
   const switchTo = (chat) => {
+    if (chat?.unloaded) fetchTranscript(chat).catch((e) => status(e.message));
     const prompt = $("project-prompt");
     if (conversation && conversation !== chat) setDraft(prompt.value, conversation);
     const changed = conversation !== chat;
@@ -934,7 +946,7 @@
     id: c.id,
     title: c.title,
     created: c.created,
-    count: c.messages?.length || 0,
+    count: c.unloaded ? c.count || 0 : c.messages?.length || 0,
     ...(c.worktree?.branch ? { branch: c.worktree.branch } : {}),
     ...(c.worktree?.path ? { root: c.worktree.path } : {}),
     ...(active.has(c.id) ? { busy: true } : {}),
@@ -1054,7 +1066,7 @@
           id: c.id,
           title: c.title,
           created: c.created,
-          count: c.messages.length,
+          count: c.unloaded ? c.count || 0 : c.messages.length,
           ...(active.has(c.id) ? { busy: true } : {}),
         }))
         .reverse(),
@@ -1562,6 +1574,10 @@
   };
   const linkChat = (id, key) => {
     const other = storedChat(id, key);
+    if (other?.unloaded) {
+      void window.accountStore?.load("chat:" + id).catch(() => {});
+      throw Error("That chat is still loading. Try again in a moment.");
+    }
     if (!other || other === conversation) throw Error("Choose another chat");
     const text = buildSeed(other.messages);
     const dir =
@@ -2026,6 +2042,7 @@
   // The subscription itself is made by bindAgents (end of file) on the platform's AgentService.
   const runTask = async (task, chat) => {
     if (!chat) chat = conversation || newChat();
+    if (chat.unloaded) chat = await fetchTranscript(chat);
     if (active.has(chat.id)) {
       enqueue(chat, task);
       return;
@@ -2486,7 +2503,7 @@
     sendOtherWay = false;
     const text = $("project-prompt").value.trim();
     if (!text) throw Error("Enter a task.");
-    const chat = conversation || newChat();
+    const chat = await fetchTranscript(conversation || newChat());
     const task = composeTask(text);
     $("project-prompt").value = "";
     setDraft("", chat);

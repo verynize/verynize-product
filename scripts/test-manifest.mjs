@@ -428,6 +428,12 @@ const desktop = [
     "web-start/src/server-telemetry.ts",
     "web-start/src/telemetry.ts",
   ]),
+  unit("tests/telemetry-process-loss.cjs", "desktop", ["desktop/telemetry.cjs"]),
+  unit("tests/telemetry-release-build.mjs", "desktop", [
+    "web-start/build/telemetry.mjs",
+    "scripts/env.mjs",
+    "vite.renderer.config.ts",
+  ]),
   electron("tests/telemetry-desktop.cjs", "desktop", [
     "desktop/telemetry.cjs",
     "web/telemetry-scrub.js",
@@ -435,6 +441,8 @@ const desktop = [
     "web/src/lib/telemetry/**",
     "web/src/islands/settings/telemetry.tsx",
     "web/src/islands/settings/pages.tsx",
+    "web/src/islands/onboarding/telemetry-prompt.tsx",
+    "web/src/islands/onboarding.tsx",
     "scripts/package-macos.cjs",
   ]),
   electron("tests/app-protocol.cjs", "desktop", [
@@ -637,6 +645,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-auth-bridge.mjs",
   "tests/cloud-orgs.mjs",
   "tests/cloud-account-state.mjs",
+  "tests/cloud-account-feed.mjs",
   "tests/cloud-share.mjs",
   "tests/cloud-directory-migration.mjs",
   "tests/cloud-merge.mjs",
