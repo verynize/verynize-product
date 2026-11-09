@@ -438,6 +438,9 @@ const pngSize = (bytes) => ({ width: bytes.readUInt32BE(16), height: bytes.readU
       null,
       { timeout: 20000 },
     );
+    // One export, one toast: a second toast stacks, and a hovered stack keeps both on screen.
+    await page.locator("[data-sonner-toast]", { hasText: "card.pdf" }).first().waitFor();
+    assert.equal(await page.locator("[data-sonner-toast]").count(), 1, "one toast per export");
     const pdf = await fs.readFile(target);
     assert.equal(pdf.subarray(0, 5).toString(), "%PDF-");
     assert.match(

@@ -1,8 +1,6 @@
 // Behaviour upgrades for the legacy <dialog>s this island restyles (see settings.css):
-// accessible names, icon close buttons, focus on open, and toasts for export results.
+// accessible names, icon close buttons and focus on open. Export results toast from the inspector's Export section.
 import { useEffect } from "react";
-import { toast } from "sonner";
-import { legacy } from "@/lib/bridge";
 
 /** Dialog id → heading element id (`title`) or accessible name (`label`), and its close button id. */
 const DIALOGS: Record<string, { title?: string; label?: string; close?: string }> = {
@@ -69,35 +67,6 @@ export function DialogEnhancer() {
       observers.push(observer);
     }
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
-  return null;
-}
-
-/** Export result toast (ref 50: "Exported 1 element"). Mirrors `#artwork-status`, which the inspector island owns. */
-export function ExportToasts() {
-  useEffect(() => {
-    let observed: HTMLElement | null = null;
-    // Every assignment replaces the text node, so repeated identical results still produce a mutation.
-    const observer = new MutationObserver(() => {
-      const text = observed?.textContent?.trim() ?? "";
-      if (!text) return;
-      if (/^Exported/i.test(text)) toast.success(text);
-      else if (!/^Exporting/i.test(text)) toast.error(text);
-    });
-    const attach = () => {
-      const el = legacy("artwork-status");
-      if (!el || el === observed) return;
-      observer.disconnect();
-      observed = el;
-      observer.observe(el, { childList: true, characterData: true, subtree: true });
-    };
-    attach();
-    // Another island may take over / move the element after we mount.
-    const timer = window.setInterval(attach, 2000);
-    return () => {
-      observer.disconnect();
-      window.clearInterval(timer);
-    };
   }, []);
   return null;
 }
