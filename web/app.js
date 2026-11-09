@@ -1372,10 +1372,18 @@ window.verynize = {
     render();
   },
   /* Collaborators' edits (web/remote-apply.js, from web/cloud-panel.js): patched in node by node with no undo step,
-     keeping unchanged nodes, the selection and the nodes a gesture in progress holds. Returns the held ids. */
+     keeping unchanged nodes, the selection and the nodes a gesture in progress holds. Returns the held ids.
+     The room's own history (cloudHistory) undoes meanwhile; local entries address nodes by position, so after a
+     remote patch they would rewrite collaborators' layers once the room is left, and are dropped. */
   applyRemote: (d) => {
+    past.length = 0;
+    future = [];
     const held = window.remoteApply.held(design, selection, worldGesture);
-    design = window.remoteApply.patch(design, window.documentSafety.load(d), held);
+    const next = window.documentSafety.load(d);
+    const sources = new Map(next.pages.map((page) => [page.id, page]));
+    design = window.remoteApply.patch(design, next, held);
+    for (const page of design.pages)
+      if (sources.has(page.id)) window.VerynizeLazyDocument.adopt(page, sources.get(page.id));
     selection = new Set([...selection].filter((id) => window.VerynizeNodeIndex.find(nodes(), id)));
     scheduleWorldNotice();
     render();

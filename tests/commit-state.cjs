@@ -112,6 +112,43 @@ test("validated inactive pages defer defaults, invalid pages keep the eager safe
   assert.throws(() => window.VerynizeLazyDocument.prepare(broken, {}, []), /Unsupported node type/);
 });
 
+test("a remote patch into a prepared page keeps the remote page's unprepared nodes to be prepared", async () => {
+  await import("../integrations/document-core.mjs");
+  window.VerynizeDocument = globalThis.VerynizeDocument;
+  require("../web/lazy-document.js");
+  require("../web/remote-apply.js");
+  const Lazy = window.VerynizeLazyDocument;
+  const node = (id) => ({ id, name: id, type: "rectangle", x: 0, y: 0, w: 10, h: 10 });
+  const doc = (nodesB) => ({
+    version: 2,
+    name: "Remote",
+    activePage: "a",
+    tokens: {},
+    pages: [
+      { id: "a", name: "A", nodes: [node("a1")] },
+      { id: "b", name: "B", nodes: nodesB },
+    ],
+  });
+  // The editor visited page B (prepared), then returned to A.
+  const editor = Lazy.prepare(doc([node("b1")]), { opacity: 100 }, []);
+  editor.activePage = "b";
+  Lazy.activate(editor);
+  editor.activePage = "a";
+  assert.equal(editor.pages[1].nodes[0].opacity, 100);
+  // A collaborator adds b2 on the inactive page B (as app.js applyRemote does).
+  const next = Lazy.prepare(doc([node("b1"), node("b2")]), { opacity: 100 }, []);
+  assert.equal(next.pages[1].nodes[1].opacity, undefined);
+  const live = window.remoteApply.patch(editor, next);
+  for (const page of live.pages) Lazy.adopt(page, next.pages.find((p) => p.id === page.id));
+  assert.equal(live.pages[1], editor.pages[1], "page objects stay in place");
+  live.activePage = "b";
+  Lazy.activate(live);
+  assert.deepEqual(
+    live.pages[1].nodes.map((n) => n.opacity),
+    [100, 100],
+  );
+});
+
 test("local geometry guard preserves existing overflow and rejects worsening overflow", async () => {
   await import("../integrations/document-core.mjs");
   window.VerynizeDocument = globalThis.VerynizeDocument;

@@ -28,5 +28,9 @@
     activate(document);
     return core.resolveAliases(document);
   }
-  window.VerynizeLazyDocument = Object.freeze({ prepare, activate });
+  // A page patched in place from another document's page (web/remote-apply.js) is prepared only if that one was.
+  function adopt(page, source) {
+    if (page !== source && !prepared.has(source)) prepared.delete(page);
+  }
+  window.VerynizeLazyDocument = Object.freeze({ prepare, activate, adopt });
 })();
