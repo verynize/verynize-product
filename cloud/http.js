@@ -7,7 +7,8 @@ export const corsHeaders = {
   "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
   // sentry-trace/baggage: distributed tracing from opted-in desktop and web clients.
   "access-control-allow-headers":
-    "Content-Type,Authorization,X-Verynize-Session,sentry-trace,baggage",
+    "Content-Type,Authorization,X-Verynize-Session,If-None-Match,sentry-trace,baggage",
+  "access-control-expose-headers": "ETag",
 };
 export const jsonHeaders = {
   "content-type": "application/json",
@@ -15,6 +16,20 @@ export const jsonHeaders = {
   ...corsHeaders,
 };
 export const json = (data, status = 200) => Response.json(data, { status, headers: jsonHeaders });
+
+/**
+ * JSON with a strong ETag of its body; 304 without a body when the request's If-None-Match names
+ * it. Still `no-store`: clients send If-None-Match themselves and keep their own copy.
+ */
+export async function jsonWithEtag(request, data) {
+  const body = JSON.stringify(data);
+  const etag = `"${(await digestHex(body)).slice(0, 32)}"`;
+  const headers = { ...jsonHeaders, etag };
+  const known = (request.headers.get("if-none-match") || "").split(",").map((tag) => tag.trim());
+  if (known.includes(etag) || known.includes(`W/${etag}`))
+    return new Response(null, { status: 304, headers });
+  return new Response(body, { status: 200, headers });
+}
 
 export class HttpError extends Error {
   constructor(status, message) {

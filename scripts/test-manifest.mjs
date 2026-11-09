@@ -633,6 +633,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-auth-bridge.mjs",
   "tests/cloud-orgs.mjs",
   "tests/cloud-account-state.mjs",
+  "tests/cloud-account-feed.mjs",
   "tests/cloud-share.mjs",
   "tests/cloud-directory-migration.mjs",
   "tests/cloud-merge.mjs",

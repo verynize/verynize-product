@@ -1,19 +1,33 @@
 // Account-scoped storage for preferences, individual transcripts and library organization.
 // Account records live in the shared database, with revision checks; sessions and device settings stay local.
+// Transcripts are not part of the account snapshot: the list holds each chat's summary and `load("chat:<id>")`
+// fetches one transcript when it is opened. Later reads ask only for records changed since the last cursor
+// (`?since=`, answered 304 when nothing changed), and only while the window is visible and focused.
 (() => {
+  const POLL_MS = 30000,
+    MAX_POLL_MS = 5 * 60000,
+    FOCUS_READ_MS = 5000;
   const records = new Map(),
     pending = new Map(),
     snapshots = new Map(),
+    loading = new Map(),
     listeners = new Set();
   let identity = "",
     ready = false,
     syncing = null,
     timer,
     retryTimer,
+    pollTimer,
+    pollDelay = POLL_MS,
     networkAttempts = 0,
     error = "",
     starting = true,
-    hydrating = false;
+    hydrating = false,
+    // null: a server without the change feed (whole snapshots, transcripts included).
+    cursor = null,
+    feed = { path: "", etag: "" },
+    lastRead = 0,
+    changes = 0;
   const account = () => {
     try {
       return JSON.parse(localStorage.getItem("verynize.cloud.account") || "null");
@@ -64,8 +78,22 @@
     clearTimeout(retryTimer);
     networkAttempts = 0;
     clearTimeout(timer);
-    timer = setTimeout(() => sync(), 150);
+    timer = setTimeout(() => sync(false), 150);
     report("");
+  };
+  // A chat of the list: its stored value, or, before `load`, its summary with no messages (`unloaded`).
+  const chatRow = (key) => {
+    try {
+      const value = valueOf(key);
+      if (value !== null) return JSON.parse(value);
+      const summary = !pending.has(key) && records.get(key)?.summary;
+      if (!summary) return null;
+      const row = JSON.parse(summary);
+      if (!row?.chat?.id) return null;
+      return { project: row.project, chat: { ...row.chat, messages: [], unloaded: true } };
+    } catch {
+      return null;
+    }
   };
   const supported = (key) =>
     key === "better-preferences" ||
@@ -97,9 +125,10 @@
     if (key.startsWith("better-agent-chats:")) {
       const project = key.slice("better-agent-chats:".length);
       return JSON.stringify(
-        entries("chat:")
-          .map(([, row]) => row)
-          .filter((row) => project === "unattached" || row.project === project)
+        [...new Set([...records.keys(), ...pending.keys()])]
+          .filter((name) => name.startsWith("chat:"))
+          .map(chatRow)
+          .filter((row) => row?.chat && (project === "unattached" || row.project === project))
           .map((row) => row.chat)
           .sort((a, b) => a.created - b.created),
       );
@@ -142,7 +171,8 @@
     } else if (key.startsWith("better-agent-chats:")) {
       const project = key.slice("better-agent-chats:".length);
       for (const chat of value) {
-        if (!chat?.id) continue;
+        // A summary without its transcript must never replace the stored chat.
+        if (!chat?.id || chat.unloaded) continue;
         if (
           !ready &&
           JSON.stringify(previous?.find((c) => c.id === chat.id)) === JSON.stringify(chat)
@@ -168,7 +198,8 @@
       for (const [id, draft] of Object.entries(value)) put("draft:" + id, JSON.stringify(draft));
     }
   }
-  async function request(path, init = {}) {
+  // `{data, etag}`; `data` is null for 304 Not Modified (only possible with an If-None-Match `etag`).
+  async function send(path, init = {}, etag = "") {
     const a = account(),
       expected = identity;
     if (!a || scope() !== expected) throw Error("The cloud account changed");
@@ -176,11 +207,20 @@
     try {
       response = await fetch(a.server + path, {
         ...init,
-        headers: { "Content-Type": "application/json", "X-Verynize-Session": a.session },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Verynize-Session": a.session,
+          ...(etag ? { "If-None-Match": etag } : {}),
+        },
       });
     } catch (failure) {
       if (failure instanceof TypeError) Object.assign(failure, { network: true });
       throw failure;
+    }
+    const tag = response.headers.get("etag") || "";
+    if (response.status === 304) {
+      if (scope() !== expected) throw Error("The cloud account changed");
+      return { data: null, etag: tag || etag };
     }
     const data = await response.json().catch((failure) => {
       if (!response.ok) return {};
@@ -191,19 +231,97 @@
       throw Object.assign(Error(data.error || `Account sync failed (HTTP ${response.status})`), {
         status: response.status,
       });
-    return data;
+    return { data, etag: tag };
   }
-  async function sync() {
+  const request = async (path, init) => (await send(path, init)).data;
+  // A record from the server: chats arrive as summaries (`value` undefined) until loaded.
+  const remember = (item) =>
+    records.set(
+      item.key,
+      "summary" in item
+        ? { key: item.key, revision: item.revision, summary: item.summary }
+        : { key: item.key, value: item.value, revision: item.revision },
+    );
+  const record = (key) =>
+    cursor === null
+      ? request("/api/me/state").then(({ items }) => items.find((item) => item.key === key))
+      : request("/api/me/state/" + encodeURIComponent(key)).then(
+          ({ item }) => item,
+          (failure) => {
+            if (failure.status === 404) return undefined;
+            throw failure;
+          },
+        );
+  /** Fetch one record's value (a chat transcript when it is opened); emits once it arrived. */
+  function load(key) {
+    if (!identity) return Promise.resolve(null);
+    if (loading.has(key)) return loading.get(key);
+    const expected = identity;
+    const promise = record(key)
+      .then((item) => {
+        if (identity !== expected || !item || pending.has(key)) return null;
+        const known = records.get(key);
+        if (typeof known?.value === "string" && known.revision >= item.revision) return known;
+        remember(item);
+        emit();
+        return item;
+      })
+      .finally(() => loading.delete(key));
+    loading.set(key, promise);
+    return promise;
+  }
+  // Applies records read from the server; true when anything visible changed.
+  function apply(items) {
+    let changed = false;
+    for (const item of items) {
+      if (pending.has(item.key) || records.get(item.key)?.revision === item.revision) continue;
+      // An open transcript stays readable until its new version arrived.
+      if ("summary" in item && typeof records.get(item.key)?.value === "string") {
+        void load(item.key).catch(() => {
+          if (records.get(item.key)?.revision !== item.revision) {
+            remember(item);
+            emit();
+          }
+        });
+        continue;
+      }
+      remember(item);
+      changed = true;
+    }
+    return changed;
+  }
+  // Records changed since the cursor; a 304 means none (and an unchanged profile).
+  async function readChanges(expected) {
+    const path = cursor === null ? "/api/me/state" : `/api/me/state?chats=summary&since=${cursor}`;
+    const { data, etag } = await send(path, {}, feed.path === path ? feed.etag : "");
+    if (identity !== expected) return;
+    lastRead = Date.now();
+    if (!data) return;
+    feed = { path, etag };
+    window.cloudAccount?.applyProfile(data.account);
+    if (typeof data.cursor === "number") cursor = data.cursor;
+    if (apply(data.items)) {
+      changes++;
+      emit();
+    }
+  }
+  async function sync(read = true) {
     if (!identity) return;
-    if (syncing) return syncing;
+    if (syncing) return read ? syncing.then(() => sync(true)) : syncing;
     const expected = identity;
     syncing = (async () => {
       try {
+        let loaded = false;
         if (!ready) {
-          const data = await request("/api/me/state");
+          const data = await request("/api/me/state?chats=summary");
           if (identity !== expected) return;
+          loaded = true;
+          lastRead = Date.now();
           window.cloudAccount?.applyProfile(data.account);
-          for (const item of data.items) records.set(item.key, item);
+          // A server without the change feed ignores the query and sends whole records.
+          cursor = typeof data.cursor === "number" ? data.cursor : null;
+          feed = { path: "", etag: "" };
+          for (const item of data.items) remember(item);
           for (const [key, change] of pending) {
             change.revision = records.get(key)?.revision ?? 0;
             change.base = records.get(key)?.value ?? null;
@@ -250,13 +368,12 @@
             }));
           } catch (failure) {
             if (failure.status !== 409) throw failure;
-            const { items } = await request("/api/me/state");
+            const remote = await record(key);
             if (identity !== expected) return;
-            const remote = items.find((item) => item.key === key);
             if (!remote) throw failure;
             const latest = pending.get(key);
             if (!latest) continue;
-            records.set(key, remote);
+            remember(remote);
             if (latest.value === remote.value) pending.delete(key);
             else if (key.startsWith("chat:") && latest.value !== null) {
               // Two devices edited one transcript. Keep the server's history and save this
@@ -295,19 +412,12 @@
           for (const key of Object.keys(localStorage).filter(supported))
             localStorage.removeItem(key);
         }
-        const { items, account: profile } = await request("/api/me/state");
+        // Writes alone need no read: their responses carry the new revisions.
+        if (read && !loaded) await readChanges(expected);
         if (identity !== expected) return;
-        window.cloudAccount?.applyProfile(profile);
-        let changed = false;
-        for (const item of items)
-          if (!pending.has(item.key) && records.get(item.key)?.revision !== item.revision) {
-            records.set(item.key, item);
-            changed = true;
-          }
         clearTimeout(retryTimer);
         networkAttempts = 0;
         report("");
-        if (changed) emit();
       } catch (e) {
         if (identity === expected) {
           clearTimeout(retryTimer);
@@ -341,12 +451,16 @@
     identity = next;
     ready = false;
     syncing = null;
+    cursor = null;
+    feed = { path: "", etag: "" };
     records.clear();
     pending.clear();
     snapshots.clear();
+    loading.clear();
     report("");
     emit();
     void sync();
+    schedule(POLL_MS);
   }
   window.accountStore = {
     getItem,
@@ -363,35 +477,58 @@
     },
     flush: async () => {
       for (let attempt = 0; attempt < 5; attempt++) {
-        await sync();
+        await sync(false);
         if (!pending.size || error) break;
       }
       if (pending.size || error) throw Error(error || "Changes have not reached the database yet.");
     },
-    refresh: sync,
+    /** Read what changed on other devices now. */
+    refresh: () => sync(true),
+    /** A record's full value, e.g. `load("chat:<id>")` when a chat opens; account-store-changed follows. */
+    load,
     status: () => ({ ready, pending: pending.size, error }),
   };
   window.addEventListener("cloud-account-changed", changedAccount);
+  // Reads only while someone looks at this window. Each read that finds nothing doubles the wait (up to
+  // five minutes); a change, focus or reconnection starts again at thirty seconds.
+  const watched = () => document.visibilityState === "visible" && document.hasFocus();
+  function schedule(delay = pollDelay) {
+    clearTimeout(pollTimer);
+    pollTimer = setTimeout(poll, delay);
+  }
+  async function poll() {
+    pollTimer = 0;
+    if (!identity || !watched()) return;
+    if (!networkAttempts) {
+      const before = changes;
+      await sync(true);
+      pollDelay = changes === before ? Math.min(MAX_POLL_MS, pollDelay * 2) : POLL_MS;
+    }
+    schedule();
+  }
   const reconnect = () => {
     clearTimeout(retryTimer);
     networkAttempts = 0;
-    void sync();
+    pollDelay = POLL_MS;
+    if (pending.size || Date.now() - lastRead > FOCUS_READ_MS) void sync(true);
+    schedule();
   };
   window.addEventListener("online", reconnect);
   window.addEventListener("focus", reconnect);
+  document.addEventListener("visibilitychange", () => {
+    if (watched()) reconnect();
+  });
   window.addEventListener("beforeunload", (event) => {
     if (pending.size) {
       event.preventDefault();
       event.returnValue = "";
     }
   });
-  setInterval(() => {
-    if (!document.hidden && !networkAttempts) void sync();
-  }, 3000);
   // Initial read happens after the legacy consumers have installed their listeners.
   identity = scope();
   window.addEventListener("DOMContentLoaded", () => {
     starting = false;
     void sync();
+    schedule(POLL_MS);
   });
 })();
