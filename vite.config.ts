@@ -22,7 +22,7 @@ export default defineConfig({
     }),
     tanstackStart({ srcDirectory, server: { entry: "server.cloudflare.ts" } }),
     react(),
-    ...sharedPlugins(),
+    ...sharedPlugins({ staticHeaders: true }),
   ],
   fmt: {
     ignorePatterns: [

@@ -12,6 +12,9 @@
 //   The server build gets an empty module: the editor is client-only. Styles still come from
 //   web/dist/ui.css (built by scripts/build-ui.cjs with Tailwind), so CSS imported under web/src is
 //   an empty module here and the web and desktop pages load the same stylesheet.
+// - With `staticHeaders`, the client build also gets Cloudflare's `_headers`: Vite's content-hashed
+//   `/assets/<name>-<hash>.*` never change, so browsers keep them for a year without asking again.
+//   Fixed names (`/app.js`, `/style.css`, fonts under `/assets/fonts/`) keep the default revalidation.
 import fs from "node:fs";
 import path from "node:path";
 
@@ -138,13 +141,20 @@ function legacyUi({ webDir }) {
   };
 }
 
-/** @param {{ webDir: string }} options */
-export function legacyWeb({ webDir }) {
-  return [legacyUi({ webDir }), legacyWebFiles({ webDir })];
+/** `_headers` of the Cloudflare static assets (one path segment: `:file` never matches a `/`). */
+export const STATIC_HEADERS = `/assets/:file
+  Cache-Control: public, max-age=31536000, immutable
+`;
+/** Public web/ files the immutable rule would match: their names never change, so they must not. */
+const HASHED_ONLY = /^assets\/[^/]+$/;
+
+/** @param {{ webDir: string, staticHeaders?: boolean }} options */
+export function legacyWeb({ webDir, staticHeaders = false }) {
+  return [legacyUi({ webDir }), legacyWebFiles({ webDir, staticHeaders })];
 }
 
-/** @param {{ webDir: string }} options */
-function legacyWebFiles({ webDir }) {
+/** @param {{ webDir: string, staticHeaders: boolean }} options */
+function legacyWebFiles({ webDir, staticHeaders }) {
   const indexHtml = path.join(webDir, "index.html");
   return {
     name: "verynize:legacy-web",
@@ -194,12 +204,17 @@ function legacyWebFiles({ webDir }) {
     },
     generateBundle() {
       if (this.environment?.name !== "client") return;
-      for (const fileName of publicWebFiles(webDir))
+      for (const fileName of publicWebFiles(webDir)) {
+        if (staticHeaders && HASHED_ONLY.test(fileName))
+          this.error(`web/${fileName} would be cached as immutable: move it out of web/assets/.`);
         this.emitFile({
           type: "asset",
           fileName,
           source: fs.readFileSync(path.join(webDir, fileName)),
         });
+      }
+      if (staticHeaders)
+        this.emitFile({ type: "asset", fileName: "_headers", source: STATIC_HEADERS });
     },
   };
 }
