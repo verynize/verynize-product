@@ -82,7 +82,6 @@ function peer(room, client) {
     ws,
     inbox,
     opened: new Promise((resolve) => ws.addEventListener("open", resolve)),
-    ready: null,
     send: (ops) => ws.send(JSON.stringify({ type: "ops", batch: ++batch, ops })),
     async next(pred, ms = 10000) {
       const until = Date.now() + ms;
@@ -101,8 +100,7 @@ function peer(room, client) {
     if (m.type === "welcome") ws.send(JSON.stringify({ type: "sync", pages: [] }));
     inbox.push(m);
   });
-  p.ready = p.opened.then(() => p.next((m) => m.type === "snapshot"));
-  return p;
+  return { ...p, ready: p.opened.then(() => p.next((m) => m.type === "snapshot")) };
 }
 const rect = (id, extra = {}) => ({
   id,
@@ -178,7 +176,7 @@ async function inst() {
       window.__statuses.push([Math.round(performance.now()), s.textContent]),
     ).observe(s, { childList: true, characterData: true, subtree: true });
     window.__sends = [];
-    const send = WebSocket.prototype.send;
+    const send = Object.getOwnPropertyDescriptor(WebSocket.prototype, "send").value;
     WebSocket.prototype.send = function (data) {
       try {
         const m = JSON.parse(data);
@@ -211,7 +209,6 @@ const B = {
     await page.evaluate(
       () => window.cloudWorkspace.isConnected() && window.cloudWorkspace.disconnect(),
     );
-    await page.evaluate((doc) => (window.fileLibrary.createFromDocument ? null : null), doc);
     await page.evaluate((doc) => window.design.loadDocument(doc), doc);
     await openSharedDesign(page);
     const prev = await page.evaluate(() => window.__lastRoom || null);
@@ -693,7 +690,7 @@ try {
             if (isDoc(v)) add("JSON.stringify(document)", performance.now() - t);
           }
         };
-        const setItem = Storage.prototype.setItem;
+        const setItem = Object.getOwnPropertyDescriptor(Storage.prototype, "setItem").value;
         Storage.prototype.setItem = function (k, v) {
           const t = performance.now();
           try {

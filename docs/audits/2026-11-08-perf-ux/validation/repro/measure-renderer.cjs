@@ -85,14 +85,14 @@ function instrument() {
       m.log.stringify.push({ ms, chars: s.length, site: m.stacks ? site() : undefined });
     return s;
   };
-  const setItem = Storage.prototype.setItem;
+  const setItem = Object.getOwnPropertyDescriptor(Storage.prototype, "setItem").value;
   Storage.prototype.setItem = function (k, v) {
     if (!m.on) return setItem.call(this, k, v);
     const t = performance.now();
     setItem.call(this, k, v);
     m.log.setItem.push({ key: k, chars: String(v).length, ms: performance.now() - t });
   };
-  const rect = Element.prototype.getBoundingClientRect;
+  const rect = Object.getOwnPropertyDescriptor(Element.prototype, "getBoundingClientRect").value;
   Element.prototype.getBoundingClientRect = function () {
     if (!m.on) return rect.call(this);
     const t = performance.now();

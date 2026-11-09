@@ -456,27 +456,9 @@ async function renderNow(
 }
 function registerRendering(handle, parent) {
   let active = false;
-  // Wait for the editor's first navigation so a fast hidden smoke page cannot become
-  // the application's first page (or steal firstWindow() from automation).
-  const smoke = () => {
-    if (parent?.isDestroyed()) return;
-    renderHTML(
-      {
-        html: '<html><body style="margin:0;background:#fff"></body></html>',
-        width: 8,
-        height: 8,
-        measure: false,
-        fonts: [],
-      },
-      parent,
-    ).catch((error) => console.error("[render] startup smoke:", error.message));
-  };
-  if (parent) parent.webContents.once("did-finish-load", smoke);
-  else
-    app
-      .whenReady()
-      .then(smoke)
-      .catch((error) => console.error("[render] startup smoke:", error.message));
+  // Validate the renderer on demand through renderHTML/renderPDF. A startup capture
+  // creates a second BrowserWindow while the editor initializes, racing window/IPC
+  // discovery and spending compositor resources before the user requests a render.
   registerArtworkExport(handle, parent);
   handle("renderDesign", async (input) => {
     if (active) throw Error("An export is already rendering");

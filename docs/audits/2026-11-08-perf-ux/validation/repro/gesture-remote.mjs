@@ -71,7 +71,7 @@ const PROBE = (names) => {
     const now = () => performance.timeOrigin + performance.now();
     const a = { log: [], ids: {}, now };
     const D = window.design;
-    const orig = D.setDocument;
+    const orig = D.setDocument.bind(D);
     D.setDocument = function (doc) {
       const t0 = now();
       const r = orig.apply(this, arguments);
