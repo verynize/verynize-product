@@ -4,7 +4,9 @@
   const Ops = window.VerynizeOps;
   // Lazy pages (web/page-loader.js): stubs until fetched, edits on them held until they load.
   const Pages = window.pageLoader;
-  const LOCAL_KEYS = ["activePage"];
+  // Sync integrity (web/room-sync.js): content digests, rejection codes, dependent edits.
+  const Sync = window.VerynizeRoomSync;
+  const LOCAL_KEYS = Sync.LOCAL_KEYS;
   const ACCOUNT_KEY = "verynize.cloud.account";
   const SESSION_TOKEN = /^(vs_[0-9a-f]{64}|[A-Za-z0-9]{16,64}\.[A-Za-z0-9+/=_%-]{16,128})$/;
   const ROLE_LABEL = { owner: "Owner", editor: "Editor", commenter: "Commenter", viewer: "Viewer" };
@@ -74,6 +76,9 @@
     applying = false;
   let confirmed = null,
     retained = [],
+    // Why `retained` is held: "too_large" (sent again once it fits) or "interrupted" (it stopped
+    // the room; never sent again on its own).
+    retainedCode = null,
     pending = [],
     batchNumber = 0,
     clientId = "",
@@ -93,6 +98,13 @@
     lastLocal = "",
     lastLocalDoc = null,
     submitted = "";
+  // A snapshot requested because this copy cannot follow the room (resync), and the timers that
+  // give up on it or on an acknowledgement.
+  let resyncing = false,
+    resyncTimer,
+    ackTimer;
+  const RESYNC_MS = 15000,
+    ACK_MS = 20000;
   // B6: the signed-in account is not yet a member of the open room (from its access list).
   let claimable = false;
   let peerList = [],
@@ -100,10 +112,12 @@
     lastPointerAt = 0,
     cursor = null,
     app = null;
-  const status = (text) => {
+  // `error` (default: the text) is what decides whether a size limit stopped the sync; room
+  // receipts pass their `code`.
+  const status = (text, error = text) => {
     $("cloud-status").textContent = text;
     // Size limits (web/storage-limits.js): server refusals become the size island's blocking error.
-    if (window.storageLimits?.isSizeError(text))
+    if (window.storageLimits?.isSizeError(error))
       window.storageLimits.reportError(String(text), "sync");
   };
   const action = (fn) => async () => {
@@ -394,10 +408,10 @@
     }
   }
   // One in-flight batch keeps a rejected prefix from being overtaken by later edits.
+  // Retained (rejected) edits wait on their own; the edits that do not build on them still go.
   async function sendPending() {
     clearTimeout(sendTimer);
-    if (socket?.readyState !== WebSocket.OPEN || retained.length || pending.some((b) => b.sent))
-      return;
+    if (socket?.readyState !== WebSocket.OPEN || resyncing || pending.some((b) => b.sent)) return;
     const batch = pending[0];
     if (batch) {
       batch.sent = true;
@@ -417,9 +431,74 @@
           actor: batch.actor || undefined,
         }),
       );
+      // A lost acknowledgement would hold this batch in flight forever: resync, whose snapshot
+      // says whether the room applied it.
+      clearTimeout(ackTimer);
+      ackTimer = setTimeout(() => {
+        if (epoch === generation && pending.includes(batch) && batch.sent)
+          resync("no acknowledgement");
+      }, ACK_MS);
     }
   }
+  /**
+   * Hold `ops` (a rejected batch) with the retained edits. Only queued edits that build on what
+   * is held wait with it; the others stay queued. `code`: the rejection (web/room-sync.js).
+   */
+  function hold(ops, code) {
+    const { held, free } = Sync.splitDependent(
+      retained.concat(ops),
+      pending.flatMap((batch) => batch.ops),
+    );
+    retained = retained.concat(ops, held);
+    if (held.length) {
+      const keep = new Set(free);
+      // A trimmed batch takes no more edits (its size is unknown); new edits start a batch.
+      for (const batch of pending) {
+        batch.ops = batch.ops.filter((op) => keep.has(op));
+        batch.size = 0;
+      }
+      pending = pending.filter((batch) => batch.ops.length);
+    }
+    if (!retained.length) retainedCode = null;
+    else if (code === "interrupted" || retainedCode === "interrupted") retainedCode = "interrupted";
+    else retainedCode = "too_large";
+  }
+  const retainedStatus = () =>
+    retainedCode === "interrupted"
+      ? "A change that interrupted the room is kept on this device. Other edits keep syncing."
+      : "Edits are not synced; kept on this device until the file fits.";
+  /**
+   * Ask the room for the pages held here again; its snapshot replaces `confirmed`, and its
+   * `acked` settles the pending batches. Used when this copy cannot follow the room: a revision
+   * gap (a lost broadcast), a remote operation this copy rejects, a stale copy at the room's
+   * revision, or a batch whose acknowledgement was lost.
+   */
+  function resync(reason) {
+    if (resyncing || socket?.readyState !== WebSocket.OPEN) return;
+    console.warn(`[cloud] resync: ${reason}`);
+    resyncing = true;
+    const ws = socket;
+    clearTimeout(resyncTimer);
+    resyncTimer = setTimeout(() => {
+      if (resyncing && ws === socket) ws.close();
+    }, RESYNC_MS);
+    // Servers without lazy pages send their whole snapshot on every connection.
+    if (lazySocket) ws.send(JSON.stringify(syncRequest(false)));
+    else ws.close();
+  }
+  /** `sync` for the pages held here (or the active page); with `revision`, `same` may answer. */
+  function syncRequest(withRevision) {
+    const active = window.design.getView?.().page;
+    const pages = loadedPages();
+    return {
+      type: "sync",
+      pages: pages.length ? pages : active ? [active] : [],
+      ...(withRevision && confirmed ? { revision } : {}),
+    };
+  }
   function retryRetained() {
+    // An interrupting batch is never sent again on its own (it would stop the room again).
+    if (retainedCode === "interrupted") return;
     if (!canEdit() || !retained.length || pending.some((b) => b.sent)) return;
     const desired = Ops.apply(confirmed, retained).doc;
     const limits = window.VerynizeRoomLimits;
@@ -434,15 +513,27 @@
       (op.t === "text" && limits.bytes(op.value) < limits.bytes(op.base));
     ops.sort((a, b) => Number(!shrinks(a)) - Number(!shrinks(b)));
     retained = [];
+    retainedCode = null;
     queueOps(ops);
   }
   function queueOps(ops) {
     if (retained.length) {
-      const desired = Ops.apply(Ops.apply(confirmed, retained).doc, ops).doc;
-      retained = Ops.diff(confirmed, desired, { ignore: LOCAL_KEYS });
-      retryRetained();
-      void saveOutbox(true);
-      return;
+      // Edits of what is retained join it; the others are sent as usual.
+      const { held, free } = Sync.splitDependent(retained, ops);
+      if (held.length) {
+        const combined = retained.concat(held);
+        const result = Ops.apply(confirmed, combined);
+        retained = result.rejected.length
+          ? combined
+          : Ops.diff(confirmed, result.doc, { ignore: LOCAL_KEYS });
+        if (!retained.length) retainedCode = null;
+      }
+      if (!free.length) {
+        retryRetained();
+        void saveOutbox(true);
+        return;
+      }
+      ops = free;
     }
     const limits = window.VerynizeRoomLimits;
     const groups = limits.batchOps(ops.map((op) => ({ ...op, s: clock.next() })));
@@ -450,9 +541,10 @@
     // batches of different editors never merge (web/version-history.js, cloud/room-history.js).
     const actor = window.versionHistory?.batchActor?.() || null;
     if (!groups) {
-      retained = pending.flatMap((b) => b.ops).concat(ops);
-      pending = [];
-      status("File is too large to sync. Your edits stay on this device.");
+      hold(ops, "too_large");
+      status("File is too large to sync. Your edits stay on this device.", {
+        code: "too_large",
+      });
     } else
       for (const group of groups) {
         // Edits made while a batch is in flight join the unsent tail, so a drag or typing burst
@@ -627,52 +719,78 @@
     },
   };
   let pageGenerations = new Map();
-  function receiveOps(message) {
-    let retryAfterRejection = false;
-    for (const page of confirmed?.pages || [])
-      if (message.ops?.some((op) => !op.page || op.page === page.id))
-        pageGenerations.set(page.id, (pageGenerations.get(page.id) || 0) + 1);
-    if (message.client !== clientId && message.ops?.length) markRemote(message.ops);
-    if (message.ops?.length) {
-      confirmed = Ops.apply(confirmed, Pages.filterRemote(message.ops)).doc;
+  /**
+   * An `ops` message: a broadcast (any client's accepted batch) or a receipt for this client's
+   * batch. Operations apply only on the revision they follow; a gap, or an operation this copy
+   * rejects, resyncs instead. `viaSocket` is false for HTTP receipts (flushOps), which may
+   * overtake broadcasts still on the socket.
+   */
+  function receiveOps(message, viaSocket = true) {
+    const own = message.client === clientId;
+    const ops = Array.isArray(message.ops) ? message.ops : [];
+    const numbered = Number.isSafeInteger(message.revision);
+    if (ops.length && (!numbered || message.revision > revision)) {
+      // The batch stays pending until a snapshot's `acked` shows it.
+      if (resyncing) return;
+      if (numbered && message.revision !== revision + 1) return resync("revision gap");
+      const result = Ops.apply(confirmed, Pages.filterRemote(ops));
+      // A replica applies every accepted operation: a rejection means this copy diverged.
+      if (result.rejected.length) return resync(`remote operation ${result.rejected[0].reason}`);
+      for (const page of confirmed?.pages || [])
+        if (ops.some((op) => !op.page || op.page === page.id))
+          pageGenerations.set(page.id, (pageGenerations.get(page.id) || 0) + 1);
+      if (!own) markRemote(ops);
+      confirmed = result.doc;
       pageGenerations = new Map(
         (confirmed?.pages || []).map((page) => [page.id, pageGenerations.get(page.id) || 1]),
       );
-      for (const op of message.ops) if (op.s) clock.observe(op.s);
-    }
-    if (Number.isSafeInteger(message.revision)) revision = Math.max(revision, message.revision);
-    if (message.client === clientId) {
-      const sizeReason = message.reasons?.find((r) => window.storageLimits?.isSizeError(r?.reason));
-      if (
-        sizeReason ||
-        message.tooLarge ||
-        (message.error && window.storageLimits?.isSizeError(message.error))
-      ) {
-        // A correction may arrive while the rejected batch is still in flight.
-        retryAfterRejection = pending.some((batch) => batch.n > message.batch);
-        retained = pending.flatMap((batch) => batch.ops).concat(retained);
-        pending = [];
-      } else pending = pending.filter((batch) => batch.n > message.batch);
-      if (message.error) status(message.error);
-      else if (sizeReason) status(sizeReason.reason);
+      for (const op of ops) if (op.s) clock.observe(op.s);
+      if (numbered) revision = message.revision;
+    } else if (!ops.length && numbered && viaSocket && message.revision > revision)
+      // A receipt follows every broadcast sent before it on this socket: one was lost.
+      resync("missed revision");
+    if (own) {
+      clearTimeout(ackTimer);
+      const code = Sync.rejection(message);
+      const sizeReason = message.reasons?.find((r) => r?.code === "too_large");
+      // A batch sent again (lost acknowledgement) is confirmed once this copy holds the revision
+      // that carried its operations; otherwise the resync snapshot settles it.
+      const unseen =
+        message.duplicate &&
+        !code &&
+        message.applied !== 0 &&
+        !(Number.isSafeInteger(message.appliedRevision) && revision >= message.appliedRevision);
+      if (code) {
+        // Only the rejected batch (and edits building on it) is held; later batches still go.
+        const rejected = pending.filter((batch) => batch.n <= message.batch);
+        pending = pending.filter((batch) => batch.n > message.batch);
+        hold(
+          rejected.flatMap((batch) => batch.ops),
+          code,
+        );
+      } else if (unseen) resync("unconfirmed duplicate");
+      else pending = pending.filter((batch) => batch.n > message.batch);
+      if (message.error)
+        status(message.error, { code: code === "too_large" ? "too_large" : message.code });
+      else if (sizeReason) status(sizeReason.reason, { code: "too_large" });
       else if (message.rejected)
         status(
           `${message.rejected} change${message.rejected === 1 ? " was" : "s were"} superseded by newer edits`,
         );
       else
-        status(
-          retained.length
-            ? "Edits are not synced; kept on this device until the file fits."
-            : `Saved shared revision ${revision}`,
-        );
-    } else if (message.ops?.length)
+        status(retained.length ? retainedStatus() : `Saved shared revision ${revision}`, {
+          code: null,
+        });
+    } else if (ops.length)
       status(
         retained.length
           ? "Edits are not synced; kept on this device."
           : `Synced revision ${revision}`,
       );
     rebuild();
-    if (retryAfterRejection) retryRetained();
+    // An accepted batch may be the correction that lets retained edits fit (never a rejection,
+    // which would send them straight back).
+    if (own && !Sync.rejection(message) && retained.length) retryRetained();
     void saveOutbox(true);
     void sendPending();
   }
@@ -743,7 +861,7 @@
         info,
       );
       if (epoch !== generation) return;
-      receiveOps(result);
+      receiveOps(result, false);
     }
   }
 
@@ -805,6 +923,7 @@
       batch: batchNumber,
       pending: batches,
       retained,
+      retainedCode,
       overflow: false,
       confirmed,
       revision,
@@ -883,6 +1002,10 @@
     pageGenerations.clear();
     pending = [];
     retained = [];
+    retainedCode = null;
+    resyncing = false;
+    clearTimeout(resyncTimer);
+    clearTimeout(ackTimer);
     drawPeers();
     legacyPending = false;
     inflight = null;
@@ -958,17 +1081,12 @@
           selfId = message.id;
           if (message.role) setRole(message.role);
           // Lazy rooms send their snapshot after `sync`: the pages held here, or the active one.
+          // A new connection replaces any resync in progress.
+          resyncing = false;
+          clearTimeout(resyncTimer);
           if (message.lazyPages) {
             lazySocket = true;
-            const active = window.design.getView?.().page;
-            const pages = loadedPages();
-            ws.send(
-              JSON.stringify({
-                type: "sync",
-                pages: pages.length ? pages : active ? [active] : [],
-                ...(confirmed ? { revision } : {}),
-              }),
-            );
+            ws.send(JSON.stringify(syncRequest(true)));
           }
           return;
         }
@@ -982,7 +1100,18 @@
         if (message.type === "snapshot") {
           if (protocol < 2) return receiveSnapshot(message);
           let released = [];
-          // `same`: the room is still at this client's revision, so its document stands.
+          // `same`: the room is still at this client's revision. Its page index and digests show
+          // whether this copy holds the same content; a stale copy asks for the pages again.
+          if (message.same) {
+            const reason = Sync.divergence(confirmed, message, Pages.isUnloaded);
+            if (reason) {
+              resyncing = false;
+              resync(`copy differs from the room (${reason})`);
+              return;
+            }
+          }
+          resyncing = false;
+          clearTimeout(resyncTimer);
           if (!message.same) {
             if (confirmed)
               markRemote(Ops.diff(confirmed, message.document, { ignore: LOCAL_KEYS }));
@@ -1003,19 +1132,22 @@
             (b) =>
               b.n <= (message.acked || 0) && (!Array.isArray(rejected) || rejected.includes(b.n)),
           );
-          retained = uncertain.flatMap((b) => b.ops).concat(retained);
           pending = pending.filter((batch) => batch.n > (message.acked || 0));
-          if (retained.length) {
-            retained = retained.concat(pending.flatMap((b) => b.ops));
-            pending = [];
-          }
           for (const batch of pending) batch.sent = false;
+          clearTimeout(ackTimer);
+          // Rejected batches are held; only the queued edits that build on them wait too.
+          if (uncertain.length || retained.length)
+            hold(
+              uncertain.flatMap((b) => b.ops),
+              uncertain.some((b) => message.rejectedCodes?.[b.n] === "interrupted")
+                ? "interrupted"
+                : retainedCode,
+            );
           if (released.length && canEdit()) queueOps(released);
           rebuild();
           window.dispatchEvent(new CustomEvent("cloud-hydrated", { detail: { epoch } }));
           retryRetained();
-          if (retained.length)
-            status("Edits are not synced; kept on this device until the file fits.");
+          if (retained.length) status(retainedStatus(), { code: null });
           void sendPending();
           Pages.resume();
           void saveOutbox();
@@ -1304,6 +1436,7 @@
         }))
       : [];
     retained = restore?.retained || [];
+    retainedCode = retained.length ? restore.retainedCode || "too_large" : null;
     batchNumber = restore ? restore.batch || 0 : 0;
     for (const batch of pending) for (const op of batch.ops) if (op.s) clock.observe(op.s);
     resetHistory();

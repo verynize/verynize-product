@@ -728,6 +728,11 @@ const e2eCloud = [
     ...AREA.cloudRenderer,
     "web/page-loader.js",
   ]),
+  electron("tests/cloud-sync-integrity-desktop.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/page-loader.js",
+    "web/storage-limits.js",
+  ]),
   electron("tests/cloud-database-sync.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
     "web/account-store.js",
