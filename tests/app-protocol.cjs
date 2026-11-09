@@ -203,12 +203,10 @@ async function appChecks(profile) {
     // Reloading a cloud file's route (Cmd+R or location.reload()) loads the app, not "Forbidden".
     const room = "/editor/room%3A0b7e4b5e-4f7a-4c55-9a43-7a2d1c3e9f10";
     await page.evaluate((route) => history.pushState({}, "", route), room);
-    const [reloaded] = await Promise.all([
-      page.waitForResponse((response) => response.url() === "app://verynize" + room),
-      page.evaluate(() => location.reload()),
-    ]);
-    assert.equal(reloaded.status(), 200);
+    await Promise.all([page.waitForEvent("load"), page.evaluate(() => location.reload())]);
     await page.waitForFunction(() => !!window.desktop && document.readyState === "complete");
+    assert.notEqual(await page.evaluate(() => document.body?.innerText.trim()), "Forbidden");
+    assert.ok(await page.evaluate(() => !!window.design), "the editor scripts ran");
     assert.ok(await ipcWorks(page), "IPC after reloading a cloud file's route");
     assert.ok((await stylesLoaded(page)) >= 10, "the app loads, not an error page");
     // A nested route loads its root-absolute assets too.

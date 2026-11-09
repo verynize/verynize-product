@@ -164,6 +164,7 @@ async function raiseErrors(app, page, home, tag) {
       active: false,
       available: true,
       restartRequired: false,
+      asked: false,
     });
     assert.equal(await session.page.evaluate(() => window.verynizePlatform.can("telemetry")), true);
     await raiseErrors(session.app, session.page, home, "off");
@@ -229,11 +230,13 @@ async function raiseErrors(app, page, home, tag) {
       typeof event.message === "string" ? event.message : (event.message?.formatted ?? "");
     const lost = () =>
       events(ingest.envelopes).find((event) =>
-        textOf(event).includes("'render' process exited with 'crashed'"),
+        /^'render' process exited with '(crashed|killed)'$/.test(textOf(event)),
       );
     await waitFor(() => lost(), "the render window's crash event");
     assert.equal(lost().contexts?.electron?.crashed_process, "render");
-    assert.equal(lost().contexts?.electron?.reason, "crashed");
+    // forcefullyCrashRenderer() reports `killed` on macOS and `crashed` elsewhere: both are events now.
+    assert.match(lost().contexts?.electron?.reason, /^(crashed|killed)$/);
+    assert.equal(typeof lost().contexts.electron.exit_code, "number");
     await new Promise((resolve) => setTimeout(resolve, 2000));
     assert.ok(
       !events(ingest.envelopes).some(
