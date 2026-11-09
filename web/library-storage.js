@@ -9,19 +9,21 @@
       idle = 0,
       writing = Promise.resolve();
     const saved = new Map();
-    const opened = new Promise((resolve, reject) => {
-      const request = indexedDB.open(databaseName, 1);
-      request.onupgradeneeded = () => request.result.createObjectStore(STORE);
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        database = request.result;
-        database.onversionchange = () => {
-          database.close();
-          database = null;
+    const opened = /** @type {Promise<void>} */ (
+      new Promise((resolve, reject) => {
+        const request = indexedDB.open(databaseName, 1);
+        request.onupgradeneeded = () => request.result.createObjectStore(STORE);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          database = request.result;
+          database.onversionchange = () => {
+            database.close();
+            database = null;
+          };
+          resolve();
         };
-        resolve();
-      };
-    });
+      })
+    );
     function transaction(mode, fn) {
       return new Promise((resolve, reject) => {
         const tx = database.transaction(STORE, mode);

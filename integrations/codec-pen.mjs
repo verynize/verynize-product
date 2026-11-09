@@ -36,6 +36,13 @@ const supported = new Set([
   "iconFontName",
   "iconFontFamily",
 ]);
+/**
+ * @param {Buffer | Uint8Array | string} source
+ * @param {{
+ *   assetSink?: (data: Buffer, type: string) => Promise<{ ref: string }>;
+ *   name?: string;
+ * }} [options]
+ */
 export async function importPen(source, { assetSink, name = "Imported Pen" } = {}) {
   const bytes = Buffer.isBuffer(source) ? source : Buffer.from(source);
   if (bytes.length > MAX_BYTES) throw Error(`Pen source exceeds limit ${MAX_BYTES} bytes`);
@@ -199,6 +206,7 @@ export async function importPen(source, { assetSink, name = "Imported Pen" } = {
       };
       const type = types[src.type];
       if (!type) throw Error(`Unsupported Pen node type: ${String(src.type).slice(0, 50)}`);
+      /** @type {Record<string, any>} */
       const node = {
         id: ids.get(id),
         type,

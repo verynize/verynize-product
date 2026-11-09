@@ -53,6 +53,17 @@ export type DesignApi = {
   editCount(): number;
   canRedo(): boolean;
   getCamera(): { x: number; y: number; zoom: number };
+  /** Camera and active page of the canvas view. */
+  getView?(): {
+    zoom: number;
+    scrollLeft: number;
+    scrollTop: number;
+    page: string;
+    x: number;
+    y: number;
+  };
+  screenToWorld?(x: number, y: number): { x: number; y: number };
+  exportHTML?(): string;
   setCamera(x: number, y: number, zoom: number): void;
   zoomToFit(): void;
   setTool(tool: string): void;
@@ -66,6 +77,15 @@ export type DesignApi = {
   [key: string]: unknown;
 };
 
+/** The shared room a library file is linked to (`fileLibrary.cloudOf`). */
+export type FileCloud = {
+  server: string;
+  roomId: string;
+  token?: string;
+  detached?: boolean;
+  [key: string]: unknown;
+};
+
 declare global {
   interface Window {
     design: DesignApi;
@@ -75,6 +95,15 @@ declare global {
       list(): unknown[];
       currentId: string | null;
       findCloud?(server: string, roomId: string): string | null;
+      cloudOf?(id: string): FileCloud | null;
+      setCloud?(id: string, cloud: FileCloud | null, initializeMetadata?: boolean): void;
+      open?(id: string, options?: { cloud?: FileCloud; [key: string]: unknown }): unknown;
+      createFromDocument?(
+        document: DesignDocument,
+        options?: { cloud?: FileCloud; [key: string]: unknown },
+      ): Promise<string>;
+      ready?(): Promise<unknown>;
+      flush?(): Promise<unknown>;
       showHome?(): void;
       applyEditor?(): void;
     };

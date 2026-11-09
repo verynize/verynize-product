@@ -82,6 +82,8 @@ declare global {
         page: object,
         measuredRects?: Map<string, { x: number; y: number; w: number; h: number }>,
       ): {
+        /** Absolute world rectangle of every node, by id. */
+        rects: Map<string, { x: number; y: number; w: number; h: number }>;
         bounds: { x: number; y: number; w: number; h: number } | null;
         outOfRange: boolean;
         advisory: boolean;
@@ -104,6 +106,60 @@ declare global {
     };
     /** web/remote-apply.js: collaborators' edits patched in node by node. */
     remoteApply: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      [key: string]: any;
+    };
+    /** web/commit-state.js: deeply frozen commit snapshots and patch-based history entries. */
+    VerynizeCommitState: Readonly<{
+      freeze<T>(value: T): T;
+      same(a: unknown, b: unknown): boolean;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      diff(before: unknown, after: unknown, path?: unknown[], out?: unknown[]): any[];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      compact(entry: any, current: any): any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      apply(entry: any, current: any): any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      store(): any;
+    }>;
+    /** web/commit-validation.js: validation of a commit, limited to what changed. */
+    VerynizeCommitValidation: Readonly<{
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      world(before: any, after: any, old: any, targets?: any): void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      schema(before: any, document: any, old: any, targets?: any): void;
+      remember(snapshot: object): void;
+    }>;
+    /** web/lazy-document.js */
+    VerynizeLazyDocument: Readonly<{
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      activate(document: any): any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      prepare(document: any, defaults?: any, repairs?: any): any;
+    }>;
+    /** web/library-storage.js: the file library in IndexedDB. */
+    VerynizeLibraryStorage: Readonly<{
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      create(onError?: (error: unknown) => void, databaseName?: string): any;
+    }>;
+    /** web/selection-bounds.js */
+    VerynizeSelectionBounds: Readonly<{
+      rects(
+        nodes: object[],
+        elementOf?: (id: string) => HTMLElement | null,
+      ): Map<string, { x: number; y: number; w: number; h: number }>;
+    }>;
+    /** web/asset-store.js: content-addressed `asset:<sha256>` image bytes. */
+    assetStore: {
+      put(blob: Blob, expectedRef?: string): Promise<string>;
+      get(ref: string): Promise<Blob>;
+      inlineMarkup(markup: string): Promise<string>;
+      resolve(ref: string): string;
+      css(value: unknown): string;
+      style(style: [string, unknown][]): [string, string][];
+    };
+    /** web/component-core.js */
+    VerynizeComponents: {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
       [key: string]: any;
     };

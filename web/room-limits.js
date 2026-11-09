@@ -60,6 +60,8 @@
    * batch leaves a node pointing at a parent that is not there. Order changes come last.
    * `documents()` (optional) returns {before, after}, the documents around the change, to find the
    * artboard of a node the operations do not place themselves.
+   * @param {any[]} ops
+   * @param {{ documents?: () => { before: any; after: any } }} [options]
    */
   function batchOps(ops, { documents } = {}) {
     const limit = BATCH_BYTES - ENVELOPE_BYTES;
@@ -106,6 +108,7 @@
     }
 
     // Parents after the change (the operations' own values first) and before it.
+    /** @type {{ before?: any; after?: any }} */
     const docs = documents?.() || {};
     const parentMap = (doc) => {
       const map = new Map();

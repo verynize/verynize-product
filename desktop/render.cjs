@@ -214,6 +214,7 @@ const MEASURE = `(()=>{const out={},k=parseFloat(document.documentElement.style.
 
 // Offscreen rasterizer shared by the export handler and the MCP bridge's take_screenshot.
 // Renders are serialized so concurrent callers never share a capture window.
+/** @type {Promise<unknown>} */
 let renderQueue = Promise.resolve();
 function renderHTML(input, parent = null) {
   assertRuntime();
