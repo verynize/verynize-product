@@ -137,6 +137,7 @@ declare global {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
       prepare(document: any, defaults?: any, repairs?: any): any;
       match(next: object, live: object): void;
+      prepareAll(document: object): void;
     }>;
     /** web/library-storage.js: the file library in IndexedDB. */
     VerynizeLibraryStorage: Readonly<{

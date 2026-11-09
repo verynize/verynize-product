@@ -64,6 +64,8 @@ export type DesignApi = {
   };
   screenToWorld?: (x: number, y: number) => { x: number; y: number };
   exportHTML?: () => string;
+  /** Editor defaults on every page now (a shared room's copy is prepared whole). */
+  prepareAllPages?: () => void;
   setCamera(x: number, y: number, zoom: number): void;
   zoomToFit(): void;
   setTool(tool: string): void;

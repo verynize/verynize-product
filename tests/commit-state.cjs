@@ -155,6 +155,37 @@ test("a remote patch into a prepared page keeps the editor defaults and changes 
   );
 });
 
+test("a document shared in a room is prepared whole, before and after it loads", async () => {
+  await import("../integrations/document-core.mjs");
+  window.VerynizeDocument = globalThis.VerynizeDocument;
+  require("../web/lazy-document.js");
+  const Lazy = window.VerynizeLazyDocument;
+  const node = (id) => ({ id, name: id, type: "rectangle", x: 0, y: 0, w: 10, h: 10 });
+  const doc = () => ({
+    version: 2,
+    name: "Room",
+    activePage: "a",
+    tokens: {},
+    pages: [
+      { id: "a", name: "A", nodes: [node("a1")] },
+      { id: "b", name: "B", nodes: [node("b1")] },
+    ],
+  });
+  const opacities = (d) => d.pages.map((p) => p.nodes[0].opacity);
+  // Open before joining: page B waits for its first activation, until the room prepares it.
+  const open = Lazy.prepare(doc(), { opacity: 100 }, []);
+  assert.deepEqual(opacities(open), [100, undefined]);
+  Lazy.prepareAll(open);
+  assert.deepEqual(opacities(open), [100, 100]);
+  // While connected, every document the room loads is prepared whole.
+  window.cloudWorkspace = { isConnected: () => true };
+  try {
+    assert.deepEqual(opacities(Lazy.prepare(doc(), { opacity: 100 }, [])), [100, 100]);
+  } finally {
+    delete window.cloudWorkspace;
+  }
+});
+
 test("local geometry guard preserves existing overflow and rejects worsening overflow", async () => {
   await import("../integrations/document-core.mjs");
   window.VerynizeDocument = globalThis.VerynizeDocument;

@@ -1387,6 +1387,11 @@ window.verynize = {
     render();
     return held;
   },
+  /* Editor defaults on every page (pages are otherwise prepared when first shown): no visible change, no undo step. */
+  prepareAllPages: () => {
+    window.VerynizeLazyDocument.prepareAll(design);
+    commitState.invalidate();
+  },
   gesturing: () => worldGesture,
   /* The live nodes a pointer gesture holds (read only), or null outside one. */
   gestureNodes: () =>

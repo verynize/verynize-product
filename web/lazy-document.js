@@ -22,8 +22,11 @@
     } catch {
       return eager();
     }
-    // Component reconciliation can touch inactive instances; prepare those documents eagerly.
-    if (window.VerynizeComponents?.hasComponents(document)) return eager();
+    // Component reconciliation can touch inactive instances; prepare those documents eagerly. So is a shared room's
+    // copy: activating a page adds the defaults in place, which the room's change diff (web/cloud-panel.js) would send
+    // as edits of every layer.
+    if (window.VerynizeComponents?.hasComponents(document) || window.cloudWorkspace?.isConnected?.())
+      return eager();
     if (!document.activePage) document.activePage = document.pages[0].id;
     activate(document);
     return core.resolveAliases(document);
@@ -40,5 +43,14 @@
         prepared.add(page);
       }
   }
-  window.VerynizeLazyDocument = Object.freeze({ prepare, activate, match });
+  // Every page of `document` prepared now (a room starts sharing the open document).
+  function prepareAll(document) {
+    if (!editorDefaults) return;
+    for (const page of document.pages)
+      if (!prepared.has(page)) {
+        window.VerynizeDocument.normalizeDocument({ ...document, pages: [page] }, editorDefaults);
+        prepared.add(page);
+      }
+  }
+  window.VerynizeLazyDocument = Object.freeze({ prepare, activate, match, prepareAll });
 })();

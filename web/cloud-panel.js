@@ -1474,6 +1474,8 @@
       lib.setCloud(fileId, cloud);
     }
     connection = { ...info, fileId };
+    // A room's copy is prepared whole (web/lazy-document.js) before the shared baseline below is taken.
+    window.design.prepareAllPages?.();
     // Active authority lives outside the disposable inactive-room LRU.
     window.switchCache.remove(window.switchCache.key(info));
     protocol = Number.isSafeInteger(current.protocol) && Ops ? current.protocol : 1;
