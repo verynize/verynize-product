@@ -61,3 +61,5 @@ body[data-page-drag] #bd-page-list,
 body[data-page-drag] #bd-page-list * {
   cursor: grabbing;
 }
+
+[data-layer-spacer] { height: var(--spacer-height); flex-shrink: 0; }

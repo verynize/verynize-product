@@ -943,6 +943,7 @@
     validateWorldBoundsChange,
     nodeLimitMessage,
     validateDocument,
+    validateNode,
     normalizeDocument,
     resolveAliases,
     prepareDocument,

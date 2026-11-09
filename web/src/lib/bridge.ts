@@ -29,6 +29,8 @@ export type DesignDocument = {
 };
 export type DesignApi = {
   getDocument(): DesignDocument;
+  /** Shared deeply frozen commit snapshot; copy before mutation. */
+  getSnapshot(): DesignDocument;
   setDocument(doc: DesignDocument): void;
   subscribe(fn: (doc: DesignDocument) => void): () => void;
   getSelection(): string[];
@@ -92,7 +94,7 @@ let attached = false;
 function attach() {
   if (attached || !window.design) return;
   attached = true;
-  snapshot = window.design.getDocument();
+  snapshot = window.design.getSnapshot();
   selectionSnapshot = window.design.getSelection();
   window.design.subscribe((doc) => {
     snapshot = doc;

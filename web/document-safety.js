@@ -242,7 +242,7 @@
       return structuredClone(d);
     let prepared;
     try {
-      prepared = core.prepareDocument(structuredClone(d), defaults, repairs);
+      prepared = window.VerynizeLazyDocument.prepare(structuredClone(d), defaults, repairs);
     } catch (error) {
       error.problems = failure(error, d).count;
       throw error;
@@ -268,7 +268,7 @@
     }
     const repairs = [];
     try {
-      const prepared = core.prepareDocument(structuredClone(raw), defaults, repairs);
+      const prepared = window.VerynizeLazyDocument.prepare(structuredClone(raw), defaults, repairs);
       if (repairs.length) {
         void backup(text, {
           source: "startup",
@@ -357,7 +357,8 @@
       if (checked.has(d)) return checked.get(d);
       let result = null;
       try {
-        core.prepareDocument(structuredClone(d), defaults, []);
+        try { core.validateDocument(d); }
+        catch { core.prepareDocument(structuredClone(d), defaults, []); }
       } catch (error) {
         const f = failure(error, d);
         result = { error: f.error, count: f.count };

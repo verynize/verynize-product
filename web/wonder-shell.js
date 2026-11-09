@@ -141,10 +141,12 @@
   }
   const stateKey = "verynize-library-v1";
   let library = { files: [], folders: [], active: null };
+  let libraryLoadError = null;
   try {
     const data = JSON.parse(localStorage.getItem(stateKey));
     if (data && Array.isArray(data.files) && Array.isArray(data.folders)) library = data;
-  } catch {}
+    else if (data) throw Error("Invalid stored file library");
+  } catch (error) { libraryLoadError = error; }
   // A profile gets its starter file once: the first run's document, signed out. Profiles that already had files count as seeded.
   if (library.files.length) library.seeded = true;
   // The edit count (window.design.editCount) when the document shown was last a library file, or was reset (launch, the
@@ -153,9 +155,14 @@
   let filedEdits = window.design.editCount?.() ?? 0;
   const legacyIds = new Set(library.files.map((file) => file.id));
   const lastSerialized = new Map();
+  let hydrated = false;
+  const storage = window.VerynizeLibraryStorage.create(() =>
+    notify("File library storage is unavailable; the original stored data is retained. Save your design to a file before closing."));
+  const storageReady = storage.load(library, libraryLoadError);
   library.files.forEach((file) => delete file.serialized);
   // Entries whose stored document does not load (web/document-safety.js): kept and marked, never overwritten by sync.
   const blocked = new Set();
+  const invalidDocuments = new Map();
   let filter = "all",
     folder = null,
     list = false,
@@ -196,7 +203,7 @@
               : file,
           ),
       };
-      localStorage.setItem(stateKey, JSON.stringify(stored));
+      if (hydrated) storage.schedule(stored);
       emit();
       return true;
     } catch {
@@ -245,7 +252,7 @@
     inspector.dataset.kind = selected?.type || "";
     if (typography) typography.open = selected?.type === "text";
     title.textContent = document.name || "Untitled";
-    if (saving || window.documentSafety.startupPending(window.design.canUndo())) return;
+    if (!hydrated || saving || window.documentSafety.startupPending(window.design.canUndo())) return;
     let file = current();
     if (file?.remoteOnly) {
       if (!window.cloudWorkspace?.isConnected()) return;
@@ -267,10 +274,10 @@
       library.seeded = true;
     }
     filedEdits = window.design.editCount?.() ?? 0;
-    const serialized = JSON.stringify(document);
+    const serialized = document;
     if (lastSerialized.get(file.id) === serialized) return;
     file.name = document.name;
-    file.document = structuredClone(document);
+    file.document = document;
     window.switchCache.trustLocal(file.document);
     lastSerialized.set(file.id, serialized);
     file.updated = Date.now();
@@ -307,6 +314,7 @@
   // The user-initiated open in progress: a repeated open of the same file joins it instead of starting over.
   let inflight = null;
   async function openFile(id, options = {}) {
+    if (!hydrated) await ready;
     const file = library.files.find((file) => file.id === id);
     if (!file) return;
     const coordinator = window.switchCoordinator;
@@ -464,6 +472,7 @@
     return file.id;
   }
   async function createFile() {
+    if (!hydrated) await ready;
     const name = await window.askText("Name your file", "Untitled");
     if (!name?.trim()) return;
     const pageId = uid(),
@@ -641,7 +650,8 @@
     if (!file.cloud && window.cloudAccount?.get()) await window.cloudWorkspace.storeFile(file.id);
     if (file.cloud && !file.cloud.detached)
       await window.cloudWorkspace.renameFile(file.cloud, name);
-    file.name = file.document.name = name;
+    file.name = name;
+    file.document = { ...file.document, name };
     if (file.id === library.active && !file.cloud) {
       saving = true;
       try {
@@ -887,12 +897,27 @@
   window.addEventListener("app-preferences-changed", profile);
   profile();
   if (window.documentSafety.startupFailed() && library.active) blocked.add(library.active);
-  sync(window.design.getDocument());
-  window.design.subscribe(() => {
-    if (!saving) sync(window.design.getDocument());
+  const ready = storageReady.then((stored) => {
+    library = stored;
+    library.files.forEach((file) => {
+      legacyIds.add(file.id);
+      const invalid = window.documentSafety.check(file.document);
+      if (invalid) { blocked.add(file.id); invalidDocuments.set(file.document, invalid); }
+    });
+    if (library.files.length) library.seeded = true;
+    hydrated = true;
+    sync(window.design.getSnapshot());
+    emit();
+  });
+  window.design.subscribe((snapshot) => {
+    if (!saving) sync(snapshot);
   });
   window.fileLibrary = {
+    ready: () => ready,
+    isReady: () => hydrated,
+    flush: () => ready.then(() => storage.flush()),
     createFromDocument: async (document, options = {}) => {
+      if (!hydrated) await ready;
       const doc = structuredClone(document),
         file = {
           id: uid(),
@@ -970,8 +995,9 @@
     applyEditor,
     list: () =>
       library.files.filter(canSee).map((f) => {
-        const copy = structuredClone(f),
-          invalid = window.documentSafety.check(f.document);
+        const { document, ...metadata } = f;
+        const copy = { ...structuredClone(metadata), document: window.VerynizeCommitState.freeze(document) },
+          invalid = invalidDocuments.get(f.document);
         if (invalid) copy.invalid = invalid;
         return copy;
       }),
@@ -979,7 +1005,8 @@
     openRoomFile: (room) => {
       const file = reference("room:" + room.id);
       if (!file) return Promise.reject(Error("Sign in to open this file."));
-      file.name = file.document.name = room.title;
+      file.name = room.title;
+      file.document = { ...file.document, name: room.title };
       return openFile(file.id);
     },
     create: createFile,

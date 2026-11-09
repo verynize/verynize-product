@@ -303,7 +303,7 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   // Reveal layers selected on the canvas: expand their ancestors and scroll them into view.
   const selectionKey = selection.join(",");
   useEffect(() => {
-    if (!selectionKey) return;
+    if (!selectionKey || selection.length > 200) return;
     const ids = selectionKey.split(",");
     const parents = ancestorsOf(ids, nodes);
     if (parents.length) {
@@ -324,6 +324,21 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   const shown = useMemo(() => applyLayerPreview(nodes, preview), [nodes, preview]);
   const rows = useMemo(() => buildRows(shown, expanded, query), [shown, expanded, query]);
   const selected = useMemo(() => new Set(selection), [selection]);
+  const [scrollTop, setScrollTop] = useState(0);
+  const start = rows.length > 100 ? Math.min(Math.max(0, Math.floor(scrollTop / 32) - 8), Math.max(0, rows.length - 60)) : 0;
+  const end = rows.length > 100 ? Math.min(rows.length, start + 60) : rows.length;
+
+  useEffect(() => {
+    if (selection.length !== 1 || rows.length <= 100) return;
+    const index = rows.findIndex((row) => row.node.id === selection[0]);
+    if (index < 0 || !treeRef.current) return;
+    const tree = treeRef.current;
+    const top = index * 32;
+    if (top < tree.scrollTop || top + 32 > tree.scrollTop + tree.clientHeight) {
+      tree.scrollTop = Math.max(0, top - tree.clientHeight / 2);
+      setScrollTop(tree.scrollTop);
+    }
+  }, [rows, selection]);
 
   const toggleExpand = useMemo(
     () => (id: string) =>
@@ -397,11 +412,25 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
         role="tree"
         aria-label="Layers"
         aria-multiselectable="true"
+        onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+        onKeyDownCapture={(event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+          if (!(event.target instanceof HTMLElement) || event.target.getAttribute("role") !== "treeitem") return;
+          const index = rows.findIndex((row) => row.node.id === (event.target as HTMLElement).dataset.id);
+          const next = index + (event.key === "ArrowDown" ? 1 : -1);
+          if (next < 0 || next >= rows.length || (next >= start && next < end)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.currentTarget.scrollTop = next * 32;
+          setScrollTop(next * 32);
+          requestAnimationFrame(() => treeRef.current?.querySelector<HTMLElement>(`[data-id="${CSS.escape(rows[next].node.id)}"]`)?.focus());
+        }}
         hidden={!open}
         className="min-h-0 flex-1 overflow-y-auto px-1.5 pt-1 pb-3"
       >
         <div ref={listRef} className="relative flex flex-col gap-0.5">
-          {rows.map((row, index) => (
+          {start > 0 && <div aria-hidden="true" data-layer-spacer style={{ "--spacer-height": `${start * 32 - 2}px` } as CSSProperties} />}
+          {rows.slice(start, end).map((row, index) => (
             <LayerRow
               key={row.node.id}
               row={row}
@@ -414,6 +443,7 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
               onDragStart={onPointerDown}
             />
           ))}
+          {end < rows.length && <div aria-hidden="true" data-layer-spacer style={{ "--spacer-height": `${(rows.length - end) * 32 - 2}px` } as CSSProperties} />}
           {drop && <DropIndicator drop={drop} />}
         </div>
         {rows.length === 0 && (

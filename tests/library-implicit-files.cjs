@@ -54,7 +54,13 @@ async function launch(dir) {
 async function seed(page, { current, library }) {
   const reloaded = page.waitForEvent("load");
   await page.evaluate(
-    ({ current, library }) => {
+    async ({ current, library }) => {
+      await window.fileLibrary.flush();
+      await new Promise((resolve, reject) => {
+        const request = indexedDB.deleteDatabase("verynize-library");
+        request.onsuccess = resolve;
+        request.onerror = () => reject(request.error);
+      });
       localStorage.setItem("verynize-v2", current);
       localStorage.setItem("verynize-library-v1", JSON.stringify(library));
       // oxlint-disable-next-line typescript/unbound-method -- monkey-patch: the original is re-invoked with .call(this) or restored
@@ -70,8 +76,7 @@ async function seed(page, { current, library }) {
   await reloaded;
   await waitForUiReady(page);
 }
-const storedLibrary = (page) =>
-  page.evaluate(() => JSON.parse(localStorage.getItem("verynize-library-v1") || "null"));
+const storedLibrary = require("./helpers/library-store.cjs").readLibrary;
 const fileIds = async (page) => ((await storedLibrary(page))?.files || []).map((f) => f.id).sort();
 // Gives every startup render, save and library sync a chance to (wrongly) create a file.
 const settle = (page) => page.waitForTimeout(2000);
@@ -118,7 +123,7 @@ const layers = (page) => page.locator("#canvas .layer").count();
     await page.evaluate(() => window.fileLibrary.applyEditor());
     await page.evaluate(() => window.design.updateNodes(["r1"], { name: "Edited" }));
     await page.waitForFunction(
-      () => JSON.parse(localStorage.getItem("verynize-library-v1")).files.length === 2,
+      () => window.fileLibrary.list().length === 2,
     );
     const edited = (await storedLibrary(page)).files.find((f) => f.id !== "kept");
     assert.equal(edited.document.pages[0].nodes[0].name, "Edited");

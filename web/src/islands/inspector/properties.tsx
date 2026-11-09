@@ -263,11 +263,13 @@ function PositionSection({ doc, node, selection }: Props) {
   const set = (key: string) => (value: string) => setField(selection, node, key, value);
   const many = selection.length > 1;
   const nodes = pageNodes(doc);
-  const parent = node.parentId ? nodes.find((n) => n.id === node.parentId) : undefined;
-  const selected = nodes.filter((n) => selection.includes(n.id));
+  const byId = new Map(nodes.map((item) => [item.id, item]));
+  const wanted = new Set(selection);
+  const parent = node.parentId ? byId.get(node.parentId) : undefined;
+  const selected = nodes.filter((n) => wanted.has(n.id));
   // Children of flow frames can be taken out of the flow; children of free frames are always positioned.
   const flowChildren = selected.filter(
-    (n) => !!n.parentId && isFlowFrame(nodes.find((m) => m.id === n.parentId)),
+    (n) => !!n.parentId && isFlowFrame(byId.get(n.parentId)),
   );
   const absolute = flowChildren.length > 0 && flowChildren.every((n) => n.position === "absolute");
   const inFlow = !!parent && isFlowFrame(parent) && node.position !== "absolute";
@@ -1051,7 +1053,7 @@ function LayerCommands() {
 }
 
 /* ---------- Panel body ---------- */
-export function PropertiesBody({
+function DetailedPropertiesBody({
   doc,
   node,
   selection,
@@ -1157,4 +1159,17 @@ export function PropertiesBody({
       <LayerCommands />
     </>
   );
+}
+
+// Large selections show the count immediately; detailed editors are opened on demand.
+export function PropertiesBody(props: { doc: DesignDocument; node: Node | undefined; selection: string[] }) {
+  const [expandedSelection, setExpandedSelection] = useState<string | null>(null);
+  const key = props.selection.join(",");
+  if (props.selection.length <= 200 || expandedSelection === key) return <DetailedPropertiesBody {...props} />;
+  return <>
+    <Section title={`${props.selection.length} nodes selected`}>
+      <button type="button" className="rounded-md bg-input px-3 py-2 text-xs text-foreground" onClick={() => setExpandedSelection(key)}>Inspect selection</button>
+    </Section>
+    <div className="hidden"><FillSection doc={props.doc} node={undefined} selection={[]} /></div>
+  </>;
 }
