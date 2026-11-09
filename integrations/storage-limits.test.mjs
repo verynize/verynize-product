@@ -135,16 +135,32 @@ test("operation batches obey UTF-8 bytes and count with envelope headroom", () =
     id: String(i),
     value: "界".repeat(3_000_000),
   }));
+  // Each operation is above the batch limit, so each travels alone, under the message limit.
   const groups = R.batchOps(ops);
-  assert.equal(groups.length, 2);
+  assert.equal(groups.length, 3);
   assert.deepEqual(groups.flat(), ops);
   for (const group of groups)
     assert.ok(
       R.bytes({ type: "ops", batch: Number.MAX_SAFE_INTEGER, ops: group }) < R.MESSAGE_BYTES,
     );
+  // Several operations share a batch up to BATCH_BYTES (UTF-8, with the envelope).
+  const halves = Array.from({ length: 3 }, (_, i) => ({
+    t: "node",
+    id: String(i),
+    value: "界".repeat(600_000),
+  }));
+  const packed = R.batchOps(halves);
+  assert.deepEqual(
+    packed.map((b) => b.length),
+    [2, 1],
+  );
+  for (const group of packed)
+    assert.ok(
+      R.bytes({ type: "ops", batch: Number.MAX_SAFE_INTEGER, ops: group }) <= R.BATCH_BYTES,
+    );
   assert.deepEqual(
     R.batchOps(Array.from({ length: 8001 }, () => ({ t: "remove", id: "a" }))).map((b) => b.length),
-    [4000, 4000, 1],
+    [R.BATCH_OPS, 8001 - R.BATCH_OPS],
   );
   assert.equal(R.batchOps([{ value: "界".repeat(8_000_000) }]), null);
 });

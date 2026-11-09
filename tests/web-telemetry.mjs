@@ -26,6 +26,8 @@ execFileSync(
       SENTRY_DSN_WEB: "https://0123456789abcdef0123456789abcdef@sentry.invalid/1",
       SENTRY_ENVIRONMENT: "test",
       SENTRY_AUTH_TOKEN: "",
+      // Only release builds bake a DSN (web-start/build/telemetry.mjs).
+      VERYNIZE_RELEASE_BUILD: "1",
     },
   },
 );

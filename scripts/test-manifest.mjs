@@ -150,6 +150,7 @@ const AREA = {
     "desktop/capture-*.cjs",
     "desktop/render.cjs",
     "desktop/render-limits.cjs",
+    "desktop/render-bitmap.cjs",
     "desktop/preview-dom.cjs",
     "desktop/html-import.cjs",
     "integrations/export-*.mjs",
@@ -208,6 +209,7 @@ const AREA = {
   ],
   cloudRenderer: [
     "web/cloud-*.js",
+    "web/room-sync.js",
     "web/cloud-panel.css",
     "web/src/lib/cloud-account.ts",
     "web/src/lib/query/**",
@@ -217,6 +219,7 @@ const AREA = {
   ],
   cloud: [
     "cloud/**",
+    "web/room-sync.js",
     "scripts/auth-schema.mjs",
     "tests/fixtures/account-directory-v1.js",
     "tests/fixtures/cloud-worker-v1.js",
@@ -331,6 +334,16 @@ const canvas = [
   electron("tests/canvas-constraints.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-position.cjs", "canvas", AREA.inspector),
   electron("tests/canvas-compositing.cjs", "canvas", AREA.canvas),
+  electron("tests/render-readiness.cjs", "canvas", [
+    ...AREA.capture,
+    "desktop/render.cjs",
+    "desktop/assets.cjs",
+    "desktop/render-assets.cjs",
+    "scripts/render-test-main.cjs",
+    "web/asset-store.js",
+    "integrations/asset-store.mjs",
+    "integrations/asset-urls.cjs",
+  ]),
   electron("tests/render-export.cjs", "canvas", [...AREA.capture, "desktop/render.cjs"]),
   electron("tests/canvas-codec.cjs", "canvas", [
     ...AREA.canvas,
@@ -351,6 +364,7 @@ const canvas = [
   electron("tests/canvas-selection-marks.cjs", "canvas", AREA.canvas),
   electron("tests/canvas-frame-labels.cjs", "canvas", AREA.canvas),
   unit("tests/node-index.cjs", "canvas", ["web/node-index.js"]),
+  unit("tests/remote-apply.cjs", "canvas", ["web/remote-apply.js", "web/cloud-ops.js"]),
   electron("tests/canvas-text-caret.cjs", "canvas", AREA.canvas),
   electron("tests/canvas-world-bounds.cjs", "canvas", [...AREA.canvas, "web/document-safety.js"]),
   electron("tests/canvas-page.cjs", "canvas", AREA.canvas),
@@ -373,7 +387,11 @@ const canvas = [
   ]),
   electron("tests/canvas-bound-resize.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-effects.cjs", "canvas", AREA.inspector),
-  electron("tests/inspector-paints.cjs", "canvas", [...AREA.inspector, "integrations/paints.mjs"]),
+  electron("tests/inspector-paints.cjs", "canvas", [
+    ...AREA.inspector,
+    ...AREA.capture,
+    "integrations/paints.mjs",
+  ]),
   electron("tests/inspector-selection-colors.cjs", "canvas", AREA.inspector),
   electron("tests/inspector-typography.cjs", "canvas", [
     ...AREA.inspector,
@@ -400,6 +418,7 @@ const desktop = [
   ),
   unit("tests/desktop-projects.cjs", "desktop"),
   unit("tests/git-changes.cjs", "desktop"),
+  unit("tests/render-bitmap.cjs", "desktop", ["desktop/render-bitmap.cjs"]),
   unit("tests/render-limits.cjs", "desktop", ["desktop/render-limits.cjs"]),
   unit("tests/repositories.cjs", "desktop"),
   electron("tests/code-workspace.cjs", "desktop", [...AREA.code, ...AREA.preview], {
@@ -424,6 +443,12 @@ const desktop = [
     "web-start/src/server-telemetry.ts",
     "web-start/src/telemetry.ts",
   ]),
+  unit("tests/telemetry-process-loss.cjs", "desktop", ["desktop/telemetry.cjs"]),
+  unit("tests/telemetry-release-build.mjs", "desktop", [
+    "web-start/build/telemetry.mjs",
+    "scripts/env.mjs",
+    "vite.renderer.config.ts",
+  ]),
   electron("tests/telemetry-desktop.cjs", "desktop", [
     "desktop/telemetry.cjs",
     "web/telemetry-scrub.js",
@@ -431,6 +456,8 @@ const desktop = [
     "web/src/lib/telemetry/**",
     "web/src/islands/settings/telemetry.tsx",
     "web/src/islands/settings/pages.tsx",
+    "web/src/islands/onboarding/telemetry-prompt.tsx",
+    "web/src/islands/onboarding.tsx",
     "scripts/package-macos.cjs",
   ]),
   electron("tests/app-protocol.cjs", "desktop", [
@@ -590,6 +617,11 @@ const ux = [
     ...AREA.shell,
     "web/cloud-panel.js",
   ]),
+  electron("tests/library-unload-persistence.cjs", "ux", [
+    ...AREA.document,
+    ...AREA.shell,
+    "web/library-storage.js",
+  ]),
   electron("tests/cloud-async.cjs", "ux", AREA.cloudRenderer),
   electron("tests/shell-router.cjs", "ux", [...AREA.shell, ...AREA.cloudRenderer]),
   electron("tests/settings-route.cjs", "ux", [...AREA.settings, ...AREA.shell]),
@@ -633,6 +665,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-auth-bridge.mjs",
   "tests/cloud-orgs.mjs",
   "tests/cloud-account-state.mjs",
+  "tests/cloud-account-feed.mjs",
   "tests/cloud-share.mjs",
   "tests/cloud-directory-migration.mjs",
   "tests/cloud-merge.mjs",
@@ -652,13 +685,17 @@ export const CLOUD_SCENARIOS = [
 const cloud = [
   ...CLOUD_SCENARIOS,
   "tests/cloud-room-poison.mjs",
+  // Fault-injecting room subclass (workerd modules): workerd only.
+  "tests/cloud-sync-integrity.mjs",
   "tests/cloud-ops-indexed.mjs",
+  "tests/cloud-room-scale.mjs",
 ].map((file) => ({
   file,
   group: "cloud",
   lane: "cloud",
   covers: AREA.cloud,
 }));
+cloud.push(unit("tests/room-sync.mjs", "cloud", ["web/room-sync.js"]));
 const cloudNode = [...CLOUD_SCENARIOS, "tests/cloud-node-server.mjs"].map((file) => ({
   id: `node:${file}`,
   file,
@@ -719,9 +756,26 @@ const e2eCloud = [
     "web/wonder-shell.js",
   ]),
   electron("tests/cloud-desktop.mjs", "e2e-cloud", AREA.cloudRenderer),
+  electron("tests/cloud-undo-after-leave.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/remote-apply.js",
+    "web/commit-state.js",
+  ]),
+  electron("tests/cloud-gesture-remote.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/remote-apply.js",
+    "web/canvas-interactions.js",
+    "web/selection-chrome.js",
+    "web/text-caret.js",
+  ]),
   electron("tests/cloud-pages-desktop.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
     "web/page-loader.js",
+  ]),
+  electron("tests/cloud-sync-integrity-desktop.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/page-loader.js",
+    "web/storage-limits.js",
   ]),
   electron("tests/cloud-database-sync.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
@@ -779,6 +833,35 @@ const manual = [
 ];
 
 export const tests = [
+  {
+    file: "tests/renderer-commit-performance.cjs",
+    group: "canvas",
+    lane: "electron",
+    covers: [
+      "web/app.js",
+      "web/canvas-render.js",
+      "web/wonder-shell.js",
+      "web/commit-validation.js",
+      "web/commit-state.js",
+      "web/library-storage.js",
+      "web/selection-chrome.js",
+      "web/selection-bounds.js",
+      "web/lazy-document.js",
+      "web/src/islands/sidebar/**",
+      "web/src/islands/inspector/**",
+    ],
+  },
+  {
+    file: "tests/commit-state.cjs",
+    group: "canvas",
+    lane: "node",
+    covers: [
+      "web/commit-state.js",
+      "web/commit-validation.js",
+      "web/lazy-document.js",
+      "web/remote-apply.js",
+    ],
+  },
   ...canvas,
   ...desktop,
   ...integrations,

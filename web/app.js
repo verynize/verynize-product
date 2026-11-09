@@ -119,8 +119,10 @@ try {
   }
 } catch {}
 
-/* render() hands every subscriber its own copy of the document; a subscriber declared without a parameter gets none (no clone). */ const subscribers =
-  new Set();
+/* One frozen snapshot shared by all subscribers; getDocument retains its mutable-copy contract. */
+const commitState = window.VerynizeCommitState.store();
+const subscribers = new Set();
+let selectionNotify = 0;
 /* Components (web/component-core.js): render() syncs instances with their mains first; in-place edits are diffed against the previous sync's result, so the sync joins the edit's undo step. */ const componentSync =
   window.VerynizeComponents.live();
 const page = () => design.pages.find((p) => p.id === design.activePage),
@@ -273,7 +275,11 @@ function recenterPage() {
   canvasApi.setCamera(camera.x + dx * camera.zoom, camera.y + dy * camera.zoom, camera.zoom);
   render();
 }
-function render() {
+function render(selectionOnly = false) {
+  clearTimeout(selectionNotify);
+  selectionNotify = 0;
+  window.VerynizeLazyDocument.activate(design);
+  if (!selectionOnly) commitState.invalidate();
   if (!presenting) {
     if (worldGesture) {
       worldGestureRendered = true;
@@ -283,7 +289,7 @@ function render() {
       }
     } else commitWorldEdit();
   }
-  componentSync.sync(design);
+  if (!selectionOnly) componentSync.sync(design);
   if (!presenting) {
     presentationSerial++;
     $("#workspace").inert = false;
@@ -308,15 +314,16 @@ function render() {
     deferred = !presenting && !retain && canvasHidden();
   canvasStale = deferred;
   if (!retain && !deferred) {
-    canvasApi?.beforeRender?.();
+    if (!selectionOnly) canvasApi?.beforeRender?.();
     {
       const pg = design.pages.find((p) => p.id === design.activePage),
         ws = $("#workspace");
       ws.style.backgroundColor = (!pg?.backgroundHidden && pg?.background) || "";
       ws.classList.toggle("page-transparent", pg?.backgroundHidden === true);
     }
-    canvasRender.render();
-    for (const n of nodes()) {
+    if (selectionOnly) canvasRender.select();
+    else canvasRender.render();
+    for (const n of selectionOnly ? [] : nodes()) {
       const p = canvasRender.node(n.parentId) ?? null,
         w = sizingMode(n, "w", p),
         h = sizingMode(n, "h", p);
@@ -487,7 +494,8 @@ function render() {
   }
   if (!retain && !deferred) {
     updateMeasurement();
-    canvasApi?.afterRender();
+    if (selectionOnly) canvasApi?.afterSelection();
+    else canvasApi?.afterRender();
   }
   if (presenting) return;
   window.pageLoader?.render(design);
@@ -501,12 +509,24 @@ function render() {
     coordinator?.finish(pageSwitchToken);
     pageSwitchToken = null;
   }
-  save();
-  for (const fn of subscribers) {
-    try {
-      fn(fn.length ? structuredClone(design) : undefined);
-    } catch {}
+  if (!selectionOnly) {
+    save();
+    if (past.length && !worldGesture)
+      past[past.length - 1] = window.VerynizeCommitState.compact(past.at(-1), design);
   }
+  const snapshot = commitState.get(design);
+  const notify = () => {
+    selectionNotify = 0;
+    for (const fn of subscribers) {
+      try {
+        fn(fn.length ? snapshot : undefined);
+      } catch {}
+    }
+  };
+  // Let the count/bounds paint before React builds the inspector and visible tree rows.
+  if (selectionOnly && selection.size > 200) selectionNotify = setTimeout(notify, 0);
+  else notify();
+  return snapshot;
 }
 function add(type, extra = {}) {
   const parent = chosen()?.type === "frame" ? chosen() : null;
@@ -749,7 +769,9 @@ form.onchange = (e) => {
 $("#delete").onclick = () => {
   if (!selection.size) return;
   checkpoint();
-  const removed = new Set([...selection].flatMap((id) => [...descendants(id)]));
+  const index = window.VerynizeNodeIndex.of(nodes());
+  const roots = index.topmost(nodes().filter((node) => selection.has(node.id)));
+  const removed = new Set(roots.flatMap((node) => [...index.descendants(node.id)]));
   page().nodes = nodes().filter((n) => !removed.has(n.id));
   selection.clear();
   render();
@@ -776,18 +798,20 @@ $("#duplicate").onclick = () => {
 $("#undo").onclick = () => {
   if (window.cloudHistory?.undo()) return;
   if (!past.length) return;
-  future.push(JSON.stringify(design));
+  const applied = window.VerynizeCommitState.apply(past.pop(), design);
+  future.push(applied.inverse);
   pendingWorldEdit = null;
-  design = JSON.parse(past.pop());
+  design = applied.document;
   scheduleWorldNotice();
   render();
 };
 $("#redo").onclick = () => {
   if (window.cloudHistory?.redo()) return;
   if (!future.length) return;
-  past.push(JSON.stringify(design));
+  const applied = window.VerynizeCommitState.apply(future.pop(), design);
+  past.push(applied.inverse);
   pendingWorldEdit = null;
-  design = JSON.parse(future.pop());
+  design = applied.document;
   scheduleWorldNotice();
   render();
 };
@@ -1175,6 +1199,7 @@ canvasApi = window.BetterCanvas.install({
     selection = new Set(ids);
   },
   render,
+  renderSelection: () => render(true),
   renderCanvas,
   beginGesture: () => {
     worldGesture = true;
@@ -1203,24 +1228,32 @@ window.verynize = {
     const wanted = new Set(ids),
       targets = nodes().filter((n) => wanted.has(n.id));
     if (!targets.length) return false;
-    const before = JSON.stringify(design),
+    const before = worldGesture
+        ? window.VerynizeCommitState.freeze(structuredClone(design))
+        : commitState.get(design),
       old = targets.map((n) => structuredClone(n));
     for (const n of targets)
       Object.assign(n, typeof patch === "function" ? patch(structuredClone(n)) : patch);
     try {
       window.imageUpload.preflightChange(design, old, targets);
       componentSync.sync(design);
-      validate(structuredClone(design));
-      window.VerynizeDocument.validateWorldBoundsChange(JSON.parse(before), design);
+      window.VerynizeCommitValidation.schema(before, design, old, targets);
+      window.VerynizeCommitValidation.world(before, design, old, targets);
     } catch (error) {
-      design = JSON.parse(before);
+      design = structuredClone(before);
+      commitState.invalidate();
       throw error;
     }
-    past.push(before);
+    past.push(
+      !worldGesture && !window.VerynizeComponents.hasComponents(design)
+        ? { before, page: design.activePage, nodeEdit: targets.map((node) => node.id) }
+        : before,
+    );
     if (past.length > 100) past.shift();
     future = [];
     scheduleWorldNotice();
-    render();
+    const committed = render();
+    if (committed === commitState.get(design)) window.VerynizeCommitValidation.remember(committed);
     return true;
   },
   addNode: (type, extra = {}) => {
@@ -1326,11 +1359,12 @@ window.verynize = {
   getSelection: () => [...selection],
   setSelection: (ids) => {
     selection = new Set(ids.filter((id) => window.VerynizeNodeIndex.find(nodes(), id)));
-    render();
+    render(true);
   },
   exportArtwork,
   exportPrintHTML,
   getDocument: () => structuredClone(design),
+  getSnapshot: () => commitState.get(design),
   loadDocument: (d) => {
     const checked = window.documentSafety.load(d);
     const edits = editCount;
@@ -1342,6 +1376,38 @@ window.verynize = {
     selection.clear();
     render();
   },
+  /* Collaborators' edits (web/remote-apply.js, from web/cloud-panel.js): patched in node by node with no undo step,
+     keeping unchanged nodes, the selection and the nodes a gesture in progress holds. Returns the held ids.
+     The room's own history (cloudHistory) undoes meanwhile; local entries address nodes by position, so after a
+     remote patch they would rewrite collaborators' layers once the room is left, and are dropped. */
+  applyRemote: (d) => {
+    past.length = 0;
+    future = [];
+    const held = window.remoteApply.held(design, selection, worldGesture);
+    const next = window.documentSafety.load(d);
+    window.VerynizeLazyDocument.match(next, design);
+    design = window.remoteApply.patch(design, next, held);
+    selection = new Set([...selection].filter((id) => window.VerynizeNodeIndex.find(nodes(), id)));
+    scheduleWorldNotice();
+    render();
+    return held;
+  },
+  /* Editor defaults on every page (pages are otherwise prepared when first shown): no visible change, no undo step. */
+  prepareAllPages: () => {
+    window.VerynizeLazyDocument.prepareAll(design);
+    commitState.invalidate();
+  },
+  gesturing: () => worldGesture,
+  /* The live nodes a pointer gesture holds (read only), or null outside one. */
+  gestureNodes: () =>
+    worldGesture
+      ? {
+          page: design.activePage,
+          nodes: [...window.remoteApply.held(design, selection, true)]
+            .map((id) => window.VerynizeNodeIndex.find(nodes(), id))
+            .filter(Boolean),
+        }
+      : null,
   exportHTML,
   subscribe: (fn) => {
     subscribers.add(fn);
@@ -1636,7 +1702,12 @@ async function exportArtwork({
     root.outerHTML +
     (shader ? "<script>" + window.BetterShaders.runtimeSource() + "</script>" : "") +
     "</body></html>";
-  if (format === "HTML") return { content: html, mime: "text/html", width: w, height: h };
+  const portableMarkup = async (markup) => {
+    const cloud = await (window.cloudAssets?.inlineHtml?.(markup) ?? markup);
+    return window.assetStore ? window.assetStore.inlineMarkup(cloud) : cloud;
+  };
+  if (format === "HTML")
+    return { content: await portableMarkup(html), mime: "text/html", width: w, height: h };
   if (format === "SVG") {
     const clone = root.cloneNode(true);
     for (const node of clone.querySelectorAll("[data-shader-preset]")) {
@@ -1658,7 +1729,9 @@ async function exportArtwork({
       }
     }
     return {
-      content: `<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`,
+      content: await portableMarkup(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${window.embeddedFontCss?.(clone.outerHTML) || ""}</style>${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`,
+      ),
       mime: "image/svg+xml",
       width: Math.ceil(w * scale),
       height: Math.ceil(h * scale),
@@ -1666,9 +1739,9 @@ async function exportArtwork({
   }
   if (!window.verynizePlatform.can("rasterExport"))
     throw Error("Open the desktop app for pixel-accurate raster export.");
-  /* cloud-assets: room images are inlined, the offscreen renderer loads no network URLs */ const raster =
+  /* The main process resolves room/hash assets through its per-render protocol allowlist. */ const raster =
     await window.desktop.renderDesign({
-      html: await (window.cloudAssets?.inlineHtml?.(html) ?? html),
+      html,
       width: Math.ceil(w - 1e-3),
       height: Math.ceil(h - 1e-3),
       scale,

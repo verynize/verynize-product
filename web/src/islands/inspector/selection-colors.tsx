@@ -199,11 +199,17 @@ export function coveredNodes(doc: DesignDocument, selection: string[]): Node[] {
   const nodes = pageNodes(doc);
   const wanted = new Set(selection);
   const seen = new Set<string>();
+  const children = new Map<string | null, Node[]>();
+  for (const node of nodes) {
+    const group = children.get(node.parentId) || [];
+    group.push(node);
+    children.set(node.parentId, group);
+  }
   const out: Node[] = [];
   const visit = (node: Node) => {
     if (seen.has(node.id)) return;
     seen.add(node.id);
-    for (const child of nodes) if (child.parentId === node.id) visit(child);
+    for (const child of children.get(node.id) || []) visit(child);
     out.push(node);
   };
   for (const node of nodes) if (wanted.has(node.id)) visit(node);
@@ -214,13 +220,20 @@ export function coveredNodes(doc: DesignDocument, selection: string[]): Node[] {
 export function selectionColors(doc: DesignDocument, selection: string[]): ColorGroup[] {
   const tokens = doc.tokens ?? {};
   const groups = new Map<string, ColorGroup>();
+  const uses = new Map<string, Set<string>>();
   for (const node of coveredNodes(doc, selection))
     for (const use of colorUses(node, tokens)) {
       const key = keyOf(use);
       const group = groups.get(key);
       if (group) {
-        if (!group.ids.includes(node.id)) group.ids.push(node.id);
-      } else groups.set(key, { key, color: use.color, token: use.token, ids: [node.id] });
+        if (!uses.get(key)?.has(node.id)) {
+          group.ids.push(node.id);
+          uses.get(key)?.add(node.id);
+        }
+      } else {
+        groups.set(key, { key, color: use.color, token: use.token, ids: [node.id] });
+        uses.set(key, new Set([node.id]));
+      }
     }
   return [...groups.values()];
 }
@@ -293,6 +306,7 @@ export function SelectionColorsSection({
   node: Node;
   selection: string[];
 }) {
+  const [visible, setVisible] = useState(40);
   if (!showsSelectionColors(doc, node, selection)) return null;
   const groups = selectionColors(doc, selection);
   if (!groups.length) return null;
@@ -348,7 +362,7 @@ export function SelectionColorsSection({
       }
     >
       <div className="flex flex-col gap-2" data-selection-colors={groups.length}>
-        {groups.map((group, index) => (
+        {groups.slice(0, visible).map((group, index) => (
           <ColorRow
             // Keyed by position: rebinding a row changes its colour key, and the open picker must stay open.
             key={index}
@@ -357,6 +371,15 @@ export function SelectionColorsSection({
             tokens={tokens}
           />
         ))}
+        {visible < groups.length && (
+          <button
+            type="button"
+            className="rounded-md bg-input px-3 py-2 text-xs"
+            onClick={() => setVisible(visible + 40)}
+          >
+            Show more colors ({groups.length - visible})
+          </button>
+        )}
       </div>
     </Section>
   );

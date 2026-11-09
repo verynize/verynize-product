@@ -1,10 +1,19 @@
+// First: the design engine's resources must be in place before any chunk that holds the engine
+// evaluates, and the bundler may split the engine into a chunk shared with lazily loaded importers.
+import "#mcp-env";
 import { sql } from "drizzle-orm";
 import { database } from "./db.js";
-import { ACCOUNT_REQUEST_BYTES, readAccountState, writeAccountState } from "./account-state.js";
+import {
+  ACCOUNT_REQUEST_BYTES,
+  readAccountItem,
+  readAccountState,
+  writeAccountState,
+} from "./account-state.js";
 // Verynize collaboration Worker: routes the HTTP API to the room, account and app Durable Objects.
 // API reference: cloud/README.md.
 import {
   json,
+  jsonWithEtag,
   corsHeaders,
   fail,
   readJson,
@@ -301,7 +310,20 @@ async function handleAuth(request, env, url) {
   }
   if (path === "/api/me/state" && request.method === "GET") {
     const account = await requireAccount(env, request, url);
-    return json({ ...(await readAccountState(env, account.id)), account });
+    const since = url.searchParams.get("since");
+    if (since !== null && !/^\d{1,16}$/.test(since)) fail(400, "Invalid change cursor");
+    const state = await readAccountState(env, account.id, {
+      chats: url.searchParams.get("chats") === "summary" ? "summary" : "full",
+      since: since === null ? -1 : Number(since),
+    });
+    return jsonWithEtag(request, { ...state, account });
+  }
+  if (path.startsWith("/api/me/state/") && request.method === "GET") {
+    const account = await requireAccount(env, request, url);
+    const key = decodeURIComponent(path.slice("/api/me/state/".length));
+    const item = await readAccountItem(env, account.id, key);
+    if (!item) fail(404, "No such account record");
+    return jsonWithEtag(request, { item });
   }
   if (path.startsWith("/api/me/state/") && request.method === "PUT") {
     const account = await requireAccount(env, request, url);
@@ -576,7 +598,7 @@ async function handleRooms(request, env, url) {
   const orgRole = account?.authUser ? await orgRoomRole(env, roomId, account.authUser.id) : null;
   const forward = new URL("https://room" + action);
   if (action === "/socket")
-    for (const key of ["token", "client", "lazy"])
+    for (const key of ["token", "client", "lazy", "presence"])
       if (url.searchParams.get(key)) forward.searchParams.set(key, url.searchParams.get(key));
   // Lazy page loading (cloud/room-store.js): `lazy=1&page=<id>` on GET /room, `id=<page>` on /pages.
   if (action === "/versions" && url.searchParams.get("artboard"))
@@ -924,8 +946,12 @@ async function serveApp(request, env, url) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Desktop requests are cross-origin with a session header: let browsers reuse one preflight.
     if (request.method === "OPTIONS")
-      return new Response(null, { status: 204, headers: corsHeaders });
+      return new Response(null, {
+        status: 204,
+        headers: { ...corsHeaders, "access-control-max-age": "7200" },
+      });
     try {
       // The directory moved to D1: copy the AccountDirectory data once, before it is read.
       if (/^\/(api|u|apps)\//.test(url.pathname)) await profiles.migrateDirectory(env);

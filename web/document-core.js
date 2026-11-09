@@ -246,6 +246,7 @@
 
   /** Room asset URLs (cloud/assets.js): https (http only on loopback), no credentials, exactly
    * /api/rooms/<uuid>/assets/<uuid> with an optional ?sig=<64 hex>. */
+  const isAssetRef = (value) => typeof value === "string" && /^asset:[a-f0-9]{64}$/.test(value);
   function isRoomAssetUrl(value) {
     if (typeof value !== "string" || value.length > 512) return false;
     let url;
@@ -395,6 +396,7 @@
         f.src.length > 3e6 ||
         !(
           /^data:font\/(woff2|woff|ttf|otf);base64,[A-Za-z0-9+/=]+$/.test(f.src) ||
+          /^asset:[a-f0-9]{64}$/.test(f.src) ||
           isRoomAssetUrl(f.src)
         )
       )
@@ -568,6 +570,7 @@
     if (
       node.src &&
       !/^data:image\/(png|jpeg|webp|gif|svg\+xml);/i.test(node.src) &&
+      !/^asset:[a-f0-9]{64}$/.test(node.src) &&
       !isRoomAssetUrl(node.src)
     )
       throw new Error("Image source must be an embedded image or a room asset URL");
@@ -943,12 +946,14 @@
     validateWorldBoundsChange,
     nodeLimitMessage,
     validateDocument,
+    validateNode,
     normalizeDocument,
     resolveAliases,
     prepareDocument,
     documentProblems,
     validateAliases,
     isRoomAssetUrl,
+    isAssetRef,
     checkVariableValue,
     variableKind,
     IMAGE_FILL_TYPES,

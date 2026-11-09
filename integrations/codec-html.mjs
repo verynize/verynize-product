@@ -180,8 +180,8 @@ function makeElement(tag, attrs, parent) {
 
 /** Parse HTML into a tree of {tag, attrs, children, parent} elements and {text} nodes. */
 export function parseHtml(source) {
-  if (String(source).length > 5_000_000)
-    throw new Error("HTML parse stage exceeds 5000000 characters");
+  if (Buffer.byteLength(String(source), "utf8") > 5_000_000)
+    throw new Error("HTML source exceeds limit 5000000 bytes");
   const s = String(source || "").replace(/^﻿/, "");
   const root = makeElement("#document", {}, null);
   const stack = [root];
@@ -406,6 +406,7 @@ class Loader {
       const m = u.href.match(/^data:([^;,]*)(;base64)?,(.*)$/s);
       if (!m) throw new Error("invalid data URL");
       const buf = m[2] ? Buffer.from(m[3], "base64") : Buffer.from(decodeURIComponent(m[3]));
+      this.account(buf, maxBytes, kind);
       return { buf, url: u };
     }
     if (++this.count > this.opts.maxSheets * 4) throw new Error("too many external resources");
@@ -420,7 +421,10 @@ class Loader {
         throw new Error(`${kind} ${u.href} is outside the import folder`);
       const info = await stat(file);
       if (!info.isFile()) throw new Error(`${kind} ${u.href} is not a file`);
-      if (info.size > maxBytes) throw new Error(`${kind} ${u.href} exceeds ${maxBytes} bytes`);
+      if (info.size > maxBytes)
+        throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+          code: "import_limit",
+        });
       buf = await readFile(file);
     } else if (u.protocol === "http:" || u.protocol === "https:") {
       if (!this.opts.allowRemote)
@@ -433,7 +437,9 @@ class Loader {
       if (!res.ok) throw new Error(`${kind} ${u.href}: HTTP ${res.status}`);
       const declared = Number(res.headers.get("content-length"));
       if (Number.isFinite(declared) && declared > maxBytes)
-        throw new Error(`${kind} ${u.href} exceeds ${maxBytes} bytes`);
+        throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+          code: "import_limit",
+        });
       const reader = res.body?.getReader?.();
       if (reader) {
         const chunks = [];
@@ -444,17 +450,32 @@ class Loader {
           size += value.byteLength;
           if (size > maxBytes) {
             await reader.cancel().catch(() => {});
-            throw new Error(`${kind} ${u.href} exceeds ${maxBytes} bytes`);
+            throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+              code: "import_limit",
+            });
           }
           chunks.push(Buffer.from(value));
         }
         buf = Buffer.concat(chunks);
       } else buf = Buffer.from(await res.arrayBuffer());
     } else throw new Error(`unsupported URL scheme ${u.protocol}`);
+    this.account(buf, maxBytes, kind);
+    return { buf, url: u };
+  }
+  account(buf, maxBytes, kind) {
+    if (buf.length > maxBytes)
+      throw Object.assign(
+        Error(`${kind} exceeds limit ${maxBytes} bytes (received ${buf.length} bytes)`),
+        { code: "import_limit" },
+      );
     this.total += buf.length;
     if (this.total > this.opts.totalBytes)
-      throw new Error(`external resources exceed ${this.opts.totalBytes} bytes in total`);
-    return { buf, url: u };
+      throw Object.assign(
+        Error(
+          `Import resources exceed limit ${this.opts.totalBytes} bytes (received ${this.total} bytes)`,
+        ),
+        { code: "import_limit" },
+      );
   }
 }
 
@@ -956,6 +977,7 @@ export async function importHtml(html, options = {}) {
           depth + 1,
         );
       } catch (error) {
+        if (error.code === "import_limit" || error.code === "asset_write") throw error;
         warnings.push(`@import ${target.href}: ${error.message}`);
       }
     }
@@ -1008,6 +1030,7 @@ export async function importHtml(html, options = {}) {
       const { buf } = await loader.load(target);
       await addSheet(buf.toString("utf8"), target, { media: [], layer: null }, 0);
     } catch (error) {
+      if (error.code === "import_limit" || error.code === "asset_write") throw error;
       warnings.push(`Stylesheet ${target.href}: ${error.message}`);
     }
   }
@@ -1365,6 +1388,13 @@ export async function importHtml(html, options = {}) {
   };
   const elementCount = { n: 0 };
   const imageCache = new Map();
+  const saveImage = async (data, type) => {
+    try {
+      return await options.assetSink(data, type);
+    } catch (error) {
+      throw Object.assign(Error("Asset storage failed: " + error.message), { code: "asset_write" });
+    }
+  };
   const embedImage = async (url, kind) => {
     if (imageCache.has(url.href)) return imageCache.get(url.href);
     let result = null;
@@ -1378,11 +1408,14 @@ export async function importHtml(html, options = {}) {
       }
       if (type && data)
         result = {
-          src: `data:${type};base64,${data.toString("base64")}`,
+          src: options.assetSink
+            ? (await saveImage(data, type)).ref
+            : `data:${type};base64,${data.toString("base64")}`,
           size: imageSize(data, type),
         };
       else warnings.push(`${kind} ${url.href} is not a supported image`);
     } catch (error) {
+      if (error.code === "import_limit" || error.code === "asset_write") throw error;
       warnings.push(`${kind} ${url.href}: ${error.message}`);
     }
     imageCache.set(url.href, result);
@@ -1845,12 +1878,15 @@ export async function importHtml(html, options = {}) {
         vectorMarkup = clean;
         if (clean) {
           const buf = Buffer.from(clean);
-          src = `data:image/svg+xml;base64,${buf.toString("base64")}`;
+          loader.account(buf, opts.maxImageBytes, "Inline SVG");
+          src = options.assetSink
+            ? (await options.assetSink(buf, "image/svg+xml")).ref
+            : `data:image/svg+xml;base64,${buf.toString("base64")}`;
           size = imageSize(buf, "image/svg+xml");
         }
       } else {
         const ref = el.attrs.src || el.attrs["data-src"] || "";
-        if (/^data:image\//i.test(ref)) src = ref;
+        if (/^asset:[a-f0-9]{64}$/.test(ref)) src = ref;
         else if (ref) {
           const target = resolveUrl(ref);
           if (

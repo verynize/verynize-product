@@ -7,7 +7,7 @@ import { attachSettings } from "./settings/api";
 import { startPreferenceRuntime } from "./settings/preference-runtime";
 import { SettingsScreen } from "./settings/SettingsScreen";
 import { GlobalSearchDialog } from "./settings/projects";
-import { DialogEnhancer, ExportToasts } from "./settings/dialogs";
+import { DialogEnhancer } from "./settings/dialogs";
 import { TextPrompt } from "./settings/text-prompt";
 import { PreviewImportDialog } from "./settings/preview-import";
 import { FigmaDialog } from "./settings/figma-dialog";
@@ -27,7 +27,6 @@ function Island() {
       <TemplatesDialog />
       <ViewsDialog />
       <DialogEnhancer />
-      <ExportToasts />
       <Toaster position="bottom-right" offset={16} visibleToasts={3} />
     </>
   );

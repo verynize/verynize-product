@@ -4,6 +4,8 @@
 //                                              deploy:check, package:mac)
 // Variables already exported win over .env. No .env: the command runs with the environment unchanged.
 // VERYNIZE_ENV_FILE names another file (tests/env-build.mjs). Only variable names are ever printed, never values.
+// It also sets VERYNIZE_RELEASE_BUILD=1: only these builds bake Sentry DSNs and upload source maps
+// (web-start/build/telemetry.mjs), whatever a plain `vp build` finds in .env.
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
@@ -33,7 +35,10 @@ if (fs.existsSync(file)) {
     );
 }
 
-const run = spawnSync(command, args, { stdio: "inherit", env: { ...loaded, ...process.env } });
+const run = spawnSync(command, args, {
+  stdio: "inherit",
+  env: { ...loaded, ...process.env, VERYNIZE_RELEASE_BUILD: "1" },
+});
 if (run.error) {
   console.error(`env: could not run ${command}: ${run.error.message}`);
   process.exit(1);

@@ -28,6 +28,38 @@ try {
   );
   await page.waitForFunction(() => window.accountStore.ready());
   await page.evaluate(() => window.accountStore.flush());
+
+  // Reads: no short polling, none after a write, and an unchanged feed costs a 304 without a body.
+  const reads = [];
+  page.on("response", (response) => {
+    const url = new URL(response.url());
+    if (url.pathname.startsWith("/api/me/state") && response.request().method() === "GET")
+      reads.push({
+        path: url.pathname + url.search,
+        status: response.status(),
+        etag: response.request().headers()["if-none-match"] || "",
+      });
+  });
+  // A focus right after a read does not read again; the poll itself waits 30 s or more.
+  await page.evaluate(() => window.accountStore.refresh());
+  reads.length = 0;
+  await new Promise((resolve) => setTimeout(resolve, 4000));
+  assert.deepEqual(reads, [], "no reads while idle (the poll waits 30 s or more)");
+  await page.evaluate(() => window.accountStore.put("preference:poll-test", 1));
+  await page.evaluate(() => window.accountStore.flush());
+  assert.deepEqual(reads, [], "a save needs no read afterwards");
+  // The first read returns this window's own save and moves the cursor past it.
+  for (let i = 0; i < 3; i++) await page.evaluate(() => window.accountStore.refresh());
+  assert.equal(reads.length, 3);
+  for (const read of reads) assert.match(read.path, /^\/api\/me\/state\?chats=summary&since=\d+$/);
+  assert.deepEqual(
+    reads.map((read) => read.status),
+    [200, 200, 304],
+  );
+  assert.equal(reads[1].path, reads[2].path);
+  assert.match(reads[2].etag, /^"[0-9a-f]{32}"$/);
+  console.log("PASS feed reads: no idle polling, no read after a save, 304 when unchanged");
+
   const attempts = [];
   page.on("request", (request) => {
     if (

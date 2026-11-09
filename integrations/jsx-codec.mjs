@@ -1020,8 +1020,8 @@ export function parseJsx(
   { maxLength = 5_000_000, maxElements = NODE_LIMITS.perDocument } = {},
 ) {
   if (typeof source !== "string") throw new JsxSyntaxError("Code must be a string");
-  if (source.length > maxLength)
-    throw new JsxSyntaxError(`JSX parse stage exceeds ${maxLength} characters`);
+  if (Buffer.byteLength(source, "utf8") > maxLength)
+    throw new JsxSyntaxError(`JSX source exceeds limit ${maxLength} bytes`);
   let src = source.replace(/^﻿/, "");
   const imports = [];
   src = src.replace(/^\s*import\s[^;\n]*?from\s*['"][^'"]+['"]\s*;?[ \t]*$/gm, (line) => {

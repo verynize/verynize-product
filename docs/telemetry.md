@@ -92,6 +92,13 @@ DSNs are public routing keys, but they still come from the environment and are n
 `npm run build`, `deploy`, `deploy:check` and `package:mac` also read a git-ignored `.env` at the repo root
 (`scripts/env.mjs`): variables already exported win, and only variable names are printed, never values.
 
+Only those release builds bake a DSN into the web client or Worker and upload source maps: `scripts/env.mjs` sets
+`VERYNIZE_RELEASE_BUILD=1`, and `web-start/build/telemetry.mjs` / `vite.renderer.config.ts` ignore every Sentry
+variable without it. Any other `vp build` (the test runner, the cloud harness, `build:web:*`) still finds `.env`,
+because TanStack Start's `load-env` plugin copies it into `process.env`, but builds without reporting. Never put
+`VERYNIZE_RELEASE_BUILD` in `.env` (a build refuses to start when it is there); a CI or self-hosted release build
+exports it with its DSNs.
+
 | Variable                                          | Where                                                                                                        | Used by                                                       |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
 | `SENTRY_DSN_DESKTOP`                              | dev run environment; `npm run package:mac` environment (written to the app's `desktop/telemetry-build.json`) | desktop                                                       |

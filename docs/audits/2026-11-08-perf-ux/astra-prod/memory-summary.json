@@ -1,0 +1,18 @@
+{
+  "audit": {
+    "snapshotMB": 554,
+    "objectCount": 6818970,
+    "objectMB": 549,
+    "context": "same tab after Spaces, retained objects; not clean scene baseline"
+  },
+  "spacesFirstAttempt": {
+    "completed": false,
+    "lastProgressPercent": 100,
+    "reason": "DevTools became unresponsive; closed/reopened; renderer later changed"
+  },
+  "spacesSecondAttempt": {
+    "completed": false,
+    "lastProgressPercent": 95,
+    "reason": "Progress stalled; DevTools closed for cleanup. No raw heap snapshot exported."
+  }
+}

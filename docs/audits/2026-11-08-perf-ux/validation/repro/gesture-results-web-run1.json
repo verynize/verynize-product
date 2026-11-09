@@ -1,0 +1,1742 @@
+{
+  "gesturer": "web",
+  "remote": "desktop",
+  "room": "AUDIT collab test (delete me)",
+  "ids": {
+    "A": "aba8ea10-5f73-4595-b6da-cc056e35f247",
+    "B": "24577de7-e37d-4e14-bfe5-d5fc18739e80",
+    "R": "5fac1410-9fed-4853-998b-9c1920b8d5af",
+    "T": "6395abfb-4a3e-42d4-89cc-53302d695e1d"
+  },
+  "startedAt": "2026-11-08T23:11:12.475Z",
+  "trials": [
+    {
+      "scenario": "drag",
+      "withRemote": false,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "remoteEdit": null,
+      "upAtMs": 1967,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1976,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 2376,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 437
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1967,
+      "moveSamples": [
+        {
+          "t": 15,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 98,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 181,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 265,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 348,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 432,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 515,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 971,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1048,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1125,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1200,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1276,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1351,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1426,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1502,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1577,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1653,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1729,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1804,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 786,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Saved shared revision 98",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "remoteEdit": {
+        "color": "#c0392b",
+        "atMsAfterDown": 456,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 1497,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1505,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 1893,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        },
+        {
+          "dir": "recv",
+          "atMs": 11155,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1497,
+      "moveSamples": [
+        {
+          "t": 5,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 80,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 155,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 239,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 322,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 398,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 474,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 549,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 624,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 698,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 774,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 856,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 939,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1016,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1092,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1172,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1248,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1323,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1398,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 1117,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Synced revision 101",
+      "shot": "screens/gesture-drag-web-after.png"
+    },
+    {
+      "scenario": "drag",
+      "withRemote": false,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "remoteEdit": null,
+      "upAtMs": 1511,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1518,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 2066,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1511,
+      "moveSamples": [
+        {
+          "t": 11,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 88,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 164,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 241,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 317,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 393,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 469,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 545,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 628,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 704,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 780,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 855,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 930,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1006,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1094,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1177,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1261,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1337,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1413,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 1059,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Saved shared revision 103",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "remoteEdit": {
+        "color": "#27ae60",
+        "atMsAfterDown": 472,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 1480,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1485,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 3510,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        },
+        {
+          "dir": "recv",
+          "atMs": 3756,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1480,
+      "moveSamples": [
+        {
+          "t": 2,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 79,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 154,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 228,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 303,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 379,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 455,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 530,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 606,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 681,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 757,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 836,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 913,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 988,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1064,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1140,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1215,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1301,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1377,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [],
+      "status": "Synced revision 106",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "remoteEdit": {
+        "color": "#2980b9",
+        "atMsAfterDown": 463,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 1575,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1581,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 1841,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        },
+        {
+          "dir": "recv",
+          "atMs": 5477,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1575,
+      "moveSamples": [
+        {
+          "t": 4,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 87,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 170,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 271,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 354,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 437,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 521,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 604,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 680,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 757,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 837,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 921,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1003,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1087,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1171,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1253,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1327,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1401,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1477,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 931,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Synced revision 109",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": false,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": null,
+      "upAtMs": 1484,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1491,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 3833,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1484,
+      "moveSamples": [
+        {
+          "t": 37,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 127,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 206,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 282,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 359,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 434,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 513,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 589,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 665,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 741,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 816,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 893,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 968,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1044,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1118,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1195,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1271,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1347,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1424,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Saved shared revision 111",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": {
+        "color": "#8e44ad",
+        "atMsAfterDown": 473
+      },
+      "upAtMs": 1504,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1503,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 1841,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        },
+        {
+          "dir": "recv",
+          "atMs": 5748,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1504,
+      "moveSamples": [
+        {
+          "t": 24,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 122,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 196,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 271,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 348,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 423,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 500,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 575,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 656,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 732,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 809,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 885,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 961,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1038,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1113,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1189,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1275,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1352,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1428,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Synced revision 114",
+      "shot": "screens/gesture-resize-web-after.png"
+    },
+    {
+      "scenario": "resize",
+      "withRemote": false,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": null,
+      "upAtMs": 1460,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1460,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 1978,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1460,
+      "moveSamples": [
+        {
+          "t": 12,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 92,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 168,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 244,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 320,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 397,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 471,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 547,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 622,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 699,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 775,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 850,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 926,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1002,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1078,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1154,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1228,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1304,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1381,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Saved shared revision 116",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": {
+        "color": "#d35400",
+        "atMsAfterDown": 482
+      },
+      "upAtMs": 1527,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1528,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 1837,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        },
+        {
+          "dir": "recv",
+          "atMs": 5694,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1527,
+      "moveSamples": [
+        {
+          "t": 31,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 132,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 215,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 298,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 374,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 463,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 540,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 616,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 690,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 766,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 841,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 918,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 993,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1069,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1147,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1223,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1299,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1375,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1451,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Synced revision 119",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": {
+        "color": "#16a085",
+        "atMsAfterDown": 544
+      },
+      "upAtMs": 1572,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1570,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 1900,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        },
+        {
+          "dir": "recv",
+          "atMs": 5788,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1572,
+      "moveSamples": [
+        {
+          "t": 43,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 124,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 201,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 277,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 353,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 444,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 527,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 611,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 692,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 778,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 861,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 945,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1028,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1105,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1182,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1259,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1343,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1427,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1511,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Synced revision 122",
+      "shot": null
+    },
+    {
+      "scenario": "text",
+      "withRemote": false,
+      "expected": "Hello one two",
+      "gesturerAfter": "Hello one two",
+      "remoteClientAfter": "Hello one two",
+      "serverAfter": "Hello one two",
+      "matchesExpected": true,
+      "beforeRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterTyping": {
+        "editing": true,
+        "text": "Hello one two",
+        "caret": 13,
+        "sameElement": true,
+        "focused": true
+      },
+      "remoteEdit": null,
+      "setDocuments": [],
+      "status": "Saved shared revision 124",
+      "shot": null
+    },
+    {
+      "scenario": "text",
+      "withRemote": true,
+      "expected": "Hello one two",
+      "gesturerAfter": " twoHello one",
+      "remoteClientAfter": " twoHello one",
+      "serverAfter": " twoHello one",
+      "matchesExpected": false,
+      "beforeRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 0,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterTyping": {
+        "editing": true,
+        "text": " twoHello one",
+        "caret": 4,
+        "sameElement": true,
+        "focused": true
+      },
+      "remoteEdit": {
+        "color": "#c0392b"
+      },
+      "setDocuments": [
+        {
+          "ms": 2,
+          "T": "Hello"
+        }
+      ],
+      "status": "Saved shared revision 127",
+      "shot": "screens/gesture-text-web-editing.png"
+    },
+    {
+      "scenario": "text",
+      "withRemote": false,
+      "expected": "Hello one two",
+      "gesturerAfter": "Hello one two",
+      "remoteClientAfter": "Hello one two",
+      "serverAfter": "Hello one two",
+      "matchesExpected": true,
+      "beforeRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterTyping": {
+        "editing": true,
+        "text": "Hello one two",
+        "caret": 13,
+        "sameElement": true,
+        "focused": true
+      },
+      "remoteEdit": null,
+      "setDocuments": [],
+      "status": "Saved shared revision 129",
+      "shot": null
+    },
+    {
+      "scenario": "text",
+      "withRemote": true,
+      "expected": "Hello one two",
+      "gesturerAfter": " twoHello one",
+      "remoteClientAfter": " twoHello one",
+      "serverAfter": " twoHello one",
+      "matchesExpected": false,
+      "beforeRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 0,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterTyping": {
+        "editing": true,
+        "text": " twoHello one",
+        "caret": 4,
+        "sameElement": true,
+        "focused": true
+      },
+      "remoteEdit": {
+        "color": "#27ae60"
+      },
+      "setDocuments": [
+        {
+          "ms": 2,
+          "T": "Hello"
+        }
+      ],
+      "status": "Saved shared revision 132",
+      "shot": null
+    },
+    {
+      "scenario": "text",
+      "withRemote": true,
+      "expected": "Hello one two",
+      "gesturerAfter": " twoHello one",
+      "remoteClientAfter": " twoHello one",
+      "serverAfter": " twoHello one",
+      "matchesExpected": false,
+      "beforeRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 9,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterRemote": {
+        "editing": true,
+        "text": "Hello one",
+        "caret": 0,
+        "sameElement": true,
+        "focused": true
+      },
+      "afterTyping": {
+        "editing": true,
+        "text": " twoHello one",
+        "caret": 4,
+        "sameElement": true,
+        "focused": true
+      },
+      "remoteEdit": {
+        "color": "#2980b9"
+      },
+      "setDocuments": [
+        {
+          "ms": 2,
+          "T": "Hello"
+        }
+      ],
+      "status": "Saved shared revision 135",
+      "shot": null
+    }
+  ],
+  "shotBefore": "screens/gesture-before-web.png",
+  "finishedAt": "2026-11-08T23:14:06.825Z"
+}

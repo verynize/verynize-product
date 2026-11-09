@@ -67,7 +67,13 @@ async function launch(dir) {
 async function seed(page, { current, library }) {
   const reloaded = page.waitForEvent("load");
   await page.evaluate(
-    ({ current, library }) => {
+    async ({ current, library }) => {
+      await window.fileLibrary.flush();
+      await new Promise((resolve, reject) => {
+        const request = indexedDB.deleteDatabase("verynize-library");
+        request.onsuccess = resolve;
+        request.onerror = () => reject(request.error);
+      });
       localStorage.setItem("verynize-v2", current);
       localStorage.setItem("verynize-library-v1", JSON.stringify(library));
       // The outgoing page still holds its own document and may save it (a media-query re-render) before the reload
@@ -86,7 +92,7 @@ async function seed(page, { current, library }) {
   await waitForUiReady(page);
 }
 const stored = (page, key) => page.evaluate((key) => localStorage.getItem(key), key);
-const storedLibrary = async (page) => JSON.parse(await stored(page, "verynize-library-v1"));
+const storedLibrary = require("./helpers/library-store.cjs").readLibrary;
 const notices = (page) => page.evaluate(() => window.documentSafety.notices());
 const backups = (page) => page.evaluate(() => window.documentSafety.backups());
 const waitNotice = (page, kind) =>

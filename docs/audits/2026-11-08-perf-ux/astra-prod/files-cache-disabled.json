@@ -1,0 +1,1028 @@
+{
+  "navigation": [
+    {
+      "ttfb": 116,
+      "responseStart": 132.10000000009313,
+      "domContentLoaded": 555,
+      "load": 709.5,
+      "transferSize": 1361,
+      "encodedBodySize": 1061
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 900
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 1832
+    }
+  ],
+  "resources": [
+    {
+      "path": "/assets/index-Dpo3UJ4v.js",
+      "type": "other",
+      "start": 147.5,
+      "duration": 513.7000000000698,
+      "ttfb": 218.20000000006985,
+      "transfer": 172498,
+      "encoded": 172198,
+      "decoded": 511806
+    },
+    {
+      "path": "/assets/react-BzYqJA6g.js",
+      "type": "other",
+      "start": 147.60000000009313,
+      "duration": 253.19999999995343,
+      "ttfb": 214.70000000006985,
+      "transfer": 3925,
+      "encoded": 3625,
+      "decoded": 8885
+    },
+    {
+      "path": "/assets/_editor-TYko6RO7.js",
+      "type": "other",
+      "start": 147.70000000006985,
+      "duration": 253.40000000002328,
+      "ttfb": 215.5,
+      "transfer": 4745,
+      "encoded": 4445,
+      "decoded": 14119
+    },
+    {
+      "path": "/assets/ui-CFIVG3HJ.js",
+      "type": "other",
+      "start": 147.70000000006985,
+      "duration": 310.5,
+      "ttfb": 53.300000000046566,
+      "transfer": 911,
+      "encoded": 611,
+      "decoded": 1055
+    },
+    {
+      "path": "/beacon.min.js/v[id]",
+      "type": "script",
+      "start": 147.90000000002328,
+      "duration": 403,
+      "ttfb": 0,
+      "transfer": 0,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/assets/_editor-BBZSFCo1.js",
+      "type": "script",
+      "start": 689.7000000000698,
+      "duration": 50.79999999993015,
+      "ttfb": 48.39999999990687,
+      "transfer": 641,
+      "encoded": 341,
+      "decoded": 527
+    },
+    {
+      "path": "/cdn-cgi/rum",
+      "type": "xmlhttprequest",
+      "start": 710.9000000000233,
+      "duration": 36.300000000046566,
+      "ttfb": 32.10000000009313,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/assets/web-auth-CF_m53Gc.js",
+      "type": "script",
+      "start": 743.3000000000466,
+      "duration": 54,
+      "ttfb": 51,
+      "transfer": 1011,
+      "encoded": 711,
+      "decoded": 1222
+    },
+    {
+      "path": "/assets/web-session-TY5upGZ9.js",
+      "type": "script",
+      "start": 743.4000000000233,
+      "duration": 54,
+      "ttfb": 51,
+      "transfer": 1924,
+      "encoded": 1624,
+      "decoded": 3704
+    },
+    {
+      "path": "/api/me",
+      "type": "fetch",
+      "start": 798.8000000000466,
+      "duration": 956.3000000000466,
+      "ttfb": 952.7999999999302,
+      "transfer": 547,
+      "encoded": 247,
+      "decoded": 304
+    },
+    {
+      "path": "/style.css",
+      "type": "link",
+      "start": 798.9000000000233,
+      "duration": 52.300000000046566,
+      "ttfb": 48.199999999953434,
+      "transfer": 2805,
+      "encoded": 2505,
+      "decoded": 7961
+    },
+    {
+      "path": "/desktop-panel.css",
+      "type": "link",
+      "start": 799,
+      "duration": 111.80000000004657,
+      "ttfb": 67.59999999997672,
+      "transfer": 2173,
+      "encoded": 1873,
+      "decoded": 6544
+    },
+    {
+      "path": "/cloud-panel.css",
+      "type": "link",
+      "start": 799.1000000000931,
+      "duration": 50.199999999953434,
+      "ttfb": 46.09999999997672,
+      "transfer": 1319,
+      "encoded": 1019,
+      "decoded": 2809
+    },
+    {
+      "path": "/page-loader.css",
+      "type": "link",
+      "start": 799.2000000000698,
+      "duration": 52.199999999953434,
+      "ttfb": 47,
+      "transfer": 715,
+      "encoded": 415,
+      "decoded": 677
+    },
+    {
+      "path": "/settings.css",
+      "type": "link",
+      "start": 799.2000000000698,
+      "duration": 58.59999999997672,
+      "ttfb": 46.40000000002328,
+      "transfer": 2734,
+      "encoded": 2434,
+      "decoded": 8389
+    },
+    {
+      "path": "/wonder-shell.css",
+      "type": "link",
+      "start": 799.3000000000466,
+      "duration": 85.90000000002328,
+      "ttfb": 53.199999999953434,
+      "transfer": 5927,
+      "encoded": 5627,
+      "decoded": 22655
+    },
+    {
+      "path": "/live-preview.css",
+      "type": "link",
+      "start": 799.3000000000466,
+      "duration": 116.09999999997672,
+      "ttfb": 106,
+      "transfer": 2144,
+      "encoded": 1844,
+      "decoded": 6431
+    },
+    {
+      "path": "/canvas.css",
+      "type": "link",
+      "start": 799.4000000000233,
+      "duration": 58.09999999997672,
+      "ttfb": 44.90000000002328,
+      "transfer": 4452,
+      "encoded": 4152,
+      "decoded": 14314
+    },
+    {
+      "path": "/preview-edit.css",
+      "type": "link",
+      "start": 799.4000000000233,
+      "duration": 68.40000000002328,
+      "ttfb": 56,
+      "transfer": 1882,
+      "encoded": 1582,
+      "decoded": 5365
+    },
+    {
+      "path": "/preview-frame-chrome.css",
+      "type": "link",
+      "start": 799.4000000000233,
+      "duration": 114.09999999997672,
+      "ttfb": 63.40000000002328,
+      "transfer": 4369,
+      "encoded": 4069,
+      "decoded": 15653
+    },
+    {
+      "path": "/vector-edit.css",
+      "type": "link",
+      "start": 799.6000000000931,
+      "duration": 62,
+      "ttfb": 56.199999999953434,
+      "transfer": 723,
+      "encoded": 423,
+      "decoded": 1067
+    },
+    {
+      "path": "/dist/ui.css",
+      "type": "link",
+      "start": 799.6000000000931,
+      "duration": 132.59999999997672,
+      "ttfb": 52.40000000002328,
+      "transfer": 39868,
+      "encoded": 39568,
+      "decoded": 245232
+    },
+    {
+      "path": "/platform.js",
+      "type": "script",
+      "start": 1762.2000000000698,
+      "duration": 123.09999999997672,
+      "ttfb": 100.40000000002328,
+      "transfer": 3051,
+      "encoded": 2751,
+      "decoded": 6447
+    },
+    {
+      "path": "/shell-request.js",
+      "type": "script",
+      "start": 1762.4000000000233,
+      "duration": 102.5,
+      "ttfb": 92.30000000004657,
+      "transfer": 1234,
+      "encoded": 934,
+      "decoded": 1888
+    },
+    {
+      "path": "/shaders.js",
+      "type": "script",
+      "start": 1762.6000000000931,
+      "duration": 164.79999999993015,
+      "ttfb": 97.40000000002328,
+      "transfer": 7211,
+      "encoded": 6911,
+      "decoded": 19141
+    },
+    {
+      "path": "/node-style.js",
+      "type": "script",
+      "start": 1762.8000000000466,
+      "duration": 196.30000000004657,
+      "ttfb": 86.30000000004657,
+      "transfer": 21663,
+      "encoded": 21363,
+      "decoded": 65772
+    },
+    {
+      "path": "/vector-geometry.js",
+      "type": "script",
+      "start": 1763,
+      "duration": 175.5,
+      "ttfb": 99.19999999995343,
+      "transfer": 11272,
+      "encoded": 10972,
+      "decoded": 31033
+    },
+    {
+      "path": "/vector-svg.js",
+      "type": "script",
+      "start": 1763.2000000000698,
+      "duration": 97.40000000002328,
+      "ttfb": 86.10000000009313,
+      "transfer": 9473,
+      "encoded": 9173,
+      "decoded": 26716
+    },
+    {
+      "path": "/document-core.js",
+      "type": "script",
+      "start": 1763.4000000000233,
+      "duration": 180.20000000006985,
+      "ttfb": 87.30000000004657,
+      "transfer": 12967,
+      "encoded": 12667,
+      "decoded": 40793
+    },
+    {
+      "path": "/component-core.js",
+      "type": "script",
+      "start": 1763.7000000000698,
+      "duration": 184.19999999995343,
+      "ttfb": 89.80000000004657,
+      "transfer": 13978,
+      "encoded": 13678,
+      "decoded": 45064
+    },
+    {
+      "path": "/room-limits.js",
+      "type": "script",
+      "start": 1763.8000000000466,
+      "duration": 247.59999999997672,
+      "ttfb": 60.59999999997672,
+      "transfer": 1232,
+      "encoded": 932,
+      "decoded": 1871
+    },
+    {
+      "path": "/storage-limits.js",
+      "type": "script",
+      "start": 1764.1000000000931,
+      "duration": 246.19999999995343,
+      "ttfb": 46.90000000002328,
+      "transfer": 5779,
+      "encoded": 5479,
+      "decoded": 14971
+    },
+    {
+      "path": "/document-safety.js",
+      "type": "script",
+      "start": 1764.2000000000698,
+      "duration": 247.79999999993015,
+      "ttfb": 45.199999999953434,
+      "transfer": 5688,
+      "encoded": 5388,
+      "decoded": 14704
+    },
+    {
+      "path": "/node-index.js",
+      "type": "script",
+      "start": 1764.4000000000233,
+      "duration": 260.80000000004657,
+      "ttfb": 62.29999999993015,
+      "transfer": 1895,
+      "encoded": 1595,
+      "decoded": 3827
+    },
+    {
+      "path": "/selection-chrome.js",
+      "type": "script",
+      "start": 1764.7000000000698,
+      "duration": 245.40000000002328,
+      "ttfb": 45.90000000002328,
+      "transfer": 11668,
+      "encoded": 11368,
+      "decoded": 34644
+    },
+    {
+      "path": "/canvas-drop-hits.js",
+      "type": "script",
+      "start": 1764.9000000000233,
+      "duration": 250.20000000006985,
+      "ttfb": 46.70000000006985,
+      "transfer": 2479,
+      "encoded": 2179,
+      "decoded": 5538
+    },
+    {
+      "path": "/svg-sanitize.js",
+      "type": "script",
+      "start": 1765.2000000000698,
+      "duration": 247.40000000002328,
+      "ttfb": 47,
+      "transfer": 1094,
+      "encoded": 794,
+      "decoded": 1809
+    },
+    {
+      "path": "/image-upload.js",
+      "type": "script",
+      "start": 1765.3000000000466,
+      "duration": 270.30000000004657,
+      "ttfb": 70,
+      "transfer": 4608,
+      "encoded": 4308,
+      "decoded": 11391
+    },
+    {
+      "path": "/canvas-interactions.js",
+      "type": "script",
+      "start": 1765.6000000000931,
+      "duration": 568,
+      "ttfb": 149.60000000009313,
+      "transfer": 45966,
+      "encoded": 45666,
+      "decoded": 159516
+    },
+    {
+      "path": "/text-caret.js",
+      "type": "script",
+      "start": 1765.7000000000698,
+      "duration": 384.5,
+      "ttfb": 65.09999999997672,
+      "transfer": 3526,
+      "encoded": 3226,
+      "decoded": 8143
+    },
+    {
+      "path": "/clipboard-commands.js",
+      "type": "script",
+      "start": 1765.9000000000233,
+      "duration": 327.80000000004657,
+      "ttfb": 52.5,
+      "transfer": 6883,
+      "encoded": 6583,
+      "decoded": 19212
+    },
+    {
+      "path": "/image-drop.js",
+      "type": "script",
+      "start": 1766,
+      "duration": 309.20000000006985,
+      "ttfb": 53.800000000046566,
+      "transfer": 2705,
+      "encoded": 2405,
+      "decoded": 5594
+    },
+    {
+      "path": "/vector-edit.js",
+      "type": "script",
+      "start": 1766.3000000000466,
+      "duration": 484.30000000004657,
+      "ttfb": 56.09999999997672,
+      "transfer": 10548,
+      "encoded": 10248,
+      "decoded": 31925
+    },
+    {
+      "path": "/preview-tab.js",
+      "type": "script",
+      "start": 1766.4000000000233,
+      "duration": 326.80000000004657,
+      "ttfb": 60,
+      "transfer": 1122,
+      "encoded": 822,
+      "decoded": 1676
+    },
+    {
+      "path": "/canvas-render.js",
+      "type": "script",
+      "start": 1766.9000000000233,
+      "duration": 482.20000000006985,
+      "ttfb": 104,
+      "transfer": 8297,
+      "encoded": 7997,
+      "decoded": 23967
+    },
+    {
+      "path": "/switch-coordinator.js",
+      "type": "script",
+      "start": 1767.3000000000466,
+      "duration": 312.30000000004657,
+      "ttfb": 55.699999999953434,
+      "transfer": 1274,
+      "encoded": 974,
+      "decoded": 2482
+    },
+    {
+      "path": "/switch-cache.js",
+      "type": "script",
+      "start": 1767.5,
+      "duration": 325.4000000000233,
+      "ttfb": 58.699999999953434,
+      "transfer": 1256,
+      "encoded": 956,
+      "decoded": 2281
+    },
+    {
+      "path": "/app.js",
+      "type": "script",
+      "start": 1767.7000000000698,
+      "duration": 534.7999999999302,
+      "ttfb": 106,
+      "transfer": 20152,
+      "encoded": 19852,
+      "decoded": 63938
+    },
+    {
+      "path": "/canvas-tiles.js",
+      "type": "script",
+      "start": 1768,
+      "duration": 383.10000000009313,
+      "ttfb": 55.60000000009313,
+      "transfer": 5671,
+      "encoded": 5371,
+      "decoded": 15313
+    },
+    {
+      "path": "/document-lifecycle.js",
+      "type": "script",
+      "start": 1768.3000000000466,
+      "duration": 398.5,
+      "ttfb": 145.30000000004657,
+      "transfer": 779,
+      "encoded": 479,
+      "decoded": 895
+    },
+    {
+      "path": "/account-store.js",
+      "type": "script",
+      "start": 1768.5,
+      "duration": 397.20000000006985,
+      "ttfb": 103.09999999997672,
+      "transfer": 4955,
+      "encoded": 4655,
+      "decoded": 14979
+    },
+    {
+      "path": "/desktop-panel.js",
+      "type": "script",
+      "start": 1768.6000000000931,
+      "duration": 564.2999999999302,
+      "ttfb": 103.5,
+      "transfer": 32393,
+      "encoded": 32093,
+      "decoded": 105261
+    },
+    {
+      "path": "/cloud-ops.js",
+      "type": "script",
+      "start": 1768.8000000000466,
+      "duration": 421.5999999999767,
+      "ttfb": 58.699999999953434,
+      "transfer": 7259,
+      "encoded": 6959,
+      "decoded": 24324
+    },
+    {
+      "path": "/cloud-invite.js",
+      "type": "script",
+      "start": 1769.1000000000931,
+      "duration": 355,
+      "ttfb": 59,
+      "transfer": 1694,
+      "encoded": 1394,
+      "decoded": 3053
+    },
+    {
+      "path": "/page-loader.js",
+      "type": "script",
+      "start": 1769.2000000000698,
+      "duration": 480.19999999995343,
+      "ttfb": 181.90000000002328,
+      "transfer": 3820,
+      "encoded": 3520,
+      "decoded": 9490
+    },
+    {
+      "path": "/cloud-panel.js",
+      "type": "script",
+      "start": 1769.4000000000233,
+      "duration": 563,
+      "ttfb": 102.40000000002328,
+      "transfer": 30149,
+      "encoded": 29849,
+      "decoded": 105756
+    },
+    {
+      "path": "/cloud-share.js",
+      "type": "script",
+      "start": 1769.6000000000931,
+      "duration": 382.19999999995343,
+      "ttfb": 71.69999999995343,
+      "transfer": 3930,
+      "encoded": 3630,
+      "decoded": 9720
+    },
+    {
+      "path": "/cloud-assets.js",
+      "type": "script",
+      "start": 1769.8000000000466,
+      "duration": 483.0999999999767,
+      "ttfb": 177.29999999993015,
+      "transfer": 6251,
+      "encoded": 5951,
+      "decoded": 16145
+    },
+    {
+      "path": "/figma-panel.js",
+      "type": "script",
+      "start": 1769.9000000000233,
+      "duration": 446.5,
+      "ttfb": 181.59999999997672,
+      "transfer": 2033,
+      "encoded": 1733,
+      "decoded": 4373
+    },
+    {
+      "path": "/trace-bitmap.js",
+      "type": "script",
+      "start": 1770,
+      "duration": 429.60000000009313,
+      "ttfb": 55.29999999993015,
+      "transfer": 7727,
+      "encoded": 7427,
+      "decoded": 20721
+    },
+    {
+      "path": "/settings.js",
+      "type": "script",
+      "start": 1770.2000000000698,
+      "duration": 429.9000000000233,
+      "ttfb": 71.69999999995343,
+      "transfer": 7621,
+      "encoded": 7321,
+      "decoded": 22232
+    },
+    {
+      "path": "/wonder-shell.js",
+      "type": "script",
+      "start": 1770.4000000000233,
+      "duration": 480.5999999999767,
+      "ttfb": 57.699999999953434,
+      "transfer": 12175,
+      "encoded": 11875,
+      "decoded": 40090
+    },
+    {
+      "path": "/views-templates.js",
+      "type": "script",
+      "start": 1771.2000000000698,
+      "duration": 460,
+      "ttfb": 70.90000000002328,
+      "transfer": 9228,
+      "encoded": 8928,
+      "decoded": 27805
+    },
+    {
+      "path": "/live-preview.js",
+      "type": "script",
+      "start": 1771.4000000000233,
+      "duration": 480.4000000000233,
+      "ttfb": 71.09999999997672,
+      "transfer": 11514,
+      "encoded": 11214,
+      "decoded": 36945
+    },
+    {
+      "path": "/preview-frame-chrome.js",
+      "type": "script",
+      "start": 1771.7000000000698,
+      "duration": 479.9000000000233,
+      "ttfb": 57.59999999997672,
+      "transfer": 11034,
+      "encoded": 10734,
+      "decoded": 34142
+    },
+    {
+      "path": "/preview-edit.js",
+      "type": "script",
+      "start": 1772.1000000000931,
+      "duration": 458.69999999995343,
+      "ttfb": 101.20000000006985,
+      "transfer": 7591,
+      "encoded": 7291,
+      "decoded": 22787
+    },
+    {
+      "path": "/agent-bridge.js",
+      "type": "script",
+      "start": 1772.3000000000466,
+      "duration": 477.5,
+      "ttfb": 181.09999999997672,
+      "transfer": 4823,
+      "encoded": 4523,
+      "decoded": 12532
+    },
+    {
+      "path": "/version-history-core.js",
+      "type": "script",
+      "start": 1772.5,
+      "duration": 441.9000000000233,
+      "ttfb": 99.90000000002328,
+      "transfer": 6919,
+      "encoded": 6619,
+      "decoded": 19922
+    },
+    {
+      "path": "/version-history.js",
+      "type": "script",
+      "start": 1772.8000000000466,
+      "duration": 477.4000000000233,
+      "ttfb": 180.29999999993015,
+      "transfer": 5556,
+      "encoded": 5256,
+      "decoded": 16338
+    },
+    {
+      "path": "/assets/fonts/inter-latin-400-normal.woff2",
+      "type": "css",
+      "start": 1775.9000000000233,
+      "duration": 182.5,
+      "ttfb": 77.59999999997672,
+      "transfer": 23964,
+      "encoded": 23664,
+      "decoded": 23664
+    },
+    {
+      "path": "/assets/fonts/inter-latin-500-normal.woff2",
+      "type": "css",
+      "start": 1777.6000000000931,
+      "duration": 181.09999999997672,
+      "ttfb": 73.5,
+      "transfer": 24572,
+      "encoded": 24272,
+      "decoded": 24272
+    },
+    {
+      "path": "/assets/legacy-ui-CXHsJAu3.js",
+      "type": "script",
+      "start": 2363.70000000007,
+      "duration": 393.5,
+      "ttfb": 80.5,
+      "transfer": 446617,
+      "encoded": 446317,
+      "decoded": 1577689
+    },
+    {
+      "path": "/assets/account-step-DjTwgSPb.js",
+      "type": "script",
+      "start": 2363.8000000000466,
+      "duration": 85.09999999997672,
+      "ttfb": 53.800000000046566,
+      "transfer": 40471,
+      "encoded": 40171,
+      "decoded": 128647
+    },
+    {
+      "path": "/api/ai/config",
+      "type": "fetch",
+      "start": 2816.5,
+      "duration": 306.5,
+      "ttfb": 305.19999999995343,
+      "transfer": 461,
+      "encoded": 161,
+      "decoded": 219
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 2823.8000000000466,
+      "duration": 1323.3000000000466,
+      "ttfb": 867.5999999999767,
+      "transfer": 556909,
+      "encoded": 556609,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me",
+      "type": "fetch",
+      "start": 2886.3000000000466,
+      "duration": 674.8000000000466,
+      "ttfb": 673.4000000000233,
+      "transfer": 547,
+      "encoded": 247,
+      "decoded": 304
+    },
+    {
+      "path": "/assets/fonts/inter-latin-600-normal.woff2",
+      "type": "css",
+      "start": 2896.9000000000233,
+      "duration": 54.800000000046566,
+      "ttfb": 48,
+      "transfer": 24752,
+      "encoded": 24452,
+      "decoded": 24452
+    },
+    {
+      "path": "/api/auth/organization/list",
+      "type": "fetch",
+      "start": 2900.8000000000466,
+      "duration": 792.3000000000466,
+      "ttfb": 790.1999999999534,
+      "transfer": 489,
+      "encoded": 189,
+      "decoded": 204
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 2901.9000000000233,
+      "duration": 597.8000000000466,
+      "ttfb": 595.8000000000466,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 2902.20000000007,
+      "duration": 597.2999999999302,
+      "ttfb": 595.3999999999069,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 4196,
+      "duration": 601.7000000000698,
+      "ttfb": 268.79999999993015,
+      "transfer": 556371,
+      "encoded": 556071,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 5349.600000000093,
+      "duration": 999.8999999999069,
+      "ttfb": 644.2000000000698,
+      "transfer": 556367,
+      "encoded": 556067,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 6540,
+      "duration": 140.70000000006985,
+      "ttfb": 137.30000000004657,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 6540.300000000047,
+      "duration": 124.40000000002328,
+      "ttfb": 120.5,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 8350.900000000023,
+      "duration": 1236.3000000000466,
+      "ttfb": 501,
+      "transfer": 557039,
+      "encoded": 556739,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 9684.100000000093,
+      "duration": 170.39999999990687,
+      "ttfb": 166.5,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 9684.20000000007,
+      "duration": 170.59999999997672,
+      "ttfb": 166.59999999997672,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 11350.900000000023,
+      "duration": 913.5999999999767,
+      "ttfb": 276.5999999999767,
+      "transfer": 556367,
+      "encoded": 556067,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 12859.900000000023,
+      "duration": 156.5,
+      "ttfb": 150.90000000002328,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 12860.600000000093,
+      "duration": 135.29999999993015,
+      "ttfb": 117.59999999997672,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 14350.400000000023,
+      "duration": 626.2000000000698,
+      "ttfb": 319.80000000004657,
+      "transfer": 556378,
+      "encoded": 556078,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 16021,
+      "duration": 190.10000000009313,
+      "ttfb": 184.30000000004657,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 16021.70000000007,
+      "duration": 139.29999999993015,
+      "ttfb": 134.09999999997672,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 17350.100000000093,
+      "duration": 1174,
+      "ttfb": 525.5999999999767,
+      "transfer": 556722,
+      "encoded": 556422,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 19217.5,
+      "duration": 814.1000000000931,
+      "ttfb": 808,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 19218.400000000023,
+      "duration": 221,
+      "ttfb": 214.70000000006985,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 20350.20000000007,
+      "duration": 605.9000000000233,
+      "ttfb": 338.29999999993015,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/orgs/[id]/rooms",
+      "type": "fetch",
+      "start": 23037.900000000023,
+      "duration": 666.5999999999767,
+      "ttfb": 659.8999999999069,
+      "transfer": 970,
+      "encoded": 670,
+      "decoded": 1729
+    },
+    {
+      "path": "/api/me/rooms",
+      "type": "fetch",
+      "start": 23038.5,
+      "duration": 542.7000000000698,
+      "ttfb": 536.0999999999767,
+      "transfer": 1005,
+      "encoded": 705,
+      "decoded": 2820
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 23350.800000000047,
+      "duration": 567.8000000000466,
+      "ttfb": 293.0999999999767,
+      "transfer": 556267,
+      "encoded": 555967,
+      "decoded": 4083883
+    }
+  ],
+  "heap": {
+    "used": 61396672,
+    "total": 100137636
+  }
+}

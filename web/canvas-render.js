@@ -137,7 +137,7 @@
         lastInFlow: ctx.lastInFlow,
         tokens,
       });
-      S.applyStyle(el, css.box);
+      S.applyStyle(el, window.assetStore ? window.assetStore.style(css.box) : css.box);
       if (editing && Number(n.outlineWidth) > 0) el.dataset.outline = "";
       if (n.icon) el.dataset.icon = n.icon;
       if (n.type === "text")
@@ -169,10 +169,10 @@
           img.setAttribute("aria-label", n.name);
           img.dataset.svgColor = "true";
         } else {
-          img.src = css.src || n.src;
+          img.src = window.assetStore?.resolve(css.src || n.src) || css.src || n.src;
           img.alt = n.name;
         }
-        S.applyStyle(img, css.img);
+        S.applyStyle(img, window.assetStore ? window.assetStore.style(css.img) : css.img);
         el.append(img);
       }
       if (editing && n.preview) window.livePreview?.renderNode(n, el);
@@ -282,7 +282,6 @@
       const redraw =
         change > 0 ||
         dirty.has(n.id) ||
-        memo.selected !== selected ||
         memo.lastInFlow !== lastInFlow ||
         memo.parentId !== parentId ||
         memo.parentVer !== parentVer;
@@ -299,6 +298,7 @@
         memos.set(n.id, {
           drawn: snapshot(n),
           selected,
+          solo: selected && selection.size === 1,
           lastInFlow,
           parentId,
           parentVer,
@@ -315,11 +315,32 @@
           list.map((c) => visit(c, n, c.id === last, kids, seen, selection, top)),
         );
       }
+      if (!drawn) selectLayer(el, memo, selected, selected && selection.size === 1);
       if (drawn) {
-        if (selected) handles(el);
+        if (selected && selection.size === 1) handles(el);
         start(el);
       }
       return el;
+    }
+    function selectLayer(el, memo, selected, solo) {
+      if (memo.selected !== selected) el.classList.toggle("selected", selected);
+      if (memo.solo && !solo)
+        el.querySelectorAll(":scope > .handle").forEach((handle) => handle.remove());
+      if (solo && !memo.solo) handles(el);
+      memo.selected = selected;
+      memo.solo = solo;
+    }
+    function select() {
+      absorb(observer.takeRecords());
+      const selection = ed.getSelection();
+      for (const [id, el] of els) {
+        const memo = memos.get(id);
+        if (memo === PREVIEW) el.classList.toggle("selected", selection.has(id));
+        else if (memo)
+          selectLayer(el, memo, selection.has(id), selection.size === 1 && selection.has(id));
+      }
+      cull();
+      observer.takeRecords();
     }
     function render() {
       absorb(observer.takeRecords());
@@ -561,7 +582,9 @@
         )
           active.delete(id);
       }
-      for (const id of [...ed.getSelection(), ...active, ...dirty]) {
+      // Large selections use model bounds; keep offscreen DOM culled until it is actually dragged/edited.
+      const selected = ed.getSelection();
+      for (const id of [...(selected.size <= 200 ? selected : []), ...active, ...dirty]) {
         const top = boardOf.get(id);
         if (boards.has(top)) near.add(top);
       }
@@ -649,10 +672,15 @@
       for (const id of memos.keys()) dirty.add(id);
     });
 
+    window.addEventListener("assets-ready", () => {
+      memos.clear();
+      render();
+    });
     document.fonts?.addEventListener("loadingdone", () => render());
 
     return {
       render,
+      select,
       layerElement,
       // For measuring right after render(): null inside a culled board this render did not redraw (nothing changed there).
       elementOf: (id) => {

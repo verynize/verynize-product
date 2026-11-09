@@ -1,0 +1,34 @@
+{
+  "source": "first /api/me/state response after load (3 identical captures)",
+  "decodedBytes": 4084341,
+  "items": 65,
+  "topLevelKeys": ["items", "account"],
+  "byKeyPrefix": {
+    "chat:": {
+      "n": 13,
+      "bytes": 4079885,
+      "maxItemBytes": 1765448
+    },
+    "preference:": {
+      "n": 20,
+      "bytes": 1305,
+      "maxItemBytes": 81
+    },
+    "file:": {
+      "n": 16,
+      "bytes": 1767,
+      "maxItemBytes": 111
+    },
+    "agent-default:": {
+      "n": 10,
+      "bytes": 665,
+      "maxItemBytes": 71
+    },
+    "draft:": {
+      "n": 6,
+      "bytes": 470,
+      "maxItemBytes": 79
+    }
+  },
+  "note": "bytes = UTF-8 length of JSON.stringify(item) per item; no keys or values recorded"
+}

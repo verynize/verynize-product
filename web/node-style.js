@@ -388,7 +388,8 @@
   const MASK_SIZE = /^(auto|cover|contain|\d{1,5}(\.\d{1,3})?(px|%)( \d{1,5}(\.\d{1,3})?(px|%))?)$/;
   const MASK_IMAGE = /^data:image\/(png|jpeg|webp|gif|svg\+xml);base64,[A-Za-z0-9+/=]+$/;
   // Room asset URLs (cloud/assets.js): the check lives in web/document-core.js, loaded after this file.
-  const assetUrl = (v) => !!root.VerynizeDocument?.isRoomAssetUrl?.(v);
+  const assetUrl = (v) =>
+    !!(root.VerynizeDocument?.isAssetRef?.(v) || root.VerynizeDocument?.isRoomAssetUrl?.(v));
   const imageSource = (v) => typeof v === "string" && (MASK_IMAGE.test(v) || assetUrl(v));
   const MASK_CSS = /^(repeating-)?(linear|radial|conic)-gradient\([^;{}<>\\]{1,2000}\)$/i;
   const MASK_SHAPE = /^inset\(-?\d{1,5}(\.\d{1,3})?%( -?\d{1,5}(\.\d{1,3})?%){0,3}\)$/;

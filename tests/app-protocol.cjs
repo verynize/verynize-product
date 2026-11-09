@@ -77,6 +77,15 @@ async function unitChecks() {
     path.resolve("web/index.html"),
     "extensionless paths are client-side routes",
   );
+  // A cloud file's route holds an encoded colon (/editor/room%3A<id>): reloading it must load the app.
+  const roomRoute = "app://verynize/editor/room%3A0b7e4b5e-4f7a-4c55-9a43-7a2d1c3e9f10";
+  assert.equal((await appProtocol.resolveRequest(roomRoute)).file, path.resolve("web/index.html"));
+  assert.equal((await appProtocol.serve(new Request(roomRoute))).status, 200);
+  assert.equal(
+    await status("app://verynize/assets/C%3Afont.woff2"),
+    403,
+    "never a colon in a file",
+  );
   // A symlink inside web/ that points outside it is refused.
   const link = path.resolve("web/zz-app-protocol-test-link.js");
   await fs.symlink(path.resolve("desktop/main.cjs"), link);
@@ -191,6 +200,15 @@ async function appChecks(profile) {
     assert.match(page.url(), /^app:\/\/verynize\/editor\/[^/?#]+$/);
     assert.ok(await ipcWorks(page), "IPC after reloading app://verynize/editor");
     assert.ok((await stylesLoaded(page)) >= 10, "stylesheets load from a route URL");
+    // Reloading a cloud file's route (Cmd+R or location.reload()) loads the app, not "Forbidden".
+    const room = "/editor/room%3A0b7e4b5e-4f7a-4c55-9a43-7a2d1c3e9f10";
+    await page.evaluate((route) => history.pushState({}, "", route), room);
+    await Promise.all([page.waitForEvent("load"), page.evaluate(() => location.reload())]);
+    await page.waitForFunction(() => !!window.desktop && document.readyState === "complete");
+    assert.notEqual(await page.evaluate(() => document.body?.innerText.trim()), "Forbidden");
+    assert.ok(await page.evaluate(() => !!window.design), "the editor scripts ran");
+    assert.ok(await ipcWorks(page), "IPC after reloading a cloud file's route");
+    assert.ok((await stylesLoaded(page)) >= 10, "the app loads, not an error page");
     // A nested route loads its root-absolute assets too.
     await Promise.all([
       page.waitForEvent("load"),

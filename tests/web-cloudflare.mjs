@@ -198,6 +198,20 @@ async function checkApp(origin, mode) {
     assert.doesNotMatch(await response.text(), /import |export /, route);
   }
   assert.equal((await get("/style.css")).status, 200);
+  if (mode === "preview") {
+    // The build's `_headers`: content-hashed assets are immutable, fixed names revalidate.
+    const hashed = (await (await get("/")).text()).match(/\/assets\/[\w.-]+-[\w-]{8}\.js/)?.[0];
+    assert.ok(hashed, "the page loads a hashed asset");
+    const cacheControl = async (route) => {
+      const response = await get(route);
+      assert.equal(response.status, 200, route);
+      return response.headers.get("cache-control") || "";
+    };
+    assert.equal(await cacheControl(hashed), "public, max-age=31536000, immutable");
+    for (const route of ["/app.js", "/style.css", "/assets/fonts/inter-latin-400-normal.woff2"])
+      assert.doesNotMatch(await cacheControl(route), /immutable/, route);
+    assert.notEqual((await get("/_headers")).status, 200, "_headers is configuration, not a file");
+  }
   assert.equal((await get("/dist/ui.js")).status, 200);
   assert.equal((await get("/storage-migration.html")).status, 404);
   const legacyIndex = await get("/index.html?x=1");

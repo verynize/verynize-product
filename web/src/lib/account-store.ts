@@ -6,6 +6,8 @@ declare global {
       entries(prefix: "file:"): [string, { folder?: string | null; archived?: boolean }][];
       entries(prefix: "preference:behavior."): [string, unknown][];
       put(key: string, value: unknown): void;
+      /** A record's full value (e.g. `load("chat:<id>")`); account-store-changed follows. */
+      load(key: string): Promise<unknown>;
       ready(): boolean;
       signedIn(): boolean;
       refresh(): Promise<void>;

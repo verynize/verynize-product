@@ -1,0 +1,51 @@
+{
+  "source": "cf o11y telemetry query --preview (read-only), filters: scriptName=verynize, $metadata.type=cf-worker-event, request.url includes /api/me/state; values are Cloudflare sampling-adjusted aggregates",
+  "timeframe_utc": {
+    "from": 1793573382576,
+    "to": 1794178180001
+  },
+  "byMethodStatus": [
+    {
+      "method": "GET",
+      "status": 401,
+      "value": 2,
+      "sampleInterval": 1
+    },
+    {
+      "method": "OPTIONS",
+      "status": 204,
+      "value": 4099,
+      "sampleInterval": 1
+    },
+    {
+      "method": "GET",
+      "status": 0,
+      "value": 11,
+      "sampleInterval": 1
+    },
+    {
+      "method": "PUT",
+      "status": 413,
+      "value": 21,
+      "sampleInterval": 1
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "value": 10115,
+      "sampleInterval": 1.0026764472640761
+    },
+    {
+      "method": "PUT",
+      "status": 200,
+      "value": 157,
+      "sampleInterval": 1
+    },
+    {
+      "method": "PUT",
+      "status": 0,
+      "value": 1,
+      "sampleInterval": 1
+    }
+  ]
+}

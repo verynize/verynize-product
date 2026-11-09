@@ -370,7 +370,7 @@
       state: "paused",
       mode: "select",
       inputToApp: false,
-      fileId: window.fileLibrary?.currentId,
+      fileId: window.fileLibrary?.currentId ?? null,
       identity: JSON.stringify([node.preview.root, node.preview.chatId]),
     };
     entry.frame.style.pointerEvents = "none";
@@ -429,9 +429,11 @@
   }
   function renderNode(node, el) {
     const entry = entries.get(node.id) || create(node, el);
-    const fileId = window.fileLibrary?.currentId;
+    const fileId = window.fileLibrary?.currentId ?? null;
     const identity = JSON.stringify([node.preview.root, node.preview.chatId]);
-    if (entry.identity !== identity || entry.fileId !== fileId) {
+    // The shown document becoming a library file (no id yet → its id; the library loads asynchronously) is no switch.
+    const switched = entry.fileId !== fileId && !(entry.fileId === null && fileId);
+    if (entry.identity !== identity || switched) {
       entry.frame.removeAttribute("src");
       entry.url = "";
       entry.settingUp = false;
@@ -819,10 +821,18 @@
       style.id = "bd-embedded-fonts";
       document.head.append(style);
     }
-    style.textContent = fontFaceCss(faces);
+    style.textContent = window.assetStore?.css(fontFaceCss(faces)) || fontFaceCss(faces);
   }
+  window.addEventListener("assets-ready", () => {
+    fontKey = "";
+    syncEmbeddedFonts(window.design.getDocument());
+  });
   window.design.subscribe(syncEmbeddedFonts);
   syncEmbeddedFonts(window.design.getDocument());
+  // Preview layers the canvas drew before this module loaded (the launch document) get their app frame now; nothing
+  // else may redraw them (the file library loads asynchronously and leaves an unchanged document alone).
+  if (window.design.getSnapshot().pages.some((page) => page.nodes.some((node) => node.preview)))
+    render();
   // Web page capture: load any http(s) page in an isolated hidden window, pick a region on its screenshot,
   // and insert editable layers with embedded images, backgrounds, fonts, source mapping and states.
   const web = document.createElement("section");

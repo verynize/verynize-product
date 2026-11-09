@@ -36,6 +36,10 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 
 /** Tools that cannot run on the hosted server, with the reason a caller gets if it calls one anyway. */
 export const UNAVAILABLE = {
+  upload_asset:
+    "upload_asset reads a permitted local file and requires the desktop/stdio backend. Use the authenticated room binary upload API on the hosted server.",
+  import_pen: "import_pen requires a local unencrypted JSON file; use the desktop/stdio backend.",
+  preflight_import: "preflight_import inspects local files; use the desktop/stdio backend.",
   take_screenshot:
     'take_screenshot is unavailable on the hosted (headless) server: there is no renderer. Inspect elements with get_element_code or get_element_tree; finish_artboard reports "unverified" without a screenshot. Open the room in the Verynize desktop app to render it.',
   ask_agent:

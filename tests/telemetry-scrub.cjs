@@ -345,3 +345,23 @@ test("DATA_COLLECTION turns every optional collection off", () => {
   assert.equal(DATA_COLLECTION.stackFrameVariables, false);
   assert.equal(DATA_COLLECTION.frameContextLines, 0);
 });
+
+test("expected 4xx from Durable Object RPC are dropped, server faults kept", () => {
+  const thrown = (...values) => ({
+    exception: { values: values.map((value) => ({ type: "Error", value })) },
+  });
+  for (const value of [
+    "[404] No such app",
+    "[403] Forbidden",
+    "[409] Revision conflict",
+    "[400] Invalid account state key",
+    "Error: [401] Sign in first",
+  ])
+    assert.equal(scrub.scrubEvent(thrown(value)), null, value);
+  for (const value of ["[500] Account record is incomplete", "[503] x", "Failed [404] later"])
+    assert.notEqual(scrub.scrubEvent(thrown(value)), null, value);
+  // The thrown error is the last value; a 4xx cause under a 500 is still reported.
+  assert.notEqual(scrub.scrubEvent(thrown("[404] cause", "[500] wrapper")), null);
+  assert.equal(scrub.scrubEvent(thrown("TypeError: x", "[403] wrapper")), null);
+  assert.notEqual(scrub.scrubEvent({ message: "[404] a message, not an exception" }), null);
+});

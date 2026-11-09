@@ -19,7 +19,8 @@ test("every handle() channel in desktop/*.cjs is a literal declared in the IPC c
   const handled = new Map();
   for (const file of fs.readdirSync(desktop).filter((name) => name.endsWith(".cjs"))) {
     const source = read(file).replace(/^\s*(\/\/|\*).*$/gm, "");
-    for (const [, name] of source.matchAll(/\bhandle\(\s*["'`](\w+)["'`]/g)) {
+    // protocol.handle registers a URL scheme (desktop/assets.cjs: asset:), not an IPC channel.
+    for (const [, name] of source.matchAll(/(?<!\bprotocol\.)\bhandle\(\s*["'`](\w+)["'`]/g)) {
       assert.ok(!handled.has(name), `${name} is registered twice (${handled.get(name)}, ${file})`);
       handled.set(name, file);
     }

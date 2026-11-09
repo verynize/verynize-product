@@ -1,0 +1,90 @@
+[
+  {
+    "p": "/assets/react-BzYqJA6g.js",
+    "t": "other",
+    "transfer": 300,
+    "enc": 3599,
+    "dec": 8885,
+    "status": 200
+  },
+  {
+    "p": "/assets/index-Dpo3UJ4v.js",
+    "t": "other",
+    "transfer": 300,
+    "enc": 172135,
+    "dec": 511806,
+    "status": 200
+  },
+  {
+    "p": "/assets/ui-CFIVG3HJ.js",
+    "t": "other",
+    "transfer": 300,
+    "enc": 611,
+    "dec": 1055,
+    "status": 200
+  },
+  {
+    "p": "/assets/_editor-TYko6RO7.js",
+    "t": "other",
+    "transfer": 300,
+    "enc": 4445,
+    "dec": 14119,
+    "status": 200
+  },
+  {
+    "p": "/assets/_editor-BBZSFCo1.js",
+    "t": "script",
+    "transfer": 300,
+    "enc": 341,
+    "dec": 527,
+    "status": 200
+  },
+  {
+    "p": "/assets/web-auth-CF_m53Gc.js",
+    "t": "script",
+    "transfer": 300,
+    "enc": 711,
+    "dec": 1222,
+    "status": 200
+  },
+  {
+    "p": "/assets/web-session-TY5upGZ9.js",
+    "t": "script",
+    "transfer": 300,
+    "enc": 1624,
+    "dec": 3704,
+    "status": 200
+  },
+  {
+    "p": "/assets/web-sign-in-Cr9X24Ih.js",
+    "t": "script",
+    "transfer": 300,
+    "enc": 1518,
+    "dec": 2906,
+    "status": 200
+  },
+  {
+    "p": "/assets/account-step-DjTwgSPb.js",
+    "t": "script",
+    "transfer": 300,
+    "enc": 40145,
+    "dec": 128647,
+    "status": 200
+  },
+  {
+    "p": "/assets/fonts/inter-latin-500-normal.woff2",
+    "t": "css",
+    "transfer": 300,
+    "enc": 24272,
+    "dec": 24272,
+    "status": 200
+  },
+  {
+    "p": "/assets/fonts/inter-latin-400-normal.woff2",
+    "t": "css",
+    "transfer": 300,
+    "enc": 23664,
+    "dec": 23664,
+    "status": 200
+  }
+]

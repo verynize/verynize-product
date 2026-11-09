@@ -28,6 +28,10 @@ const MIME_EXT = {
   "image/gif": "gif",
   "image/webp": "webp",
   "image/svg+xml": "svg",
+  "font/woff2": "woff2",
+  "font/woff": "woff",
+  "font/ttf": "ttf",
+  "font/otf": "otf",
 };
 const EXT_MIME = Object.fromEntries(Object.entries(MIME_EXT).map(([mime, ext]) => [ext, mime]));
 
@@ -190,9 +194,12 @@ function readZip(input) {
 /** Replace embedded data-URL images by asset references; `assets` collects name → Buffer. */
 function extractAssets(value, assets) {
   if (typeof value === "string") {
-    const m = /^data:(image\/(?:png|jpeg|gif|webp|svg\+xml));base64,([A-Za-z0-9+/=\s]+)$/.exec(
-      value,
-    );
+    if (/^asset:[a-f0-9]{64}$/.test(value))
+      throw Error("Resolve asset references before encoding a portable pack");
+    const m =
+      /^data:((?:image\/(?:png|jpeg|gif|webp|svg\+xml)|font\/(?:woff2|woff|ttf|otf)));base64,([A-Za-z0-9+/=\s]+)$/.exec(
+        value,
+      );
     if (!m) return value;
     const bytes = Buffer.from(m[2], "base64");
     const name = `assets/${crypto.createHash("sha256").update(bytes).digest("hex").slice(0, 32)}.${MIME_EXT[m[1]]}`;
@@ -329,7 +336,12 @@ function registerTemplatePacks(handle) {
     if (value instanceof ArrayBuffer) return Buffer.from(value);
     throw Error("Choose a .zip template pack");
   };
-  handle("templatePackEncode", (pack) => new Uint8Array(encodePack(pack)));
+  handle("templatePackEncode", async (pack) => {
+    const { inlineAssets } = await import("../integrations/asset-store.mjs");
+    const store = await require("./assets.cjs").store();
+    const portable = JSON.parse(await inlineAssets(JSON.stringify(pack), (ref) => store.get(ref)));
+    return new Uint8Array(encodePack(portable));
+  });
   handle("templatePackDecode", (data) => decodePack(bytes(data)));
 }
 
