@@ -6,7 +6,7 @@ import path from "node:path";
 import { _electron as electron } from "@playwright/test";
 import { Miniflare, cloudOptions, passwordUser } from "./cloud-harness.mjs";
 import { waitForUiReady } from "./helpers/ui-ready.cjs";
-import { freePort, startProcess, launchBrowser } from "./helpers/web-app.mjs";
+import { freePort, startProcess, launchBrowser, readLibrary } from "./helpers/web-app.mjs";
 import { execFileSync } from "node:child_process";
 
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-database-sync-"));
@@ -229,14 +229,18 @@ try {
   for (const client of [desktop, page]) {
     assert.equal(await client.evaluate(() => localStorage.getItem("verynize-v2")), null);
     assert.equal(await client.evaluate(() => localStorage.getItem("better-preferences")), null);
-    const stored = await client.evaluate(() =>
+    // The library lives in IndexedDB (web/library-storage.js); an older localStorage copy, if any, holds no design either.
+    const noDesign = (library) =>
+      library.files
+        .filter((f) => f.cloud && !f.cloud.detached)
+        .every((f) => f.document.pages.every((p) => p.nodes.length === 0));
+    const stored = await readLibrary(client);
+    assert.ok(stored.files.some((f) => f.cloud && !f.cloud.detached));
+    assert.ok(noDesign(stored));
+    const legacy = await client.evaluate(() =>
       JSON.parse(localStorage.getItem("verynize-library-v1")),
     );
-    assert.ok(
-      stored.files
-        .filter((f) => f.cloud && !f.cloud.detached)
-        .every((f) => f.document.pages.every((p) => p.nodes.length === 0)),
-    );
+    assert.ok(legacy === null || noDesign(legacy));
   }
   // Reload reads the room from the database, never the empty local reference.
   await page.reload();
