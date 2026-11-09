@@ -13,7 +13,8 @@
 //
 //   scrubString(text)         -> text with secrets and personal data replaced
 //   scrubUrl(url)             -> scheme://host/path only (no credentials, query or fragment; id-like segments → :id)
-//   scrubEvent(event)         -> a new event built from allowed fields (errors and transactions)
+//   scrubEvent(event)         -> a new event built from allowed fields (errors and transactions); null for an
+//                                expected client error ("[4xx] …", thrown by cloud/http.js rpcFail in Durable Objects)
 //   scrubBreadcrumb(crumb)    -> a new breadcrumb, or null for categories that are not allowed
 //   scrubStreamedSpan(span)   -> a span (beforeSendSpan, streamed traces) with allowed attributes only
 //   setLiterals([home, user]) -> exact strings to replace too (the main process passes os.homedir() and the username)
@@ -429,9 +430,21 @@
     return out;
   }
 
-  /** A new event built from allowed fields only. Returns null for anything that is not an object. */
+  // `rpcFail` (cloud/http.js) throws "[status] message" because Durable Object RPC loses error fields; Sentry's Durable
+  // Object wrapper reports it before the Worker turns it back into a response. Statuses below 500 are answers, not faults.
+  const EXPECTED_STATUS = /^(?:\w*Error: )?\[[1-4]\d\d\] /;
+  // The thrown error is the last value (earlier ones are its causes).
+  const expectedStatus = (event) => {
+    const values = isObject(event.exception) ? event.exception.values : null;
+    const thrown = Array.isArray(values) ? values[values.length - 1] : null;
+    return (
+      isObject(thrown) && typeof thrown.value === "string" && EXPECTED_STATUS.test(thrown.value)
+    );
+  };
+
+  /** A new event built from allowed fields only. Returns null for anything that is not an object, or an expected 4xx. */
   function scrubEvent(event) {
-    if (!isObject(event)) return null;
+    if (!isObject(event) || expectedStatus(event)) return null;
     const out = pick(event, [
       "event_id",
       "timestamp",
