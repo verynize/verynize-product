@@ -112,7 +112,7 @@ test("validated inactive pages defer defaults, invalid pages keep the eager safe
   assert.throws(() => window.VerynizeLazyDocument.prepare(broken, {}, []), /Unsupported node type/);
 });
 
-test("a remote patch into a prepared page keeps the remote page's unprepared nodes to be prepared", async () => {
+test("a remote patch into a prepared page keeps the editor defaults and changes only what changed", async () => {
   await import("../integrations/document-core.mjs");
   window.VerynizeDocument = globalThis.VerynizeDocument;
   require("../web/lazy-document.js");
@@ -130,22 +130,28 @@ test("a remote patch into a prepared page keeps the remote page's unprepared nod
     ],
   });
   // The editor visited page B (prepared), then returned to A.
-  const editor = Lazy.prepare(doc([node("b1")]), { opacity: 100 }, []);
+  const editor = Lazy.prepare(doc([node("b1"), node("b2")]), { opacity: 100 }, []);
   editor.activePage = "b";
   Lazy.activate(editor);
   editor.activePage = "a";
-  assert.equal(editor.pages[1].nodes[0].opacity, 100);
-  // A collaborator adds b2 on the inactive page B (as app.js applyRemote does).
-  const next = Lazy.prepare(doc([node("b1"), node("b2")]), { opacity: 100 }, []);
-  assert.equal(next.pages[1].nodes[1].opacity, undefined);
-  const live = window.remoteApply.patch(editor, next);
-  for (const page of live.pages) Lazy.adopt(page, next.pages.find((p) => p.id === page.id));
+  const kept = editor.pages[1].nodes[0];
+  // A collaborator moves b2 and adds b3 on the inactive page B (as app.js applyRemote does).
+  const moved = doc([node("b1"), { ...node("b2"), x: 5 }, node("b3")]);
+  const next = Lazy.prepare(moved, { opacity: 100 }, []);
+  assert.equal(next.pages[1].nodes[2].opacity, undefined, "the remote page is not prepared");
+  Lazy.match(next, editor);
+  const changed = new Set();
+  const live = window.remoteApply.patch(editor, next, new Set(), changed);
+  assert.deepEqual([...changed].sort(), ["b2", "b3"], "only what the collaborator changed");
   assert.equal(live.pages[1], editor.pages[1], "page objects stay in place");
-  live.activePage = "b";
-  Lazy.activate(live);
+  assert.equal(live.pages[1].nodes[0], kept, "unchanged nodes stay in place");
   assert.deepEqual(
-    live.pages[1].nodes.map((n) => n.opacity),
-    [100, 100],
+    live.pages[1].nodes.map((n) => [n.id, n.x, n.opacity]),
+    [
+      ["b1", 0, 100],
+      ["b2", 5, 100],
+      ["b3", 0, 100],
+    ],
   );
 });
 

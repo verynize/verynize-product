@@ -28,9 +28,17 @@
     activate(document);
     return core.resolveAliases(document);
   }
-  // A page patched in place from another document's page (web/remote-apply.js) is prepared only if that one was.
-  function adopt(page, source) {
-    if (page !== source && !prepared.has(source)) prepared.delete(page);
+  // Before `live` (the editor document) is patched in place from `next` (web/remote-apply.js): the pages of `next` that
+  // replace prepared pages of `live` are prepared too, so patched and inserted nodes carry the editor defaults and
+  // unchanged nodes compare equal.
+  function match(next, live) {
+    if (!editorDefaults) return;
+    const ready = new Set(live.pages.filter((page) => prepared.has(page)).map((page) => page.id));
+    for (const page of next.pages)
+      if (ready.has(page.id) && !prepared.has(page)) {
+        window.VerynizeDocument.normalizeDocument({ ...next, pages: [page] }, editorDefaults);
+        prepared.add(page);
+      }
   }
-  window.VerynizeLazyDocument = Object.freeze({ prepare, activate, adopt });
+  window.VerynizeLazyDocument = Object.freeze({ prepare, activate, match });
 })();

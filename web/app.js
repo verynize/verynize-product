@@ -1380,10 +1380,8 @@ window.verynize = {
     future = [];
     const held = window.remoteApply.held(design, selection, worldGesture);
     const next = window.documentSafety.load(d);
-    const sources = new Map(next.pages.map((page) => [page.id, page]));
+    window.VerynizeLazyDocument.match(next, design);
     design = window.remoteApply.patch(design, next, held);
-    for (const page of design.pages)
-      if (sources.has(page.id)) window.VerynizeLazyDocument.adopt(page, sources.get(page.id));
     selection = new Set([...selection].filter((id) => window.VerynizeNodeIndex.find(nodes(), id)));
     scheduleWorldNotice();
     render();
