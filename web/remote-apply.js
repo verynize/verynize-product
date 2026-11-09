@@ -294,14 +294,17 @@
   function streamTick() {
     const g = peer && editor().gestureNodes?.();
     if (!g?.nodes.length) return;
-    const base = peer.baseline()?.pages?.find((p) => p.id === g.page)?.nodes;
-    if (!base) return;
+    const page = peer.baseline()?.pages?.find((p) => p.id === g.page);
+    if (!Array.isArray(page?.nodes)) return;
+    const base = window.VerynizeNodeIndex.of(page.nodes);
     streamed ||= new Map();
     const ops = [];
     for (const n of g.nodes) {
-      const prev = streamed.get(n.id) || base.find((b) => b.id === n.id);
+      const prev = streamed.get(n.id) || base.get(n.id);
       if (!prev) continue; // created by this gesture: sent whole when it ends
-      ops.push(...nodeOps(g.page, prev, n));
+      const changes = nodeOps(g.page, prev, n);
+      if (!changes.length) continue;
+      ops.push(...changes);
       streamed.set(n.id, structuredClone(n));
     }
     if (ops.length) peer.stream(ops);

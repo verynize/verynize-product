@@ -43,6 +43,7 @@ try {
   await a.locator("#cloud-create").click();
   await a.waitForFunction(() => document.getElementById("cloud-invite").value.includes("token="));
   const invite = await a.locator("#cloud-invite").inputValue();
+  b.on("dialog", (dialog) => dialog.accept(dialog.type() === "prompt" ? invite : undefined));
   await openSharedDesign(b);
   await b.locator("#cloud-invite").fill(invite);
   await b.locator("#cloud-connect").click();
@@ -64,9 +65,11 @@ try {
     return (await r.json()).document.pages.flatMap((p) => p.nodes).find((n) => n.id === id);
   };
 
-  // Test layers on A, far enough apart that a drag never snaps to another one.
+  // Test layers on A, on a page without the starter layers (nothing to snap to: a drag lands where it was dropped).
   const ids = await a.evaluate(() => {
     const d = window.design;
+    d.setSelection(d.getDocument().pages[0].nodes.map((n) => n.id));
+    d.runCommand("edit.delete");
     d.setCamera(40, 60, 1);
     const make = (type, extra) => {
       const id = d.addNode(type, extra);
