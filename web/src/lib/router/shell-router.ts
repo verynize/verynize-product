@@ -174,10 +174,18 @@ if (!host && !fileProtocol && location.pathname === "/index.html") {
 }
 // The entry's own state, before createBrowserHistory gives a state-less entry a fresh key.
 const rawStartState = (host ? host.initialState : window.history.state) as EntryState | null;
+// Before the file library has loaded (IndexedDB, asynchronously) the shown editor has no file id yet: a file launch
+// starts on the bare editor, which restoreFile settles to the file's URL (or Files) once the library is ready.
+function fileStartView(): ViewPath {
+  const { view } = shown();
+  return view === "/" && !body().contains("files-view") && legacy().fileLibrary?.isReady?.() === false
+    ? "/editor"
+    : view;
+}
 const history: RouterHistory = host
   ? host.router.history
   : fileProtocol
-    ? createMemoryHistory({ initialEntries: [shown().view] })
+    ? createMemoryHistory({ initialEntries: [fileStartView()] })
     : createBrowserHistory();
 // Memory history never owns the address bar, so the real fragment is already untouched there.
 const dropFragment = fileProtocol
