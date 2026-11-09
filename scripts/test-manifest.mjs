@@ -150,6 +150,7 @@ const AREA = {
     "desktop/capture-*.cjs",
     "desktop/render.cjs",
     "desktop/render-limits.cjs",
+    "desktop/render-bitmap.cjs",
     "desktop/preview-dom.cjs",
     "desktop/html-import.cjs",
     "integrations/export-*.mjs",
@@ -377,7 +378,7 @@ const canvas = [
   ]),
   electron("tests/canvas-bound-resize.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-effects.cjs", "canvas", AREA.inspector),
-  electron("tests/inspector-paints.cjs", "canvas", [...AREA.inspector, "integrations/paints.mjs"]),
+  electron("tests/inspector-paints.cjs", "canvas", [...AREA.inspector, ...AREA.capture, "integrations/paints.mjs"]),
   electron("tests/inspector-selection-colors.cjs", "canvas", AREA.inspector),
   electron("tests/inspector-typography.cjs", "canvas", [
     ...AREA.inspector,
@@ -404,6 +405,7 @@ const desktop = [
   ),
   unit("tests/desktop-projects.cjs", "desktop"),
   unit("tests/git-changes.cjs", "desktop"),
+  unit("tests/render-bitmap.cjs", "desktop", ["desktop/render-bitmap.cjs"]),
   unit("tests/render-limits.cjs", "desktop", ["desktop/render-limits.cjs"]),
   unit("tests/repositories.cjs", "desktop"),
   electron("tests/code-workspace.cjs", "desktop", [...AREA.code, ...AREA.preview], {

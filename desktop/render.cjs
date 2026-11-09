@@ -4,6 +4,7 @@ const { pathToFileURL } = require("node:url");
 const fs = require("node:fs/promises");
 const { BrowserWindow, dialog, app, screen } = require("electron");
 const { captureSize } = require("./render-limits.cjs");
+const { createCoverageCheck } = require("./render-bitmap.cjs");
 const { mapAssetUrls, assetUrls } = require("../integrations/asset-urls.cjs");
 const fsSync = require("node:fs");
 const { randomUUID } = require("node:crypto");
@@ -320,15 +321,48 @@ async function renderNow(
     const boxes = measure
       ? await guard.run("measure", () => window.webContents.executeJavaScript(MEASURE))
       : null;
-    const image = await guard.run("capture", () => window.webContents.capturePage(
-      { x: 0, y: 0, width: outputWidth, height: outputHeight },
-      { stayHidden: true, stayAwake: true },
-    ));
-    if (image.isEmpty()) throw Error("Render capture returned an empty image; capture refused.");
+    // The zoom probe and decoded background images above can invalidate paint after
+    // the earlier font barrier. Settle again after the last DOM work, before capture.
+    await guard.run("paint-settle", async () => {
+      window.webContents.invalidate();
+      await window.webContents.executeJavaScript(
+        "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+    });
+    let image;
+    const checkCoverage = createCoverageCheck();
+    for (let attempt = 0; attempt < 4; attempt++) {
+      image = await guard.run("capture", () => window.webContents.capturePage(
+        { x: 0, y: 0, width: outputWidth, height: outputHeight },
+        { stayHidden: true, stayAwake: true },
+      ));
+      // DOM/font readiness does not prove that the compositor supplied painted pixels.
+      // Check before encoding: isEmpty() also accepts allocated transparent PNGs.
+      const size = image.getSize();
+      // Validate the actual export bitmap, including display-scale normalization.
+      image = image.resize({ width: outputWidth, height: outputHeight, quality: "best" });
+      const coverage = checkCoverage(image.toBitmap());
+      const painted = !image.isEmpty() && coverage.pixels > 0;
+      if (painted && coverage.stable) break;
+      const reason = painted ? "unstable painted area" : "empty or fully transparent";
+      if (!painted || coverage.previousPixels)
+        console.warn("[render]", JSON.stringify({ category: "capture-retry", attempt: attempt + 1,
+          reason, paintedPixels: coverage.pixels, previousPaintedPixels: coverage.previousPixels,
+          width: size.width, height: size.height, outputWidth, outputHeight }));
+      if (attempt === 3)
+        throw Error(`Render capture remained ${reason} after retry; capture refused. Check that the selection contains stable visible artwork and try again.`);
+      // A partially painted/stale surface is not empty. Require two consecutive nonempty
+      // footprints that also retain all painted regions observed in this render.
+      // Yield to raster/compositor work under load, then let a fresh frame settle. Never
+      // mutate the page after this barrier; the readiness probe above invalidates layout.
+      await guard.run("capture-settle", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        window.webContents.invalidate();
+        await window.webContents.executeJavaScript(
+          "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+      });
+    }
     return {
-      dataURL: image
-        .resize({ width: outputWidth, height: outputHeight, quality: "best" })
-        .toDataURL(),
+      dataURL: image.toDataURL(),
       width: outputWidth,
       height: outputHeight,
       scale,
