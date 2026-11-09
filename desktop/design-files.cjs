@@ -24,6 +24,12 @@ async function unopened(file, error) {
     { code: error.code },
   );
 }
+async function copyDocumentAssets(document, file, opening) {
+  const { assetRefs, sidecarAssets, copyAssets } = await import("../integrations/asset-store.mjs");
+  if (!assetRefs(document).length) return;
+  const local = await require("./assets.cjs").store();
+  await copyAssets(document, opening ? sidecarAssets(file) : local, opening ? local : sidecarAssets(file));
+}
 class DesignFileSession {
   constructor(onChange = () => {}) {
     this.onChange = onChange;
@@ -50,6 +56,8 @@ class DesignFileSession {
       .read(target.name)
       .catch((error) => unopened(target.path, error));
     if (generation !== this.generation) throw Error("Document switched while opening.");
+    await copyDocumentAssets(state.document, target.path, true);
+    if (generation !== this.generation) throw Error("Document switched while opening.");
     this.select(target, state.revision);
     return { path: target.path, ...state };
   }
@@ -71,6 +79,8 @@ class DesignFileSession {
     try {
       const state = await target.store.read(target.name);
       if (this.selected !== target || state.revision === this.lastNotified) return;
+      await copyDocumentAssets(state.document, target.path, true);
+      if (this.selected !== target || state.revision === this.lastNotified) return;
       this.lastNotified = state.revision;
       this.onChange({ path: target.path, ...state });
     } catch (error) {
@@ -81,6 +91,8 @@ class DesignFileSession {
     if (!this.selected) throw Error("No design file is open");
     const target = this.selected,
       state = await target.store.read(target.name);
+    if (this.selected !== target) throw Error("Document switched while reloading.");
+    await copyDocumentAssets(state.document, target.path, true);
     if (this.selected !== target) throw Error("Document switched while reloading.");
     target.revision = state.revision;
     this.lastNotified = state.revision;
@@ -109,6 +121,7 @@ class DesignFileSession {
     if (generation !== this.generation)
       throw Error("Document switched while saving. Save the active document again.");
     if (!target) throw Error("Choose a destination first");
+    await copyDocumentAssets(document, target.path, false);
     const result = await target.store.mutate(target.name, async () => {
       if (generation !== this.generation) throw Error("Document switched while saving.");
       let current = null;

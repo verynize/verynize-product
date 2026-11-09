@@ -3,7 +3,7 @@
 //   - Paste: copying layers in Figma puts a binary scene into text/html; the canvas paste handler asks
 //     window.figmaPaste to convert it (main process) and pastes the result like in-app layers.
 //   - Drop: a .fig file dropped on the canvas imports as a new document.
-//     .pen files are vendor-encrypted and are refused with an explanation.
+//     .pen accepts the documented unencrypted JSON subset; encrypted/binary formats are refused.
 (() => {
   const desktop = () => window.desktop;
   // The command behind Insert › Import Figma and Settings › Connections › Figma (the chrome island takes it over);
@@ -58,8 +58,9 @@
       footer("Open the desktop app to import Figma files.");
       return;
     }
-    if (file.size > MAX) {
-      footer("The file exceeds 200 MB.");
+    const limit = /\.pen$/i.test(file.name) ? 5_000_000 : MAX;
+    if (file.size > limit) {
+      footer(`File exceeds limit ${limit} bytes.`);
       return;
     }
     footer(`Importing ${file.name}…`);

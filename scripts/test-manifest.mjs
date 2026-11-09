@@ -331,6 +331,7 @@ const canvas = [
   electron("tests/canvas-constraints.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-position.cjs", "canvas", AREA.inspector),
   electron("tests/canvas-compositing.cjs", "canvas", AREA.canvas),
+  electron("tests/render-readiness.cjs", "canvas", [...AREA.capture, "desktop/render.cjs", "desktop/assets.cjs", "desktop/render-assets.cjs", "scripts/render-test-main.cjs", "web/asset-store.js", "integrations/asset-store.mjs", "integrations/asset-urls.cjs"]),
   electron("tests/render-export.cjs", "canvas", [...AREA.capture, "desktop/render.cjs"]),
   electron("tests/canvas-codec.cjs", "canvas", [
     ...AREA.canvas,

@@ -17,7 +17,7 @@ const valid = (f) =>
   WEIGHT.test(String(f.weight)) &&
   ["normal", "italic", "oblique"].includes(f.style) &&
   typeof f.src === "string" &&
-  (SOURCE.test(f.src) || ASSET_URL.test(f.src)) &&
+  (SOURCE.test(f.src) || /^asset:[a-f0-9]{64}$/.test(f.src) || ASSET_URL.test(f.src)) &&
   (f.unicodeRange === undefined ||
     (typeof f.unicodeRange === "string" && RANGE.test(f.unicodeRange)));
 

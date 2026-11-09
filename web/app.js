@@ -1636,7 +1636,11 @@ async function exportArtwork({
     root.outerHTML +
     (shader ? "<script>" + window.BetterShaders.runtimeSource() + "</script>" : "") +
     "</body></html>";
-  if (format === "HTML") return { content: html, mime: "text/html", width: w, height: h };
+  const portableMarkup = async (markup) => {
+    const cloud = await (window.cloudAssets?.inlineHtml?.(markup) ?? markup);
+    return window.assetStore ? window.assetStore.inlineMarkup(cloud) : cloud;
+  };
+  if (format === "HTML") return { content: await portableMarkup(html), mime: "text/html", width: w, height: h };
   if (format === "SVG") {
     const clone = root.cloneNode(true);
     for (const node of clone.querySelectorAll("[data-shader-preset]")) {
@@ -1658,7 +1662,7 @@ async function exportArtwork({
       }
     }
     return {
-      content: `<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`,
+      content: await portableMarkup(`<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${window.embeddedFontCss?.(clone.outerHTML) || ""}</style>${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`),
       mime: "image/svg+xml",
       width: Math.ceil(w * scale),
       height: Math.ceil(h * scale),
@@ -1666,9 +1670,9 @@ async function exportArtwork({
   }
   if (!window.verynizePlatform.can("rasterExport"))
     throw Error("Open the desktop app for pixel-accurate raster export.");
-  /* cloud-assets: room images are inlined, the offscreen renderer loads no network URLs */ const raster =
+  /* The main process resolves room/hash assets through its per-render protocol allowlist. */ const raster =
     await window.desktop.renderDesign({
-      html: await (window.cloudAssets?.inlineHtml?.(html) ?? html),
+      html,
       width: Math.ceil(w - 1e-3),
       height: Math.ceil(h - 1e-3),
       scale,

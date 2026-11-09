@@ -401,7 +401,7 @@ test("IPC handlers: clipboard, .fig bytes and .pen refusal", async () => {
   );
   await assert.rejects(
     async () => handlers.figmaFile({ bytes: new Uint8Array([1]), name: "Design.pen" }),
-    /encrypted by their vendor/,
+    /Unsupported Pen signature; encrypted\/binary files are not decoded/,
   );
   assert.equal(await handlers.figmaFileOpen(), null);
   await assert.rejects(

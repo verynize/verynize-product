@@ -251,6 +251,17 @@ function createLiveBackend({
       : { ...document, name: "Untitled" };
   return {
     mode: "live",
+    assets: {
+      async put(ref, bytes, type) {
+        const target = await route(ref);
+        if (!target.live) return storeBackend.assets.put(ref, bytes, type);
+        return (await require("./assets.cjs").store()).put(bytes, type);
+      },
+      async get(ref, asset) {
+        const target = await route(ref);
+        return target.live ? (await require("./assets.cjs").store()).get(asset) : storeBackend.assets.get(ref, asset);
+      },
+    },
     shell: agentShell.createShell({
       activeEditor: editorReady,
       request,
@@ -423,6 +434,10 @@ function createLiveBackend({
               ...(result.fonts ? { fonts: result.fonts } : {}),
             };
         } catch {}
+      }
+      if (!state.live) {
+        const { copyAssets, sidecarAssets } = await import("../integrations/asset-store.mjs");
+        await copyAssets(state.document, sidecarAssets(store.file(state.name || ref)), await require("./assets.cjs").store());
       }
       return shot(state.document, pageId, nodeId, scale);
     },

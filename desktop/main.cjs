@@ -98,6 +98,7 @@ if (process.platform === "linux" && process.env.CI) {
 require("./app-preferences.cjs").attachDeepLinks(app); // verynize:// design links (Settings › Preferences › Advanced)
 void app.whenReady().then(async () => {
   appProtocol.registerHandler(protocol, net);
+  require("./assets.cjs").register();
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) =>
     callback(false),
   );

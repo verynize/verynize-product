@@ -5,7 +5,7 @@ const outputSize = (size, scale) => Math.max(1, Math.ceil(Math.ceil(size) * scal
 function captureSize(width, height, requestedScale, deviceScale = 1, screenshot = false) {
   if (![width, height, requestedScale, deviceScale].every((v) => Number.isFinite(v) && v > 0))
     throw Error("Invalid capture dimensions or scale");
-  const maxSide = Math.floor(MAX_SIDE / deviceScale);
+  const maxSide = Math.min(screenshot ? 4096 : Infinity, Math.floor(MAX_SIDE / deviceScale));
   const fits = (scale) => {
     const w = outputSize(width, scale),
       h = outputSize(height, scale);

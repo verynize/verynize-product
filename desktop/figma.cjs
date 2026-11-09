@@ -1021,8 +1021,15 @@ function convertFigFile(bytes, { name } = {}) {
     name: name || decoded.meta?.file_name || undefined,
   });
 }
-const PEN_MESSAGE =
-  ".pen files are encrypted by their vendor and can only be opened with the vendor's own tools. Export the design to another format (for example SVG or PNG) and import that instead.";
+async function convertPenFile(bytes, name) {
+  const { importPen } = await import("../integrations/codec-pen.mjs");
+  const result = await importPen(Buffer.from(bytes), {
+    name: name?.replace(/\.pen$/i, ""),
+    assetSink: async (data, type) => (await require("./assets.cjs").store()).put(data, type),
+  });
+  return { document: result.document, warnings: result.unsupportedFeatures.map((item) => `Pen ${item.sourceId || "document"}: unsupported ${item.feature}`),
+    source: { format: result.sourceFormat, digest: result.sourceDigest }, fidelityStatus: result.fidelityStatus };
+}
 function registerFigma(handle, parent, { dialog } = {}) {
   handle("importFigma", async (options) => {
     let bearer;
@@ -1034,7 +1041,7 @@ function registerFigma(handle, parent, { dialog } = {}) {
   });
   handle("figmaClipboard", (html) => convertFigmaClipboard(html));
   handle("figmaFile", ({ bytes, name } = {}) => {
-    if (typeof name === "string" && /\.pen$/i.test(name)) throw Error(PEN_MESSAGE);
+    if (typeof name === "string" && /\.pen$/i.test(name)) return convertPenFile(bytes, name);
     return convertFigFile(bytes, {
       name: typeof name === "string" ? name.replace(/\.fig$/i, "").slice(0, 200) : undefined,
     });
@@ -1044,15 +1051,17 @@ function registerFigma(handle, parent, { dialog } = {}) {
     const picked = await electron.showOpenDialog(parent, {
       title: "Import Figma file",
       properties: ["openFile"],
-      filters: [{ name: "Figma file", extensions: ["fig"] }],
+      filters: [{ name: "Design file", extensions: ["fig", "pen"] }],
     });
     if (picked.canceled || !picked.filePaths[0]) return null;
     const file = picked.filePaths[0];
     const stat = await fs.stat(file);
     if (!stat.isFile() || stat.size > FILE_LIMIT) throw Error("Choose a .fig file under 200 MB");
+    if (/\.pen$/i.test(file) && stat.size > 5_000_000) throw Error("Pen source exceeds limit 5000000 bytes");
     const name = require("node:path")
       .basename(file)
       .replace(/\.fig$/i, "");
+    if (/\.pen$/i.test(file)) return convertPenFile(await fs.readFile(file), name);
     return convertFigFile(await fs.readFile(file), { name });
   });
 }
@@ -1064,5 +1073,5 @@ module.exports = {
   convertFigFile,
   parseFigmaURL,
   vectorSvg,
-  PEN_MESSAGE,
+  convertPenFile,
 };
