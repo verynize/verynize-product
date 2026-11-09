@@ -353,6 +353,7 @@ const canvas = [
   electron("tests/canvas-selection-marks.cjs", "canvas", AREA.canvas),
   electron("tests/canvas-frame-labels.cjs", "canvas", AREA.canvas),
   unit("tests/node-index.cjs", "canvas", ["web/node-index.js"]),
+  unit("tests/remote-apply.cjs", "canvas", ["web/remote-apply.js", "web/cloud-ops.js"]),
   electron("tests/canvas-text-caret.cjs", "canvas", AREA.canvas),
   electron("tests/canvas-world-bounds.cjs", "canvas", [...AREA.canvas, "web/document-safety.js"]),
   electron("tests/canvas-page.cjs", "canvas", AREA.canvas),
@@ -725,6 +726,13 @@ const e2eCloud = [
     "web/wonder-shell.js",
   ]),
   electron("tests/cloud-desktop.mjs", "e2e-cloud", AREA.cloudRenderer),
+  electron("tests/cloud-gesture-remote.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    "web/remote-apply.js",
+    "web/canvas-interactions.js",
+    "web/selection-chrome.js",
+    "web/text-caret.js",
+  ]),
   electron("tests/cloud-pages-desktop.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
     "web/page-loader.js",

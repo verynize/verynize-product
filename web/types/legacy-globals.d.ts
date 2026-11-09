@@ -102,6 +102,16 @@ declare global {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
       [key: string]: any;
     };
+    /** web/remote-apply.js: collaborators' edits patched in node by node. */
+    remoteApply: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      [key: string]: any;
+    };
+    /** web/node-index.js */
+    VerynizeNodeIndex: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped legacy API
+      [key: string]: any;
+    };
     /** web/document-safety.js; only the world-bounds notices are typed. */
     documentSafety: {
       worldBounds(page: object, recenter: () => void): void;

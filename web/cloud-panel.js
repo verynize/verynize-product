@@ -83,7 +83,6 @@
     batchNumber = 0,
     clientId = "",
     clock = null,
-    sendTimer,
     rotating = false;
   let legacyPending = false,
     inflight = null,
@@ -329,13 +328,21 @@
     $("cloud-conflict").hidden = false;
     status("Concurrent edits need your choice. Local work has been retained.");
   }
-  function apply(doc) {
+  function apply(doc, remote = false) {
     applying = true;
     try {
-      const selection = window.design.getSelection?.() || [];
-      window.design.setDocument(doc);
-      if (selection.length && window.design.setSelection) window.design.setSelection(selection);
-      lastLocalDoc = window.design.getDocument();
+      const prior = lastLocalDoc;
+      // Collaborators' edits are patched in node by node (web/remote-apply.js): a gesture, the selection and the
+      // caret survive them, and the nodes a gesture holds keep their pre-gesture state here until it ends.
+      const held = remote ? window.remoteApply?.apply(doc) : null;
+      if (held)
+        lastLocalDoc = window.remoteApply.baseline(window.design.getDocument(), prior, held);
+      else {
+        const selection = window.design.getSelection?.() || [];
+        window.design.setDocument(doc);
+        if (selection.length && window.design.setSelection) window.design.setSelection(selection);
+        lastLocalDoc = window.design.getDocument();
+      }
       lastLocal = shared(lastLocalDoc);
       drawPeers();
     } finally {
@@ -413,7 +420,7 @@
       return;
     }
     try {
-      apply(next);
+      apply(next, true);
     } catch (e) {
       status("Unable to apply shared changes: " + e.message);
     }
@@ -421,7 +428,6 @@
   // One in-flight batch keeps a rejected prefix from being overtaken by later edits.
   // Retained (rejected) edits wait on their own; the edits that do not build on them still go.
   async function sendPending() {
-    clearTimeout(sendTimer);
     if (socket?.readyState !== WebSocket.OPEN || resyncing || pending.some((b) => b.sent)) return;
     const batch = pending[0];
     if (batch) {
@@ -574,15 +580,30 @@
           last.ops.length + group.length <= limits.BATCH_OPS &&
           last.size + size <= limits.BATCH_BYTES - limits.ENVELOPE_BYTES
         ) {
-          last.ops.push(...group);
-          last.size += size;
+          // Repeated edits of one property (a drag, a slider) keep only the newest value.
+          last.size += size - window.remoteApply.coalesce(last.ops, group, limits.bytes);
         } else pending.push({ n: ++batchNumber, ops: group, sent: false, size, actor });
       }
-    clearTimeout(sendTimer);
-    sendTimer = setTimeout(sendPending, 40);
+    // A fixed interval that later edits do not push back: a burst is sent while it lasts, not after it ends.
+    sendSoon();
     // sendPending writes the outbox before each send; this only covers edits waiting behind it.
     void saveOutbox();
   }
+  const sendSoon = window.remoteApply.throttle(() => void sendPending());
+  // Gestures (web/remote-apply.js): their nodes' changes stream while the pointer moves; remote edits to those nodes
+  // wait, and are reconciled from confirmed + pending once the gesture ends.
+  window.remoteApply.connect({
+    baseline: () => lastLocalDoc,
+    stream: (ops) => {
+      if (connection && protocol >= 2 && canEdit() && !applying) {
+        const local = Pages.splitLocal(ops);
+        if (local.length) queueOps(local);
+      }
+    },
+    settle: () => {
+      if (connection && protocol >= 2) rebuild();
+    },
+  });
   function localChange() {
     drawPeers();
     if (applying || !connection) return;
@@ -695,7 +716,7 @@
       refreshHistoryButtons();
       return;
     }
-    apply(next);
+    apply(next, true);
     to.push({ from: current, to: lastLocalDoc, seq: remoteSeq, at: 0, history: true });
     const send = Pages.splitLocal(changes);
     if (send.length) queueOps(send);
@@ -807,7 +828,7 @@
     // which would send them straight back).
     if (own && !Sync.rejection(message) && retained.length) retryRetained();
     void saveOutbox(true);
-    void sendPending();
+    sendSoon(); // the next batch waits for the send interval, so a burst goes out in a few batches
   }
   /**
    * Pages fetched on the socket (lazy rooms): each replaces its stub in the confirmed document and
@@ -998,7 +1019,7 @@
     resetHistory();
     clearTimeout(timer);
     clearTimeout(retryTimer);
-    clearTimeout(sendTimer);
+    sendSoon.cancel();
     unsub?.();
     unsub = null;
     const old = socket;
