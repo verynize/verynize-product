@@ -33,9 +33,8 @@
       });
     }
     const signature = ({ document: _document, ...meta }) => JSON.stringify(meta);
-    async function write(value) {
-      await opened;
-      const changed = value.files.filter((file) => {
+    const unsaved = (value) =>
+      value.files.filter((file) => {
         const old = saved.get(file.id);
         return (
           !old ||
@@ -43,25 +42,77 @@
           old.meta !== signature(file)
         );
       });
+    let inflight = null;
+    async function write(value) {
+      await opened;
+      const changed = unsaved(value);
       const ids = new Set(value.files.map((file) => file.id));
-      await transaction("readwrite", (store) => {
-        for (const id of saved.keys()) if (!ids.has(id)) store.delete("file:" + id);
-        for (const file of changed) store.put(file, "file:" + file.id);
-        const { files, ...meta } = value;
-        store.put({ ...meta, ids: files.map((file) => file.id) }, "meta");
-      });
+      inflight = value;
+      try {
+        await transaction("readwrite", (store) => {
+          for (const id of saved.keys()) if (!ids.has(id)) store.delete("file:" + id);
+          for (const file of changed) store.put(file, "file:" + file.id);
+          const { files, ...meta } = value;
+          store.put({ ...meta, ids: files.map((file) => file.id), savedAt: Date.now() }, "meta");
+        });
+      } finally {
+        if (inflight === value) inflight = null;
+      }
       saved.clear();
       for (const file of value.files)
         saved.set(file.id, { document: file.document, meta: signature(file) });
     }
+    // An IndexedDB write the page starts while it unloads may never commit (and one still waiting for the idle callback
+    // never starts). pagehide keeps what is not stored yet in a localStorage journal, written synchronously; the next
+    // load applies it when it is newer than the stored library, then removes it.
+    const journalKey = "verynize-library-journal:" + databaseName;
+    function writeJournal() {
+      const value = queued || inflight;
+      if (!value) return;
+      try {
+        const { files, ...meta } = value;
+        localStorage.setItem(
+          journalKey,
+          JSON.stringify({
+            at: Date.now(),
+            meta: { ...meta, ids: files.map((file) => file.id) },
+            files: unsaved(value),
+          }),
+        );
+      } catch {
+        // Too large for localStorage: the IndexedDB write below is all there is, as before.
+      }
+    }
+    function readJournal(stored, files) {
+      let journal = null;
+      try {
+        journal = JSON.parse(localStorage.getItem(journalKey) || "null");
+      } catch {}
+      if (!journal?.meta || !Array.isArray(journal.meta.ids) || !Array.isArray(journal.files))
+        return null;
+      if (stored && !(journal.at > (stored.savedAt || 0))) return null;
+      const byId = new Map(files.map((file) => [file.id, file]));
+      for (const file of journal.files) byId.set(file.id, file);
+      const merged = journal.meta.ids.map((id) => byId.get(id));
+      if (merged.some((file) => !file)) return null;
+      const { ids: _ids, ...meta } = journal.meta;
+      return { ...meta, files: merged };
+    }
+    const dropJournal = () => {
+      try {
+        localStorage.removeItem(journalKey);
+      } catch {}
+    };
     async function load(legacy, sourceError = null) {
       try {
         await opened;
         const meta = await transaction("readonly", (store) => store.get("meta"));
         if (!meta) {
           if (sourceError) throw sourceError;
-          await write(legacy);
-          return legacy;
+          const journaled = readJournal(null, legacy.files);
+          await write(journaled || legacy);
+          dropJournal();
+          return journaled || legacy;
         }
         const files = await Promise.all(
           meta.ids.map((id) => transaction("readonly", (store) => store.get("file:" + id))),
@@ -69,7 +120,14 @@
         if (files.some((file) => !file)) throw Error("A stored library file is missing");
         for (const file of files)
           saved.set(file.id, { document: file.document, meta: signature(file) });
-        const { ids: _ids, ...rest } = meta;
+        const journaled = readJournal(meta, files);
+        if (journaled) {
+          await write(journaled);
+          dropJournal();
+          return journaled;
+        }
+        dropJournal();
+        const { ids: _ids, savedAt: _savedAt, ...rest } = meta;
         return { ...rest, files };
       } catch (error) {
         onError(error);
@@ -112,6 +170,7 @@
         );
     }
     addEventListener("pagehide", () => {
+      writeJournal();
       flush().catch(() => {});
     });
     return { load, schedule, flush };
