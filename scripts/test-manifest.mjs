@@ -424,6 +424,11 @@ const desktop = [
     "web-start/src/server-telemetry.ts",
     "web-start/src/telemetry.ts",
   ]),
+  unit("tests/telemetry-release-build.mjs", "desktop", [
+    "web-start/build/telemetry.mjs",
+    "scripts/env.mjs",
+    "vite.renderer.config.ts",
+  ]),
   electron("tests/telemetry-desktop.cjs", "desktop", [
     "desktop/telemetry.cjs",
     "web/telemetry-scrub.js",
