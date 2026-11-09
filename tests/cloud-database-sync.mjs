@@ -135,6 +135,8 @@ try {
   });
   const cloud = await desktop.evaluate((id) => window.fileLibrary.cloudOf(id), fileId);
   assert.ok(cloud, "creation resolves only after database storage");
+  // Another device's new file shows on focus or the next minute's poll: ask now.
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent("cloud-files-changed")));
   await page.locator(`[data-room-id="${cloud.roomId}"] .file-open`).waitFor();
   await page.locator(`[data-room-id="${cloud.roomId}"] .file-open`).click();
   await page.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, cloud.roomId);

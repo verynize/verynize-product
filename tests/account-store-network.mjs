@@ -40,6 +40,9 @@ try {
         etag: response.request().headers()["if-none-match"] || "",
       });
   });
+  // A focus right after a read does not read again; the poll itself waits 30 s or more.
+  await page.evaluate(() => window.accountStore.refresh());
+  reads.length = 0;
   await new Promise((resolve) => setTimeout(resolve, 4000));
   assert.deepEqual(reads, [], "no reads while idle (the poll waits 30 s or more)");
   await page.evaluate(() => window.accountStore.put("preference:poll-test", 1));

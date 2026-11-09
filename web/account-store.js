@@ -359,6 +359,7 @@
           emit();
         }
         // A snapshot: `pending` changes while each write is awaited.
+        const sent = new Set(pending.values());
         for (const [key, change] of Array.from(pending)) {
           let item;
           try {
@@ -418,6 +419,12 @@
         clearTimeout(retryTimer);
         networkAttempts = 0;
         report("");
+        // Saves made while this sync ran, and conflicts rebased on the server's revision, go out next
+        // (after `syncing` is cleared: a save during a sync only joined the one in flight).
+        if ([...pending.values()].some((change) => !sent.has(change))) {
+          clearTimeout(timer);
+          timer = setTimeout(() => sync(false), 0);
+        }
       } catch (e) {
         if (identity === expected) {
           clearTimeout(retryTimer);
