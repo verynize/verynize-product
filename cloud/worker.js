@@ -1,3 +1,6 @@
+// First: the design engine's resources must be in place before any chunk that holds the engine
+// evaluates, and the bundler may split the engine into a chunk shared with lazily loaded importers.
+import "#mcp-env";
 import { sql } from "drizzle-orm";
 import { database } from "./db.js";
 import {
