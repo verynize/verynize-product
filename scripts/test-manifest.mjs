@@ -208,6 +208,7 @@ const AREA = {
   ],
   cloudRenderer: [
     "web/cloud-*.js",
+    "web/room-sync.js",
     "web/cloud-panel.css",
     "web/src/lib/cloud-account.ts",
     "web/src/lib/query/**",
@@ -217,6 +218,7 @@ const AREA = {
   ],
   cloud: [
     "cloud/**",
+    "web/room-sync.js",
     "scripts/auth-schema.mjs",
     "tests/fixtures/account-directory-v1.js",
     "tests/fixtures/cloud-worker-v1.js",
@@ -652,6 +654,8 @@ export const CLOUD_SCENARIOS = [
 const cloud = [
   ...CLOUD_SCENARIOS,
   "tests/cloud-room-poison.mjs",
+  // Fault-injecting room subclass (workerd modules): workerd only.
+  "tests/cloud-sync-integrity.mjs",
   "tests/cloud-ops-indexed.mjs",
 ].map((file) => ({
   file,
@@ -659,6 +663,7 @@ const cloud = [
   lane: "cloud",
   covers: AREA.cloud,
 }));
+cloud.push(unit("tests/room-sync.mjs", "cloud", ["web/room-sync.js"]));
 const cloudNode = [...CLOUD_SCENARIOS, "tests/cloud-node-server.mjs"].map((file) => ({
   id: `node:${file}`,
   file,
