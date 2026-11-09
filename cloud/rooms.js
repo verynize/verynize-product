@@ -4,6 +4,7 @@
 // (cloud/room-store.js) and clients that ask for it load pages lazily (`lazy=1`, `sync`, `pages`).
 import { DurableObject, acceptWebSocket } from "#cloud-runtime";
 import "../web/cloud-ops.js";
+import "../web/room-sync.js";
 import { RoomStore } from "./room-store.js";
 import { RoomHistory } from "./room-history.js";
 import {
@@ -32,6 +33,7 @@ import { reportError } from "./telemetry.js";
 import { mayHoldInline, rejectInline, screenOps } from "./inline-binaries.js";
 
 const Ops = globalThis.VerynizeOps;
+const Sync = globalThis.VerynizeRoomSync;
 /** What collaborators see of a socket (its attachment). */
 const peerOf = (state) => ({
   id: state.id,
@@ -55,6 +57,12 @@ const ORG_ROLES = ["viewer", "commenter", "editor", "owner"];
 export const VISIBILITIES = ["private", "public"];
 const PAGE_ID = (id) => typeof id === "string" && id.length > 0 && id.length <= 200;
 const MAX_PAGE_REQUEST = 200;
+// Receipts kept per client for answering a batch sent again (its outcome, not a bare "duplicate").
+const RECEIPTS_KEPT = 64;
+const INTERRUPTED =
+  "This batch interrupted room processing. Edits are retained on this device; retry a smaller import.";
+/** The `code` of a stored batch rejection (web/room-sync.js `rejection`). */
+const rejectionCode = (reason) => (reason === INTERRUPTED ? "interrupted" : "too_large");
 const requireDocument = (document) => {
   if (document === null || typeof document !== "object")
     fail(400, "Document must be a JSON object or array");
@@ -75,6 +83,7 @@ export class DesignRoom extends DurableObject {
       CREATE TABLE IF NOT EXISTS rejected_batches (client_id TEXT, batch INTEGER, reason TEXT NOT NULL, PRIMARY KEY(client_id,batch));
       CREATE TABLE IF NOT EXISTS pending_batches (client_id TEXT, batch INTEGER, started_at INTEGER NOT NULL, PRIMARY KEY(client_id,batch));
       CREATE TABLE IF NOT EXISTS clients (client_id TEXT PRIMARY KEY, last_batch INTEGER NOT NULL, seen_at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS batch_receipts (client_id TEXT NOT NULL, batch INTEGER NOT NULL, revision INTEGER NOT NULL, applied INTEGER NOT NULL, PRIMARY KEY(client_id,batch));
       CREATE TABLE IF NOT EXISTS comments (id TEXT PRIMARY KEY, author TEXT NOT NULL, account_id TEXT, page_id TEXT, node_id TEXT, text TEXT NOT NULL, created_at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     `);
@@ -245,11 +254,23 @@ export class DesignRoom extends DurableObject {
   broadcast(value, except) {
     const message = JSON.stringify(value);
     for (const socket of this.ctx.getWebSockets())
-      if (socket !== except) {
-        try {
-          socket.send(message);
-        } catch {}
-      }
+      if (socket !== except) this.deliver(socket, message);
+  }
+  /**
+   * Send one message to one socket. A socket that cannot take it is closed, so its client
+   * reconnects and resyncs instead of silently missing an operation or an acknowledgement.
+   */
+  deliver(socket, message) {
+    try {
+      socket.send(typeof message === "string" ? message : JSON.stringify(message));
+      return true;
+    } catch (error) {
+      console.warn("[room-socket] send failed:", error?.message || error);
+      try {
+        socket.close(1011, "Message delivery failed");
+      } catch {}
+      return false;
+    }
   }
 
   stampStore() {
@@ -318,6 +339,43 @@ export class DesignRoom extends DurableObject {
       .exec("SELECT batch FROM rejected_batches WHERE client_id=?", client || "")
       .toArray()
       .map((row) => row.batch);
+  }
+  /** The rejection `code` of each rejected batch of a client: {batch: code}. */
+  rejectedCodes(client) {
+    return Object.fromEntries(
+      this.sql
+        .exec("SELECT batch,reason FROM rejected_batches WHERE client_id=?", client || "")
+        .toArray()
+        .map((row) => [row.batch, rejectionCode(row.reason)]),
+    );
+  }
+  /** What a snapshot tells a client about its batches. */
+  batchState(client) {
+    return {
+      rejectedBatches: this.rejectedBatches(client),
+      rejectedCodes: this.rejectedCodes(client),
+    };
+  }
+  /**
+   * Digests (web/room-sync.js) of the pages in `ids` and of the settings at the current revision,
+   * for a client that claims to hold them (`sync` at the room's revision). Cached per revision.
+   */
+  contentDigests(ids) {
+    if (this.store.layout !== "pages") return {};
+    const revision = this.row().revision;
+    if (this.digestCache?.revision !== revision)
+      this.digestCache = { revision, pages: new Map(), meta: null };
+    const cache = this.digestCache;
+    const digests = {};
+    for (const id of ids) {
+      if (!cache.pages.has(id)) {
+        const page = this.store.page(id);
+        cache.pages.set(id, page ? Sync.pageDigest(page) : null);
+      }
+      if (cache.pages.get(id)) digests[id] = cache.pages.get(id);
+    }
+    cache.meta ??= Sync.metaDigest(this.store.metadata());
+    return { digests, metaDigest: cache.meta };
   }
 
   /**
@@ -397,8 +455,7 @@ export class DesignRoom extends DurableObject {
         }
         let result;
         if (poisoned) {
-          const reason =
-            "This batch interrupted room processing. Edits are retained on this device; retry a smaller import.";
+          const reason = INTERRUPTED;
           this.sql.exec(
             "INSERT OR REPLACE INTO rejected_batches VALUES (?,?,?)",
             client,
@@ -414,9 +471,23 @@ export class DesignRoom extends DurableObject {
             rejected: ops.length,
             tooLarge: true,
             retained: true,
+            code: "interrupted",
             error: reason,
           };
         } else result = this.applyBatchNow(data, role, who);
+        // The outcome answers this batch if it is sent again (a lost acknowledgement).
+        this.sql.exec(
+          "INSERT OR REPLACE INTO batch_receipts (client_id,batch,revision,applied) VALUES (?,?,?,?)",
+          client,
+          batch,
+          result.revision,
+          result.ops.length,
+        );
+        this.sql.exec(
+          "DELETE FROM batch_receipts WHERE client_id=? AND batch<=?",
+          client,
+          batch - RECEIPTS_KEPT,
+        );
         // These writes share the document/stamp transaction. Never ack the durable marker.
         this.sql.exec(
           "INSERT OR REPLACE INTO clients (client_id,last_batch,seen_at) VALUES (?,?,?)",
@@ -446,6 +517,15 @@ export class DesignRoom extends DurableObject {
       const reason = this.sql
         .exec("SELECT reason FROM rejected_batches WHERE client_id=? AND batch=?", client, batch)
         .toArray()[0]?.reason;
+      // The original outcome: the revision that carried the batch's operations and how many
+      // applied. Without a receipt (older batch) the client must resync to see them.
+      const receipt = this.sql
+        .exec(
+          "SELECT revision,applied FROM batch_receipts WHERE client_id=? AND batch=?",
+          client,
+          batch,
+        )
+        .toArray()[0];
       return {
         type: "ops",
         client,
@@ -454,7 +534,12 @@ export class DesignRoom extends DurableObject {
         ops: [],
         rejected: reason ? ops.length : 0,
         duplicate: true,
-        ...(reason ? { tooLarge: true, retained: true, error: reason } : {}),
+        ...(receipt
+          ? { appliedRevision: receipt.revision, applied: receipt.applied }
+          : { resync: true }),
+        ...(reason
+          ? { tooLarge: true, retained: true, code: rejectionCode(reason), error: reason }
+          : {}),
       };
     }
     if (!atLeast(role, "editor"))
@@ -496,7 +581,7 @@ export class DesignRoom extends DurableObject {
       stamp: this.clock.next(),
       external: (id) => state.stubs.has(this.store.nodePage(id)),
     });
-    result.rejected.unshift(...screened.rejected);
+    result.rejected.unshift(...screened.rejected.map((item) => ({ ...item, code: "too_large" })));
     if (!result.applied.length)
       return {
         type: "ops",
@@ -527,6 +612,7 @@ export class DesignRoom extends DurableObject {
         error: error.message,
         tooLarge: true,
         retained: true,
+        code: "too_large",
       };
     }
     store.flush();
@@ -836,9 +922,7 @@ export class DesignRoom extends DurableObject {
           role,
           capability: capability ? state.capability : null,
         });
-        try {
-          socket.send(JSON.stringify({ type: "role", role }));
-        } catch {}
+        this.deliver(socket, { type: "role", role });
       }
     }
     this.broadcast({ type: "presence", peers: this.peers() });
@@ -919,7 +1003,7 @@ export class DesignRoom extends DurableObject {
               type: "snapshot",
               ...this.snapshot(),
               acked,
-              rejectedBatches: this.rejectedBatches(client),
+              ...this.batchState(client),
             }),
           );
         this.pruneSilent();
@@ -1196,9 +1280,7 @@ export class DesignRoom extends DurableObject {
         delta && state?.presence === 2
           ? peer
           : (list ??= JSON.stringify({ type: "presence", peers: this.peers() }));
-      try {
-        socket.send(message);
-      } catch {}
+      this.deliver(socket, message);
     }
   }
 
@@ -1217,9 +1299,7 @@ export class DesignRoom extends DurableObject {
               type: "presence",
               peers: this.peers().filter((peer) => !gone.has(peer.id)),
             }));
-      try {
-        socket.send(message);
-      } catch {}
+      this.deliver(socket, message);
     }
   }
 
@@ -1254,7 +1334,7 @@ export class DesignRoom extends DurableObject {
         if (!atLeast(state.role, "editor")) throw Error("Your role in this room cannot edit");
         const response = this.update(data.document, data.baseRevision);
         if (response.status !== 200)
-          ws.send(JSON.stringify({ type: "conflict", ...(await response.json()) }));
+          this.deliver(ws, { type: "conflict", ...(await response.json()) });
       } else if (data.type === "ops") {
         const batch = { ...data, client: state.client || data.client };
         const result =
@@ -1264,7 +1344,7 @@ export class DesignRoom extends DurableObject {
             name: state.name,
           }));
         if (result.ops.length) this.broadcast(result);
-        else ws.send(JSON.stringify(result));
+        else this.deliver(ws, result);
       } else if (data.type === "sync") {
         // A lazy client's snapshot: the pages it holds (or the active page), unless its revision
         // is current. `acked` drops the batches the room already applied.
@@ -1277,24 +1357,26 @@ export class DesignRoom extends DurableObject {
         const pages = Array.isArray(data.pages)
           ? data.pages.filter(PAGE_ID).slice(0, MAX_PAGE_REQUEST)
           : [];
-        ws.send(
-          JSON.stringify(
-            Number.isSafeInteger(data.revision) && data.revision === revision
-              ? {
-                  type: "snapshot",
-                  same: true,
-                  revision,
-                  acked,
-                  rejectedBatches: this.rejectedBatches(state.client),
-                  pages: this.store.index(),
-                }
-              : {
-                  type: "snapshot",
-                  ...this.lazySnapshot(pages),
-                  acked,
-                  rejectedBatches: this.rejectedBatches(state.client),
-                },
-          ),
+        // `same` carries what the client checks its copy against: the page index (node counts)
+        // and digests of the pages it holds (web/room-sync.js `divergence`).
+        this.deliver(
+          ws,
+          Number.isSafeInteger(data.revision) && data.revision === revision
+            ? {
+                type: "snapshot",
+                same: true,
+                revision,
+                acked,
+                ...this.batchState(state.client),
+                pages: this.store.index(),
+                ...this.contentDigests(pages),
+              }
+            : {
+                type: "snapshot",
+                ...this.lazySnapshot(pages),
+                acked,
+                ...this.batchState(state.client),
+              },
         );
       } else if (data.type === "pages") {
         // Pages arrive on the socket that carries the operations, so a page reflects every
@@ -1302,10 +1384,9 @@ export class DesignRoom extends DurableObject {
         // page keeps each under the page limit.
         const ids = Array.isArray(data.ids) ? data.ids : [];
         const { revision, pages, missing } = this.readPages(ids);
-        for (const page of pages)
-          ws.send(JSON.stringify({ type: "pages", revision, pages: [page] }));
+        for (const page of pages) this.deliver(ws, { type: "pages", revision, pages: [page] });
         if (missing.length || !pages.length)
-          ws.send(JSON.stringify({ type: "pages", revision, pages: [], missing }));
+          this.deliver(ws, { type: "pages", revision, pages: [], missing });
       } else if (data.type === "presence") {
         const presence = {
           name: typeof data.name === "string" ? data.name.slice(0, 80) : "Guest",
@@ -1324,7 +1405,7 @@ export class DesignRoom extends DurableObject {
         this.pruneSilent(now);
       } else throw Error("Unknown message type");
     } catch (error) {
-      ws.send(JSON.stringify({ type: "error", error: error.message }));
+      this.deliver(ws, { type: "error", error: error.message });
     }
   }
 
