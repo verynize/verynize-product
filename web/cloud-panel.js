@@ -141,6 +141,17 @@
     selfId,
     peers: peerList,
   });
+  // The open page without copying the document (getDocument clones it): presence runs per pointer move.
+  const currentPage = () =>
+    window.design.getView?.().page ?? window.design.getDocument().activePage;
+  // Presence version 2: the room sends one peer per change and expects a heartbeat while idle.
+  const HEARTBEAT_MS = 20000;
+  function setPeers(list) {
+    peerList = list;
+    $("cloud-presence").textContent = `${peerList.length} connected`;
+    drawPeers();
+    stateChanged();
+  }
   function drawPeers() {
     if (window.cloudPresence) return window.cloudPresence.sync(presenceState());
     document.getElementById("cloud-cursors")?.remove();
@@ -154,7 +165,7 @@
       pointerEvents: "none",
       zIndex: "2147483646",
     });
-    const activePage = window.design.getDocument().activePage;
+    const activePage = currentPage();
     for (const peer of peerList) {
       if (peer.id === selfId || !peer.cursor || (peer.pageId && peer.pageId !== activePage))
         continue;
@@ -183,7 +194,7 @@
       type: "presence",
       name: presenceName(),
       cursor,
-      pageId: window.design.getDocument().activePage,
+      pageId: currentPage(),
     };
     // null: "Go invisible" sends nothing (collab/presence-engine.ts).
     const message = window.cloudPresence ? window.cloudPresence.message(base) : base;
@@ -445,7 +456,11 @@
       return;
     }
     const limits = window.VerynizeRoomLimits;
-    const groups = limits.batchOps(ops.map((op) => ({ ...op, s: clock.next() })));
+    // A large change goes out as whole artboards, each batch applied atomically by the room.
+    const groups = limits.batchOps(
+      ops.map((op) => ({ ...op, s: clock.next() })),
+      { documents: () => ({ before: confirmed, after: lastLocalDoc }) },
+    );
     // Version history: a batch names its editor (an agent, a restore) when it is not the person;
     // batches of different editors never merge (web/version-history.js, cloud/room-history.js).
     const actor = window.versionHistory?.batchActor?.() || null;
@@ -464,8 +479,8 @@
           !last.sent &&
           last.size &&
           JSON.stringify(last.actor || null) === JSON.stringify(actor) &&
-          last.ops.length + group.length <= 4000 &&
-          last.size + size <= limits.MESSAGE_BYTES - 65536
+          last.ops.length + group.length <= limits.BATCH_OPS &&
+          last.size + size <= limits.BATCH_BYTES - limits.ENVELOPE_BYTES
         ) {
           last.ops.push(...group);
           last.size += size;
@@ -935,6 +950,7 @@
     if (info.token) url.searchParams.set("token", info.token);
     if (clientId) url.searchParams.set("client", clientId);
     url.searchParams.set("lazy", "1");
+    url.searchParams.set("presence", "2");
     const session = sessionFor(info.server);
     if (session) url.searchParams.set("session", session);
     const ws = new WebSocket(url);
@@ -956,6 +972,12 @@
         const message = JSON.parse(event.data);
         if (message.type === "welcome") {
           selfId = message.id;
+          if (message.presence >= 2) {
+            const beat = setInterval(() => {
+              if (ws !== socket || ws.readyState !== WebSocket.OPEN) clearInterval(beat);
+              else ws.send('{"type":"heartbeat"}');
+            }, HEARTBEAT_MS);
+          }
           if (message.role) setRole(message.role);
           // Lazy rooms send their snapshot after `sync`: the pages held here, or the active one.
           if (message.lazyPages) {
@@ -973,10 +995,21 @@
           return;
         }
         if (message.type === "presence") {
-          peerList = message.peers || [];
-          $("cloud-presence").textContent = `${peerList.length} connected`;
-          drawPeers();
-          stateChanged();
+          setPeers(message.peers || []);
+          return;
+        }
+        if (message.type === "peer" && message.peer?.id) {
+          const at = peerList.findIndex((peer) => peer.id === message.peer.id);
+          setPeers(
+            at < 0
+              ? [...peerList, message.peer]
+              : peerList.map((peer, index) => (index === at ? message.peer : peer)),
+          );
+          return;
+        }
+        if (message.type === "peerLeft") {
+          const gone = new Set(message.ids || []);
+          setPeers(peerList.filter((peer) => !gone.has(peer.id)));
           return;
         }
         if (message.type === "snapshot") {

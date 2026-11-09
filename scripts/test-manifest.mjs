@@ -653,6 +653,7 @@ const cloud = [
   ...CLOUD_SCENARIOS,
   "tests/cloud-room-poison.mjs",
   "tests/cloud-ops-indexed.mjs",
+  "tests/cloud-room-scale.mjs",
 ].map((file) => ({
   file,
   group: "cloud",
