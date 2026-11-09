@@ -54,7 +54,7 @@ export type DesignApi = {
   canRedo(): boolean;
   getCamera(): { x: number; y: number; zoom: number };
   /** Camera and active page of the canvas view. */
-  getView?(): {
+  getView?: () => {
     zoom: number;
     scrollLeft: number;
     scrollTop: number;
@@ -62,8 +62,8 @@ export type DesignApi = {
     x: number;
     y: number;
   };
-  screenToWorld?(x: number, y: number): { x: number; y: number };
-  exportHTML?(): string;
+  screenToWorld?: (x: number, y: number) => { x: number; y: number };
+  exportHTML?: () => string;
   setCamera(x: number, y: number, zoom: number): void;
   zoomToFit(): void;
   setTool(tool: string): void;
