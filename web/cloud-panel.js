@@ -1395,7 +1395,9 @@
   // connects through `library-file-opened`.
   const editorHidden = () =>
     location.pathname === "/" || document.body.classList.contains("files-view");
-  const reconnectOpenFile = () => {
+  const reconnectOpenFile = async () => {
+    await library()?.ready?.();
+    if (editorHidden()) { reconnectPending = true; return; }
     const lib = library(),
       id = lib?.currentId;
     if (id) reconnectFile(id, lib.cloudOf?.(id));
@@ -1406,13 +1408,13 @@
     // A Home click owns the destination load; do not reconnect the outgoing room.
     const switching = window.switchCoordinator.getState();
     if (switching?.kind === "file" && ["begin", "ready"].includes(switching.phase)) return;
-    reconnectOpenFile();
+    void reconnectOpenFile();
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("DOMContentLoaded", () => {
     if (new URLSearchParams(location.hash.slice(1)).has("room")) return;
     // At launch the shell router has not applied the URL yet, so the Files home path counts too.
     if (editorHidden()) reconnectPending = true;
-    else reconnectOpenFile();
+    else void reconnectOpenFile();
   });
   window.cloudWorkspace = {
     flush: flushBeforeSwitch,

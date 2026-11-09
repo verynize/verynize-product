@@ -779,6 +779,8 @@ const manual = [
 ];
 
 export const tests = [
+  { file: "tests/renderer-commit-performance.cjs", group: "canvas", lane: "electron", covers: ["web/app.js", "web/canvas-render.js", "web/wonder-shell.js", "web/commit-validation.js", "web/commit-state.js", "web/library-storage.js", "web/selection-chrome.js", "web/selection-bounds.js", "web/lazy-document.js", "web/src/islands/sidebar/**", "web/src/islands/inspector/**"] },
+  { file: "tests/commit-state.cjs", group: "canvas", lane: "node", covers: ["web/commit-state.js", "web/commit-validation.js", "web/lazy-document.js"] },
   ...canvas,
   ...desktop,
   ...integrations,

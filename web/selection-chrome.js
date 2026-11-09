@@ -315,9 +315,10 @@
       for (const el of ed.canvas.querySelectorAll("[data-clip-ring]")) delete el.dataset.clipRing;
       if (!ids.length || document.body.classList.contains("files-view")) return;
       if (multi) {
+        const modelRects = window.VerynizeSelectionBounds.rects(ed.nodes(), elementOf);
         const rects = topSelected()
           .filter((n) => !n.hidden)
-          .map((n) => ctx.worldRect(n.id))
+          .map((n) => modelRects.get(n.id))
           .filter(Boolean);
         if (!rects.length) return;
         const x = Math.min(...rects.map((r) => r.x)),

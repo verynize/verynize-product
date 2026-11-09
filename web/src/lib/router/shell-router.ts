@@ -72,6 +72,8 @@ type LegacyShell = {
     applyHome?(): void;
     applyEditor?(): void;
     currentId: string | null;
+    ready?(): Promise<void>;
+    isReady?(): boolean;
     summaries(): { id: string }[];
     cloudOf(id: string): { roomId: string } | null;
     subscribe(fn: () => void): () => void;
@@ -441,6 +443,10 @@ function restoreFile(view: ViewPath) {
   if (!view.startsWith("/editor")) return;
   const lib = legacy().fileLibrary;
   if (!lib) return;
+  if (lib.isReady?.() === false) {
+    void lib.ready?.().then(() => { if (logical().view === view) restoreFile(view); });
+    return;
+  }
   if (view === "/editor") {
     const path = editorPath();
     if (isSettingsPath(history.location.pathname))

@@ -112,7 +112,7 @@
     clearTimeout(fontState.timer);
     fontState.timer = setTimeout(async () => {
       if (!window.verynizePlatform.can("localFonts")) return;
-      const families = documentFonts(editor().getDocument());
+      const families = documentFonts(editor().getSnapshot());
       const key = JSON.stringify(families);
       if (!families.length || key === fontState.requested) return;
       fontState.requested = key;

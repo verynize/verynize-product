@@ -9,6 +9,7 @@
             await window.cloudWorkspace?.storeFile?.(window.fileLibrary?.currentId);
           await window.cloudWorkspace?.flush?.();
         }
+        await window.fileLibrary?.flush?.();
         // Room listeners must be disconnected before any replacement document renders.
         window.dispatchEvent(new CustomEvent("document-will-change", { detail: options }));
         if (!options.preserveNative && window.verynizePlatform.can("designFiles"))

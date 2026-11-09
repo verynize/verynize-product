@@ -199,6 +199,7 @@
     clippedSelection.className = "clipped-selection";
     overlay.append(clippedSelection);
     function drawClippedSelection() {
+      if (sel().size > 200) { clippedSelection.replaceChildren(); return; }
       // Measure every ring first, then write once: a read after each append would force a style recalc per ring.
       const boxes = [];
       for (const id of sel()) {
@@ -1031,7 +1032,7 @@
     }
     function select(ids) {
       ed.setSelection(new Set(ids));
-      ed.render();
+      ed.renderSelection();
     }
     function clearSelection() {
       drilled.clear();
@@ -4293,6 +4294,7 @@
     return {
       beforeRender,
       afterRender,
+      afterSelection: () => { drawFrameLabels(); drawClippedSelection(); chrome.draw(); refreshHover(true); },
       setConstraints,
       constraintsOf: (id) => {
         const n = find(id);

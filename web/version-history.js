@@ -227,7 +227,7 @@
       return [];
     }
     if (t.kind === "room") return [];
-    const now = editor().getDocument();
+    const now = editor().getSnapshot();
     const edits = V.changes(baseline, now);
     if (force?.artboardId && !edits.some((edit) => edit.artboardId === force.artboardId)) {
       const before = V.snapshot(baseline, force.artboardId);

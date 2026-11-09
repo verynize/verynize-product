@@ -1,0 +1,1848 @@
+{
+  "date": "2026-11-09T00:19:03.263Z",
+  "commit": "2630c307c834bae2d61b2dc1b42689397c3f3e0d",
+  "node": "v26.13.0",
+  "machine": {
+    "cpu": "Apple M1",
+    "logicalCpus": 8,
+    "ramGiB": 8,
+    "loadAverage": [
+      2.4,
+      3.8,
+      4.2
+    ],
+    "macos": "27.2"
+  },
+  "sizes": [
+    {
+      "n": 1000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.4,
+          3.8,
+          4.2
+        ],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 222809,
+      "load": {
+        "syncMs": 45.09999999962747,
+        "paintFenceMs": 101.09999999962747
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 1,
+          "src": "(snapshot) => { if (!saving) sync(snapshot); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{qm=e;let t=window.design.getSelection();t.join()!==Jm.join()&&(Jm=t),Ym.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 3,
+        "minMs": 2.900000000372529,
+        "maxMs": 3.099999999627471
+      },
+      "editAttribution": {
+        "syncMs": 13.099999999627471,
+        "fenceMs": 45.80000000074506,
+        "sync": {
+          "clones": 1,
+          "cloneMs": 3.200000001117587,
+          "stringifyBig": 1,
+          "stringifyMs": 0,
+          "setItem": [],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "fence": {
+          "clones": 1,
+          "cloneMs": 3.200000001117587,
+          "stringifyBig": 2,
+          "stringifyMs": 2,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 619809,
+              "ms": 0.5
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "all": {
+          "clones": 1,
+          "cloneMs": 3.200000001117587,
+          "stringifyBig": 4,
+          "stringifyMs": 7,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 619809,
+              "ms": 0.5
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "syncSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 3.200000001117587
+          }
+        ],
+        "syncStringifySites": [
+          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
+        ],
+        "deferredSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 3.200000001117587
+          }
+        ],
+        "allStringifySites": [
+          {
+            "site": "dist/ui.js:59:172774 <- notify (app.js:521:9)",
+            "chars": 104376,
+            "ms": 0
+          },
+          {
+            "site": "persist (app.js:158:46)",
+            "chars": 619809,
+            "ms": 2
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- storage-limits.js:164:14",
+            "chars": 619732,
+            "ms": 2.400000000372529
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- measure (storage-limits.js:176:14)",
+            "chars": 619809,
+            "ms": 2.599999999627471
+          }
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 7.900000000372529,
+          "fenceMs": 31.09999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 3.300000000745058,
+            "stringifyBig": 1,
+            "stringifyMs": 0.09999999962747097,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 3.300000000745058,
+            "stringifyBig": 2,
+            "stringifyMs": 2.099999999627471,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.3999999985098839
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 3.300000000745058,
+            "stringifyBig": 4,
+            "stringifyMs": 7.099999999627471,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.3999999985098839
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          }
+        },
+        {
+          "syncMs": 7.5,
+          "fenceMs": 28.5,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 3.099999999627471,
+            "stringifyBig": 1,
+            "stringifyMs": 0.09999999962747097,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 3.099999999627471,
+            "stringifyBig": 2,
+            "stringifyMs": 2,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000037252903
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 3.099999999627471,
+            "stringifyBig": 4,
+            "stringifyMs": 6.900000000372529,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000037252903
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          }
+        },
+        {
+          "syncMs": 18.100000001490116,
+          "fenceMs": 44.20000000111759,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 1,
+            "stringifyMs": 0.2000000011175871,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 2,
+            "stringifyMs": 3.700000001117587,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.599999999627471
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 4,
+            "stringifyMs": 19.800000000745058,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.599999999627471
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          }
+        },
+        {
+          "syncMs": 11.600000001490116,
+          "fenceMs": 29,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 5.400000000372529,
+            "stringifyBig": 1,
+            "stringifyMs": 0.09999999962747097,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 5.400000000372529,
+            "stringifyBig": 2,
+            "stringifyMs": 2.800000000745058,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000037252903
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 5.400000000372529,
+            "stringifyBig": 4,
+            "stringifyMs": 14.600000001490116,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.40000000037252903
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          }
+        },
+        {
+          "syncMs": 20.5,
+          "fenceMs": 43.5,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 8.5,
+            "stringifyBig": 1,
+            "stringifyMs": 0.2000000011175871,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 8.5,
+            "stringifyBig": 2,
+            "stringifyMs": 4.000000001862645,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 8.5,
+            "stringifyBig": 4,
+            "stringifyMs": 19.09999999962747,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          }
+        },
+        {
+          "syncMs": 18.300000000745058,
+          "fenceMs": 42.59999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 1,
+            "stringifyMs": 0.19999999925494194,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 2,
+            "stringifyMs": 3.699999999254942,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.599999999627471
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 4,
+            "stringifyMs": 19.199999999254942,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.599999999627471
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          }
+        },
+        {
+          "syncMs": 17.699999999254942,
+          "fenceMs": 43.09999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 1,
+            "stringifyMs": 0.10000000149011612,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 2,
+            "stringifyMs": 3.800000000745058,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 8,
+            "stringifyBig": 4,
+            "stringifyMs": 16.09999999962747,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 619809,
+                "ms": 0.5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          }
+        }
+      ],
+      "cleanEdits": [
+        {
+          "syncMs": 7.300000000745058,
+          "fenceMs": 31.40000000037253
+        },
+        {
+          "syncMs": 17.199999999254942,
+          "fenceMs": 28.59999999962747
+        },
+        {
+          "syncMs": 17.800000000745058,
+          "fenceMs": 30.40000000037253
+        },
+        {
+          "syncMs": 18.700000001117587,
+          "fenceMs": 42.40000000037253
+        },
+        {
+          "syncMs": 15.599999999627471,
+          "fenceMs": 30.09999999962747
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 17.7,
+        "fenceMsMedian": 42.6,
+        "syncMsRange": [
+          7.5,
+          20.5
+        ],
+        "syncClones": 1,
+        "syncCloneMs": 8,
+        "fenceClones": 1,
+        "fenceCloneMs": 8,
+        "allClones": 1,
+        "allCloneMs": 8,
+        "syncStringifyBig": 1,
+        "syncStringifyMs": 0.1,
+        "allStringifyBig": 4,
+        "allStringifyMs": 16.1,
+        "cleanSyncMsMedian": 17.2,
+        "cleanFenceMsMedian": 30.4,
+        "setItemsSync": [],
+        "setItemsAll": [
+          {
+            "key": "verynize-v2",
+            "chars": 619809,
+            "ms": 0.40000000037252903
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 121,
+          "changed": true,
+          "handlerP50": 1.8,
+          "handlerP95": 2.1,
+          "rafP50": 16.7,
+          "rafP95": 17.7,
+          "over25Pct": 0
+        },
+        "zoom": {
+          "events": 120,
+          "changed": true,
+          "handlerP50": 2.1,
+          "handlerP95": 2.5,
+          "rafP50": 16.7,
+          "rafP95": 17.7,
+          "over25Pct": 0
+        }
+      },
+      "heapBeforeSelect": 27446704,
+      "elementsBeforeSelect": 4087,
+      "selectAll": {
+        "syncMs": 9,
+        "paintFenceMs": 42.59999999962747,
+        "clones": 2,
+        "cloneMs": 8.400000000372529,
+        "stringifyBig": 1,
+        "stringifyMs": 0.09999999962747097,
+        "setItem": [],
+        "rects": 0,
+        "rectMs": 0
+      },
+      "heapAfterSelect": 38090532,
+      "domCounters": {
+        "documents": 3,
+        "nodes": 9211,
+        "jsEventListeners": 5197
+      },
+      "connected": {
+        "elements": 4308,
+        "canvasLayers": 1000,
+        "selectionBoxes": 1000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.1,
+          3.6,
+          4.1
+        ],
+        "macos": "27.2"
+      }
+    },
+    {
+      "n": 5000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.1,
+          3.6,
+          4.1
+        ],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 1127779,
+      "load": {
+        "syncMs": 182.5,
+        "paintFenceMs": 329.90000000037253
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 1,
+          "src": "(snapshot) => { if (!saving) sync(snapshot); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{qm=e;let t=window.design.getSelection();t.join()!==Jm.join()&&(Jm=t),Ym.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 18.5,
+        "minMs": 15.599999999627471,
+        "maxMs": 37.29999999888241
+      },
+      "editAttribution": {
+        "syncMs": 45.30000000074506,
+        "fenceMs": 81.20000000111759,
+        "sync": {
+          "clones": 1,
+          "cloneMs": 15.400000000372529,
+          "stringifyBig": 1,
+          "stringifyMs": 0.30000000074505806,
+          "setItem": [],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "fence": {
+          "clones": 1,
+          "cloneMs": 15.400000000372529,
+          "stringifyBig": 2,
+          "stringifyMs": 9.300000000745058,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 3.400000000372529
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "all": {
+          "clones": 1,
+          "cloneMs": 15.400000000372529,
+          "stringifyBig": 4,
+          "stringifyMs": 57,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 3112779,
+              "ms": 3.400000000372529
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "syncSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 15.400000000372529
+          }
+        ],
+        "syncStringifySites": [
+          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
+        ],
+        "deferredSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 15.400000000372529
+          }
+        ],
+        "allStringifySites": [
+          {
+            "site": "dist/ui.js:59:172774 <- notify (app.js:521:9)",
+            "chars": 534976,
+            "ms": 0.30000000074505806
+          },
+          {
+            "site": "persist (app.js:158:46)",
+            "chars": 3112779,
+            "ms": 9
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- storage-limits.js:164:14",
+            "chars": 3112702,
+            "ms": 34.09999999962747
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- measure (storage-limits.js:176:14)",
+            "chars": 3112779,
+            "ms": 13.599999999627471
+          }
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 58.40000000037253,
+          "fenceMs": 87.80000000074506,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 25.299999998882413,
+            "stringifyBig": 1,
+            "stringifyMs": 0.599999999627471,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 25.299999998882413,
+            "stringifyBig": 2,
+            "stringifyMs": 10.900000000372529,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.899999998509884
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 25.299999998882413,
+            "stringifyBig": 4,
+            "stringifyMs": 63.40000000037253,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.899999998509884
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          }
+        },
+        {
+          "syncMs": 55.29999999888241,
+          "fenceMs": 82.89999999850988,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 24.300000000745058,
+            "stringifyBig": 1,
+            "stringifyMs": 0.5,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 24.300000000745058,
+            "stringifyBig": 2,
+            "stringifyMs": 10.699999999254942,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.199999999254942
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 24.300000000745058,
+            "stringifyBig": 4,
+            "stringifyMs": 37.099999997764826,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.199999999254942
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          }
+        },
+        {
+          "syncMs": 32.19999999925494,
+          "fenceMs": 64.5,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 1,
+            "stringifyMs": 0.40000000037252903,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 2,
+            "stringifyMs": 10.099999999627471,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.700000001117587
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 4,
+            "stringifyMs": 35.40000000037253,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 3.700000001117587
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          }
+        },
+        {
+          "syncMs": 45.09999999962747,
+          "fenceMs": 75.69999999925494,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 21,
+            "stringifyBig": 1,
+            "stringifyMs": 0.5,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 21,
+            "stringifyBig": 2,
+            "stringifyMs": 9.699999999254942,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 21,
+            "stringifyBig": 4,
+            "stringifyMs": 56.1999999973923,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          }
+        },
+        {
+          "syncMs": 63.69999999925494,
+          "fenceMs": 91.79999999888241,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 26.300000000745058,
+            "stringifyBig": 1,
+            "stringifyMs": 0.5,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 26.300000000745058,
+            "stringifyBig": 2,
+            "stringifyMs": 10.799999998882413,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.300000000745058
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 26.300000000745058,
+            "stringifyBig": 4,
+            "stringifyMs": 36.09999999962747,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.300000000745058
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          }
+        },
+        {
+          "syncMs": 32.59999999962747,
+          "fenceMs": 68.59999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 1,
+            "stringifyMs": 0.3999999985098839,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 2,
+            "stringifyMs": 9.199999999254942,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 16,
+            "stringifyBig": 4,
+            "stringifyMs": 35.29999999888241,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          }
+        },
+        {
+          "syncMs": 51.90000000037253,
+          "fenceMs": 87.10000000149012,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 23.5,
+            "stringifyBig": 1,
+            "stringifyMs": 0.40000000037252903,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 23.5,
+            "stringifyBig": 2,
+            "stringifyMs": 11.100000001490116,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.299999998882413
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 23.5,
+            "stringifyBig": 4,
+            "stringifyMs": 48.80000000074506,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 3112779,
+                "ms": 2.299999998882413
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.09999999962747097
+          }
+        }
+      ],
+      "cleanEdits": [
+        {
+          "syncMs": 61.79999999888241,
+          "fenceMs": 102.40000000037253
+        },
+        {
+          "syncMs": 57.19999999925494,
+          "fenceMs": 88.39999999850988
+        },
+        {
+          "syncMs": 62.09999999962747,
+          "fenceMs": 91.09999999962747
+        },
+        {
+          "syncMs": 54.09999999962747,
+          "fenceMs": 93.09999999962747
+        },
+        {
+          "syncMs": 49.5,
+          "fenceMs": 81.90000000037253
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 45.1,
+        "fenceMsMedian": 75.7,
+        "syncMsRange": [
+          32.2,
+          63.7
+        ],
+        "syncClones": 1,
+        "syncCloneMs": 21,
+        "fenceClones": 1,
+        "fenceCloneMs": 21,
+        "allClones": 1,
+        "allCloneMs": 21,
+        "syncStringifyBig": 1,
+        "syncStringifyMs": 0.4,
+        "allStringifyBig": 4,
+        "allStringifyMs": 36.1,
+        "cleanSyncMsMedian": 57.2,
+        "cleanFenceMsMedian": 91.1,
+        "setItemsSync": [],
+        "setItemsAll": [
+          {
+            "key": "verynize-v2",
+            "chars": 3112779,
+            "ms": 3.199999999254942
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 121,
+          "changed": true,
+          "handlerP50": 1.4,
+          "handlerP95": 1.6,
+          "rafP50": 16.7,
+          "rafP95": 17.3,
+          "over25Pct": 0
+        },
+        "zoom": {
+          "events": 120,
+          "changed": true,
+          "handlerP50": 5.8,
+          "handlerP95": 6.8,
+          "rafP50": 16.7,
+          "rafP95": 16.8,
+          "over25Pct": 0
+        }
+      },
+      "heapBeforeSelect": 47329420,
+      "elementsBeforeSelect": 9088,
+      "selectAll": {
+        "syncMs": 32,
+        "paintFenceMs": 133.59999999962747,
+        "clones": 2,
+        "cloneMs": 32.80000000074506,
+        "stringifyBig": 1,
+        "stringifyMs": 0.5,
+        "setItem": [],
+        "rects": 0,
+        "rectMs": 0
+      },
+      "heapAfterSelect": 48955288,
+      "domCounters": {
+        "documents": 3,
+        "nodes": 20477,
+        "jsEventListeners": 5582
+      },
+      "connected": {
+        "elements": 9309,
+        "canvasLayers": 5000,
+        "selectionBoxes": 5000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.1,
+          3.4,
+          4
+        ],
+        "macos": "27.2"
+      }
+    },
+    {
+      "n": 10000,
+      "machineBefore": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.1,
+          3.4,
+          4
+        ],
+        "macos": "27.2"
+      },
+      "versions": {
+        "electron": "45.2.3",
+        "chrome": "156.0.8078.80"
+      },
+      "docChars": 2259180,
+      "load": {
+        "syncMs": 367.1000000014901,
+        "paintFenceMs": 634.3000000007451
+      },
+      "subscribers": [
+        {
+          "arity": 0,
+          "src": "() => syncSelection()"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(sweepTimer); sweepTimer = setTimeout(sweep, 50); }"
+        },
+        {
+          "arity": 1,
+          "src": "(snapshot) => { if (!saving) sync(snapshot); }"
+        },
+        {
+          "arity": 1,
+          "src": "(doc) => { const alive = new Set( doc.pages .find((p) => p.id === doc.activePage) .nodes.f"
+        },
+        {
+          "arity": 1,
+          "src": "function syncEmbeddedFonts(doc) { const faces = Array.isArray(doc.fontFaces) ? doc.fontFac"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (!pop.hidden) requestAnimationFrame(placePublish); }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { stamp++; }"
+        },
+        {
+          "arity": 0,
+          "src": "() => { clearTimeout(fontState.timer); fontState.timer = setTimeout(async () => { if (!win"
+        },
+        {
+          "arity": 0,
+          "src": "() => { if (inside) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => flush("
+        },
+        {
+          "arity": 0,
+          "src": "() => { // Any real render (an edit, a remote change, a page switch) ends the preview. if "
+        },
+        {
+          "arity": 1,
+          "src": "e=>{qm=e;let t=window.design.getSelection();t.join()!==Jm.join()&&(Jm=t),Ym.forEach(e=>e()"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        },
+        {
+          "arity": 1,
+          "src": "r=>{let i=JSON.stringify(t.current(r));i!==n.current&&(n.current=i,e())}"
+        }
+      ],
+      "cloneCost": {
+        "medianMs": 30.199999999254942,
+        "minMs": 29.800000000745058,
+        "maxMs": 59.100000001490116
+      },
+      "editAttribution": {
+        "syncMs": 88.10000000149012,
+        "fenceMs": 138.30000000074506,
+        "sync": {
+          "clones": 1,
+          "cloneMs": 31,
+          "stringifyBig": 1,
+          "stringifyMs": 0.8000000007450581,
+          "setItem": [],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "fence": {
+          "clones": 1,
+          "cloneMs": 31,
+          "stringifyBig": 2,
+          "stringifyMs": 19.800000000745058,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 6229180,
+              "ms": 5
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "all": {
+          "clones": 1,
+          "cloneMs": 31,
+          "stringifyBig": 4,
+          "stringifyMs": 81.5,
+          "setItem": [
+            {
+              "key": "verynize-v2",
+              "chars": 6229180,
+              "ms": 5
+            }
+          ],
+          "rects": 2,
+          "rectMs": 0.09999999962747097,
+          "rectSites": {
+            "viewport (canvas-interactions.js:627:33) <- showHover (canvas-interactions.js:259:86)": {
+              "calls": 1,
+              "ms": 0.09999999962747097
+            },
+            "Object.frameOf (selection-chrome.js:47:18) <- showHover (canvas-interactions.js:259:27)": {
+              "calls": 1,
+              "ms": 0
+            }
+          }
+        },
+        "syncSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 31
+          }
+        ],
+        "syncStringifySites": [
+          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
+        ],
+        "deferredSites": [
+          {
+            "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
+            "kind": "document",
+            "ms": 31
+          }
+        ],
+        "allStringifySites": [
+          {
+            "site": "dist/ui.js:59:172774 <- notify (app.js:521:9)",
+            "chars": 1073226,
+            "ms": 0.8000000007450581
+          },
+          {
+            "site": "persist (app.js:158:46)",
+            "chars": 6229180,
+            "ms": 19
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- storage-limits.js:164:14",
+            "chars": 6229102,
+            "ms": 36.09999999962747
+          },
+          {
+            "site": "sharedSize (storage-limits.js:153:49) <- measure (storage-limits.js:176:14)",
+            "chars": 6229180,
+            "ms": 25.59999999962747
+          }
+        ]
+      },
+      "edits": [
+        {
+          "syncMs": 95.79999999888241,
+          "fenceMs": 141.89999999850988,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 39,
+            "stringifyBig": 1,
+            "stringifyMs": 0.900000000372529,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 39,
+            "stringifyBig": 2,
+            "stringifyMs": 19.59999999962747,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 39,
+            "stringifyBig": 4,
+            "stringifyMs": 97.29999999888241,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 5
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          }
+        },
+        {
+          "syncMs": 93,
+          "fenceMs": 137.09999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 38.20000000111759,
+            "stringifyBig": 1,
+            "stringifyMs": 0.6999999992549419,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 38.20000000111759,
+            "stringifyBig": 2,
+            "stringifyMs": 19.5,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 38.20000000111759,
+            "stringifyBig": 4,
+            "stringifyMs": 104.59999999962747,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.19999999925494194
+          }
+        },
+        {
+          "syncMs": 93.5,
+          "fenceMs": 140.90000000037253,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 39.69999999925494,
+            "stringifyBig": 1,
+            "stringifyMs": 0.7999999988824129,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 39.69999999925494,
+            "stringifyBig": 2,
+            "stringifyMs": 18.899999998509884,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 39.69999999925494,
+            "stringifyBig": 4,
+            "stringifyMs": 104.5,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 4.900000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          }
+        },
+        {
+          "syncMs": 63.59999999962747,
+          "fenceMs": 102.09999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 31.699999999254942,
+            "stringifyBig": 1,
+            "stringifyMs": 0.8000000007450581,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 31.699999999254942,
+            "stringifyBig": 2,
+            "stringifyMs": 20.40000000037253,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 8.700000001117587
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 31.699999999254942,
+            "stringifyBig": 4,
+            "stringifyMs": 74.79999999888241,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 8.700000001117587
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.2000000011175871
+          }
+        },
+        {
+          "syncMs": 65.09999999962747,
+          "fenceMs": 119.09999999962747,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 33.20000000111759,
+            "stringifyBig": 1,
+            "stringifyMs": 0.900000000372529,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 33.20000000111759,
+            "stringifyBig": 2,
+            "stringifyMs": 21.300000000745058,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 8.199999999254942
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 33.20000000111759,
+            "stringifyBig": 4,
+            "stringifyMs": 75.10000000335276,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 8.199999999254942
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.10000000149011612
+          }
+        },
+        {
+          "syncMs": 66.5,
+          "fenceMs": 124.5,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 33,
+            "stringifyBig": 1,
+            "stringifyMs": 0.900000000372529,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.40000000037252903
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 33,
+            "stringifyBig": 2,
+            "stringifyMs": 21.200000001117587,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 9.400000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.40000000037252903
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 33,
+            "stringifyBig": 4,
+            "stringifyMs": 76.3000000026077,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 9.400000000372529
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.40000000037252903
+          }
+        },
+        {
+          "syncMs": 72.40000000037253,
+          "fenceMs": 125.40000000037253,
+          "sync": {
+            "clones": 1,
+            "cloneMs": 33.59999999962747,
+            "stringifyBig": 1,
+            "stringifyMs": 1.099999999627471,
+            "setItem": [],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "fence": {
+            "clones": 1,
+            "cloneMs": 33.59999999962747,
+            "stringifyBig": 2,
+            "stringifyMs": 23.300000000745058,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 9.799999998882413
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          },
+          "all": {
+            "clones": 1,
+            "cloneMs": 33.59999999962747,
+            "stringifyBig": 4,
+            "stringifyMs": 78.20000000111759,
+            "setItem": [
+              {
+                "key": "verynize-v2",
+                "chars": 6229180,
+                "ms": 9.799999998882413
+              }
+            ],
+            "rects": 2,
+            "rectMs": 0.30000000074505806
+          }
+        }
+      ],
+      "cleanEdits": [
+        {
+          "syncMs": 69.59999999962747,
+          "fenceMs": 118.69999999925494
+        },
+        {
+          "syncMs": 66.5,
+          "fenceMs": 121.69999999925494
+        },
+        {
+          "syncMs": 92,
+          "fenceMs": 150.59999999962747
+        },
+        {
+          "syncMs": 73.19999999925494,
+          "fenceMs": 121.19999999925494
+        },
+        {
+          "syncMs": 85.69999999925494,
+          "fenceMs": 141.59999999962747
+        }
+      ],
+      "editSummary": {
+        "syncMsMedian": 66.5,
+        "fenceMsMedian": 124.5,
+        "syncMsRange": [
+          63.6,
+          93.5
+        ],
+        "syncClones": 1,
+        "syncCloneMs": 33.2,
+        "fenceClones": 1,
+        "fenceCloneMs": 33.2,
+        "allClones": 1,
+        "allCloneMs": 33.2,
+        "syncStringifyBig": 1,
+        "syncStringifyMs": 0.8,
+        "allStringifyBig": 4,
+        "allStringifyMs": 76.3,
+        "cleanSyncMsMedian": 73.2,
+        "cleanFenceMsMedian": 121.7,
+        "setItemsSync": [],
+        "setItemsAll": [
+          {
+            "key": "verynize-v2",
+            "chars": 6229180,
+            "ms": 4.900000000372529
+          }
+        ]
+      },
+      "motion": {
+        "pan": {
+          "events": 119,
+          "changed": true,
+          "handlerP50": 2.1,
+          "handlerP95": 2.5,
+          "rafP50": 16.7,
+          "rafP95": 16.9,
+          "over25Pct": 0
+        },
+        "zoom": {
+          "events": 118,
+          "changed": true,
+          "handlerP50": 10.5,
+          "handlerP95": 13.3,
+          "rafP50": 16.7,
+          "rafP95": 17.5,
+          "over25Pct": 1.7
+        }
+      },
+      "heapBeforeSelect": 73385616,
+      "elementsBeforeSelect": 15338,
+      "selectAll": {
+        "syncMs": 67.80000000074506,
+        "paintFenceMs": 298.30000000074506,
+        "clones": 2,
+        "cloneMs": 92.80000000074506,
+        "stringifyBig": 1,
+        "stringifyMs": 1.800000000745058,
+        "setItem": [],
+        "rects": 0,
+        "rectMs": 0
+      },
+      "heapAfterSelect": 85146412,
+      "domCounters": {
+        "documents": 3,
+        "nodes": 29188,
+        "jsEventListeners": 5208
+      },
+      "connected": {
+        "elements": 15559,
+        "canvasLayers": 10000,
+        "selectionBoxes": 10000
+      },
+      "machineAfter": {
+        "cpu": "Apple M1",
+        "logicalCpus": 8,
+        "ramGiB": 8,
+        "loadAverage": [
+          2.1,
+          3.3,
+          3.9
+        ],
+        "macos": "27.2"
+      }
+    }
+  ]
+}
