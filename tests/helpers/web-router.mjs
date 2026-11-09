@@ -9,7 +9,7 @@
 // plus the view under settings.
 import assert from "node:assert/strict";
 import { checkHomeOpening } from "./home-first-opening.cjs";
-import { openStarterFile } from "./web-app.mjs";
+import { openStarterFile, readLibrary, writeLibrary } from "./web-app.mjs";
 
 const ROOM = "11111111-1111-4111-8111-111111111111";
 const INVITE = `#room=${ROOM}&token=${"ab".repeat(32)}`;
@@ -106,27 +106,23 @@ export async function checkWebRouter(browser, origin, context = browser) {
 
   // File URLs restore documents through Start's parameter route without remounting the editor.
   const original = await page.evaluate(() => window.fileLibrary.currentId);
-  const urlFileId = await page.evaluate(() => {
-    const key = "verynize-library-v1";
-    const library = JSON.parse(localStorage.getItem(key));
-    const document = window.design.getDocument();
-    const id = crypto.randomUUID();
-    document.name = "URL route fixture";
-    // Detached records exercise local file routing without asking the Node stub backend to create rooms.
-    const cloud = { server: location.origin, roomId: "route-fixture", detached: true };
-    library.files.find((file) => file.id === library.active).cloud = cloud;
-    library.files.push({
-      id,
-      name: document.name,
-      document,
-      updated: Date.now(),
-      archived: false,
-      folder: null,
-      cloud: { ...cloud, roomId: "route-fixture-two" },
-    });
-    localStorage.setItem(key, JSON.stringify(library));
-    return id;
+  const library = await readLibrary(page);
+  const fixture = await page.evaluate(() => window.design.getDocument());
+  const urlFileId = crypto.randomUUID();
+  fixture.name = "URL route fixture";
+  // Detached records exercise local file routing without asking the Node stub backend to create rooms.
+  const cloud = { server: new URL(page.url()).origin, roomId: "route-fixture", detached: true };
+  library.files.find((file) => file.id === library.active).cloud = cloud;
+  library.files.push({
+    id: urlFileId,
+    name: fixture.name,
+    document: fixture,
+    updated: Date.now(),
+    archived: false,
+    folder: null,
+    cloud: { ...cloud, roomId: "route-fixture-two" },
   });
+  await writeLibrary(page, library);
   await page.reload();
   await ready();
   await page.evaluate(
