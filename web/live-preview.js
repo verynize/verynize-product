@@ -819,8 +819,9 @@
       style.id = "bd-embedded-fonts";
       document.head.append(style);
     }
-    style.textContent = fontFaceCss(faces);
+    style.textContent = window.assetStore?.css(fontFaceCss(faces)) || fontFaceCss(faces);
   }
+  window.addEventListener("assets-ready", () => { fontKey = ""; syncEmbeddedFonts(window.design.getDocument()); });
   window.design.subscribe(syncEmbeddedFonts);
   syncEmbeddedFonts(window.design.getDocument());
   // Web page capture: load any http(s) page in an isolated hidden window, pick a region on its screenshot,

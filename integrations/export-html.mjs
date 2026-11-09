@@ -37,7 +37,7 @@ const escape = (value) =>
   );
 const safeSrc = (src) =>
   typeof src === "string" &&
-  (/^data:image\/(png|jpeg|webp|gif|svg\+xml);/i.test(src) || /^https?:\/\/[^\s"'<>]+$/i.test(src))
+  (/^asset:[a-f0-9]{64}$/.test(src) || /^data:image\/(png|jpeg|webp|gif|svg\+xml);/i.test(src) || /^https?:\/\/[^\s"'<>]+$/i.test(src))
     ? src
     : "";
 

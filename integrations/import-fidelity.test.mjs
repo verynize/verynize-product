@@ -79,7 +79,8 @@ test("visible text and unresolved relative images have explicit outcomes", async
   assert.ok(r.warnings.some((w) => /Unresolved relative image/.test(w)));
 });
 test("source budget allows embedded data above the former hidden cap", async () => {
-  const source = `<img src="data:image/png;base64,${"A".repeat(2_000_001)}"/>`;
+  const image = Buffer.concat([Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64"), Buffer.alloc(1_500_100)]);
+  const source = `<img src="data:image/png;base64,${image.toString("base64")}"/>`;
   assert.ok(nodes(await importHtml(source))[0].src.length > 2_000_000);
   assert.ok(nodes(jsxToDocument(source))[0].src.length > 2_000_000);
 });

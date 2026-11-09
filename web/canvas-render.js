@@ -137,7 +137,7 @@
         lastInFlow: ctx.lastInFlow,
         tokens,
       });
-      S.applyStyle(el, css.box);
+      S.applyStyle(el, window.assetStore ? window.assetStore.style(css.box) : css.box);
       if (editing && Number(n.outlineWidth) > 0) el.dataset.outline = "";
       if (n.icon) el.dataset.icon = n.icon;
       if (n.type === "text")
@@ -169,10 +169,10 @@
           img.setAttribute("aria-label", n.name);
           img.dataset.svgColor = "true";
         } else {
-          img.src = css.src || n.src;
+          img.src = window.assetStore?.resolve(css.src || n.src) || css.src || n.src;
           img.alt = n.name;
         }
-        S.applyStyle(img, css.img);
+        S.applyStyle(img, window.assetStore ? window.assetStore.style(css.img) : css.img);
         el.append(img);
       }
       if (editing && n.preview) window.livePreview?.renderNode(n, el);
@@ -670,6 +670,7 @@
       for (const id of memos.keys()) dirty.add(id);
     });
 
+    window.addEventListener("assets-ready", () => { memos.clear(); render(); });
     document.fonts?.addEventListener("loadingdone", () => render());
 
     return {

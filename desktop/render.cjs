@@ -4,14 +4,75 @@ const { pathToFileURL } = require("node:url");
 const fs = require("node:fs/promises");
 const { BrowserWindow, dialog, app, screen } = require("electron");
 const { captureSize } = require("./render-limits.cjs");
+const { mapAssetUrls, assetUrls } = require("../integrations/asset-urls.cjs");
+const fsSync = require("node:fs");
 const { randomUUID } = require("node:crypto");
+// Capture the identity of runtime files while this main process starts. A dependency update
+// can replace helpers while the old Electron framework remains mapped in this process.
+const runtimeFiles = [process.execPath, ...(process.platform === "darwin" ? [
+  path.resolve(path.dirname(process.execPath), "../Frameworks/Electron Framework.framework/Versions/A/Electron Framework"),
+  path.resolve(path.dirname(process.execPath), "../Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper"),
+] : [])];
+function runtimeFingerprint() {
+  return runtimeFiles.map((file) => {
+    try { const s = fsSync.statSync(file); return [s.dev, s.ino, s.size, s.mtimeMs, s.ctimeMs].join(":"); }
+    catch { return "missing"; }
+  }).join("|");
+}
+const startupRuntime = runtimeFingerprint();
+function assertRuntime() {
+  if (runtimeFingerprint() !== startupRuntime)
+    throw Error("Render runtime changed on disk; perlu restart Verynize (restart required).");
+}
+function watchRender(window) {
+  const contents = window.webContents;
+  let fail, failure, phase = "navigation";
+  const id = randomUUID();
+  const rejected = new Promise((_, reject) => { fail = reject; });
+  rejected.catch(() => {});
+  const stop = (category, details = {}) => {
+    if (failure) return;
+    failure = Error(`Render ${category} during ${phase} (reason: ${details.reason || "unknown"}, exit: ${details.exitCode ?? "unknown"}). Restart Verynize if this persists.`);
+    console.error("[render]", { id, phase, category, reason: details.reason, exitCode: details.exitCode });
+    fail(failure);
+  };
+  const gone = (_e, d) => stop("renderer-process-gone", d);
+  const child = (_e, d) => {
+    if (["GPU", "Utility", "Zygote", "Sandbox helper"].includes(d.type) && d.reason !== "clean-exit")
+      stop("child-process-gone", d);
+  };
+  const closed = () => stop("window-closed");
+  contents.on("render-process-gone", gone);
+  window.on("closed", closed);
+  app.on("child-process-gone", child);
+  return {
+    async run(name, fn) {
+      phase = name;
+      if (failure) throw failure;
+      let timer;
+      try {
+        return await Promise.race([Promise.resolve().then(fn), rejected,
+          new Promise((_, reject) => { timer = setTimeout(() => reject(Error("Render timed out during " + name)), 15000); })]);
+      } catch (error) {
+        // Process termination can reject navigation before Electron delivers its detailed event.
+        await new Promise((resolve) => setTimeout(resolve, 30));
+        throw failure || Error("Render failed during " + name + ": " + error.message);
+      } finally { clearTimeout(timer); }
+    },
+    dispose() {
+      contents.removeListener("render-process-gone", gone);
+      window.removeListener("closed", closed);
+      app.removeListener("child-process-gone", child);
+    },
+  };
+}
 function renderOptions(options) {
   if (
     !options ||
     typeof options.html !== "string" ||
     Buffer.byteLength(options.html) > 20 * 1024 * 1024
   )
-    throw Error("Export HTML must be under 20 MB");
+    throw Error("Export HTML exceeds limit 20971520 bytes");
   const width = Number(options.width),
     height = Number(options.height),
     scale = Number(options.scale ?? 1);
@@ -21,11 +82,13 @@ function renderOptions(options) {
     height < 1 ||
     scale < 0.01 ||
     scale > 100 ||
-    width > 10000 ||
-    height > 10000
+    width > 1e7 ||
+    height > 1e7
   )
-    throw Error("Invalid render dimensions: sides must be 1–10000 CSS px and scale 0.01–100");
-  const fonts = Array.isArray(options.fonts) ? options.fonts.slice(0, 40) : null;
+    throw Error("Invalid render dimensions: sides must be 1–10000000 CSS px and scale 0.01–100");
+  if (Array.isArray(options.fonts) && options.fonts.length > 40)
+    throw Error("Render exceeds limit 40 font families");
+  const fonts = Array.isArray(options.fonts) ? options.fonts : null;
   return {
     html: options.html,
     width: Math.ceil(width),
@@ -82,6 +145,7 @@ function familiesFromHtml(html, splitFontStack) {
   }
   for (const m of decode(source).matchAll(/font-weight\s*:\s*(\d{3}|bold)/gi))
     for (const entry of byFamily.values()) entry.weights.add(m[1] === "bold" ? 700 : Number(m[1]));
+  if (byFamily.size > 40) throw Error("Render exceeds limit 40 font families");
   return [...byFamily.values()].slice(0, 40).map((e) => ({
     family: e.family,
     weights: [...e.weights].sort((a, b) => a - b),
@@ -95,7 +159,7 @@ function liftEmbeddedFonts(html) {
   const rules = [],
     families = new Set();
   const lean = String(html).replace(
-    /@font-face\s*\{[^{}]*?src\s*:\s*url\(\s*["']?data:font\/[^{}]*\}/gi,
+    /@font-face\s*\{[^{}]*?src\s*:\s*url\(\s*["']?(?:data:font\/|asset:)[^{}]*\}/gi,
     (rule) => {
       rules.push(rule);
       const family = /font-family\s*:\s*(["']?)([^;"'}]+)\1/i.exec(rule)?.[2];
@@ -103,6 +167,7 @@ function liftEmbeddedFonts(html) {
       return "";
     },
   );
+  if (rules.length > 40) throw Error("Render exceeds limit 40 embedded font faces");
   return {
     html: lean,
     css: rules.slice(0, 40).join("\n"),
@@ -151,6 +216,7 @@ const MEASURE = `(()=>{const out={},k=parseFloat(document.documentElement.style.
 // Renders are serialized so concurrent callers never share a capture window.
 let renderQueue = Promise.resolve();
 function renderHTML(input, parent = null) {
+  assertRuntime();
   const options = renderOptions(input);
   const run = () => renderNow(options, parent);
   const result = renderQueue.then(run, run);
@@ -161,6 +227,7 @@ async function renderNow(
   { html, width, height, scale: requestedScale, fonts: families, measure, screenshot },
   parent,
 ) {
+  assertRuntime();
   // Use the largest connected display factor: a hidden window may be placed on any display.
   const deviceScale = Math.max(1, ...screen.getAllDisplays().map((display) => display.scaleFactor));
   const {
@@ -171,6 +238,7 @@ async function renderNow(
   // Chromium clamps page zoom at 5×; larger factors add CSS zoom on the root for the remainder.
   const pageZoom = Math.max(0.25, Math.min(scale, 4)),
     cssZoom = scale / pageZoom;
+  html = await require("./render-assets.cjs").hydrateRoomAssets(html);
   const lifted = liftEmbeddedFonts(html);
   html = lifted.html;
   const fonts = await embedFonts(html, families, lifted.families);
@@ -198,9 +266,10 @@ async function renderNow(
   // Some window systems clamp the constructor size to the display work area. Reapply the
   // already-bounded content size and refuse a clipped capture if the window manager rejects it.
   window.setContentSize(outputWidth, outputHeight);
-  const disposePage = serveRenderPage(window, html, true);
+  const guard = watchRender(window);
+  const disposePage = serveRenderPage(window, html, true, fonts.css + lifted.css);
   try {
-    await window.loadURL(RENDER_URL);
+    await guard.run("navigation", () => window.loadURL(RENDER_URL));
     const [actualWidth, actualHeight] = window.getContentSize();
     if (actualWidth !== outputWidth || actualHeight !== outputHeight)
       throw Error(
@@ -208,24 +277,52 @@ async function renderNow(
       );
     // Navigation establishes the page's zoom context. Set scale after loading, otherwise
     // loadURL can reset it. CSS zoom handles factors outside Chromium's page zoom range.
-    window.webContents.setZoomFactor(pageZoom);
-    if (cssZoom !== 1)
-      await window.webContents.executeJavaScript(
-        `document.documentElement.style.zoom=${JSON.stringify(String(cssZoom))}`,
-      );
-    // Inserted after load so cached and document fonts share the same settling path.
-    if (fonts.css) await window.webContents.insertCSS(fonts.css);
-    if (lifted.css) await window.webContents.insertCSS(lifted.css);
-    await window.webContents.executeJavaScript(
-      `Promise.race([Promise.all([document.body&&document.body.offsetHeight,...[...document.fonts].map(face=>face.load().catch(()=>{}))]).then(()=>Promise.all([document.fonts.ready,...[...document.images].map(image=>image.decode().catch(()=>{}))])).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))),new Promise(resolve=>setTimeout(resolve,4000))])`,
-    );
+    let ready = false, readiness;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await guard.run("zoom-font-settle", async () => {
+        window.webContents.setZoomFactor(pageZoom);
+        await window.webContents.executeJavaScript(
+          `document.documentElement.style.zoom=${JSON.stringify(String(cssZoom))}`);
+        if (fonts.css) await window.webContents.insertCSS(renderAssetUrls(fonts.css));
+        if (lifted.css) await window.webContents.insertCSS(renderAssetUrls(lifted.css));
+        await window.webContents.executeJavaScript(
+          `Promise.all([...document.fonts].map(face=>face.load().catch(()=>{}))).then(()=>Promise.all([document.fonts.ready,...[...document.images].map(image=>image.decode().catch(()=>{}))])).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))`);
+        const state = await window.webContents.executeJavaScript(`(async()=>{
+          const urls=new Set();
+          for(const el of document.querySelectorAll('*')) {
+            const css=getComputedStyle(el);
+            for(const value of [css.backgroundImage,css.maskImage])
+              for(const m of value.matchAll(/url\\(["']?([^"')]+)["']?\\)/g)) urls.add(m[1]);
+          }
+          const paints=await Promise.all([...urls].map(src=>new Promise(resolve=>{
+            const image=new Image();image.onload=()=>resolve(true);image.onerror=()=>resolve(false);image.src=src;
+          })));
+
+          const el=document.createElement('verynize-render-probe');
+          el.style.cssText='all:initial!important;position:absolute!important;width:100px!important;height:100px!important;left:0!important;top:0!important';
+          document.body.append(el);
+          const zoom=el.getBoundingClientRect().width/100;el.remove();
+          return {zoom,viewport:innerWidth,fonts:document.fonts.status==='loaded'&&[...document.fonts].every(f=>f.status==='loaded'),
+            images:paints.every(Boolean)&&[...document.images].every(i=>i.complete&&i.naturalWidth>0),
+            faces:document.fonts.size};
+        })()`);
+        readiness = { zoom: state.zoom, expectedZoom: cssZoom, viewport: state.viewport, expectedViewport: outputWidth / pageZoom, fontsReady: state.fonts, imagesReady: state.images, faces: state.faces, expectedFaces: fonts.loaded, missingFonts: fonts.missing.length };
+        ready = Math.abs(window.webContents.getZoomFactor() - pageZoom) < 0.001 &&
+          Math.abs(state.zoom - cssZoom) < 0.001 && Math.abs(state.viewport - outputWidth / pageZoom) <= 2 && state.fonts && state.images &&
+          state.faces >= fonts.loaded && !fonts.missing.length;
+      });
+      if (ready) break;
+      console.warn("[render]", JSON.stringify({ category: "readiness-retry", attempt: attempt + 1, ...readiness }));
+    }
+    if (!ready) throw Error("Render zoom, fonts or images were not applied after retry; capture refused.");
     const boxes = measure
-      ? await window.webContents.executeJavaScript(MEASURE).catch(() => null)
+      ? await guard.run("measure", () => window.webContents.executeJavaScript(MEASURE))
       : null;
-    const image = await window.webContents.capturePage(
+    const image = await guard.run("capture", () => window.webContents.capturePage(
       { x: 0, y: 0, width: outputWidth, height: outputHeight },
       { stayHidden: true, stayAwake: true },
-    );
+    ));
+    if (image.isEmpty()) throw Error("Render capture returned an empty image; capture refused.");
     return {
       dataURL: image
         .resize({ width: outputWidth, height: outputHeight, quality: "best" })
@@ -238,6 +335,7 @@ async function renderNow(
       fonts: { loaded: fonts.loaded, missing: fonts.missing },
     };
   } finally {
+    guard.dispose();
     disposePage();
     close();
     offClosed();
@@ -245,6 +343,16 @@ async function renderNow(
 }
 function registerRendering(handle, parent) {
   let active = false;
+  // Wait for the editor's first navigation so a fast hidden smoke page cannot become
+  // the application's first page (or steal firstWindow() from automation).
+  const smoke = () => {
+    if (parent?.isDestroyed()) return;
+    renderHTML({ html: '<html><body style="margin:0;background:#fff"></body></html>',
+      width: 8, height: 8, measure: false, fonts: [] }, parent)
+      .catch((error) => console.error("[render] startup smoke:", error.message));
+  };
+  if (parent) parent.webContents.once("did-finish-load", smoke);
+  else app.whenReady().then(smoke).catch((error) => console.error("[render] startup smoke:", error.message));
   registerArtworkExport(handle, parent);
   handle("renderDesign", async (input) => {
     if (active) throw Error("An export is already rendering");
@@ -278,7 +386,10 @@ function registerRendering(handle, parent) {
 // Artwork export (inspector Export section): vector PDF of the selection, native save dialog and the
 // font catalog for the font family picker.
 const RENDER_URL = "verynize-render://document/";
-function serveRenderPage(window, html, scripts = false) {
+const renderAssetUrls = (text) => mapAssetUrls(text, (ref) => RENDER_URL + "assets/" + ref.slice(6));
+function serveRenderPage(window, html, scripts = false, resources = "") {
+  const assets = new Set(assetUrls(html + resources).map((ref) => ref.slice(6)));
+  html = renderAssetUrls(html);
   const contents = window.webContents,
     session = contents.session;
   contents.setWindowOpenHandler(() => ({ action: "deny" }));
@@ -290,22 +401,31 @@ function serveRenderPage(window, html, scripts = false) {
     cb({
       cancel:
         details.url !== RENDER_URL &&
+        ![...assets].some((hash) => details.url === RENDER_URL + "assets/" + hash) &&
         !details.url.startsWith("data:") &&
         !details.url.startsWith("blob:"),
     }),
   );
   session.protocol.handle(
     "verynize-render",
-    (request) =>
-      new Response(request.url === RENDER_URL ? html : "", {
+    async (request) => {
+      const hash = request.url.startsWith(RENDER_URL + "assets/") ? request.url.slice((RENDER_URL + "assets/").length) : "";
+      if (assets.has(hash)) {
+        try {
+          const asset = await (await require("./assets.cjs").store()).get("asset:" + hash);
+          return new Response(asset.bytes, { headers: { "Content-Type": asset.contentType, "Access-Control-Allow-Origin": "*" } });
+        } catch { return new Response("Asset unavailable", { status: 404 }); }
+      }
+      return new Response(request.url === RENDER_URL ? html : "", {
         status: request.url === RENDER_URL ? 200 : 404,
         headers: {
           "Content-Type": "text/html; charset=utf-8",
           "Content-Security-Policy":
-            "default-src 'none'; img-src data: blob:; style-src 'unsafe-inline'; font-src data:;" +
+            "default-src 'none'; img-src data: blob: verynize-render:; style-src 'unsafe-inline'; font-src data: verynize-render:;" +
             (scripts ? " script-src 'unsafe-inline';" : ""),
         },
-      }),
+      });
+    },
   );
   return () => session.protocol.unhandle("verynize-render");
 }
@@ -337,9 +457,17 @@ async function settleFonts(webContents) {
     }
   }
 }
-async function renderPDF(input, parent = null) {
+function renderPDF(input, parent = null) {
+  assertRuntime();
+  renderOptions({ ...input, scale: 1 });
+  const result = renderQueue.then(() => renderPDFNow(input, parent));
+  renderQueue = result.catch(() => {});
+  return result;
+}
+async function renderPDFNow(input, parent = null) {
+  assertRuntime();
   const { width, height } = renderOptions({ ...input, scale: 1 });
-  const lifted = liftEmbeddedFonts(input.html);
+  const lifted = liftEmbeddedFonts(await require("./render-assets.cjs").hydrateRoomAssets(input.html));
   const fonts = await embedFonts(lifted.html, null, lifted.families);
   fonts.loaded += lifted.count;
   const window = new BrowserWindow({
@@ -362,18 +490,19 @@ async function renderPDF(input, parent = null) {
     .replace(/[<>&]/g, "")
     .slice(0, 120);
   const page = `<title>${title}</title><style>@page{size:${width}px ${height}px;margin:0}html,body{margin:0;width:${width}px;height:${height}px;overflow:hidden}</style>`;
-  const disposePage = serveRenderPage(window, page + lifted.html);
+  const guard = watchRender(window);
+  const disposePage = serveRenderPage(window, page + lifted.html, false, fonts.css + lifted.css);
   try {
-    await window.loadURL(RENDER_URL);
-    if (fonts.css) await window.webContents.insertCSS(fonts.css);
-    if (lifted.css) await window.webContents.insertCSS(lifted.css);
+    await guard.run("pdf-navigation", () => window.loadURL(RENDER_URL));
+    if (fonts.css) await window.webContents.insertCSS(renderAssetUrls(fonts.css));
+    if (lifted.css) await window.webContents.insertCSS(renderAssetUrls(lifted.css));
     await settleFonts(window.webContents);
-    const pdf = await window.webContents.printToPDF({
+    const pdf = await guard.run("pdf-print", () => window.webContents.printToPDF({
       printBackground: true,
       preferCSSPageSize: true,
       margins: { top: 0, bottom: 0, left: 0, right: 0 },
       pageSize: { width: width / 96, height: height / 96 },
-    });
+    }));
     return {
       dataURL: "data:application/pdf;base64," + pdf.toString("base64"),
       width,
@@ -382,6 +511,7 @@ async function renderPDF(input, parent = null) {
       fonts: { loaded: fonts.loaded, missing: fonts.missing },
     };
   } finally {
+    guard.dispose();
     disposePage();
     close();
     offClosed();
@@ -414,7 +544,7 @@ function saveRequest(options) {
   if (data) bytes = Buffer.from(data[2], "base64");
   else if (options.data.startsWith("data:")) throw Error("Unsupported data URL");
   else bytes = Buffer.from(options.data, "utf8");
-  if (bytes.length > 200 * 1024 * 1024) throw Error("Export exceeds 200 MB");
+  if (bytes.length > 200 * 1024 * 1024) throw Error("Export exceeds limit 209715200 bytes");
   return {
     name: base.toLowerCase().endsWith("." + extension) ? base : base + "." + extension,
     extension,
@@ -431,10 +561,12 @@ function registerArtworkExport(handle, parent) {
     const code = await import(
       pathToFileURL(path.join(__dirname, "../integrations/export-code.mjs")).href
     );
+    const { inlineAssets } = await import("../integrations/asset-store.mjs");
+    const portable = (markup) => inlineAssets(markup, async (ref) => (await require("./assets.cjs").store()).get(ref));
     if (options.flavor === "css") {
       if (typeof options.html !== "string" || Buffer.byteLength(options.html) > 20 * 1024 * 1024)
-        throw Error("Export HTML must be under 20 MB");
-      return { content: code.cssCode(options.html, options.tokens || {}), extension: "html" };
+        throw Error("Export HTML exceeds limit 20971520 bytes");
+      return { content: await portable(code.cssCode(options.html, options.tokens || {})), extension: "html" };
     }
     if (!Array.isArray(options.nodeIds) || options.nodeIds.length > 5000)
       throw Error("Invalid export selection");
@@ -451,9 +583,9 @@ function registerArtworkExport(handle, parent) {
             }
           : null;
     return {
-      content: code.tailwindCode(options.document, options.pageId, options.nodeIds, options.name, {
+      content: await portable(code.tailwindCode(options.document, options.pageId, options.nodeIds, options.name, {
         snippet,
-      }),
+      })),
       extension: "jsx",
     };
   });

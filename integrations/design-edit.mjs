@@ -1013,7 +1013,7 @@ export function buildNodes(
       applyIconElement(node, el, tokens, warnings, where, { isNew: true });
     } else if (type === "image") {
       const src = typeof el.attrs.src === "string" ? el.attrs.src.trim() : "";
-      if (isEmbeddedSrc(src)) node.src = src;
+      if (isEmbeddedSrc(src) || /^asset:[a-f0-9]{64}$/.test(src)) node.src = src;
       else if (isRemoteSrc(src)) {
         // Fetched asynchronously by the tool layer, which embeds it as src and sets assetStatus 'ready'.
         if (reused?.srcRemote === src && reused.src) {
@@ -1535,7 +1535,7 @@ function editNode(document, page, node, el, warnings) {
   }
   if (node.type === "image" && !node.icon && typeof el.attrs.src === "string") {
     const src = el.attrs.src.trim();
-    if (isEmbeddedSrc(src)) {
+    if (isEmbeddedSrc(src) || /^asset:[a-f0-9]{64}$/.test(src)) {
       node.src = src;
       delete node.srcRemote;
       delete node.assetStatus;
