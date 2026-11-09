@@ -370,7 +370,7 @@
       state: "paused",
       mode: "select",
       inputToApp: false,
-      fileId: window.fileLibrary?.currentId,
+      fileId: window.fileLibrary?.currentId ?? null,
       identity: JSON.stringify([node.preview.root, node.preview.chatId]),
     };
     entry.frame.style.pointerEvents = "none";
@@ -429,9 +429,11 @@
   }
   function renderNode(node, el) {
     const entry = entries.get(node.id) || create(node, el);
-    const fileId = window.fileLibrary?.currentId;
+    const fileId = window.fileLibrary?.currentId ?? null;
     const identity = JSON.stringify([node.preview.root, node.preview.chatId]);
-    if (entry.identity !== identity || entry.fileId !== fileId) {
+    // The shown document becoming a library file (no id yet → its id; the library loads asynchronously) is no switch.
+    const switched = entry.fileId !== fileId && !(entry.fileId === null && fileId);
+    if (entry.identity !== identity || switched) {
       entry.frame.removeAttribute("src");
       entry.url = "";
       entry.settingUp = false;
