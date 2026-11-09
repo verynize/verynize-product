@@ -310,7 +310,8 @@ async function renderNow(
         readiness = { zoom: state.zoom, expectedZoom: cssZoom, viewport: state.viewport, expectedViewport: outputWidth / pageZoom, fontsReady: state.fonts, imagesReady: state.images, faces: state.faces, expectedFaces: fonts.loaded, missingFonts: fonts.missing.length };
         ready = Math.abs(window.webContents.getZoomFactor() - pageZoom) < 0.001 &&
           Math.abs(state.zoom - cssZoom) < 0.001 && Math.abs(state.viewport - outputWidth / pageZoom) <= 2 && state.fonts && state.images &&
-          state.faces >= fonts.loaded && !fonts.missing.length;
+          // A family the font cache cannot provide falls back and is reported in `fonts.missing`.
+          state.faces >= fonts.loaded;
       });
       if (ready) break;
       console.warn("[render]", JSON.stringify({ category: "readiness-retry", attempt: attempt + 1, ...readiness }));
