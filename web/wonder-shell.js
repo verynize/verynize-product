@@ -146,7 +146,9 @@
     const data = JSON.parse(localStorage.getItem(stateKey));
     if (data && Array.isArray(data.files) && Array.isArray(data.folders)) library = data;
     else if (data) throw Error("Invalid stored file library");
-  } catch (error) { libraryLoadError = error; }
+  } catch (error) {
+    libraryLoadError = error;
+  }
   // A profile gets its starter file once: the first run's document, signed out. Profiles that already had files count as seeded.
   if (library.files.length) library.seeded = true;
   // The edit count (window.design.editCount) when the document shown was last a library file, or was reset (launch, the
@@ -157,7 +159,10 @@
   const lastSerialized = new Map();
   let hydrated = false;
   const storage = window.VerynizeLibraryStorage.create(() =>
-    notify("File library storage is unavailable; the original stored data is retained. Save your design to a file before closing."));
+    notify(
+      "File library storage is unavailable; the original stored data is retained. Save your design to a file before closing.",
+    ),
+  );
   const storageReady = storage.load(library, libraryLoadError);
   library.files.forEach((file) => delete file.serialized);
   // Entries whose stored document does not load (web/document-safety.js): kept and marked, never overwritten by sync.
@@ -252,7 +257,8 @@
     inspector.dataset.kind = selected?.type || "";
     if (typography) typography.open = selected?.type === "text";
     title.textContent = document.name || "Untitled";
-    if (!hydrated || saving || window.documentSafety.startupPending(window.design.canUndo())) return;
+    if (!hydrated || saving || window.documentSafety.startupPending(window.design.canUndo()))
+      return;
     let file = current();
     if (file?.remoteOnly) {
       if (!window.cloudWorkspace?.isConnected()) return;
@@ -902,7 +908,10 @@
     library.files.forEach((file) => {
       legacyIds.add(file.id);
       const invalid = window.documentSafety.check(file.document);
-      if (invalid) { blocked.add(file.id); invalidDocuments.set(file.document, invalid); }
+      if (invalid) {
+        blocked.add(file.id);
+        invalidDocuments.set(file.document, invalid);
+      }
     });
     if (library.files.length) library.seeded = true;
     hydrated = true;
@@ -996,7 +1005,10 @@
     list: () =>
       library.files.filter(canSee).map((f) => {
         const { document, ...metadata } = f;
-        const copy = { ...structuredClone(metadata), document: window.VerynizeCommitState.freeze(document) },
+        const copy = {
+            ...structuredClone(metadata),
+            document: window.VerynizeCommitState.freeze(document),
+          },
           invalid = invalidDocuments.get(f.document);
         if (invalid) copy.invalid = invalid;
         return copy;

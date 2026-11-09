@@ -28,7 +28,11 @@ async function copyDocumentAssets(document, file, opening) {
   const { assetRefs, sidecarAssets, copyAssets } = await import("../integrations/asset-store.mjs");
   if (!assetRefs(document).length) return;
   const local = await require("./assets.cjs").store();
-  await copyAssets(document, opening ? sidecarAssets(file) : local, opening ? local : sidecarAssets(file));
+  await copyAssets(
+    document,
+    opening ? sidecarAssets(file) : local,
+    opening ? local : sidecarAssets(file),
+  );
 }
 class DesignFileSession {
   constructor(onChange = () => {}) {

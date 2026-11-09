@@ -334,7 +334,16 @@ const canvas = [
   electron("tests/canvas-constraints.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-position.cjs", "canvas", AREA.inspector),
   electron("tests/canvas-compositing.cjs", "canvas", AREA.canvas),
-  electron("tests/render-readiness.cjs", "canvas", [...AREA.capture, "desktop/render.cjs", "desktop/assets.cjs", "desktop/render-assets.cjs", "scripts/render-test-main.cjs", "web/asset-store.js", "integrations/asset-store.mjs", "integrations/asset-urls.cjs"]),
+  electron("tests/render-readiness.cjs", "canvas", [
+    ...AREA.capture,
+    "desktop/render.cjs",
+    "desktop/assets.cjs",
+    "desktop/render-assets.cjs",
+    "scripts/render-test-main.cjs",
+    "web/asset-store.js",
+    "integrations/asset-store.mjs",
+    "integrations/asset-urls.cjs",
+  ]),
   electron("tests/render-export.cjs", "canvas", [...AREA.capture, "desktop/render.cjs"]),
   electron("tests/canvas-codec.cjs", "canvas", [
     ...AREA.canvas,
@@ -378,7 +387,11 @@ const canvas = [
   ]),
   electron("tests/canvas-bound-resize.cjs", "canvas", [...AREA.canvas, ...AREA.inspector]),
   electron("tests/inspector-effects.cjs", "canvas", AREA.inspector),
-  electron("tests/inspector-paints.cjs", "canvas", [...AREA.inspector, ...AREA.capture, "integrations/paints.mjs"]),
+  electron("tests/inspector-paints.cjs", "canvas", [
+    ...AREA.inspector,
+    ...AREA.capture,
+    "integrations/paints.mjs",
+  ]),
   electron("tests/inspector-selection-colors.cjs", "canvas", AREA.inspector),
   electron("tests/inspector-typography.cjs", "canvas", [
     ...AREA.inspector,
@@ -820,8 +833,35 @@ const manual = [
 ];
 
 export const tests = [
-  { file: "tests/renderer-commit-performance.cjs", group: "canvas", lane: "electron", covers: ["web/app.js", "web/canvas-render.js", "web/wonder-shell.js", "web/commit-validation.js", "web/commit-state.js", "web/library-storage.js", "web/selection-chrome.js", "web/selection-bounds.js", "web/lazy-document.js", "web/src/islands/sidebar/**", "web/src/islands/inspector/**"] },
-  { file: "tests/commit-state.cjs", group: "canvas", lane: "node", covers: ["web/commit-state.js", "web/commit-validation.js", "web/lazy-document.js", "web/remote-apply.js"] },
+  {
+    file: "tests/renderer-commit-performance.cjs",
+    group: "canvas",
+    lane: "electron",
+    covers: [
+      "web/app.js",
+      "web/canvas-render.js",
+      "web/wonder-shell.js",
+      "web/commit-validation.js",
+      "web/commit-state.js",
+      "web/library-storage.js",
+      "web/selection-chrome.js",
+      "web/selection-bounds.js",
+      "web/lazy-document.js",
+      "web/src/islands/sidebar/**",
+      "web/src/islands/inspector/**",
+    ],
+  },
+  {
+    file: "tests/commit-state.cjs",
+    group: "canvas",
+    lane: "node",
+    covers: [
+      "web/commit-state.js",
+      "web/commit-validation.js",
+      "web/lazy-document.js",
+      "web/remote-apply.js",
+    ],
+  },
   ...canvas,
   ...desktop,
   ...integrations,

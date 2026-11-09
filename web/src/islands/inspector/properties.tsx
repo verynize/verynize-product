@@ -268,9 +268,7 @@ function PositionSection({ doc, node, selection }: Props) {
   const parent = node.parentId ? byId.get(node.parentId) : undefined;
   const selected = nodes.filter((n) => wanted.has(n.id));
   // Children of flow frames can be taken out of the flow; children of free frames are always positioned.
-  const flowChildren = selected.filter(
-    (n) => !!n.parentId && isFlowFrame(byId.get(n.parentId)),
-  );
+  const flowChildren = selected.filter((n) => !!n.parentId && isFlowFrame(byId.get(n.parentId)));
   const absolute = flowChildren.length > 0 && flowChildren.every((n) => n.position === "absolute");
   const inFlow = !!parent && isFlowFrame(parent) && node.position !== "absolute";
   // One layer: align it to its parent unless the flow places it (Wonder dims the tools for top-level layers and
@@ -1162,14 +1160,29 @@ function DetailedPropertiesBody({
 }
 
 // Large selections show the count immediately; detailed editors are opened on demand.
-export function PropertiesBody(props: { doc: DesignDocument; node: Node | undefined; selection: string[] }) {
+export function PropertiesBody(props: {
+  doc: DesignDocument;
+  node: Node | undefined;
+  selection: string[];
+}) {
   const [expandedSelection, setExpandedSelection] = useState<string | null>(null);
   const key = props.selection.join(",");
-  if (props.selection.length <= 200 || expandedSelection === key) return <DetailedPropertiesBody {...props} />;
-  return <>
-    <Section title={`${props.selection.length} nodes selected`}>
-      <button type="button" className="rounded-md bg-input px-3 py-2 text-xs text-foreground" onClick={() => setExpandedSelection(key)}>Inspect selection</button>
-    </Section>
-    <div className="hidden"><FillSection doc={props.doc} node={undefined} selection={[]} /></div>
-  </>;
+  if (props.selection.length <= 200 || expandedSelection === key)
+    return <DetailedPropertiesBody {...props} />;
+  return (
+    <>
+      <Section title={`${props.selection.length} nodes selected`}>
+        <button
+          type="button"
+          className="rounded-md bg-input px-3 py-2 text-xs text-foreground"
+          onClick={() => setExpandedSelection(key)}
+        >
+          Inspect selection
+        </button>
+      </Section>
+      <div className="hidden">
+        <FillSection doc={props.doc} node={undefined} selection={[]} />
+      </div>
+    </>
+  );
 }

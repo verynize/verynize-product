@@ -6,11 +6,7 @@
     "cpu": "Apple M1",
     "logicalCpus": 8,
     "ramGiB": 8,
-    "loadAverage": [
-      2.8,
-      4.1,
-      4.4
-    ],
+    "loadAverage": [2.8, 4.1, 4.4],
     "macos": "27.2"
   },
   "sizes": [
@@ -20,11 +16,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.8,
-          4.1,
-          4.4
-        ],
+        "loadAverage": [2.8, 4.1, 4.4],
         "macos": "27.2"
       },
       "versions": {
@@ -155,9 +147,7 @@
             "ms": 4.5
           }
         ],
-        "syncStringifySites": [
-          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
-        ],
+        "syncStringifySites": ["dist/ui.js:59:172774 <- notify (app.js:521:9)"],
         "deferredSites": [
           {
             "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
@@ -430,10 +420,7 @@
       "editSummary": {
         "syncMsMedian": 19.2,
         "fenceMsMedian": 42.5,
-        "syncMsRange": [
-          17.7,
-          20
-        ],
+        "syncMsRange": [17.7, 20],
         "syncClones": 1,
         "syncCloneMs": 8,
         "fenceClones": 1,
@@ -503,11 +490,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.5,
-          3.9,
-          4.3
-        ],
+        "loadAverage": [2.5, 3.9, 4.3],
         "macos": "27.2"
       }
     },
@@ -517,11 +500,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.5,
-          3.9,
-          4.3
-        ],
+        "loadAverage": [2.5, 3.9, 4.3],
         "macos": "27.2"
       },
       "versions": {
@@ -652,9 +631,7 @@
             "ms": 15.299999999813735
           }
         ],
-        "syncStringifySites": [
-          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
-        ],
+        "syncStringifySites": ["dist/ui.js:59:172774 <- notify (app.js:521:9)"],
         "deferredSites": [
           {
             "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
@@ -927,10 +904,7 @@
       "editSummary": {
         "syncMsMedian": 53.9,
         "fenceMsMedian": 91.5,
-        "syncMsRange": [
-          31,
-          58.4
-        ],
+        "syncMsRange": [31, 58.4],
         "syncClones": 1,
         "syncCloneMs": 23.9,
         "fenceClones": 1,
@@ -1000,11 +974,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.4,
-          3.8,
-          4.3
-        ],
+        "loadAverage": [2.4, 3.8, 4.3],
         "macos": "27.2"
       }
     },
@@ -1014,11 +984,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.4,
-          3.8,
-          4.3
-        ],
+        "loadAverage": [2.4, 3.8, 4.3],
         "macos": "27.2"
       },
       "versions": {
@@ -1149,9 +1115,7 @@
             "ms": 31.200000000186265
           }
         ],
-        "syncStringifySites": [
-          "dist/ui.js:59:172774 <- notify (app.js:521:9)"
-        ],
+        "syncStringifySites": ["dist/ui.js:59:172774 <- notify (app.js:521:9)"],
         "deferredSites": [
           {
             "site": "Object.get (commit-state.js:134:37) <- render (app.js:516:32)",
@@ -1424,10 +1388,7 @@
       "editSummary": {
         "syncMsMedian": 94.4,
         "fenceMsMedian": 135.9,
-        "syncMsRange": [
-          91.7,
-          95.2
-        ],
+        "syncMsRange": [91.7, 95.2],
         "syncClones": 1,
         "syncCloneMs": 39.3,
         "fenceClones": 1,
@@ -1497,11 +1458,7 @@
         "cpu": "Apple M1",
         "logicalCpus": 8,
         "ramGiB": 8,
-        "loadAverage": [
-          2.4,
-          3.7,
-          4.2
-        ],
+        "loadAverage": [2.4, 3.7, 4.2],
         "macos": "27.2"
       }
     }

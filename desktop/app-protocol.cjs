@@ -59,7 +59,17 @@ const MIME = {
 };
 
 function registerSchemes(protocol) {
-  protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: PRIVILEGES }, { scheme: "asset", privileges: { secure: true, supportFetchAPI: true, corsEnabled: true, bypassCSP: false } }, { scheme: "verynize-render", privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]);
+  protocol.registerSchemesAsPrivileged([
+    { scheme: SCHEME, privileges: PRIVILEGES },
+    {
+      scheme: "asset",
+      privileges: { secure: true, supportFetchAPI: true, corsEnabled: true, bypassCSP: false },
+    },
+    {
+      scheme: "verynize-render",
+      privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true },
+    },
+  ]);
 }
 
 /** True for app://verynize/... (no credentials, no port). Node's URL reports origin "null" for

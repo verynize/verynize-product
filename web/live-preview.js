@@ -823,12 +823,16 @@
     }
     style.textContent = window.assetStore?.css(fontFaceCss(faces)) || fontFaceCss(faces);
   }
-  window.addEventListener("assets-ready", () => { fontKey = ""; syncEmbeddedFonts(window.design.getDocument()); });
+  window.addEventListener("assets-ready", () => {
+    fontKey = "";
+    syncEmbeddedFonts(window.design.getDocument());
+  });
   window.design.subscribe(syncEmbeddedFonts);
   syncEmbeddedFonts(window.design.getDocument());
   // Preview layers the canvas drew before this module loaded (the launch document) get their app frame now; nothing
   // else may redraw them (the file library loads asynchronously and leaves an unchanged document alone).
-  if (window.design.getSnapshot().pages.some((page) => page.nodes.some((node) => node.preview))) render();
+  if (window.design.getSnapshot().pages.some((page) => page.nodes.some((node) => node.preview)))
+    render();
   // Web page capture: load any http(s) page in an isolated hidden window, pick a region on its screenshot,
   // and insert editable layers with embedded images, backgrounds, fonts, source mapping and states.
   const web = document.createElement("section");

@@ -1353,7 +1353,8 @@ export function toolTable(backend, context = {}) {
       const key = docKey(state.name, ref);
       const revision = state.revision || revisionOf(state.document);
       const shot = await backend.screenshot(ref, page.id, node.id, scale, state);
-      if (shot.verified === false || shot.fonts?.missing?.length) throw Error("Screenshot readiness failed; no verification receipt recorded");
+      if (shot.verified === false || shot.fonts?.missing?.length)
+        throw Error("Screenshot readiness failed; no verification receipt recorded");
       const png = Buffer.from(shot.data || "", "base64");
       const bounds =
         shot.bounds && typeof shot.bounds === "object" && Object.keys(shot.bounds).length
@@ -1996,15 +1997,30 @@ export function toolTable(backend, context = {}) {
       const stored = session.receipts.latest(key, artboardId);
       const receipt = stored ? { ...stored, reviewNote } : null;
       const imported = session.imports.get(key);
-      const faithful = intent === "faithful-import" && imported?.revision === revision && imported.artboardIds.includes(node.id);
+      const faithful =
+        intent === "faithful-import" &&
+        imported?.revision === revision &&
+        imported.artboardIds.includes(node.id);
       if (intent === "faithful-import" && !faithful)
-        throw Error("faithful-import requires an unchanged import from this session; reimport or use new-design.");
+        throw Error(
+          "faithful-import requires an unchanged import from this session; reimport or use new-design.",
+        );
       const canWaiveContrast = faithful && !imported.unsupportedFeatures.length;
-      const waivers = canWaiveContrast ? (lint?.problems || []).filter((p) => p.rule === "contrast").map((p) => ({
-        id: p.id, node: p.ref, rule: p.rule, sourceDigest: imported.sourceDigest,
-        reason: "Source-preserved contrast",
-      })) : [];
-      const gateLint = canWaiveContrast && lint ? { ...lint, problems: lint.problems.filter((p) => p.rule !== "contrast") } : lint;
+      const waivers = canWaiveContrast
+        ? (lint?.problems || [])
+            .filter((p) => p.rule === "contrast")
+            .map((p) => ({
+              id: p.id,
+              node: p.ref,
+              rule: p.rule,
+              sourceDigest: imported.sourceDigest,
+              reason: "Source-preserved contrast",
+            }))
+        : [];
+      const gateLint =
+        canWaiveContrast && lint
+          ? { ...lint, problems: lint.problems.filter((p) => p.rule !== "contrast") }
+          : lint;
       const gate = finishGate({
         receipt,
         currentRevision: revision,
@@ -2013,7 +2029,9 @@ export function toolTable(backend, context = {}) {
         artboardId,
       });
       if (!gate.allowFinish) {
-        const budget = faithful ? session.receipts.repairBudget(key, artboardId) : session.receipts.recordRepair(key, artboardId);
+        const budget = faithful
+          ? session.receipts.repairBudget(key, artboardId)
+          : session.receipts.recordRepair(key, artboardId);
         const fixes = gate.critical.map(
           (p) =>
             `- [${p.rule || "lint"}] ${p.ref || artboardId}: ${p.message || p.id}${p.fix ? ` Fix: ${p.fix}` : ""}`,
@@ -2052,8 +2070,15 @@ export function toolTable(backend, context = {}) {
       return text({
         intent,
         renderVerified: gate.status === "verified",
-        ...(faithful ? { sourceDigest: imported.sourceDigest, fidelityStatus: imported.unsupportedFeatures.length ? "partial" : "unverified",
-          unsupportedFeatures: imported.unsupportedFeatures, waivers, qualityFindings: lint?.problems || [] } : {}),
+        ...(faithful
+          ? {
+              sourceDigest: imported.sourceDigest,
+              fidelityStatus: imported.unsupportedFeatures.length ? "partial" : "unverified",
+              unsupportedFeatures: imported.unsupportedFeatures,
+              waivers,
+              qualityFindings: lint?.problems || [],
+            }
+          : {}),
         status: gate.status,
         verified: gate.status === "verified",
         reasons: gate.reasons,
@@ -2850,7 +2875,13 @@ export function toolTable(backend, context = {}) {
     annotations: { readOnlyHint: true },
     run: async ({ name, pageId }) => {
       const state = await backend.read(name);
-      return { html: await inlineAssets(exportHTML(state.document, pageId), backend.assets ? (asset) => backend.assets.get(name, asset) : null), revision: state.revision };
+      return {
+        html: await inlineAssets(
+          exportHTML(state.document, pageId),
+          backend.assets ? (asset) => backend.assets.get(name, asset) : null,
+        ),
+        revision: state.revision,
+      };
     },
   };
   // Source round trips (integrations/codec-source.mjs, codec-html.mjs): lossless exports and imports.
@@ -2861,7 +2892,13 @@ export function toolTable(backend, context = {}) {
     annotations: { readOnlyHint: true },
     run: async ({ name, pageId }) => {
       const state = await backend.read(name);
-      return { html: await inlineAssets(documentToHtml(state.document, pageId), backend.assets ? (asset) => backend.assets.get(name, asset) : null), revision: state.revision };
+      return {
+        html: await inlineAssets(
+          documentToHtml(state.document, pageId),
+          backend.assets ? (asset) => backend.assets.get(name, asset) : null,
+        ),
+        revision: state.revision,
+      };
     },
   };
   t.export_jsx = {
@@ -2871,7 +2908,13 @@ export function toolTable(backend, context = {}) {
     annotations: { readOnlyHint: true },
     run: async ({ name, pageId }) => {
       const state = await backend.read(name);
-      return { code: await inlineAssets(documentToJsx(state.document, pageId), backend.assets ? (asset) => backend.assets.get(name, asset) : null), revision: state.revision };
+      return {
+        code: await inlineAssets(
+          documentToJsx(state.document, pageId),
+          backend.assets ? (asset) => backend.assets.get(name, asset) : null,
+        ),
+        revision: state.revision,
+      };
     },
   };
   const viewportArg = z
@@ -2906,17 +2949,21 @@ export function toolTable(backend, context = {}) {
       ),
   };
   t.import_pen = {
-    description: "Import supported unencrypted Pen JSON (versions 1.0/2.8). Preserves components and instances, reports unsupported features; never decrypts files.",
+    description:
+      "Import supported unencrypted Pen JSON (versions 1.0/2.8). Preserves components and instances, reports unsupported features; never decrypts files.",
     inputSchema: { document: documentArg, path: z.string().max(4096) },
     run: async ({ document: ref, path: file }) => {
       const fs = await import("node:fs/promises");
       const path = await import("node:path");
       if (!path.isAbsolute(file)) throw Error("Pen path must be absolute");
       const stat = await fs.stat(file);
-      if (!stat.isFile() || stat.size > 5_000_000) throw Error("Pen source exceeds limit 5000000 bytes");
+      if (!stat.isFile() || stat.size > 5_000_000)
+        throw Error("Pen source exceeds limit 5000000 bytes");
       const { importPen } = await import("./codec-pen.mjs");
       const imported = await importPen(await fs.readFile(file), {
-        assetSink: backend.assets ? (bytes, type) => backend.assets.put(ref, bytes, type) : undefined,
+        assetSink: backend.assets
+          ? (bytes, type) => backend.assets.put(ref, bytes, type)
+          : undefined,
         name: path.basename(file, ".pen"),
       });
       const out = await write(backend, ref, (document) => {
@@ -2924,16 +2971,26 @@ export function toolTable(backend, context = {}) {
         return { document, result: null };
       });
       sessionFor(backend).imports.set(docKey(out.name, ref), {
-        revision: out.revision, sourceDigest: imported.sourceDigest,
-        artboardIds: imported.document.pages.flatMap((p) => p.nodes.filter((n) => !n.parentId).map((n) => n.id)), unsupportedFeatures: imported.unsupportedFeatures,
+        revision: out.revision,
+        sourceDigest: imported.sourceDigest,
+        artboardIds: imported.document.pages.flatMap((p) =>
+          p.nodes.filter((n) => !n.parentId).map((n) => n.id),
+        ),
+        unsupportedFeatures: imported.unsupportedFeatures,
       });
-      return { pages: imported.document.pages.map((p) => p.id), sourceDigest: imported.sourceDigest,
-        unsupportedFeatures: imported.unsupportedFeatures, fidelityStatus: imported.fidelityStatus,
-        counts: imported.counts, revision: out.revision };
+      return {
+        pages: imported.document.pages.map((p) => p.id),
+        sourceDigest: imported.sourceDigest,
+        unsupportedFeatures: imported.unsupportedFeatures,
+        fidelityStatus: imported.fidelityStatus,
+        counts: imported.counts,
+        revision: out.revision,
+      };
     },
   };
   t.preflight_import = {
-    description: "Read-only HTML/Pen capacity check. Counts UTF-8 bytes and nodes, reports exceeded limits. Local HTML resolves sibling assets without a server.",
+    description:
+      "Read-only HTML/Pen capacity check. Counts UTF-8 bytes and nodes, reports exceeded limits. Local HTML resolves sibling assets without a server.",
     inputSchema: { format: z.enum(["html", "pen"]), path: z.string().max(4096) },
     annotations: { readOnlyHint: true },
     run: async ({ format, path: file }) => {
@@ -2942,7 +2999,11 @@ export function toolTable(backend, context = {}) {
       if (!path.isAbsolute(file)) throw Error("Import path must be absolute");
       const info = await fs.stat(file);
       if (!info.isFile()) throw Error("Import path must be a file");
-      if (info.size > 5_000_000) return { ok: false, exceeded: { budget: "source", bytes: info.size, limitBytes: 5_000_000 } };
+      if (info.size > 5_000_000)
+        return {
+          ok: false,
+          exceeded: { budget: "source", bytes: info.size, limitBytes: 5_000_000 },
+        };
       try {
         const source = await fs.readFile(file);
         const staged = new Map();
@@ -2952,17 +3013,40 @@ export function toolTable(backend, context = {}) {
           const { bytes: _bytes, ...meta } = asset;
           return meta;
         };
-        const result = format === "pen" ? await (await import("./codec-pen.mjs")).importPen(source, { assetSink }) :
-          await (await import("./codec-html.mjs")).importHtml(source.toString("utf8"), { baseUrl: file, root: path.dirname(file), allowFiles: true, assetSink });
-        return { ok: true, uniqueAssets: staged.size, decodedAssetBytes: [...staged.values()].reduce((a,b) => a+b, 0), sourceBytes: source.length, documentBytes: Buffer.byteLength(JSON.stringify(result.document)),
-          nodes: result.document.pages.reduce((n,p) => n + p.nodes.length, 0),
-          warnings: result.warnings || result.unsupportedFeatures || [], limitBytes: 5_000_000 };
-      } catch (error) { return { ok: false, error: error.message }; }
+        const result =
+          format === "pen"
+            ? await (await import("./codec-pen.mjs")).importPen(source, { assetSink })
+            : await (
+                await import("./codec-html.mjs")
+              ).importHtml(source.toString("utf8"), {
+                baseUrl: file,
+                root: path.dirname(file),
+                allowFiles: true,
+                assetSink,
+              });
+        return {
+          ok: true,
+          uniqueAssets: staged.size,
+          decodedAssetBytes: [...staged.values()].reduce((a, b) => a + b, 0),
+          sourceBytes: source.length,
+          documentBytes: Buffer.byteLength(JSON.stringify(result.document)),
+          nodes: result.document.pages.reduce((n, p) => n + p.nodes.length, 0),
+          warnings: result.warnings || result.unsupportedFeatures || [],
+          limitBytes: 5_000_000,
+        };
+      } catch (error) {
+        return { ok: false, error: error.message };
+      }
     },
   };
   t.upload_asset = {
-    description: "Store an image/font once by SHA-256. Returns asset:<hash>; local path must be absolute. No binary in the response.",
-    inputSchema: { document: documentArg, path: z.string().max(4096), contentType: z.string().max(100).optional() },
+    description:
+      "Store an image/font once by SHA-256. Returns asset:<hash>; local path must be absolute. No binary in the response.",
+    inputSchema: {
+      document: documentArg,
+      path: z.string().max(4096),
+      contentType: z.string().max(100).optional(),
+    },
     run: async ({ document: ref, path: file, contentType }) => {
       if (!backend.assets) throw Error("This backend does not support local asset uploads");
       const fs = await import("node:fs/promises");
@@ -2971,9 +3055,12 @@ export function toolTable(backend, context = {}) {
       const h = await fs.open(file, "r");
       try {
         const stat = await h.stat();
-        if (!stat.isFile() || stat.size > 4 * 1024 * 1024) throw Error("Asset exceeds limit 4194304 bytes");
+        if (!stat.isFile() || stat.size > 4 * 1024 * 1024)
+          throw Error("Asset exceeds limit 4194304 bytes");
         return await backend.assets.put(ref, await h.readFile(), contentType);
-      } finally { await h.close(); }
+      } finally {
+        await h.close();
+      }
     },
   };
   t.import_html = {
@@ -2983,7 +3070,14 @@ export function toolTable(backend, context = {}) {
       ...importOptions,
       document: documentArg,
       pageId: pageArg,
-      html: z.string().min(1).refine((source) => Buffer.byteLength(source, "utf8") <= 5_000_000, "HTML source exceeds limit 5000000 bytes").optional(),
+      html: z
+        .string()
+        .min(1)
+        .refine(
+          (source) => Buffer.byteLength(source, "utf8") <= 5_000_000,
+          "HTML source exceeds limit 5000000 bytes",
+        )
+        .optional(),
       path: z.string().min(1).max(4096).optional(),
       url: z.string().url().max(4096).optional(),
       viewport: viewportArg,
@@ -3033,7 +3127,10 @@ export function toolTable(backend, context = {}) {
           const { done, value } = await reader.read();
           if (done) break;
           received += value.byteLength;
-          if (received > 5_000_000) { await reader.cancel(); throw Error("HTML source exceeds limit 5000000 bytes"); }
+          if (received > 5_000_000) {
+            await reader.cancel();
+            throw Error("HTML source exceeds limit 5000000 bytes");
+          }
           chunks.push(Buffer.from(value));
         }
         source = Buffer.concat(chunks).toString("utf8");
@@ -3042,7 +3139,9 @@ export function toolTable(backend, context = {}) {
       const state = await backend.read(ref);
       const page = getPage(state.document, pageId);
       const prepared = await prepareHtmlImport(source, state.document, page.id, {
-        assetSink: backend.assets ? (bytes, type) => backend.assets.put(ref, bytes, type) : undefined,
+        assetSink: backend.assets
+          ? (bytes, type) => backend.assets.put(ref, bytes, type)
+          : undefined,
         baseUrl,
         root,
         allowFiles: file !== undefined,
@@ -3064,8 +3163,10 @@ export function toolTable(backend, context = {}) {
         return { document: r.document, result: null };
       });
       sessionFor(backend).imports.set(docKey(out.name, ref), {
-        revision: out.revision, sourceDigest: createHash("sha256").update(source).digest("hex"),
-        artboardIds: created, unsupportedFeatures: prepared.warnings,
+        revision: out.revision,
+        sourceDigest: createHash("sha256").update(source).digest("hex"),
+        artboardIds: created,
+        unsupportedFeatures: prepared.warnings,
       });
       const warnings = warningText([
         ...new Set([
@@ -3100,7 +3201,13 @@ export function toolTable(backend, context = {}) {
       ...importOptions,
       document: documentArg,
       pageId: pageArg,
-      code: z.string().min(1).refine((source) => Buffer.byteLength(source, "utf8") <= 5_000_000, "JSX source exceeds limit 5000000 bytes"),
+      code: z
+        .string()
+        .min(1)
+        .refine(
+          (source) => Buffer.byteLength(source, "utf8") <= 5_000_000,
+          "JSX source exceeds limit 5000000 bytes",
+        ),
       viewport: viewportArg,
     },
     run: async ({
@@ -3245,8 +3352,12 @@ export function createStoreBackend(
   return {
     mode: "headless",
     assets: {
-      async put(ref, bytes, type) { return sidecarAssets(store.file(await resolveName(ref))).put(bytes, type); },
-      async get(ref, asset) { return sidecarAssets(store.file(await resolveName(ref))).get(asset); },
+      async put(ref, bytes, type) {
+        return sidecarAssets(store.file(await resolveName(ref))).put(bytes, type);
+      },
+      async get(ref, asset) {
+        return sidecarAssets(store.file(await resolveName(ref))).get(asset);
+      },
     },
     async list() {
       const names = await store.list();

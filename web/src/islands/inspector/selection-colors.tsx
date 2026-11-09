@@ -226,7 +226,10 @@ export function selectionColors(doc: DesignDocument, selection: string[]): Color
       const key = keyOf(use);
       const group = groups.get(key);
       if (group) {
-        if (!uses.get(key)?.has(node.id)) { group.ids.push(node.id); uses.get(key)?.add(node.id); }
+        if (!uses.get(key)?.has(node.id)) {
+          group.ids.push(node.id);
+          uses.get(key)?.add(node.id);
+        }
       } else {
         groups.set(key, { key, color: use.color, token: use.token, ids: [node.id] });
         uses.set(key, new Set([node.id]));
@@ -368,7 +371,15 @@ export function SelectionColorsSection({
             tokens={tokens}
           />
         ))}
-        {visible < groups.length && <button type="button" className="rounded-md bg-input px-3 py-2 text-xs" onClick={() => setVisible(visible + 40)}>Show more colors ({groups.length - visible})</button>}
+        {visible < groups.length && (
+          <button
+            type="button"
+            className="rounded-md bg-input px-3 py-2 text-xs"
+            onClick={() => setVisible(visible + 40)}
+          >
+            Show more colors ({groups.length - visible})
+          </button>
+        )}
       </div>
     </Section>
   );

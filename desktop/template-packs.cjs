@@ -28,7 +28,10 @@ const MIME_EXT = {
   "image/gif": "gif",
   "image/webp": "webp",
   "image/svg+xml": "svg",
-  "font/woff2": "woff2", "font/woff": "woff", "font/ttf": "ttf", "font/otf": "otf",
+  "font/woff2": "woff2",
+  "font/woff": "woff",
+  "font/ttf": "ttf",
+  "font/otf": "otf",
 };
 const EXT_MIME = Object.fromEntries(Object.entries(MIME_EXT).map(([mime, ext]) => [ext, mime]));
 
@@ -191,10 +194,12 @@ function readZip(input) {
 /** Replace embedded data-URL images by asset references; `assets` collects name → Buffer. */
 function extractAssets(value, assets) {
   if (typeof value === "string") {
-    if (/^asset:[a-f0-9]{64}$/.test(value)) throw Error("Resolve asset references before encoding a portable pack");
-    const m = /^data:((?:image\/(?:png|jpeg|gif|webp|svg\+xml)|font\/(?:woff2|woff|ttf|otf)));base64,([A-Za-z0-9+/=\s]+)$/.exec(
-      value,
-    );
+    if (/^asset:[a-f0-9]{64}$/.test(value))
+      throw Error("Resolve asset references before encoding a portable pack");
+    const m =
+      /^data:((?:image\/(?:png|jpeg|gif|webp|svg\+xml)|font\/(?:woff2|woff|ttf|otf)));base64,([A-Za-z0-9+/=\s]+)$/.exec(
+        value,
+      );
     if (!m) return value;
     const bytes = Buffer.from(m[2], "base64");
     const name = `assets/${crypto.createHash("sha256").update(bytes).digest("hex").slice(0, 32)}.${MIME_EXT[m[1]]}`;

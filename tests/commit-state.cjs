@@ -142,7 +142,11 @@ test("a remote patch into a prepared page keeps the editor defaults and changes 
   Lazy.match(next, editor);
   const changed = new Set();
   const live = window.remoteApply.patch(editor, next, new Set(), changed);
-  assert.deepEqual([...changed].sort((a, b) => a.localeCompare(b)), ["b2", "b3"], "only what the collaborator changed");
+  assert.deepEqual(
+    [...changed].sort((a, b) => a.localeCompare(b)),
+    ["b2", "b3"],
+    "only what the collaborator changed",
+  );
   assert.equal(live.pages[1], editor.pages[1], "page objects stay in place");
   assert.equal(live.pages[1].nodes[0], kept, "unchanged nodes stay in place");
   assert.deepEqual(

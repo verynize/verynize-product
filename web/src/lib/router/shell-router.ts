@@ -178,7 +178,9 @@ const rawStartState = (host ? host.initialState : window.history.state) as Entry
 // starts on the bare editor, which restoreFile settles to the file's URL (or Files) once the library is ready.
 function fileStartView(): ViewPath {
   const { view } = shown();
-  return view === "/" && !body().contains("files-view") && legacy().fileLibrary?.isReady?.() === false
+  return view === "/" &&
+    !body().contains("files-view") &&
+    legacy().fileLibrary?.isReady?.() === false
     ? "/editor"
     : view;
 }
@@ -452,7 +454,9 @@ function restoreFile(view: ViewPath) {
   const lib = legacy().fileLibrary;
   if (!lib) return;
   if (lib.isReady?.() === false) {
-    void lib.ready?.().then(() => { if (logical().view === view) restoreFile(view); });
+    void lib.ready?.().then(() => {
+      if (logical().view === view) restoreFile(view);
+    });
     return;
   }
   if (view === "/editor") {

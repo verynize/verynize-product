@@ -196,8 +196,12 @@ const os = require("node:os");
       global.render.renderHTML({ html: '<body style="background:red"/>', width: 8, height: 8 }),
     );
     assert.equal(recovery.width, 8);
-    const recoveredPixel = await app.evaluate(({ nativeImage }, dataURL) =>
-      [...nativeImage.createFromDataURL(dataURL).toBitmap().subarray(0, 4)], recovery.dataURL);
+    const recoveredPixel = await app.evaluate(
+      ({ nativeImage }, dataURL) => [
+        ...nativeImage.createFromDataURL(dataURL).toBitmap().subarray(0, 4),
+      ],
+      recovery.dataURL,
+    );
     assert.deepEqual(recoveredPixel, [0, 0, 255, 255], "queue recovers with painted red pixels");
     console.log(
       "PASS large 18420×5313, zoom retry, font refusal, actual renderer crash, blank 2160p refusal and painted queue recovery",

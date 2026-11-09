@@ -396,7 +396,8 @@
         f.src.length > 3e6 ||
         !(
           /^data:font\/(woff2|woff|ttf|otf);base64,[A-Za-z0-9+/=]+$/.test(f.src) ||
-          /^asset:[a-f0-9]{64}$/.test(f.src) || isRoomAssetUrl(f.src)
+          /^asset:[a-f0-9]{64}$/.test(f.src) ||
+          isRoomAssetUrl(f.src)
         )
       )
         throw new Error("Embedded font source must be a base64 font data URL or a room asset URL");

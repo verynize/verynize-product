@@ -10,15 +10,32 @@ const fsSync = require("node:fs");
 const { randomUUID } = require("node:crypto");
 // Capture the identity of runtime files while this main process starts. A dependency update
 // can replace helpers while the old Electron framework remains mapped in this process.
-const runtimeFiles = [process.execPath, ...(process.platform === "darwin" ? [
-  path.resolve(path.dirname(process.execPath), "../Frameworks/Electron Framework.framework/Versions/A/Electron Framework"),
-  path.resolve(path.dirname(process.execPath), "../Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper"),
-] : [])];
+const runtimeFiles = [
+  process.execPath,
+  ...(process.platform === "darwin"
+    ? [
+        path.resolve(
+          path.dirname(process.execPath),
+          "../Frameworks/Electron Framework.framework/Versions/A/Electron Framework",
+        ),
+        path.resolve(
+          path.dirname(process.execPath),
+          "../Frameworks/Electron Helper.app/Contents/MacOS/Electron Helper",
+        ),
+      ]
+    : []),
+];
 function runtimeFingerprint() {
-  return runtimeFiles.map((file) => {
-    try { const s = fsSync.statSync(file); return [s.dev, s.ino, s.size, s.mtimeMs, s.ctimeMs].join(":"); }
-    catch { return "missing"; }
-  }).join("|");
+  return runtimeFiles
+    .map((file) => {
+      try {
+        const s = fsSync.statSync(file);
+        return [s.dev, s.ino, s.size, s.mtimeMs, s.ctimeMs].join(":");
+      } catch {
+        return "missing";
+      }
+    })
+    .join("|");
 }
 const startupRuntime = runtimeFingerprint();
 function assertRuntime() {
@@ -27,19 +44,34 @@ function assertRuntime() {
 }
 function watchRender(window) {
   const contents = window.webContents;
-  let fail, failure, phase = "navigation";
+  let fail,
+    failure,
+    phase = "navigation";
   const id = randomUUID();
-  const rejected = new Promise((_, reject) => { fail = reject; });
+  const rejected = new Promise((_, reject) => {
+    fail = reject;
+  });
   rejected.catch(() => {});
   const stop = (category, details = {}) => {
     if (failure) return;
-    failure = Error(`Render ${category} during ${phase} (reason: ${details.reason || "unknown"}, exit: ${details.exitCode ?? "unknown"}). Restart Verynize if this persists.`);
-    console.error("[render]", { id, phase, category, reason: details.reason, exitCode: details.exitCode });
+    failure = Error(
+      `Render ${category} during ${phase} (reason: ${details.reason || "unknown"}, exit: ${details.exitCode ?? "unknown"}). Restart Verynize if this persists.`,
+    );
+    console.error("[render]", {
+      id,
+      phase,
+      category,
+      reason: details.reason,
+      exitCode: details.exitCode,
+    });
     fail(failure);
   };
   const gone = (_e, d) => stop("renderer-process-gone", d);
   const child = (_e, d) => {
-    if (["GPU", "Utility", "Zygote", "Sandbox helper"].includes(d.type) && d.reason !== "clean-exit")
+    if (
+      ["GPU", "Utility", "Zygote", "Sandbox helper"].includes(d.type) &&
+      d.reason !== "clean-exit"
+    )
       stop("child-process-gone", d);
   };
   const closed = () => stop("window-closed");
@@ -52,13 +84,20 @@ function watchRender(window) {
       if (failure) throw failure;
       let timer;
       try {
-        return await Promise.race([Promise.resolve().then(fn), rejected,
-          new Promise((_, reject) => { timer = setTimeout(() => reject(Error("Render timed out during " + name)), 15000); })]);
+        return await Promise.race([
+          Promise.resolve().then(fn),
+          rejected,
+          new Promise((_, reject) => {
+            timer = setTimeout(() => reject(Error("Render timed out during " + name)), 15000);
+          }),
+        ]);
       } catch (error) {
         // Process termination can reject navigation before Electron delivers its detailed event.
         await new Promise((resolve) => setTimeout(resolve, 30));
         throw failure || Error("Render failed during " + name + ": " + error.message);
-      } finally { clearTimeout(timer); }
+      } finally {
+        clearTimeout(timer);
+      }
     },
     dispose() {
       contents.removeListener("render-process-gone", gone);
@@ -279,16 +318,19 @@ async function renderNow(
       );
     // Navigation establishes the page's zoom context. Set scale after loading, otherwise
     // loadURL can reset it. CSS zoom handles factors outside Chromium's page zoom range.
-    let ready = false, readiness;
+    let ready = false,
+      readiness;
     for (let attempt = 0; attempt < 2; attempt++) {
       await guard.run("zoom-font-settle", async () => {
         window.webContents.setZoomFactor(pageZoom);
         await window.webContents.executeJavaScript(
-          `document.documentElement.style.zoom=${JSON.stringify(String(cssZoom))}`);
+          `document.documentElement.style.zoom=${JSON.stringify(String(cssZoom))}`,
+        );
         if (fonts.css) await window.webContents.insertCSS(renderAssetUrls(fonts.css));
         if (lifted.css) await window.webContents.insertCSS(renderAssetUrls(lifted.css));
         await window.webContents.executeJavaScript(
-          `Promise.all([...document.fonts].map(face=>face.load().catch(()=>{}))).then(()=>Promise.all([document.fonts.ready,...[...document.images].map(image=>image.decode().catch(()=>{}))])).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))`);
+          `Promise.all([...document.fonts].map(face=>face.load().catch(()=>{}))).then(()=>Promise.all([document.fonts.ready,...[...document.images].map(image=>image.decode().catch(()=>{}))])).then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))))`,
+        );
         const state = await window.webContents.executeJavaScript(`(async()=>{
           const urls=new Set();
           for(const el of document.querySelectorAll('*')) {
@@ -308,16 +350,34 @@ async function renderNow(
             images:paints.every(Boolean)&&[...document.images].every(i=>i.complete&&i.naturalWidth>0),
             faces:document.fonts.size};
         })()`);
-        readiness = { zoom: state.zoom, expectedZoom: cssZoom, viewport: state.viewport, expectedViewport: outputWidth / pageZoom, fontsReady: state.fonts, imagesReady: state.images, faces: state.faces, expectedFaces: fonts.loaded, missingFonts: fonts.missing.length };
-        ready = Math.abs(window.webContents.getZoomFactor() - pageZoom) < 0.001 &&
-          Math.abs(state.zoom - cssZoom) < 0.001 && Math.abs(state.viewport - outputWidth / pageZoom) <= 2 && state.fonts && state.images &&
+        readiness = {
+          zoom: state.zoom,
+          expectedZoom: cssZoom,
+          viewport: state.viewport,
+          expectedViewport: outputWidth / pageZoom,
+          fontsReady: state.fonts,
+          imagesReady: state.images,
+          faces: state.faces,
+          expectedFaces: fonts.loaded,
+          missingFonts: fonts.missing.length,
+        };
+        ready =
+          Math.abs(window.webContents.getZoomFactor() - pageZoom) < 0.001 &&
+          Math.abs(state.zoom - cssZoom) < 0.001 &&
+          Math.abs(state.viewport - outputWidth / pageZoom) <= 2 &&
+          state.fonts &&
+          state.images &&
           // A family the font cache cannot provide falls back and is reported in `fonts.missing`.
           state.faces >= fonts.loaded;
       });
       if (ready) break;
-      console.warn("[render]", JSON.stringify({ category: "readiness-retry", attempt: attempt + 1, ...readiness }));
+      console.warn(
+        "[render]",
+        JSON.stringify({ category: "readiness-retry", attempt: attempt + 1, ...readiness }),
+      );
     }
-    if (!ready) throw Error("Render zoom, fonts or images were not applied after retry; capture refused.");
+    if (!ready)
+      throw Error("Render zoom, fonts or images were not applied after retry; capture refused.");
     const boxes = measure
       ? await guard.run("measure", () => window.webContents.executeJavaScript(MEASURE))
       : null;
@@ -326,15 +386,18 @@ async function renderNow(
     await guard.run("paint-settle", async () => {
       window.webContents.invalidate();
       await window.webContents.executeJavaScript(
-        "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+        "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))",
+      );
     });
     let image;
     const checkCoverage = createCoverageCheck();
     for (let attempt = 0; attempt < 4; attempt++) {
-      image = await guard.run("capture", () => window.webContents.capturePage(
-        { x: 0, y: 0, width: outputWidth, height: outputHeight },
-        { stayHidden: true, stayAwake: true },
-      ));
+      image = await guard.run("capture", () =>
+        window.webContents.capturePage(
+          { x: 0, y: 0, width: outputWidth, height: outputHeight },
+          { stayHidden: true, stayAwake: true },
+        ),
+      );
       // DOM/font readiness does not prove that the compositor supplied painted pixels.
       // Check before encoding: isEmpty() also accepts allocated transparent PNGs.
       const size = image.getSize();
@@ -345,11 +408,24 @@ async function renderNow(
       if (painted && coverage.stable) break;
       const reason = painted ? "unstable painted area" : "empty or fully transparent";
       if (!painted || coverage.previousPixels)
-        console.warn("[render]", JSON.stringify({ category: "capture-retry", attempt: attempt + 1,
-          reason, paintedPixels: coverage.pixels, previousPaintedPixels: coverage.previousPixels,
-          width: size.width, height: size.height, outputWidth, outputHeight }));
+        console.warn(
+          "[render]",
+          JSON.stringify({
+            category: "capture-retry",
+            attempt: attempt + 1,
+            reason,
+            paintedPixels: coverage.pixels,
+            previousPaintedPixels: coverage.previousPixels,
+            width: size.width,
+            height: size.height,
+            outputWidth,
+            outputHeight,
+          }),
+        );
       if (attempt === 3)
-        throw Error(`Render capture remained ${reason} after retry; capture refused. Check that the selection contains stable visible artwork and try again.`);
+        throw Error(
+          `Render capture remained ${reason} after retry; capture refused. Check that the selection contains stable visible artwork and try again.`,
+        );
       // A partially painted/stale surface is not empty. Require two consecutive nonempty
       // footprints that also retain all painted regions observed in this render.
       // Yield to raster/compositor work under load, then let a fresh frame settle. Never
@@ -358,7 +434,8 @@ async function renderNow(
         await new Promise((resolve) => setTimeout(resolve, 100));
         window.webContents.invalidate();
         await window.webContents.executeJavaScript(
-          "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))");
+          "new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))",
+        );
       });
     }
     return {
@@ -383,12 +460,23 @@ function registerRendering(handle, parent) {
   // the application's first page (or steal firstWindow() from automation).
   const smoke = () => {
     if (parent?.isDestroyed()) return;
-    renderHTML({ html: '<html><body style="margin:0;background:#fff"></body></html>',
-      width: 8, height: 8, measure: false, fonts: [] }, parent)
-      .catch((error) => console.error("[render] startup smoke:", error.message));
+    renderHTML(
+      {
+        html: '<html><body style="margin:0;background:#fff"></body></html>',
+        width: 8,
+        height: 8,
+        measure: false,
+        fonts: [],
+      },
+      parent,
+    ).catch((error) => console.error("[render] startup smoke:", error.message));
   };
   if (parent) parent.webContents.once("did-finish-load", smoke);
-  else app.whenReady().then(smoke).catch((error) => console.error("[render] startup smoke:", error.message));
+  else
+    app
+      .whenReady()
+      .then(smoke)
+      .catch((error) => console.error("[render] startup smoke:", error.message));
   registerArtworkExport(handle, parent);
   handle("renderDesign", async (input) => {
     if (active) throw Error("An export is already rendering");
@@ -422,7 +510,8 @@ function registerRendering(handle, parent) {
 // Artwork export (inspector Export section): vector PDF of the selection, native save dialog and the
 // font catalog for the font family picker.
 const RENDER_URL = "verynize-render://document/";
-const renderAssetUrls = (text) => mapAssetUrls(text, (ref) => RENDER_URL + "assets/" + ref.slice(6));
+const renderAssetUrls = (text) =>
+  mapAssetUrls(text, (ref) => RENDER_URL + "assets/" + ref.slice(6));
 function serveRenderPage(window, html, scripts = false, resources = "") {
   const assets = new Set(assetUrls(html + resources).map((ref) => ref.slice(6)));
   html = renderAssetUrls(html);
@@ -442,27 +531,30 @@ function serveRenderPage(window, html, scripts = false, resources = "") {
         !details.url.startsWith("blob:"),
     }),
   );
-  session.protocol.handle(
-    "verynize-render",
-    async (request) => {
-      const hash = request.url.startsWith(RENDER_URL + "assets/") ? request.url.slice((RENDER_URL + "assets/").length) : "";
-      if (assets.has(hash)) {
-        try {
-          const asset = await (await require("./assets.cjs").store()).get("asset:" + hash);
-          return new Response(asset.bytes, { headers: { "Content-Type": asset.contentType, "Access-Control-Allow-Origin": "*" } });
-        } catch { return new Response("Asset unavailable", { status: 404 }); }
+  session.protocol.handle("verynize-render", async (request) => {
+    const hash = request.url.startsWith(RENDER_URL + "assets/")
+      ? request.url.slice((RENDER_URL + "assets/").length)
+      : "";
+    if (assets.has(hash)) {
+      try {
+        const asset = await (await require("./assets.cjs").store()).get("asset:" + hash);
+        return new Response(asset.bytes, {
+          headers: { "Content-Type": asset.contentType, "Access-Control-Allow-Origin": "*" },
+        });
+      } catch {
+        return new Response("Asset unavailable", { status: 404 });
       }
-      return new Response(request.url === RENDER_URL ? html : "", {
-        status: request.url === RENDER_URL ? 200 : 404,
-        headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Content-Security-Policy":
-            "default-src 'none'; img-src data: blob: verynize-render:; style-src 'unsafe-inline'; font-src data: verynize-render:;" +
-            (scripts ? " script-src 'unsafe-inline';" : ""),
-        },
-      });
-    },
-  );
+    }
+    return new Response(request.url === RENDER_URL ? html : "", {
+      status: request.url === RENDER_URL ? 200 : 404,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Security-Policy":
+          "default-src 'none'; img-src data: blob: verynize-render:; style-src 'unsafe-inline'; font-src data: verynize-render:;" +
+          (scripts ? " script-src 'unsafe-inline';" : ""),
+      },
+    });
+  });
   return () => session.protocol.unhandle("verynize-render");
 }
 // The PDF page runs without JavaScript, so web fonts (cached or embedded) are loaded through the
@@ -503,7 +595,9 @@ function renderPDF(input, parent = null) {
 async function renderPDFNow(input, parent = null) {
   assertRuntime();
   const { width, height } = renderOptions({ ...input, scale: 1 });
-  const lifted = liftEmbeddedFonts(await require("./render-assets.cjs").hydrateRoomAssets(input.html));
+  const lifted = liftEmbeddedFonts(
+    await require("./render-assets.cjs").hydrateRoomAssets(input.html),
+  );
   const fonts = await embedFonts(lifted.html, null, lifted.families);
   fonts.loaded += lifted.count;
   const window = new BrowserWindow({
@@ -533,12 +627,14 @@ async function renderPDFNow(input, parent = null) {
     if (fonts.css) await window.webContents.insertCSS(renderAssetUrls(fonts.css));
     if (lifted.css) await window.webContents.insertCSS(renderAssetUrls(lifted.css));
     await settleFonts(window.webContents);
-    const pdf = await guard.run("pdf-print", () => window.webContents.printToPDF({
-      printBackground: true,
-      preferCSSPageSize: true,
-      margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      pageSize: { width: width / 96, height: height / 96 },
-    }));
+    const pdf = await guard.run("pdf-print", () =>
+      window.webContents.printToPDF({
+        printBackground: true,
+        preferCSSPageSize: true,
+        margins: { top: 0, bottom: 0, left: 0, right: 0 },
+        pageSize: { width: width / 96, height: height / 96 },
+      }),
+    );
     return {
       dataURL: "data:application/pdf;base64," + pdf.toString("base64"),
       width,
@@ -598,11 +694,15 @@ function registerArtworkExport(handle, parent) {
       pathToFileURL(path.join(__dirname, "../integrations/export-code.mjs")).href
     );
     const { inlineAssets } = await import("../integrations/asset-store.mjs");
-    const portable = (markup) => inlineAssets(markup, async (ref) => (await require("./assets.cjs").store()).get(ref));
+    const portable = (markup) =>
+      inlineAssets(markup, async (ref) => (await require("./assets.cjs").store()).get(ref));
     if (options.flavor === "css") {
       if (typeof options.html !== "string" || Buffer.byteLength(options.html) > 20 * 1024 * 1024)
         throw Error("Export HTML exceeds limit 20971520 bytes");
-      return { content: await portable(code.cssCode(options.html, options.tokens || {})), extension: "html" };
+      return {
+        content: await portable(code.cssCode(options.html, options.tokens || {})),
+        extension: "html",
+      };
     }
     if (!Array.isArray(options.nodeIds) || options.nodeIds.length > 5000)
       throw Error("Invalid export selection");
@@ -619,9 +719,11 @@ function registerArtworkExport(handle, parent) {
             }
           : null;
     return {
-      content: await portable(code.tailwindCode(options.document, options.pageId, options.nodeIds, options.name, {
-        snippet,
-      })),
+      content: await portable(
+        code.tailwindCode(options.document, options.pageId, options.nodeIds, options.name, {
+          snippet,
+        }),
+      ),
       extension: "jsx",
     };
   });

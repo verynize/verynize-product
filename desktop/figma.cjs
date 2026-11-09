@@ -1027,8 +1027,14 @@ async function convertPenFile(bytes, name) {
     name: name?.replace(/\.pen$/i, ""),
     assetSink: async (data, type) => (await require("./assets.cjs").store()).put(data, type),
   });
-  return { document: result.document, warnings: result.unsupportedFeatures.map((item) => `Pen ${item.sourceId || "document"}: unsupported ${item.feature}`),
-    source: { format: result.sourceFormat, digest: result.sourceDigest }, fidelityStatus: result.fidelityStatus };
+  return {
+    document: result.document,
+    warnings: result.unsupportedFeatures.map(
+      (item) => `Pen ${item.sourceId || "document"}: unsupported ${item.feature}`,
+    ),
+    source: { format: result.sourceFormat, digest: result.sourceDigest },
+    fidelityStatus: result.fidelityStatus,
+  };
 }
 function registerFigma(handle, parent, { dialog } = {}) {
   handle("importFigma", async (options) => {
@@ -1057,7 +1063,8 @@ function registerFigma(handle, parent, { dialog } = {}) {
     const file = picked.filePaths[0];
     const stat = await fs.stat(file);
     if (!stat.isFile() || stat.size > FILE_LIMIT) throw Error("Choose a .fig file under 200 MB");
-    if (/\.pen$/i.test(file) && stat.size > 5_000_000) throw Error("Pen source exceeds limit 5000000 bytes");
+    if (/\.pen$/i.test(file) && stat.size > 5_000_000)
+      throw Error("Pen source exceeds limit 5000000 bytes");
     const name = require("node:path")
       .basename(file)
       .replace(/\.fig$/i, "");

@@ -1586,7 +1586,10 @@
     location.pathname === "/" || document.body.classList.contains("files-view");
   const reconnectOpenFile = async () => {
     await library()?.ready?.();
-    if (editorHidden()) { reconnectPending = true; return; }
+    if (editorHidden()) {
+      reconnectPending = true;
+      return;
+    }
     const lib = library(),
       id = lib?.currentId;
     if (id) reconnectFile(id, lib.cloudOf?.(id));

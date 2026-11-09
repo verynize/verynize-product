@@ -421,7 +421,10 @@ class Loader {
         throw new Error(`${kind} ${u.href} is outside the import folder`);
       const info = await stat(file);
       if (!info.isFile()) throw new Error(`${kind} ${u.href} is not a file`);
-      if (info.size > maxBytes) throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), { code: "import_limit" });
+      if (info.size > maxBytes)
+        throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+          code: "import_limit",
+        });
       buf = await readFile(file);
     } else if (u.protocol === "http:" || u.protocol === "https:") {
       if (!this.opts.allowRemote)
@@ -434,7 +437,9 @@ class Loader {
       if (!res.ok) throw new Error(`${kind} ${u.href}: HTTP ${res.status}`);
       const declared = Number(res.headers.get("content-length"));
       if (Number.isFinite(declared) && declared > maxBytes)
-        throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), { code: "import_limit" });
+        throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+          code: "import_limit",
+        });
       const reader = res.body?.getReader?.();
       if (reader) {
         const chunks = [];
@@ -445,7 +450,9 @@ class Loader {
           size += value.byteLength;
           if (size > maxBytes) {
             await reader.cancel().catch(() => {});
-            throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), { code: "import_limit" });
+            throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes`), {
+              code: "import_limit",
+            });
           }
           chunks.push(Buffer.from(value));
         }
@@ -457,10 +464,18 @@ class Loader {
   }
   account(buf, maxBytes, kind) {
     if (buf.length > maxBytes)
-      throw Object.assign(Error(`${kind} exceeds limit ${maxBytes} bytes (received ${buf.length} bytes)`), { code: "import_limit" });
+      throw Object.assign(
+        Error(`${kind} exceeds limit ${maxBytes} bytes (received ${buf.length} bytes)`),
+        { code: "import_limit" },
+      );
     this.total += buf.length;
     if (this.total > this.opts.totalBytes)
-      throw Object.assign(Error(`Import resources exceed limit ${this.opts.totalBytes} bytes (received ${this.total} bytes)`), { code: "import_limit" });
+      throw Object.assign(
+        Error(
+          `Import resources exceed limit ${this.opts.totalBytes} bytes (received ${this.total} bytes)`,
+        ),
+        { code: "import_limit" },
+      );
   }
 }
 
@@ -1374,8 +1389,11 @@ export async function importHtml(html, options = {}) {
   const elementCount = { n: 0 };
   const imageCache = new Map();
   const saveImage = async (data, type) => {
-    try { return await options.assetSink(data, type); }
-    catch (error) { throw Object.assign(Error("Asset storage failed: " + error.message), { code: "asset_write" }); }
+    try {
+      return await options.assetSink(data, type);
+    } catch (error) {
+      throw Object.assign(Error("Asset storage failed: " + error.message), { code: "asset_write" });
+    }
   };
   const embedImage = async (url, kind) => {
     if (imageCache.has(url.href)) return imageCache.get(url.href);
@@ -1390,7 +1408,9 @@ export async function importHtml(html, options = {}) {
       }
       if (type && data)
         result = {
-          src: options.assetSink ? (await saveImage(data, type)).ref : `data:${type};base64,${data.toString("base64")}`,
+          src: options.assetSink
+            ? (await saveImage(data, type)).ref
+            : `data:${type};base64,${data.toString("base64")}`,
           size: imageSize(data, type),
         };
       else warnings.push(`${kind} ${url.href} is not a supported image`);
@@ -1859,7 +1879,9 @@ export async function importHtml(html, options = {}) {
         if (clean) {
           const buf = Buffer.from(clean);
           loader.account(buf, opts.maxImageBytes, "Inline SVG");
-          src = options.assetSink ? (await options.assetSink(buf, "image/svg+xml")).ref : `data:image/svg+xml;base64,${buf.toString("base64")}`;
+          src = options.assetSink
+            ? (await options.assetSink(buf, "image/svg+xml")).ref
+            : `data:image/svg+xml;base64,${buf.toString("base64")}`;
           size = imageSize(buf, "image/svg+xml");
         }
       } else {

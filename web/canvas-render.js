@@ -324,7 +324,8 @@
     }
     function selectLayer(el, memo, selected, solo) {
       if (memo.selected !== selected) el.classList.toggle("selected", selected);
-      if (memo.solo && !solo) el.querySelectorAll(":scope > .handle").forEach((handle) => handle.remove());
+      if (memo.solo && !solo)
+        el.querySelectorAll(":scope > .handle").forEach((handle) => handle.remove());
       if (solo && !memo.solo) handles(el);
       memo.selected = selected;
       memo.solo = solo;
@@ -335,7 +336,8 @@
       for (const [id, el] of els) {
         const memo = memos.get(id);
         if (memo === PREVIEW) el.classList.toggle("selected", selection.has(id));
-        else if (memo) selectLayer(el, memo, selection.has(id), selection.size === 1 && selection.has(id));
+        else if (memo)
+          selectLayer(el, memo, selection.has(id), selection.size === 1 && selection.has(id));
       }
       cull();
       observer.takeRecords();
@@ -670,7 +672,10 @@
       for (const id of memos.keys()) dirty.add(id);
     });
 
-    window.addEventListener("assets-ready", () => { memos.clear(); render(); });
+    window.addEventListener("assets-ready", () => {
+      memos.clear();
+      render();
+    });
     document.fonts?.addEventListener("loadingdone", () => render());
 
     return {

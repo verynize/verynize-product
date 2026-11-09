@@ -511,7 +511,8 @@ function render(selectionOnly = false) {
   }
   if (!selectionOnly) {
     save();
-    if (past.length && !worldGesture) past[past.length - 1] = window.VerynizeCommitState.compact(past.at(-1), design);
+    if (past.length && !worldGesture)
+      past[past.length - 1] = window.VerynizeCommitState.compact(past.at(-1), design);
   }
   const snapshot = commitState.get(design);
   const notify = () => {
@@ -1227,7 +1228,9 @@ window.verynize = {
     const wanted = new Set(ids),
       targets = nodes().filter((n) => wanted.has(n.id));
     if (!targets.length) return false;
-    const before = worldGesture ? window.VerynizeCommitState.freeze(structuredClone(design)) : commitState.get(design),
+    const before = worldGesture
+        ? window.VerynizeCommitState.freeze(structuredClone(design))
+        : commitState.get(design),
       old = targets.map((n) => structuredClone(n));
     for (const n of targets)
       Object.assign(n, typeof patch === "function" ? patch(structuredClone(n)) : patch);
@@ -1241,9 +1244,11 @@ window.verynize = {
       commitState.invalidate();
       throw error;
     }
-    past.push(!worldGesture && !window.VerynizeComponents.hasComponents(design)
-      ? { before, page: design.activePage, nodeEdit: targets.map(node => node.id) }
-      : before);
+    past.push(
+      !worldGesture && !window.VerynizeComponents.hasComponents(design)
+        ? { before, page: design.activePage, nodeEdit: targets.map((node) => node.id) }
+        : before,
+    );
     if (past.length > 100) past.shift();
     future = [];
     scheduleWorldNotice();
@@ -1701,7 +1706,8 @@ async function exportArtwork({
     const cloud = await (window.cloudAssets?.inlineHtml?.(markup) ?? markup);
     return window.assetStore ? window.assetStore.inlineMarkup(cloud) : cloud;
   };
-  if (format === "HTML") return { content: await portableMarkup(html), mime: "text/html", width: w, height: h };
+  if (format === "HTML")
+    return { content: await portableMarkup(html), mime: "text/html", width: w, height: h };
   if (format === "SVG") {
     const clone = root.cloneNode(true);
     for (const node of clone.querySelectorAll("[data-shader-preset]")) {
@@ -1723,7 +1729,9 @@ async function exportArtwork({
       }
     }
     return {
-      content: await portableMarkup(`<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${window.embeddedFontCss?.(clone.outerHTML) || ""}</style>${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`),
+      content: await portableMarkup(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>${window.embeddedFontCss?.(clone.outerHTML) || ""}</style>${new XMLSerializer().serializeToString(clone)}</div></foreignObject></svg>`,
+      ),
       mime: "image/svg+xml",
       width: Math.ceil(w * scale),
       height: Math.ceil(h * scale),

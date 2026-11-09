@@ -122,9 +122,7 @@ const layers = (page) => page.locator("#canvas .layer").count();
     // An edit in the editor keeps the work: it becomes a file.
     await page.evaluate(() => window.fileLibrary.applyEditor());
     await page.evaluate(() => window.design.updateNodes(["r1"], { name: "Edited" }));
-    await page.waitForFunction(
-      () => window.fileLibrary.list().length === 2,
-    );
+    await page.waitForFunction(() => window.fileLibrary.list().length === 2);
     const edited = (await storedLibrary(page)).files.find((f) => f.id !== "kept");
     assert.equal(edited.document.pages[0].nodes[0].name, "Edited");
 

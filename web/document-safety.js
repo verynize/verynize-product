@@ -357,8 +357,11 @@
       if (checked.has(d)) return checked.get(d);
       let result = null;
       try {
-        try { core.validateDocument(d); }
-        catch { core.prepareDocument(structuredClone(d), defaults, []); }
+        try {
+          core.validateDocument(d);
+        } catch {
+          core.prepareDocument(structuredClone(d), defaults, []);
+        }
       } catch (error) {
         const f = failure(error, d);
         result = { error: f.error, count: f.count };

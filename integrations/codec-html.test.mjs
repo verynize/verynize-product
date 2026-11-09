@@ -211,8 +211,11 @@ test("remote stylesheets over http: opt-in, size limit and timeout", async () =>
       off.warnings.some((w) => /remote loading is off/.test(w)),
       "remote CSS is not fetched unless allowed",
     );
-    await assert.rejects(importHtml(html, { baseUrl: `${url}/index.html`, allowRemote: true, maxBytes: 4096 }), /exceeds limit 4096 bytes/);
-    const on = await importHtml(html.replace('<link rel="stylesheet" href="/big.css">', ''), {
+    await assert.rejects(
+      importHtml(html, { baseUrl: `${url}/index.html`, allowRemote: true, maxBytes: 4096 }),
+      /exceeds limit 4096 bytes/,
+    );
+    const on = await importHtml(html.replace('<link rel="stylesheet" href="/big.css">', ""), {
       baseUrl: `${url}/index.html`,
       allowRemote: true,
       maxBytes: 4096,

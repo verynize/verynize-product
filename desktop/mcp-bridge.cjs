@@ -259,7 +259,9 @@ function createLiveBackend({
       },
       async get(ref, asset) {
         const target = await route(ref);
-        return target.live ? (await require("./assets.cjs").store()).get(asset) : storeBackend.assets.get(ref, asset);
+        return target.live
+          ? (await require("./assets.cjs").store()).get(asset)
+          : storeBackend.assets.get(ref, asset);
       },
     },
     shell: agentShell.createShell({
@@ -437,7 +439,11 @@ function createLiveBackend({
       }
       if (!state.live) {
         const { copyAssets, sidecarAssets } = await import("../integrations/asset-store.mjs");
-        await copyAssets(state.document, sidecarAssets(store.file(state.name || ref)), await require("./assets.cjs").store());
+        await copyAssets(
+          state.document,
+          sidecarAssets(store.file(state.name || ref)),
+          await require("./assets.cjs").store(),
+        );
       }
       return shot(state.document, pageId, nodeId, scale);
     },

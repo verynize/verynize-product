@@ -25,7 +25,10 @@
     // Component reconciliation can touch inactive instances; prepare those documents eagerly. So is a shared room's
     // copy: activating a page adds the defaults in place, which the room's change diff (web/cloud-panel.js) would send
     // as edits of every layer.
-    if (window.VerynizeComponents?.hasComponents(document) || window.cloudWorkspace?.isConnected?.())
+    if (
+      window.VerynizeComponents?.hasComponents(document) ||
+      window.cloudWorkspace?.isConnected?.()
+    )
       return eager();
     if (!document.activePage) document.activePage = document.pages[0].id;
     activate(document);

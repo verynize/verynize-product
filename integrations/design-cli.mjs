@@ -76,22 +76,38 @@ try {
       break;
     case "export": {
       const { document } = await store.read(name);
-      process.stdout.write(await inlineAssets(exportHTML(document, rest[0]), (ref) => sidecarAssets(store.file(name)).get(ref)) + "\n");
+      process.stdout.write(
+        (await inlineAssets(exportHTML(document, rest[0]), (ref) =>
+          sidecarAssets(store.file(name)).get(ref),
+        )) + "\n",
+      );
       process.exit(0);
     }
     case "export-jsx": {
       const { document } = await store.read(name);
-      process.stdout.write(await inlineAssets(documentToJsx(document, rest[0]), (ref) => sidecarAssets(store.file(name)).get(ref)));
+      process.stdout.write(
+        await inlineAssets(documentToJsx(document, rest[0]), (ref) =>
+          sidecarAssets(store.file(name)).get(ref),
+        ),
+      );
       process.exit(0);
     }
     case "export-css": {
       const { document } = await store.read(name);
-      process.stdout.write(await inlineAssets(documentToHtml(document, rest[0]), (ref) => sidecarAssets(store.file(name)).get(ref)) + "\n");
+      process.stdout.write(
+        (await inlineAssets(documentToHtml(document, rest[0]), (ref) =>
+          sidecarAssets(store.file(name)).get(ref),
+        )) + "\n",
+      );
       process.exit(0);
     }
     case "import-html": {
       if (rest.length !== 1) throw Error("import-html requires NAME FILE");
-      const r = await importHtmlFrom(rest[0], { viewport: vp || undefined, name, assetSink: (bytes, type) => sidecarAssets(store.file(name)).put(bytes, type) });
+      const r = await importHtmlFrom(rest[0], {
+        viewport: vp || undefined,
+        name,
+        assetSink: (bytes, type) => sidecarAssets(store.file(name)).put(bytes, type),
+      });
       const saved = await fresh(name, r.document);
       output = { ...saved, warnings: r.warnings, stats: r.stats };
       break;
