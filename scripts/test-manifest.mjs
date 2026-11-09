@@ -424,6 +424,7 @@ const desktop = [
     "web-start/src/server-telemetry.ts",
     "web-start/src/telemetry.ts",
   ]),
+  unit("tests/telemetry-process-loss.cjs", "desktop", ["desktop/telemetry.cjs"]),
   unit("tests/telemetry-release-build.mjs", "desktop", [
     "web-start/build/telemetry.mjs",
     "scripts/env.mjs",
@@ -436,6 +437,8 @@ const desktop = [
     "web/src/lib/telemetry/**",
     "web/src/islands/settings/telemetry.tsx",
     "web/src/islands/settings/pages.tsx",
+    "web/src/islands/onboarding/telemetry-prompt.tsx",
+    "web/src/islands/onboarding.tsx",
     "scripts/package-macos.cjs",
   ]),
   electron("tests/app-protocol.cjs", "desktop", [

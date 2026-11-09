@@ -8,7 +8,8 @@
 // - rendererArguments()      webPreferences.additionalArguments for the editor window: the renderer half
 //                            (web/src/telemetry.ts, loaded before every legacy script) reads them through
 //                            window.desktop.telemetry.config() (desktop/preload.cjs).
-// - registerTelemetry(handle)  telemetryGet() / telemetrySet(enabled) for the settings toggle.
+// - registerTelemetry(handle)  telemetryGet() / telemetrySet(enabled) for the settings toggle and the first-launch
+//                            question (web/src/islands/onboarding/telemetry-prompt.tsx; `asked` until either answer).
 //
 // Turning reports on takes effect at the next launch (the SDK must start before app ready). Turning them off is
 // immediate: the client is closed, and the offline transport's shouldSend/shouldStore also refuse anything queued.
@@ -17,7 +18,12 @@
 // is rebuilt by web/telemetry-scrub.js from an allowlist, with this machine's home directory and username replaced
 // as literals. Renderer IPC uses Classic mode (no extra privileged scheme next to app://); the SDK's preload is
 // injected into the default session only (preview, render, capture and passkey windows use their own partitions),
-// and events from any page that is not app://verynize are dropped.
+// and events from any page that is not app://verynize are dropped, except our own render windows
+// (verynize-render://, desktop/render.cjs): their process loss is reported as `render`, but never their native crash
+// dump, which holds the document being rendered.
+//
+// Process loss: `crashed`, `oom` and `killed` are events too (the SDK default reports only abnormal-exit,
+// launch-failed and integrity-failure), with the lost process's name, reason and exit code in the `electron` context.
 //
 // Configuration (environment at run time, or desktop/telemetry-build.json written by scripts/package-macos.cjs):
 //   SENTRY_DSN_DESKTOP          the verynize-desktop project DSN; none → reporting is unavailable
@@ -35,6 +41,16 @@ const scrub = globalThis.verynizeTelemetryScrub;
 const CONSENT_FILE = "telemetry.json";
 const ARGUMENT = "--verynize-telemetry=";
 const UNTRUSTED = "untrusted";
+// Pages of our own helper windows, by protocol: never user or third-party content.
+const INTERNAL_PAGES = { "verynize-render:": "render" };
+const PROCESS_EVENTS = [
+  "abnormal-exit",
+  "launch-failed",
+  "integrity-failure",
+  "crashed",
+  "oom",
+  "killed",
+];
 // Integrations that would collect more than the allowlist keeps, or that this module replaces.
 const DROPPED_INTEGRATIONS = new Set([
   "OnUncaughtException", // replaced by the handlers below (flush before the error dialog)
@@ -43,10 +59,12 @@ const DROPPED_INTEGRATIONS = new Set([
   "ContextLines",
   "Screenshots",
   "Console",
+  "ChildProcess", // added again below with PROCESS_EVENTS
 ]);
 
 const state = {
   consent: false,
+  asked: false,
   active: false,
   available: false,
   reason: "",
@@ -102,6 +120,9 @@ function resolveSettings(app, env = process.env) {
   return { ...settings, dsn, reason: "" };
 }
 
+/** Whether the user ever answered (the settings toggle or the first-launch question). */
+const answered = (userData) => fs.existsSync(path.join(userData, CONSENT_FILE));
+
 function readConsent(userData) {
   try {
     return JSON.parse(fs.readFileSync(path.join(userData, CONSENT_FILE), "utf8")).enabled === true;
@@ -124,10 +145,49 @@ const originPatterns = (origins) =>
 let Sentry = null;
 const sendable = () => state.consent && state.active;
 
+/** The process name a page's events carry: the editor, one of our internal windows, or untrusted. */
+function rendererName(url) {
+  // A window that has not loaded yet (no URL) is the editor being created: reports only come from a page that ran the preload.
+  if (!url || require("./app-protocol.cjs").isAppURL(url)) return "renderer";
+  try {
+    return INTERNAL_PAGES[new URL(url).protocol] || UNTRUSTED;
+  } catch {
+    return UNTRUSTED;
+  }
+}
+
+/** Events that may leave (before scrubbing): nothing from untrusted pages, no native dump of an internal window. */
+function keepEvent(event) {
+  const name = event?.tags?.["event.process"];
+  if (name === UNTRUSTED) return false;
+  if (
+    Object.values(INTERNAL_PAGES).includes(name) &&
+    event?.tags?.["event.environment"] === "native"
+  )
+    return false;
+  return true;
+}
+
+// Which process was lost, for the event the SDK captures right after (its message names only process and reason).
+function describeProcessLoss(Sentry, name, details) {
+  Sentry.setContext("electron", {
+    crashed_process: name,
+    reason: details.reason,
+    exit_code: details.exitCode,
+  });
+  setImmediate(() => Sentry.setContext("electron", null));
+}
+
 function initSdk(app, settings) {
   Sentry = require("@sentry/electron/main");
-  const appProtocol = require("./app-protocol.cjs");
-  const keep = (event) => sendable() && event?.tags?.["event.process"] !== UNTRUSTED;
+  const keep = (event) => sendable() && keepEvent(event);
+  // Registered before Sentry.init, so they run before the SDK's own listeners capture the message.
+  app.on("render-process-gone", (_event, contents, details) =>
+    describeProcessLoss(Sentry, rendererName(contents.getURL()), details),
+  );
+  app.on("child-process-gone", (_event, details) =>
+    describeProcessLoss(Sentry, details.type, details),
+  );
   Sentry.init({
     dsn: settings.dsn,
     release: settings.release,
@@ -136,18 +196,16 @@ function initSdk(app, settings) {
     tracesSampleRate: settings.tracesSampleRate,
     tracePropagationTargets: originPatterns(settings.tracePropagationOrigins),
     ipcMode: Sentry.IPCMode.Classic,
-    // Only the editor page may report; anything else in the default session is tagged and dropped below. A window
-    // that has not loaded yet (no URL) is the editor being created: reports only come from a page that ran the preload.
-    getRendererName: (contents) => {
-      const url = contents.getURL();
-      return !url || appProtocol.isAppURL(url) ? "renderer" : UNTRUSTED;
-    },
+    // Only the editor page and our own render windows may report; anything else is tagged and dropped below.
+    getRendererName: (contents) => rendererName(contents.getURL()),
     sendDefaultPii: false,
     dataCollection: scrub.DATA_COLLECTION,
     attachScreenshot: false,
     maxBreadcrumbs: 50,
-    integrations: (defaults) =>
-      defaults.filter((integration) => !DROPPED_INTEGRATIONS.has(integration.name)),
+    integrations: (defaults) => [
+      ...defaults.filter((integration) => !DROPPED_INTEGRATIONS.has(integration.name)),
+      Sentry.childProcessIntegration({ events: PROCESS_EVENTS }),
+    ],
     beforeBreadcrumb: (breadcrumb) => scrub.scrubBreadcrumb(breadcrumb),
     beforeSend: (event) => (keep(event) ? scrub.scrubEvent(event) : null),
     // Traces are streamed spans (beforeSendTransaction is ignored) and cannot be dropped here: gated by the transport.
@@ -207,6 +265,7 @@ function start(app, { dialog, env = process.env } = {}) {
   installProcessHandlers({ dialog });
   state.userData = app.getPath("userData");
   state.consent = readConsent(state.userData);
+  state.asked = answered(state.userData);
   state.settings = resolveSettings(app, env);
   state.available = !!state.settings.dsn;
   state.reason = state.settings.reason;
@@ -246,6 +305,7 @@ const status = () => ({
   available: state.available,
   // On, but this launch started with it off: reports start after a restart.
   restartRequired: state.consent && state.available && !state.active,
+  asked: state.asked,
 });
 
 function registerTelemetry(handle) {
@@ -254,6 +314,7 @@ function registerTelemetry(handle) {
     if (typeof enabled !== "boolean") throw Error("Invalid crash report setting");
     writeConsent(state.userData, enabled);
     state.consent = enabled;
+    state.asked = true;
     if (!enabled && state.active) {
       state.active = false;
       await Sentry.close(2000).catch(() => false);
@@ -270,5 +331,8 @@ module.exports = {
   reportError,
   resolveSettings,
   readConsent,
+  rendererName,
+  keepEvent,
+  PROCESS_EVENTS,
   status,
 };

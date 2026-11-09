@@ -21,6 +21,8 @@ export type TelemetryStatus = {
   available: boolean;
   /** On, but takes effect after a restart (desktop) or a reload (web). */
   restartRequired: boolean;
+  /** Desktop: the user answered at least once (the first-launch question or the setting). */
+  asked?: boolean;
 };
 
 /** window.desktop.telemetry (desktop/preload.cjs). */
