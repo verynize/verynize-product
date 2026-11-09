@@ -695,7 +695,7 @@
     rebuild();
     if (retryAfterRejection) retryRetained();
     void saveOutbox(true);
-    void sendPending();
+    sendSoon(); // the next batch waits for the send interval, so a burst goes out in a few batches
   }
   /**
    * Pages fetched on the socket (lazy rooms): each replaces its stub in the confirmed document and
