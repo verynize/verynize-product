@@ -576,7 +576,7 @@ async function handleRooms(request, env, url) {
   const orgRole = account?.authUser ? await orgRoomRole(env, roomId, account.authUser.id) : null;
   const forward = new URL("https://room" + action);
   if (action === "/socket")
-    for (const key of ["token", "client", "lazy"])
+    for (const key of ["token", "client", "lazy", "presence"])
       if (url.searchParams.get(key)) forward.searchParams.set(key, url.searchParams.get(key));
   // Lazy page loading (cloud/room-store.js): `lazy=1&page=<id>` on GET /room, `id=<page>` on /pages.
   if (action === "/versions" && url.searchParams.get("artboard"))

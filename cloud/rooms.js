@@ -6,10 +6,18 @@ import { DurableObject, acceptWebSocket } from "#cloud-runtime";
 import "../web/cloud-ops.js";
 import { RoomStore } from "./room-store.js";
 import { RoomHistory } from "./room-history.js";
-import { MESSAGE_BYTES, REQUEST_BYTES, byteSize } from "./limits.js";
+import {
+  BATCH_BYTES,
+  BATCH_OPS,
+  BATCH_TOO_LARGE,
+  MESSAGE_BYTES,
+  REQUEST_BYTES,
+  byteSize,
+} from "./limits.js";
 import {
   json,
   fail,
+  readBytes,
   readJson,
   randomHex,
   digestHex,
@@ -24,9 +32,22 @@ import { reportError } from "./telemetry.js";
 import { mayHoldInline, rejectInline, screenOps } from "./inline-binaries.js";
 
 const Ops = globalThis.VerynizeOps;
+/** What collaborators see of a socket (its attachment). */
+const peerOf = (state) => ({
+  id: state.id,
+  name: state.name,
+  role: state.role,
+  pageId: state.pageId ?? null,
+  cursor: state.cursor ?? null,
+  handle: state.handle ?? null,
+});
 const CLIENT = /^[A-Za-z0-9_-]{1,64}$/;
 const MAX_SOCKETS = 32;
 const FUTURE_SKEW = 5 * 60 * 1000;
+// Sockets that send presence version 2 (`presence=2`) get one peer per change (`peer`,
+// `peerLeft`) instead of the whole list, and send `heartbeat` while idle; one silent for longer
+// than this (PRESENCE_TIMEOUT_MS overrides it) is closed, so its cursor does not linger.
+const PRESENCE_TIMEOUT = 90 * 1000;
 const TOKEN_ROLES = ["viewer", "commenter", "editor", "owner"];
 const ORG_ROLES = ["viewer", "commenter", "editor", "owner"];
 // File visibility: private rooms need a link, a membership or an organization role; public rooms
@@ -60,12 +81,15 @@ export class DesignRoom extends DurableObject {
     this.clock = Ops.createClock("server");
     // Batches being applied right now, so a live duplicate waits for the first attempt.
     this.applyingBatches = new Map();
-    this.store = new RoomStore(this.sql);
+    // ROOM_NODE_STORAGE=page stores nodes as one text per page again (before rolling back).
+    this.store = new RoomStore(this.sql, { rows: env?.ROOM_NODE_STORAGE !== "page" });
     // Per-artboard version history (cloud/room-history.js, docs/version-history.md).
+    this.presenceTimeout = Number(env?.PRESENCE_TIMEOUT_MS) || PRESENCE_TIMEOUT;
     this.history = new RoomHistory(this.sql, { idleMs: Number(env?.VERSION_IDLE_MS) || undefined });
     this.migrateLegacyToken();
-    // Rooms that kept the whole document in room.document move to per-page records once.
-    this.store.migrate(this.row());
+    // Rooms that kept the whole document in room.document move to per-page records once, and
+    // pages stored as one node text move to node rows; all or nothing.
+    ctx.storage.transactionSync(() => this.store.migrate(this.row()));
   }
 
   // Rooms created before roles stored one capability hash as a JSON byte array on the room row.
@@ -297,6 +321,29 @@ export class DesignRoom extends DurableObject {
   }
 
   /**
+   * The refusal of a client batch above the batch limits (web/room-limits.js), or null. One
+   * operation may exceed BATCH_BYTES on its own (up to the message limit); several may not, so
+   * applying a batch never holds more than a few megabytes. Nothing is stored: the client keeps
+   * the batch and splits the change (`code`: BATCH_TOO_LARGE).
+   */
+  batchTooLarge(data, bytes) {
+    const count = Array.isArray(data?.ops) ? data.ops.length : 0;
+    if (count < 2 || bytes <= BATCH_BYTES) return null;
+    return {
+      type: "ops",
+      client: data.client,
+      batch: data.batch,
+      revision: this.row().revision,
+      ops: [],
+      rejected: count,
+      tooLarge: true,
+      retained: true,
+      code: BATCH_TOO_LARGE,
+      error: `An operation batch is limited to ${BATCH_BYTES / 1024 / 1024} MB; split the change into smaller batches`,
+    };
+  }
+
+  /**
    * Apply one client batch of operations. Returns the message describing the outcome. `who`
    * ({id, name}) is the editor the version history records (with the batch's optional `actor`).
    */
@@ -306,7 +353,8 @@ export class DesignRoom extends DurableObject {
       ops = data?.ops;
     if (typeof client !== "string" || !CLIENT.test(client)) fail(400, "Invalid client id");
     if (!Number.isSafeInteger(batch) || batch < 1) fail(400, "Invalid batch number");
-    if (!Array.isArray(ops) || ops.length > 5000) fail(400, "A batch holds 1–5000 operations");
+    if (!Array.isArray(ops) || ops.length > BATCH_OPS)
+      fail(400, `A batch holds 1–${BATCH_OPS} operations`);
     // A live duplicate waits for its first request; only a marker from an interrupted
     // invocation is poison. sync() is a durability boundary, not an acknowledgement.
     const key = `${client}/${batch}`;
@@ -440,7 +488,9 @@ export class DesignRoom extends DurableObject {
     // Only the pages the batch touches are read and written; the others stay stubs.
     const touched = Ops.touchedPages(stamped);
     const state = this.store.load(touched.all ? null : touched.pages);
+    // The operations come from a freshly parsed message: their values join the document uncopied.
     const result = Ops.apply(state.doc, stamped, {
+      owned: true,
       stamps: store,
       normalize: true,
       stamp: this.clock.next(),
@@ -692,7 +742,7 @@ export class DesignRoom extends DurableObject {
     const dirty = new Set(
       scan.filter(
         (id) =>
-          fresh(id) && check(id, this.store.text("h:" + id) + "\n" + this.store.text("n:" + id)),
+          fresh(id) && check(id, this.store.text("h:" + id) + "\n" + this.store.nodesText(id)),
       ),
     );
     const meta = fresh("m") && check("m", this.store.text("m"));
@@ -847,6 +897,8 @@ export class DesignRoom extends DurableObject {
           handle: account?.handle || null,
           client,
           lazy,
+          presence: url.searchParams.get("presence") === "2" ? 2 : 1,
+          seen: Date.now(),
         });
         // Lazy clients answer the welcome with `sync` (the pages they hold) and get a snapshot
         // of those pages only; other clients get the whole document at once.
@@ -855,6 +907,7 @@ export class DesignRoom extends DurableObject {
             type: "welcome",
             id,
             protocol: Ops.PROTOCOL,
+            presence: 2,
             role,
             acked,
             ...(lazy ? { lazyPages: true } : {}),
@@ -869,7 +922,8 @@ export class DesignRoom extends DurableObject {
               rejectedBatches: this.rejectedBatches(client),
             }),
           );
-        this.broadcast({ type: "presence", peers: this.peers() });
+        this.pruneSilent();
+        this.presenceChanged(server, true);
         return response;
       }
       if (action === "/room" && method === "GET")
@@ -889,10 +943,19 @@ export class DesignRoom extends DurableObject {
         return this.update(data.document, data.baseRevision);
       }
       if (action === "/ops" && method === "POST") {
-        const message = await this.applyBatch(await readJson(request, MESSAGE_BYTES), role, {
-          id: account?.id || capability,
-          name: account?.displayName || account?.handle,
-        });
+        const body = await readBytes(request, MESSAGE_BYTES);
+        let data;
+        try {
+          data = JSON.parse(new TextDecoder().decode(body));
+        } catch {
+          fail(400, "Body must be JSON");
+        }
+        const message =
+          this.batchTooLarge(data, body.byteLength) ||
+          (await this.applyBatch(data, role, {
+            id: account?.id || capability,
+            name: account?.displayName || account?.handle,
+          }));
         if (message.ops.length) this.broadcast(message);
         return json(message, message.tooLarge ? 413 : message.error ? 403 : 200);
       }
@@ -1114,34 +1177,92 @@ export class DesignRoom extends DurableObject {
     return this.ctx
       .getWebSockets()
       .map((ws) => ws.deserializeAttachment())
-      .filter(Boolean)
-      .map((state) => ({
-        id: state.id,
-        name: state.name,
-        role: state.role,
-        pageId: state.pageId ?? null,
-        cursor: state.cursor ?? null,
-        handle: state.handle ?? null,
-      }));
+      .filter((state) => state && !state.gone)
+      .map(peerOf);
+  }
+
+  /**
+   * Announce the presence of `ws` after it joined (`joined`: it gets the whole list) or changed.
+   * Presence-2 sockets get the one peer, older ones the whole list, as before.
+   */
+  presenceChanged(ws, joined = false) {
+    const peer = JSON.stringify({ type: "peer", peer: peerOf(ws.deserializeAttachment()) });
+    let list = null;
+    for (const socket of this.ctx.getWebSockets()) {
+      const state = socket.deserializeAttachment();
+      if (state?.gone) continue;
+      const delta = socket !== ws || !joined;
+      const message =
+        delta && state?.presence === 2
+          ? peer
+          : (list ??= JSON.stringify({ type: "presence", peers: this.peers() }));
+      try {
+        socket.send(message);
+      } catch {}
+    }
+  }
+
+  /** Announce that the peers in `ids` left; `except` is a socket that is closing. */
+  presenceLeft(ids, except) {
+    const gone = new Set(ids);
+    let list = null;
+    for (const socket of this.ctx.getWebSockets()) {
+      if (socket === except) continue;
+      const state = socket.deserializeAttachment();
+      if (state?.gone) continue;
+      const message =
+        state?.presence === 2
+          ? JSON.stringify({ type: "peerLeft", ids: [...gone] })
+          : (list ??= JSON.stringify({
+              type: "presence",
+              peers: this.peers().filter((peer) => !gone.has(peer.id)),
+            }));
+      try {
+        socket.send(message);
+      } catch {}
+    }
+  }
+
+  /**
+   * Close presence-2 sockets whose heartbeat stopped (a connection that died without a close).
+   * Runs on heartbeats and when a socket joins.
+   */
+  pruneSilent(now = Date.now()) {
+    const ids = [];
+    for (const socket of this.ctx.getWebSockets()) {
+      const state = socket.deserializeAttachment();
+      if (state?.presence !== 2 || state.gone || now - (state.seen || 0) <= this.presenceTimeout)
+        continue;
+      ids.push(state.id);
+      try {
+        socket.serializeAttachment({ ...state, gone: true });
+        socket.close(4408, "Presence heartbeat timed out");
+      } catch {}
+    }
+    if (ids.length) this.presenceLeft(ids);
   }
 
   async webSocketMessage(ws, message) {
     try {
-      if (typeof message !== "string" || byteSize(message) > MESSAGE_BYTES)
-        throw Error("Invalid message size");
+      const size = typeof message === "string" ? byteSize(message) : Infinity;
+      if (size > MESSAGE_BYTES) throw Error("Invalid message size");
       const data = JSON.parse(message);
       const state = ws.deserializeAttachment() || {};
+      // A socket closed for a stopped heartbeat: whatever it still sends is ignored.
+      if (state.gone) return;
       if (data.type === "update") {
         if (!atLeast(state.role, "editor")) throw Error("Your role in this room cannot edit");
         const response = this.update(data.document, data.baseRevision);
         if (response.status !== 200)
           ws.send(JSON.stringify({ type: "conflict", ...(await response.json()) }));
       } else if (data.type === "ops") {
-        const result = await this.applyBatch(
-          { ...data, client: state.client || data.client },
-          state.role,
-          { id: state.accountId || state.client || state.id, name: state.name },
-        );
+        const batch = { ...data, client: state.client || data.client };
+        const result =
+          this.batchTooLarge(batch, size) ||
+          (await this.applyBatch(batch, state.role, {
+            id: state.accountId || state.client || state.id,
+            name: state.name,
+          }));
         if (result.ops.length) this.broadcast(result);
         else ws.send(JSON.stringify(result));
       } else if (data.type === "sync") {
@@ -1194,8 +1315,13 @@ export class DesignRoom extends DurableObject {
               ? { x: data.cursor.x, y: data.cursor.y }
               : null,
         };
-        ws.serializeAttachment({ ...state, ...presence });
-        this.broadcast({ type: "presence", peers: this.peers() });
+        ws.serializeAttachment({ ...state, ...presence, seen: Date.now() });
+        this.presenceChanged(ws);
+      } else if (data.type === "heartbeat") {
+        // Nothing is broadcast: the socket is alive, and silent ones are closed.
+        const now = Date.now();
+        ws.serializeAttachment({ ...state, seen: now });
+        this.pruneSilent(now);
       } else throw Error("Unknown message type");
     } catch (error) {
       ws.send(JSON.stringify({ type: "error", error: error.message }));
@@ -1203,8 +1329,8 @@ export class DesignRoom extends DurableObject {
   }
 
   webSocketClose(ws) {
-    const id = ws.deserializeAttachment()?.id;
-    this.broadcast({ type: "presence", peers: this.peers().filter((peer) => peer.id !== id) }, ws);
+    const state = ws.deserializeAttachment();
+    if (state?.id && !state.gone) this.presenceLeft([state.id], ws);
   }
 
   webSocketError(ws) {

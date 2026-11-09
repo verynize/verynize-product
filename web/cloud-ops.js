@@ -277,17 +277,32 @@
   }
 
   /**
-   * Apply operations to a document copy. With `clock` (a {get,set,clear} stamp store) the
-   * call is authoritative: stale stamps lose, and the resolved operations to broadcast are
-   * returned in `applied`. Without it (replicas replaying accepted operations) every valid
-   * operation applies in order. `external(id)` (optional) is true for node ids used on pages
-   * the document copy leaves out.
+   * Apply operations to a document. The input is never changed: the result shares every page,
+   * node and value the operations leave alone and copies only what they write (copy on write).
+   * With `stamps` (a {get,set,clear} stamp store) the call is authoritative: stale stamps lose,
+   * and the resolved operations to broadcast are returned in `applied`. Without it (replicas
+   * replaying accepted operations) every valid operation applies in order. `external(id)`
+   * (optional) is true for node ids used on pages the document leaves out. `owned` hands the
+   * operation values over (a freshly parsed message): they enter the document without a copy.
+   * Values in `applied` are the operations' own values; neither they nor the result's values
+   * may be changed in place afterwards.
    */
   function apply(document, ops, options = {}) {
     const stamps = options.stamps || null;
-    let doc = clone(document);
+    const own = options.owned ? (value) => value : clone;
+    let doc = document;
     const applied = [],
       rejected = [];
+    // Objects this call created, which it may change in place; everything else is copied first.
+    const fresh = new WeakSet();
+    const writable = (value) => {
+      if (fresh.has(value)) return value;
+      const copy = Array.isArray(value) ? value.slice() : { ...value };
+      fresh.add(copy);
+      return copy;
+    };
+    const docForWrite = () => (doc = writable(doc));
+    const pagesForWrite = () => (docForWrite().pages = writable(doc.pages));
     const newer = (path, stamp) =>
       !stamps || !stamps.get(path) || (stamp && stamp > stamps.get(path));
     const record = (path, stamp) => {
@@ -299,11 +314,12 @@
     let indexed = false,
       structured,
       pages,
+      positions,
       nodeIds,
       indexes;
     const dirtyPages = new Set();
     const compact = () => {
-      for (const page of dirtyPages) page.nodes = page.nodes.filter(Boolean);
+      for (const page of dirtyPages) fresh.add((page.nodes = page.nodes.filter(Boolean)));
       dirtyPages.clear();
     };
     const ensureIndex = () => {
@@ -311,11 +327,13 @@
       compact();
       structured = isStructured(doc);
       pages = new Map();
+      positions = new Map();
       nodeIds = new Map();
       indexes = new Map();
       if (structured)
-        for (const page of doc.pages) {
+        doc.pages.forEach((page, position) => {
           if (!pages.has(page.id)) pages.set(page.id, page);
+          positions.set(page, position);
           const first = new Map(),
             byId = new Map();
           page.nodes.forEach((node, index) => {
@@ -324,8 +342,36 @@
             nodeIds.set(node.id, (nodeIds.get(node.id) || 0) + 1);
           });
           indexes.set(page, { first, byId });
-        }
+        });
       indexed = true;
+    };
+    // Writable versions of an indexed page, its node list and one of its nodes, swapped into
+    // the document and the indexes in place of the shared originals.
+    const pageForWrite = (page) => {
+      if (fresh.has(page)) return page;
+      const copy = writable(page),
+        position = positions.get(page);
+      pagesForWrite()[position] = copy;
+      positions.set(copy, position);
+      indexes.set(copy, indexes.get(page));
+      if (pages.get(page.id) === page) pages.set(page.id, copy);
+      return copy;
+    };
+    const nodesForWrite = (page) => {
+      page = pageForWrite(page);
+      page.nodes = writable(page.nodes);
+      return page;
+    };
+    const nodeForWrite = (page, index, node) => {
+      if (fresh.has(node)) return node;
+      page = nodesForWrite(page);
+      const copy = writable(node);
+      page.nodes[index] = copy;
+      const { first, byId } = indexes.get(page);
+      if (byId.get(node.id) === node) byId.set(node.id, copy);
+      const entry = first.get(node.id);
+      if (entry?.node === node) entry.node = copy;
+      return copy;
     };
     const hasPages = () => {
       ensureIndex();
@@ -340,7 +386,7 @@
       ensureIndex();
       return pages.get(id);
     };
-    const nodeOf = (page, id) => page && indexes.get(page).first.get(id)?.node;
+    const entryOf = (page, id) => (page ? indexes.get(page).first.get(id) : undefined);
     const createsCycle = (page, id, parent) => {
       const byId = indexes.get(page).byId;
       const seen = new Set();
@@ -367,23 +413,24 @@
         case "root": {
           if (!newer(path, stamp)) return reject("Superseded");
           compact();
-          doc = clone(op.value);
+          doc = own(op.value);
           indexed = false;
           if (stamps) stamps.clear();
-          return accept({ t: "root", value: clone(op.value) });
+          return accept({ t: "root", value: op.value });
         }
         case "doc": {
           if (!isObject(doc)) return reject("Document is not an object");
           if (op.key === "pages" && hasPages())
             return reject("Pages change through page operations");
           if (!newer(path, stamp)) return reject("Superseded");
+          docForWrite();
           if (op.del) delete doc[op.key];
-          else doc[op.key] = clone(op.value);
+          else doc[op.key] = own(op.value);
           if (op.key === "pages") indexed = false;
           return accept(
             op.del
               ? { t: "doc", key: op.key, del: true }
-              : { t: "doc", key: op.key, value: clone(op.value) },
+              : { t: "doc", key: op.key, value: op.value },
           );
         }
         case "addPage": {
@@ -392,19 +439,19 @@
           if (op.value.nodes.some((node) => findNode(node.id)))
             return reject("Node id already used");
           if (!newer(path, stamp)) return reject("Superseded");
-          doc.pages.push(clone(op.value));
+          pagesForWrite().push(own(op.value));
           indexed = false;
           for (const node of op.value.nodes) record("n/" + node.id, stamp);
-          return accept({ t: "addPage", id: op.id, value: clone(op.value) });
+          return accept({ t: "addPage", id: op.id, value: op.value });
         }
         case "removePage": {
           const page = pageOf(op.id);
           if (!page) return reject("Missing page");
           if (doc.pages.length === 1) return reject("A document keeps at least one page");
           if (!newer(path, stamp)) return reject("Superseded");
-          doc.pages = doc.pages.filter((item) => item.id !== op.id);
+          fresh.add((docForWrite().pages = doc.pages.filter((item) => item.id !== op.id)));
           indexed = false;
-          for (const node of page.nodes) record("n/" + node.id, stamp);
+          for (const node of page.nodes) if (node) record("n/" + node.id, stamp);
           return accept({ t: "removePage", id: op.id });
         }
         case "page": {
@@ -412,18 +459,19 @@
           if (!page) return reject("Missing page");
           if (op.key === "id" || op.key === "nodes") return reject("Reserved page property");
           if (!newer(path, stamp)) return reject("Superseded");
-          if (op.del) delete page[op.key];
-          else page[op.key] = clone(op.value);
+          const target = pageForWrite(page);
+          if (op.del) delete target[op.key];
+          else target[op.key] = own(op.value);
           return accept(
             op.del
               ? { t: "page", page: op.page, key: op.key, del: true }
-              : { t: "page", page: op.page, key: op.key, value: clone(op.value) },
+              : { t: "page", page: op.page, key: op.key, value: op.value },
           );
         }
         case "pageOrder": {
           if (!hasPages()) return reject("Document has no pages");
           if (!newer(path, stamp)) return reject("Superseded");
-          doc.pages = reorder(doc.pages, op.value);
+          fresh.add((docForWrite().pages = reorder(doc.pages, op.value)));
           indexed = false;
           return accept({ t: "pageOrder", value: op.value.slice() });
         }
@@ -432,21 +480,25 @@
           if (!page) return reject("Missing page");
           if (findNode(op.id)) return reject("Node exists");
           if (!newer(path, stamp)) return reject("Superseded");
-          const node = clone(op.value);
-          const index = page.nodes.length;
-          page.nodes.push(node);
-          indexes.get(page).first.set(node.id, { node, index });
-          indexes.get(page).byId.set(node.id, node);
+          const node = own(op.value);
+          // A copy made here may change in place; a handed-over value is also in `applied`.
+          if (node !== op.value) fresh.add(node);
+          const target = nodesForWrite(page);
+          const index = target.nodes.length;
+          target.nodes.push(node);
+          indexes.get(target).first.set(node.id, { node, index });
+          indexes.get(target).byId.set(node.id, node);
           nodeIds.set(node.id, 1);
           if (stamps && stamp)
             for (const key of Object.keys(op.value)) record(path + "/" + key, stamp);
-          return accept({ t: "add", page: op.page, id: op.id, value: clone(op.value) });
+          return accept({ t: "add", page: op.page, id: op.id, value: op.value });
         }
         case "remove": {
-          const page = pageOf(op.page);
-          const index = page ? (indexes.get(page).first.get(op.id)?.index ?? -1) : -1;
+          let page = pageOf(op.page);
+          const index = entryOf(page, op.id)?.index ?? -1;
           if (index < 0) return reject("Missing node");
           if (!newer(path, stamp)) return reject("Superseded");
+          page = nodesForWrite(page);
           page.nodes[index] = null;
           dirtyPages.add(page);
           const count = nodeIds.get(op.id);
@@ -460,8 +512,8 @@
         }
         case "node": {
           const page = pageOf(op.page);
-          const node = nodeOf(page, op.id);
-          if (!node) return reject("Missing node");
+          const entry = entryOf(page, op.id);
+          if (!entry) return reject("Missing node");
           if (op.key === "id") return reject("Node ids are immutable");
           if (op.key === "parentId" && !op.del && op.value !== null) {
             if (!validId(op.value) || !indexes.get(page).byId.has(op.value))
@@ -469,19 +521,20 @@
             if (createsCycle(page, op.id, op.value)) return reject("Move would create a cycle");
           }
           if (!newer(path, stamp)) return reject("Superseded");
+          const node = nodeForWrite(page, entry.index, entry.node);
           if (op.del) delete node[op.key];
-          else node[op.key] = clone(op.value);
+          else node[op.key] = own(op.value);
           return accept(
             op.del
               ? { t: "node", page: op.page, id: op.id, key: op.key, del: true }
-              : { t: "node", page: op.page, id: op.id, key: op.key, value: clone(op.value) },
+              : { t: "node", page: op.page, id: op.id, key: op.key, value: op.value },
           );
         }
         case "text": {
           const page = pageOf(op.page);
-          const node = nodeOf(page, op.id);
-          if (!node) return reject("Missing node");
-          const current = node[op.key];
+          const entry = entryOf(page, op.id);
+          if (!entry) return reject("Missing node");
+          const current = entry.node[op.key];
           let value =
             typeof current === "string"
               ? current === op.base
@@ -492,7 +545,7 @@
             if (!newer(path, stamp)) return reject("Superseded");
             value = op.value;
           }
-          node[op.key] = value;
+          nodeForWrite(page, entry.index, entry.node)[op.key] = value;
           if (op.key === "id") indexed = false;
           return accept({ t: "node", page: op.page, id: op.id, key: op.key, value });
         }
@@ -501,7 +554,8 @@
           if (!page) return reject("Missing page");
           if (!newer(path, stamp)) return reject("Superseded");
           compact();
-          page.nodes = reorder(page.nodes, op.value);
+          const target = pageForWrite(page);
+          fresh.add((target.nodes = reorder(target.nodes, op.value)));
           indexed = false;
           return accept({ t: "nodeOrder", page: op.page, value: op.value.slice() });
         }
@@ -511,6 +565,7 @@
     if (options.normalize && hasPages()) {
       // Concurrent deletes can orphan children; reattach them to the page so content stays visible.
       for (const page of doc.pages) {
+        let target = page;
         const byId = indexes.get(page).byId;
         const ids = new Set(byId.keys());
         const unique = ids.size === page.nodes.length;
@@ -544,7 +599,7 @@
             }
             for (const id of chain) reaches.set(id, cycle);
           }
-        for (const node of page.nodes) {
+        page.nodes.forEach((node, index) => {
           if (
             node.parentId !== undefined &&
             node.parentId !== null &&
@@ -561,7 +616,8 @@
                   safe.push(child);
                 }
             }
-            node.parentId = null;
+            target = nodesForWrite(target);
+            nodeForWrite(target, index, node).parentId = null;
             applied.push({
               t: "node",
               page: page.id,
@@ -572,7 +628,7 @@
             });
             record("n/" + node.id + "/parentId", options.stamp);
           }
-        }
+        });
       }
     }
     return { doc, applied, rejected };
