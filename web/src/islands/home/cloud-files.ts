@@ -86,7 +86,9 @@ export function useCloudRooms(active: boolean) {
   const query = useQuery({
     ...cloudRoomsQuery(scope ?? SIGNED_OUT, organization),
     enabled,
-    refetchInterval: 3000,
+    // This device's creates and renames invalidate the list (`cloud-files-changed`); showing Files
+    // and focusing the window refetch it. The interval only picks up other people's changes.
+    refetchInterval: 60_000,
     refetchOnWindowFocus: true,
   });
   const { data, error } = query;
