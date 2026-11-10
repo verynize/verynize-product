@@ -162,7 +162,13 @@ export function PagesSection({ open, onToggle }: { open: boolean; onToggle: () =
   }, []);
 
   return (
-    <section aria-label="Pages" className="shrink-0 border-b border-divider">
+    <section
+      aria-label="Pages"
+      className={cn(
+        "flex flex-col border-b border-divider",
+        open ? "min-h-24" : "min-h-9 shrink-0",
+      )}
+    >
       <SectionHeader title="Pages" open={open} onToggle={onToggle} controls="bd-page-list">
         <IconButton ref={addRef} label="Add page" onClick={() => runLegacy("add-page")}>
           <PlusIcon className="size-4" />
@@ -172,7 +178,7 @@ export function PagesSection({ open, onToggle }: { open: boolean; onToggle: () =
         ref={listRef}
         id="bd-page-list"
         hidden={!open}
-        className="relative flex flex-col gap-0.5 px-1.5 pb-1.5"
+        className="relative flex min-h-0 flex-col gap-0.5 overflow-y-auto px-1.5 pb-1.5"
       >
         {doc.pages.map((page) => (
           <PageRow

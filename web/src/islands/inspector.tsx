@@ -52,7 +52,8 @@ function Island() {
   // Variables start collapsed and Properties expanded; with nothing selected Properties shows the page settings.
   // The user can still toggle either; the automatic state is re-applied when the selection empties or fills.
   // Accordion (Wonder): every open section shares the panel height and scrolls inside, so collapsed sections below an
-  // open one sit at the bottom of the panel; with nothing open they stack under each other.
+  // open one sit at the bottom of the panel; with nothing open they stack under each other. Each expanded section
+  // keeps a usable body at short window heights; the outer scroll then keeps every section reachable.
   const [variablesOpen, setVariablesOpen] = useState(false);
   const [propertiesOpen, setPropertiesOpen] = useState(true);
   const [iconsOpen, setIconsOpen] = useState(false);
@@ -62,7 +63,7 @@ function Island() {
   }, [selected]);
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background text-xs text-foreground-2">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-background text-xs text-foreground-2">
       <PanelHeader />
       <VariablesSection open={variablesOpen} onToggle={() => setVariablesOpen(!variablesOpen)} />
       <IconsSection
@@ -70,14 +71,14 @@ function Island() {
         node={node}
         open={iconsOpen}
         onToggle={() => setIconsOpen(!iconsOpen)}
-        className={iconsOpen ? "flex-1" : "shrink-0"}
+        className={iconsOpen ? "min-h-24 flex-1" : "min-h-9 shrink-0"}
       />
       <section
         id="insp-properties"
         aria-label="Properties"
         className={cn(
-          "flex min-h-0 flex-col border-b border-divider",
-          propertiesOpen ? "flex-1" : "shrink-0",
+          "flex flex-col border-b border-divider",
+          propertiesOpen ? "min-h-24 flex-1" : "min-h-9 shrink-0",
         )}
       >
         <PanelSectionHeader

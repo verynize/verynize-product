@@ -84,7 +84,7 @@ body.bd-chrome.agent-chat-open > main {
   width: calc(100% - var(--chat-dock-width)) !important;
 }
 body.bd-chrome.agent-chat-open > main > #layer-panel {
-  display: block !important;
+  display: flex !important;
 }
 body.bd-chrome.agent-chat-open #agent-chat-dock {
   top: 0 !important;

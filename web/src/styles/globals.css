@@ -220,8 +220,11 @@ html[data-platform="web"] {
   outline: 1px solid var(--ring);
   outline-offset: 1px;
 }
-[data-bd] [hidden]:not([hidden="until-found"]) {
-  display: none !important;
+/* Important layer precedence is reversed: hidden must beat the important flex/grid utilities. */
+@layer theme {
+  [data-bd] [hidden]:not([hidden="until-found"]) {
+    display: none !important;
+  }
 }
 
 /* Legacy elements replaced by an island (see hideLegacy in lib/bridge.ts). */

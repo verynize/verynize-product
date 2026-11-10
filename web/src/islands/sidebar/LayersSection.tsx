@@ -359,7 +359,10 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   };
 
   return (
-    <section aria-label="Layers" className="flex min-h-0 flex-1 flex-col">
+    <section
+      aria-label="Layers"
+      className={cn("flex flex-col", open ? "min-h-24 flex-1" : "min-h-9 shrink-0")}
+    >
       <SectionHeader
         title="Layers"
         open={open}

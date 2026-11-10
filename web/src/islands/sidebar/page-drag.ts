@@ -83,7 +83,7 @@ export function usePageDrag(listRef: RefObject<HTMLElement | null>) {
           index < all.length
             ? all[index].getBoundingClientRect().top - base.top
             : all[all.length - 1].getBoundingClientRect().bottom - base.top;
-        return { index, top };
+        return { index, top: top + list.scrollTop };
       };
 
       const finish = (commit: boolean) => {

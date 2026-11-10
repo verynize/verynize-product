@@ -635,6 +635,7 @@ const ux = [
   ]),
   electron("tests/ui-ready.cjs", "ux", AREA.shell),
   electron("tests/panel-resize.cjs", "ux", AREA.shell),
+  electron("tests/sidebar-scroll.cjs", "ux", [...AREA.shell, ...AREA.inspector, ...isl("chat")]),
   electron("tests/web-platform.cjs", "ux", [
     ...AREA.shell,
     "web/platform.js",

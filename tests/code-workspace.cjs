@@ -148,6 +148,30 @@ const git = (cwd, ...args) =>
       null,
     );
 
+    // A split chosen in a tall window must leave the terminal reachable after resizing or reopening.
+    const splitHandle = page.getByRole("separator", { name: "Resize files and terminal" });
+    await splitHandle.focus();
+    for (let i = 0; i < 30; i++) await page.keyboard.press("ArrowDown");
+    await page.setViewportSize({ width: 1440, height: 600 });
+    const assertPanesFit = async () => {
+      await page.waitForFunction(() => {
+        const panel = document.querySelector("#code-panel");
+        const tree = document.querySelector("#code-files");
+        const terminal = document.querySelector("#code-terminal");
+        if (!panel || !tree || !terminal) return false;
+        const bounds = panel.getBoundingClientRect();
+        const files = tree.getBoundingClientRect();
+        const shell = terminal.getBoundingClientRect();
+        return files.height >= 96 && shell.height >= 96 && shell.bottom <= bounds.bottom + 1;
+      });
+    };
+    await assertPanesFit();
+    await page.locator("#code-panel-toggle").click();
+    await page.locator("#code-panel").waitFor({ state: "detached" });
+    await page.locator("#code-panel-toggle").click();
+    await assertPanesFit();
+    await page.setViewportSize({ width: 1440, height: 870 });
+
     // 2. Add the repository from a local folder → its first chat gets a worktree on a verynize/ branch.
     await app.evaluate(
       ({ dialog }, dir) =>

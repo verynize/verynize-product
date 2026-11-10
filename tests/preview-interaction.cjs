@@ -1,4 +1,5 @@
 const { _electron } = require("@playwright/test");
+const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 const assert = require("node:assert/strict"),
   fs = require("node:fs/promises"),
   os = require("node:os"),
@@ -20,6 +21,7 @@ const assert = require("node:assert/strict"),
   const app = await _electron.launch({ env, args: [".", `--user-data-dir=${dir}`] });
   try {
     const page = await app.firstWindow();
+    await waitForUiReady(page);
     await page.waitForFunction(() => !!window.livePreview);
     const url = `http://127.0.0.1:${server.address().port}/`;
     await page.evaluate((url) => window.livePreview.show(url), url);
@@ -69,7 +71,9 @@ const assert = require("node:assert/strict"),
     await frame.waitForFunction(() => scrollY > 0);
     const wrap = await page.locator("#canvas-wrap").boundingBox();
     await page.mouse.click(wrap.x + 10, wrap.y + 10);
-    assert.equal(await page.locator("#preview-toolbar").count(), 0);
+    await page.waitForFunction(() => window.design.getSelection().length === 0);
+    // The selection event schedules a React update; the toolbar can remain mounted until that commit.
+    await page.locator("#preview-toolbar").waitFor({ state: "detached" });
     p = await point();
     const before = await position();
     await page.mouse.click(p.x, p.y);

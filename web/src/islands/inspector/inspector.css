@@ -9,6 +9,7 @@
   border-right: 0 !important;
 }
 #properties > #bd-inspector-root {
+  height: 100%;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -19,6 +20,7 @@
   min-height: 0;
 }
 #bd-inspector-root [data-scroll] {
+  overscroll-behavior-y: contain;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
 }

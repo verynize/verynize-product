@@ -52,17 +52,21 @@ function useTitlebarSlot(active: boolean) {
 }
 
 /** Files / terminal split: the tree height in px, stored; dragged or moved with the arrow keys. */
-function useSplit() {
+function useSplit(panelOpen: boolean) {
   const panel = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(() => Number(readStored(SPLIT_KEY)) || 0);
   useEffect(() => {
     const el = panel.current;
     if (!el) return;
-    el.style.setProperty("--code-tree-height", height ? `${height}px` : "37%");
-  }, [height]);
+    // Preserve the preferred split, but always reserve room for the terminal and divider after a resize.
+    el.style.setProperty(
+      "--code-tree-height",
+      height ? `clamp(96px, ${height}px, calc(100% - 100px))` : "37%",
+    );
+  }, [height, panelOpen]);
   const clamp = (value: number) => {
     const total = panel.current?.getBoundingClientRect().height ?? 600;
-    return Math.round(Math.min(Math.max(value, 96), total - 96));
+    return Math.round(Math.max(96, Math.min(value, total - 100)));
   };
   const commit = (value: number) => {
     const next = clamp(value);
@@ -108,7 +112,7 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
   const [panelOpen, setPanelOpen] = useState(() => readStored(PANEL_KEY) !== "0");
   const slot = useTitlebarSlot(codeMode);
   const file = useOpenFile();
-  const split = useSplit();
+  const split = useSplit(panelOpen);
   const root = state.activeRoot ?? null;
 
   // The chat section (transcript + composer) lives in the center column while Code mode is on.
@@ -162,11 +166,11 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
     >
       {slot && createPortal(<Breadcrumb state={state} />, slot)}
       {codeMode && !sidebarCollapsed && <CodeSidebar state={state} />}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         {/* Row under the window title bar (breadcrumb, search and the Design/Code switch are drawn there). */}
         <div className="h-chrome shrink-0 border-b border-border" />
         <div className="flex min-h-0 flex-1">
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             {codeMode && (
               <Toolbar state={state} panelOpen={panelOpen} onTogglePanel={togglePanel} />
             )}
@@ -182,12 +186,12 @@ export function CodeWorkspace({ state, routed = false }: { state: ChatState; rou
             <aside
               id="code-panel"
               aria-label="Files and terminal"
-              className="m-0 flex w-code-panel shrink-0 flex-col border-l border-border bg-background p-0"
+              className="m-0 flex min-h-0 w-code-panel shrink-0 flex-col overflow-hidden border-l border-border bg-background p-0"
             >
               <div className="flex h-10 shrink-0 items-center justify-end gap-2 border-b border-border px-2">
                 {codeMode && <ChangesButton state={state} />}
               </div>
-              <div ref={split.panel} className="flex min-h-0 flex-1 flex-col">
+              <div ref={split.panel} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                 <div className="flex h-(--code-tree-height) min-h-code-tree-min shrink-0 flex-col">
                   <FileTree root={root} />
                 </div>

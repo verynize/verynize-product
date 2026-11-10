@@ -40,18 +40,20 @@ export function Sidebar() {
       hidden={collapsed}
     >
       <FileHeader onCollapse={() => document.body.classList.add("left-collapsed")} />
-      <PagesSection
-        open={sections.pages}
-        onToggle={() => setSections((s) => ({ ...s, pages: !s.pages }))}
-      />
-      <ComponentsSection
-        open={sections.components}
-        onToggle={() => setSections((s) => ({ ...s, components: !s.components }))}
-      />
-      <LayersSection
-        open={sections.layers}
-        onToggle={() => setSections((s) => ({ ...s, layers: !s.layers }))}
-      />
+      <div data-sidebar-sections className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <PagesSection
+          open={sections.pages}
+          onToggle={() => setSections((s) => ({ ...s, pages: !s.pages }))}
+        />
+        <ComponentsSection
+          open={sections.components}
+          onToggle={() => setSections((s) => ({ ...s, components: !s.components }))}
+        />
+        <LayersSection
+          open={sections.layers}
+          onToggle={() => setSections((s) => ({ ...s, layers: !s.layers }))}
+        />
+      </div>
     </div>
   );
 }

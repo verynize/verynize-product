@@ -545,7 +545,12 @@ export function Composer({ state }: { state: ChatState }) {
       <StylePicker />
       <WorkingDirectories state={state} />
       {(state.attachments.length > 0 || mentions.length > 0) && (
-        <div className={cn(hook.mentions, "flex flex-wrap gap-1.5 px-2 pt-2 pb-1.5")}>
+        <div
+          className={cn(
+            hook.mentions,
+            "flex max-h-32 flex-wrap gap-1.5 overflow-y-auto px-2 pt-2 pb-1.5",
+          )}
+        >
           {mentions.map((mention) => (
             <Chip
               key={mention.id}
