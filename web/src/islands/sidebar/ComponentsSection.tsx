@@ -153,7 +153,10 @@ export function ComponentsSection({ open, onToggle }: { open: boolean; onToggle:
     <section
       aria-label="Components"
       id="components-panel"
-      className={cn("flex min-h-0 flex-col border-b border-divider", open ? "flex-1" : "shrink-0")}
+      className={cn(
+        "flex flex-col border-b border-divider",
+        open ? "min-h-24 flex-1" : "min-h-9 shrink-0",
+      )}
     >
       <SectionHeader
         title="Components"
@@ -182,7 +185,7 @@ export function ComponentsSection({ open, onToggle }: { open: boolean; onToggle:
       <div
         id="bd-components-body"
         hidden={!open}
-        className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-3"
+        className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-3 pb-3"
       >
         {searching ? (
           <div className="flex h-7 shrink-0 items-center gap-2 rounded-md bg-input px-2 text-muted-foreground focus-within:outline focus-within:outline-1 focus-within:outline-ring">
@@ -227,7 +230,7 @@ export function ComponentsSection({ open, onToggle }: { open: boolean; onToggle:
             <span className="truncate">Page shell</span>
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="shrink-0">
           {shown.length ? (
             <div id="components-list" className="grid grid-cols-2 gap-1">
               {shown.map((main) => (

@@ -286,7 +286,7 @@ export function IconsSection({
     <section
       id="insp-icons"
       aria-label="Icons"
-      className={cn("flex min-h-0 flex-col border-b border-divider", className)}
+      className={cn("flex flex-col border-b border-divider", className)}
     >
       <PanelSectionHeader
         label="Icons"
@@ -371,7 +371,7 @@ export function IconsSection({
           if (addIcons(entries)) reveal();
         }}
       />
-      <div hidden={!open} className="min-h-0 flex-1 overflow-y-auto pb-2">
+      <div hidden={!open} data-scroll className="min-h-0 flex-1 overflow-y-auto pb-2">
         {searching ? (
           <div className="px-3 pb-2">
             <input
