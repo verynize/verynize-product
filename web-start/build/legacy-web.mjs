@@ -14,9 +14,11 @@
 //   an empty module here and the web and desktop pages load the same stylesheet.
 // - With `staticHeaders`, the client build also gets Cloudflare's `_headers`: Vite's content-hashed
 //   `/assets/<name>-<hash>.*` never change, so browsers keep them for a year without asking again.
-//   Fixed names (`/app.js`, `/style.css`, fonts under `/assets/fonts/`) keep the default revalidation.
+//   Legacy scripts/styles and their CSS dependencies get hashed copies under /assets/legacy/.
+//   Fixed-name originals remain reachable with default revalidation for frames and other callers.
 import fs from "node:fs";
 import path from "node:path";
+import { buildLegacyAssets } from "./legacy-assets.mjs";
 
 const VIRTUAL_ID = "virtual:verynize/legacy-shell";
 const RESOLVED_ID = "\0" + VIRTUAL_ID;
@@ -144,9 +146,11 @@ function legacyUi({ webDir }) {
 /** `_headers` of the Cloudflare static assets (one path segment: `:file` never matches a `/`). */
 export const STATIC_HEADERS = `/assets/:file
   Cache-Control: public, max-age=31536000, immutable
+/assets/legacy/:file
+  Cache-Control: public, max-age=31536000, immutable
 `;
 /** Public web/ files the immutable rule would match: their names never change, so they must not. */
-const HASHED_ONLY = /^assets\/[^/]+$/;
+const HASHED_ONLY = /^assets\/(?:[^/]+|legacy\/.*)$/;
 
 /** @param {{ webDir: string, staticHeaders?: boolean }} options */
 export function legacyWeb({ webDir, staticHeaders = false }) {
@@ -156,15 +160,22 @@ export function legacyWeb({ webDir, staticHeaders = false }) {
 /** @param {{ webDir: string, staticHeaders: boolean }} options */
 function legacyWebFiles({ webDir, staticHeaders }) {
   const indexHtml = path.join(webDir, "index.html");
+  let building = false;
+  let assets;
+  const shell = () => parseLegacyShell(fs.readFileSync(indexHtml, "utf8"));
+  const hashedAssets = () => (assets ??= buildLegacyAssets(webDir, shell()));
   return {
     name: "verynize:legacy-web",
+    configResolved(config) {
+      building = config.command === "build";
+    },
     resolveId(id) {
       if (id === VIRTUAL_ID) return RESOLVED_ID;
     },
     load(id) {
       if (id !== RESOLVED_ID) return;
       this.addWatchFile(indexHtml);
-      return `export default ${JSON.stringify(parseLegacyShell(fs.readFileSync(indexHtml, "utf8")))};`;
+      return `export default ${JSON.stringify({ ...shell(), assetUrls: building ? hashedAssets().assetUrls : {} })};`;
     },
     configureServer(server) {
       server.watcher.add(indexHtml);
@@ -198,6 +209,7 @@ function legacyWebFiles({ webDir, staticHeaders }) {
       });
     },
     buildStart() {
+      assets = undefined;
       if (this.environment?.name !== "client") return;
       if (!fs.existsSync(path.join(webDir, "dist", "ui.js")))
         this.warn("web/dist/ui.js is missing: run `npm run build:ui` before building the web app.");
@@ -213,6 +225,13 @@ function legacyWebFiles({ webDir, staticHeaders }) {
           source: fs.readFileSync(path.join(webDir, fileName)),
         });
       }
+      for (const [fileName, source] of hashedAssets().files)
+        this.emitFile({ type: "asset", fileName, source });
+      this.emitFile({
+        type: "asset",
+        fileName: "legacy-assets.json",
+        source: JSON.stringify(hashedAssets().assetUrls, null, 2),
+      });
       if (staticHeaders)
         this.emitFile({ type: "asset", fileName: "_headers", source: STATIC_HEADERS });
     },

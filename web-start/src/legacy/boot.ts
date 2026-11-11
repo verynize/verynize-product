@@ -59,7 +59,7 @@ async function styles() {
     }
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = style.href;
+    link.href = shell.assetUrls[style.href] ?? style.href;
     styles.push(loaded(link, style.href).catch((error: Error) => console.error(error.message)));
     document.head.append(link);
   }
@@ -94,6 +94,7 @@ async function run() {
     if (afterUi) await last;
     const element = document.createElement("script");
     for (const [name, value] of Object.entries(script.attrs)) element.setAttribute(name, value);
+    if (script.attrs.src) element.src = shell.assetUrls[script.attrs.src] ?? script.attrs.src;
     element.async = false;
     if (script.text !== undefined) {
       // Inserted inline scripts run immediately, so wait for the scripts before them.

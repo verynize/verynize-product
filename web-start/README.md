@@ -69,6 +69,15 @@ copied. Extra or reordered script tags, such as a `web/platform.js` added early 
 picked up automatically, including scripts in `<head>` (they run first, after the body markup
 exists). Inline scripts and `<style>` blocks are supported.
 
+Production builds keep those original names in the shell and add `shell.assetUrls`, an original-name
+to content-hashed URL lookup. Boot code selects scripts by original name, then resolves the URL
+when inserting each script or stylesheet. Copies live under `/assets/legacy/`; classic scripts
+remain byte-for-byte unchanged, and CSS `url()` dependencies (including fonts) are rewritten to
+hashed copies before hashing the CSS. Original files remain available for frames, workers and
+other callers. Cloudflare `_headers` and the Node server cache hashed copies immutably for a year;
+route documents and the diagnostic `/legacy-assets.json` manifest keep normal revalidation.
+Development and Electron continue using original URLs.
+
 Alternatives considered:
 
 - SSR the static markup with parser-inserted scripts: this gives exact parse-time semantics, but

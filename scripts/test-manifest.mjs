@@ -728,6 +728,7 @@ const webBuild = (file, covers, extra = {}) => ({
 });
 const AI = ["cloud/ai*.js", "web-start/**", "server/node.mjs", "tests/helpers/fake-openrouter.mjs"];
 const web = [
+  webBuild("tests/web-legacy-assets.mjs", []),
   webBuild("tests/web-cloudflare.mjs", []),
   webBuild("tests/web-node.mjs", []),
   webBuild("tests/env-build.mjs", [
