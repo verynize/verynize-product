@@ -1614,12 +1614,17 @@
     if (switching?.kind === "file" && ["begin", "ready"].includes(switching.phase)) return;
     void reconnectOpenFile();
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("DOMContentLoaded", () => {
-    if (new URLSearchParams(location.hash.slice(1)).has("room")) return;
-    // At launch the shell router has not applied the URL yet, so the Files home path counts too.
-    if (editorHidden()) reconnectPending = true;
-    else void reconnectOpenFile();
-  });
+  // Once: the web boot dispatches DOMContentLoaded again when the editor phase follows Home.
+  window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+      if (new URLSearchParams(location.hash.slice(1)).has("room")) return;
+      // At launch the shell router has not applied the URL yet, so the Files home path counts too.
+      if (editorHidden()) reconnectPending = true;
+      else void reconnectOpenFile();
+    },
+    { once: true },
+  );
   window.cloudWorkspace = {
     flush: flushBeforeSwitch,
     storeDocument: (document) => storeDocument(document),

@@ -283,6 +283,7 @@
   }
   window.addEventListener("cloud-account-changed", migrateFiles);
   window.addEventListener("online", migrateFiles);
-  window.addEventListener("DOMContentLoaded", migrateFiles);
+  // Home and the editor each dispatch DOMContentLoaded (web-start legacy boot); migrate once.
+  window.addEventListener("DOMContentLoaded", migrateFiles, { once: true });
   roomChanged();
 })();
