@@ -682,6 +682,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-ai-durable.mjs",
   "tests/cloud-assets.mjs",
   "tests/cloud-pages-assets.mjs",
+  "tests/cloud-page-icons.mjs",
 ];
 const cloud = [
   ...CLOUD_SCENARIOS,
@@ -729,6 +730,7 @@ const webBuild = (file, covers, extra = {}) => ({
 const AI = ["cloud/ai*.js", "web-start/**", "server/node.mjs", "tests/helpers/fake-openrouter.mjs"];
 const web = [
   webBuild("tests/web-cloudflare.mjs", []),
+  webBuild("tests/web-icons.mjs", []),
   webBuild("tests/web-node.mjs", []),
   webBuild("tests/env-build.mjs", [
     "scripts/env.mjs",

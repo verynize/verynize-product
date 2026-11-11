@@ -97,6 +97,7 @@ const CONTENT_TYPES = {
   ".json": "application/json",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".ico": "image/x-icon",
   ".jpg": "image/jpeg",
   ".webp": "image/webp",
   ".woff": "font/woff",
@@ -144,6 +145,12 @@ function legacyUi({ webDir }) {
 /** `_headers` of the Cloudflare static assets (one path segment: `:file` never matches a `/`). */
 export const STATIC_HEADERS = `/assets/:file
   Cache-Control: public, max-age=31536000, immutable
+/favicon.ico
+  Cache-Control: public, max-age=86400
+/favicon.svg
+  Cache-Control: public, max-age=86400
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400
 `;
 /** Public web/ files the immutable rule would match: their names never change, so they must not. */
 const HASHED_ONLY = /^assets\/[^/]+$/;
