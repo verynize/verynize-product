@@ -8,7 +8,7 @@ const headers = {
   "referrer-policy": "no-referrer",
 };
 
-const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verynize passkey</title><style>
+const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Verynize passkey</title><link rel="icon" href="/favicon.ico" sizes="16x16 32x32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><style>
 body{margin:0;font:14px/1.55 Inter,system-ui,-apple-system,sans-serif;background:#141416;color:#e6e3ec;display:flex;min-height:100vh;align-items:center;justify-content:center}
 main{width:min(360px,90vw);padding:28px;border:1px solid #2f2b37;border-radius:14px;background:#1b1a20}
 h1{font-size:18px;margin:0 0 8px}p{color:#aaa3b5;margin:0 0 18px}
@@ -63,8 +63,9 @@ export function passkeyPage() {
     headers: {
       ...headers,
       "content-type": "text/html; charset=utf-8",
+      "cache-control": "no-store, no-transform",
       "content-security-policy":
-        "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+        "default-src 'none'; img-src 'self'; script-src 'self'; connect-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
     },
   });
 }
