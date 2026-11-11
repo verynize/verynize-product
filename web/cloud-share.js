@@ -42,7 +42,8 @@
       .storeDocument(file.document)
       .then(async (cloud) => {
         lib.setCloud(id, cloud, true);
-        if (lib.currentId === id && !ws.room()) await ws.attachRoom(cloud, file.document);
+        if (window.design && lib.currentId === id && !ws.room())
+          await ws.attachRoom(cloud, file.document);
         return cloud;
       })
       .finally(() => uploads.delete(id));

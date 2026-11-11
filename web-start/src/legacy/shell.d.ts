@@ -3,7 +3,7 @@ declare module "virtual:verynize/legacy-shell" {
   const shell: {
     title: string;
     assetUrls: Record<string, string>;
-    styles: { href?: string; text?: string }[];
+    styles: { href?: string; text?: string; boot?: string }[];
     bodyAttributes: Record<string, string>;
     bodyHtml: string;
     scripts: { attrs: Record<string, string>; text?: string }[];
@@ -13,5 +13,6 @@ declare module "virtual:verynize/legacy-shell" {
 
 // The renderer UI from source (web/src/web-app.tsx) on the client; an empty module on the server.
 declare module "virtual:verynize/legacy-ui" {
+  export const editorIslandUrl: string;
   export * from "@/web-app";
 }

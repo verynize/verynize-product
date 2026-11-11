@@ -1595,7 +1595,7 @@
   // user leaves the Files home (the Code workspace counts: agents edit the open file there). Opening another file
   // connects through `library-file-opened`.
   const editorHidden = () =>
-    location.pathname === "/" || document.body.classList.contains("files-view");
+    !window.design || location.pathname === "/" || document.body.classList.contains("files-view");
   const reconnectOpenFile = async () => {
     await library()?.ready?.();
     if (editorHidden()) {
