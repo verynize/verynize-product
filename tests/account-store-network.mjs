@@ -60,6 +60,28 @@ try {
   assert.match(reads[2].etag, /^"[0-9a-f]{32}"$/);
   console.log("PASS feed reads: no idle polling, no read after a save, 304 when unchanged");
 
+  // Tab/window activation can deliver visibility and focus together. Concurrent explicit
+  // refreshes also join the same GET rather than queuing another one behind it.
+  reads.length = 0;
+  await page.evaluate(() =>
+    Promise.all([
+      window.accountStore.refresh(),
+      window.accountStore.refresh(),
+      window.accountStore.refresh(),
+    ]),
+  );
+  assert.equal(reads.length, 1, "concurrent readers share one feed request");
+  await page.waitForTimeout(5100);
+  reads.length = 0;
+  await page.evaluate(async () => {
+    window.dispatchEvent(new Event("focus"));
+    document.dispatchEvent(new Event("visibilitychange"));
+    window.dispatchEvent(new Event("focus"));
+    await window.accountStore.refresh();
+  });
+  assert.equal(reads.length, 1, "one feed read for a focus/visibility burst");
+  console.log("PASS concurrent refresh and focus burst deduplicate feed reads");
+
   const attempts = [];
   page.on("request", (request) => {
     if (

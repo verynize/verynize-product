@@ -293,6 +293,18 @@
       e.data = data;
       throw e;
     }
+    if (path === "/api/me" && options.method === "PATCH")
+      window.dispatchEvent(new Event("cloud-profile-updated"));
+    // Access and workspace mutations affect the Home listing even while its query is fresh.
+    if (
+      options.method &&
+      options.method !== "GET" &&
+      (/^\/api\/rooms\/[^/]+\/(members|visibility|share-invitations|organization)(?:\/|$)/.test(
+        path,
+      ) ||
+        (options.method === "DELETE" && /^\/api\/rooms\/[^/]+$/.test(path)))
+    )
+      window.dispatchEvent(new Event("cloud-files-changed"));
     return data;
   }
   // Owners share a role-limited link (web/cloud-invite.js), never their own owner token. Others

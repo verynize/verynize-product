@@ -144,6 +144,8 @@ const byPersonalThenName = (a: Organization, b: Organization) =>
 export const organizationsQuery = (scope: AccountScope) =>
   queryOptions({
     queryKey: queryKeys.organizations(scope),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
     queryFn: async () =>
       (await scopedRequest<Organization[]>(scope, "/api/auth/organization/list")).sort(
         byPersonalThenName,
@@ -178,11 +180,15 @@ export function reloadOrganizations(): Promise<void> {
   if (!scope) return Promise.resolve();
   // refetchType "all": also refresh the list when no island shows it right now, so a reader that
   // mounts next (e.g. after switching to a just-created workspace) finds it current.
-  return queryClient.invalidateQueries({
-    queryKey: queryKeys.organizations(scope),
-    exact: true,
-    refetchType: "all",
-  });
+  return Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.organizations(scope),
+      exact: true,
+      refetchType: "all",
+    }),
+    // Joining/leaving a workspace or changing its member roles also changes room access.
+    queryClient.invalidateQueries({ queryKey: queryKeys.rooms(scope) }),
+  ]).then(() => {});
 }
 const NO_ORGANIZATIONS: Organization[] = [];
 /** The organizations of the signed-in email account, personal first; refreshes on changes. */

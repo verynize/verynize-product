@@ -33,9 +33,8 @@ export const queryKeys = {
     [...queryKeys.organizations(scope), organizationId] as const,
   /** Invitations addressed to the account, from any organization. */
   invitations: (scope: AccountScope) => [...queryKeys.account(scope), "invitations"] as const,
-  /** Rooms of a workspace (or none) plus rooms shared with the account directly. */
-  rooms: (scope: AccountScope, organizationId: string | null) =>
-    [...queryKeys.account(scope), "rooms", organizationId] as const,
+  /** All rooms accessible to the account, including organization memberships. */
+  rooms: (scope: AccountScope) => [...queryKeys.account(scope), "rooms"] as const,
   /** The model API runtime configuration of the account's server (GET /api/ai/config). */
   aiConfig: (scope: AccountScope) => [...queryKeys.account(scope), "ai-config"] as const,
 };
