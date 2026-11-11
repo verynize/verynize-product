@@ -164,7 +164,8 @@ try {
     watch(page);
     const meResponses = [];
     page.on("response", (response) => {
-      if (new URL(response.url()).pathname === "/api/me") meResponses.push(response.status());
+      if (new URL(response.url()).pathname === "/api/me" && response.request().method() === "GET")
+        meResponses.push(response.status());
     });
     await page.goto(origin + "/editor");
     await page.waitForFunction(() => document.documentElement.dataset.webAuth === "signed-out");
@@ -211,6 +212,7 @@ try {
       })),
       { kind: "web", capabilities: false, service: "web", ready: false, agents: ["openrouter"] },
     );
+    assert.deepEqual(meResponses, [200], "sign-in and first-run AI setup share one account read");
     // Skip for now: closed and remembered for the account on the server.
     await page.locator("#onboarding-ai-skip").click();
     await setup.waitFor({ state: "detached" });
@@ -225,17 +227,16 @@ try {
     watch(second);
     const secondMe = [];
     second.on("response", (response) => {
-      if (new URL(response.url()).pathname === "/api/me") secondMe.push(response.status());
+      if (new URL(response.url()).pathname === "/api/me" && response.request().method() === "GET")
+        secondMe.push(response.status());
     });
     await second.goto(origin + "/editor");
     await second.locator("#web-sign-in #onboarding-email").waitFor();
     await signInWithPassword(second);
-    // The sign-in itself, then the onboarding island's check.
+    // Auth and onboarding consume the same successful response, including aiSetupAt.
     await second.waitForFunction(() => document.documentElement.dataset.uiReady === "true");
-    const until = Date.now() + 10000;
-    while (secondMe.length < 2 && Date.now() < until) await new Promise((r) => setTimeout(r, 100));
-    assert.ok(secondMe.length >= 2, `GET /api/me after sign-in: ${secondMe.join(",")}`);
     await new Promise((resolve) => setTimeout(resolve, 300));
+    assert.deepEqual(secondMe, [200], "one GET /api/me after sign-in, including onboarding");
     assert.equal(await second.locator("#onboarding").count(), 0, "AI setup shown once per account");
 
     // Settings › Agents › AI setup reopens it.
@@ -259,6 +260,13 @@ try {
     );
     await second.locator("#web-sign-in").waitFor();
     assert.equal(new URL(second.url()).pathname, "/settings/agents");
+    const beforeSignIn = secondMe.length;
+    await signInWithPassword(second);
+    assert.equal(
+      secondMe.length,
+      beforeSignIn + 1,
+      "signing in again gets a fresh account response",
+    );
     await other.close();
     assert.ok(
       meResponses.every((status) => status === 200),

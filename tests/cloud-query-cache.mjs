@@ -47,6 +47,21 @@ try {
     organizationId: studio.id,
   });
   const budiRoom = await api("/api/rooms", budi, { document: doc("Budi brief") });
+  const sharedTeam = await api("/api/auth/organization/create", budi, {
+    name: "Shared team",
+    slug: "shared-team",
+    metadata: { roomRole: "commenter" },
+  });
+  const sharedInvite = await api("/api/auth/organization/invite-member", budi, {
+    email: "ana@example.test",
+    role: "member",
+    organizationId: sharedTeam.id,
+  });
+  await api("/api/auth/organization/accept-invitation", ana, { invitationId: sharedInvite.id });
+  const orgOnlyRoom = await api("/api/rooms", budi, {
+    document: doc("Organization-only access"),
+    organizationId: sharedTeam.id,
+  });
 
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
@@ -120,7 +135,26 @@ try {
     `every cloud key is scoped to Ana: ${JSON.stringify(keys)}`,
   );
   assert.ok(keys.some((key) => key[3] === "organizations"));
-  assert.ok(keys.some((key) => key[3] === "rooms" && key[4] === studio.id));
+  assert.ok(keys.some((key) => key[3] === "rooms" && key.length === 4));
+
+  // Workspace switching reuses the account-wide list and never leaks another workspace's rooms.
+  const roomRequests = [];
+  page.on("request", (request) => {
+    if (/\/api\/(?:me|orgs\/[^/]+)\/rooms$/.test(new URL(request.url()).pathname))
+      roomRequests.push(request.url());
+  });
+  await page.evaluate(() =>
+    window.cloudAccount.setActiveOrganization(window.cloudAccount.get().personalOrganizationId),
+  );
+  await card(anaRoom.id).waitFor({ state: "detached" });
+  await page.evaluate((id) => window.cloudAccount.setActiveOrganization(id), sharedTeam.id);
+  await card(orgOnlyRoom.id).waitFor();
+  assert.match(await card(orgOnlyRoom.id).textContent(), /Commenter/);
+  assert.equal(await card(anaRoom.id).count(), 0);
+  await page.evaluate((id) => window.cloudAccount.setActiveOrganization(id), studio.id);
+  await card(anaRoom.id).waitFor();
+  await card(orgOnlyRoom.id).waitFor({ state: "detached" });
+  assert.deepEqual(roomRequests, [], "workspace switches filter the fresh account-wide room list");
 
   // 2. Sign-out clears every account-scoped entry; nothing of Ana's is rendered afterwards.
   await page.evaluate(() => window.cloudAccount.signOut());

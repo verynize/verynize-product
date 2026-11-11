@@ -49,14 +49,67 @@ function store(next: StoredSession | null) {
   } catch {}
 }
 
+// Auth runs before the editor and onboarding. Keep their full response together, keyed by
+// origin + session (never just account id), and give every caller its own readable body.
+let meCache: {
+  key: string;
+  response: Promise<Response>;
+  expires: number;
+} | null = null;
+
+export function invalidateWebMe() {
+  meCache = null;
+}
+
 async function me(session: string, signal?: AbortSignal) {
-  return fetch(`${origin()}/api/me`, { headers: { "X-Verynize-Session": session }, signal });
+  const key = `${origin()}|${session}`;
+  if (!meCache || meCache.key !== key || meCache.expires <= Date.now()) {
+    const entry = {
+      key,
+      expires: Infinity,
+      response: fetch(`${origin()}/api/me`, {
+        headers: { "X-Verynize-Session": session },
+        signal,
+      }),
+    };
+    meCache = entry;
+    entry.response = entry.response.then(
+      (response) => {
+        entry.expires = response.ok ? Date.now() + 30_000 : 0;
+        return response;
+      },
+      (error: unknown) => {
+        if (meCache === entry) invalidateWebMe();
+        throw error;
+      },
+    );
+  }
+  return (await meCache.response).clone();
+}
+
+/** The same full account response checked by the web sign-in gate. */
+export async function getWebMe(): Promise<{ aiSetupAt?: number | null }> {
+  const stored = storedWebSession();
+  if (!stored) throw Error("Sign in first");
+  const response = await me(stored.session, AbortSignal.timeout(8000));
+  if (!response.ok) throw Error(await message(response));
+  return response.json();
+}
+
+// These listeners also cover profile updates and sign-out performed by the legacy shell.
+if (typeof window !== "undefined") {
+  window.addEventListener("cloud-account-changed", invalidateWebMe);
+  window.addEventListener("cloud-profile-updated", invalidateWebMe);
+  window.addEventListener("storage", (event) => {
+    if (event.key === ACCOUNT_KEY || event.key === null) invalidateWebMe();
+  });
 }
 
 /** Store a fresh session with its profile (GET /api/me), as cloud-panel.js does after signing in. */
 async function adopt(session: string) {
   if (!SESSION_TOKEN.test(session)) throw Error("The server did not return a session");
-  const response = await me(session);
+  invalidateWebMe();
+  const response = await me(session, AbortSignal.timeout(8000));
   if (!response.ok) throw Error(await message(response));
   const data = await response.json();
   store({
@@ -79,6 +132,7 @@ export async function checkWebSession(timeout = 8000): Promise<boolean> {
   try {
     const response = await me(stored.session, AbortSignal.timeout(timeout));
     if (response.status === 401 || response.status === 403) {
+      invalidateWebMe();
       store(null);
       return false;
     }
@@ -184,6 +238,7 @@ export async function signInWithPasskey(signal?: AbortSignal) {
       });
       if (response.status === 200) {
         const result = await response.json();
+        invalidateWebMe();
         store({ server: origin(), session: result.session, account: result.account });
         return result.account as Profile;
       }

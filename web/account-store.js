@@ -15,6 +15,7 @@
   let identity = "",
     ready = false,
     syncing = null,
+    syncReads = false,
     timer,
     retryTimer,
     pollTimer,
@@ -354,7 +355,10 @@
   }
   async function sync(read = true) {
     if (!identity) return;
-    if (syncing) return read ? syncing.then(() => sync(true)) : syncing;
+    // Readers share an active read. A sync that only writes still needs one follow-up read;
+    // all waiting readers will join that read once it starts.
+    if (syncing) return read && !syncReads ? syncing.then(() => sync(true)) : syncing;
+    syncReads = read || !ready;
     const expected = identity;
     syncing = (async () => {
       try {
@@ -583,9 +587,7 @@
   };
   window.addEventListener("online", reconnect);
   window.addEventListener("focus", reconnect);
-  document.addEventListener("visibilitychange", () => {
-    if (watched()) reconnect();
-  });
+
   window.addEventListener("beforeunload", (event) => {
     if (pending.size) {
       event.preventDefault();
