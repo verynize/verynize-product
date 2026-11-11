@@ -29,10 +29,9 @@ export function loadLegacyUi(): Promise<LegacyUi> {
     );
     // Route areas render after the islands' first commit, so takeover claims and the UI-ready signal see the same
     // first frame as on desktop, where the router island applies the location after the other islands.
-    void module.islandsCommitted().then(() => {
-      ui = module;
-      for (const listener of listeners) listener();
-    });
+    await module.islandsCommitted();
+    ui = module;
+    for (const listener of listeners) listener();
     return module;
   });
   return loading;

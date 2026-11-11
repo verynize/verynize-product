@@ -61,7 +61,7 @@ try {
   await desktop.waitForFunction(() => window.accountStore.ready() && window.cloudWorkspace.room());
   await desktop.evaluate(() => window.cloudWorkspace.flush());
 
-  if (!process.env.VERYNIZE_WEB_NODE_BUILT)
+  if (!process.env.TEST_WEB_NODE_BUILT)
     execFileSync(
       process.execPath,
       ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
@@ -111,6 +111,11 @@ try {
   await waitForUiReady(page);
 
   await page.waitForFunction(() => window.accountStore?.ready());
+  assert.equal(transcriptReads.length, 0, "deferred Home does not fetch a transcript");
+  assert.equal(await page.evaluate(() => typeof window.agentWorkspace), "undefined");
+  // The chat runtime is editor-only. Initialize it explicitly while keeping its panel closed
+  // before checking summary hydration and transcript fetching below.
+  await page.evaluate(() => window.verynizeEditorBoot());
 
   await page.waitForFunction(() =>
     window.agentWorkspace.getState().conversations.some((chat) => chat.id === "legacy-history"),
@@ -123,7 +128,7 @@ try {
     ),
     2,
   );
-  assert.equal(transcriptReads.length, 0, "Home boot loads summaries only");
+  assert.equal(transcriptReads.length, 0, "closed chat initializes summaries only");
   await page.evaluate(() => window.accountStore.refresh());
   assert.equal(transcriptReads.length, 0, "closed-panel refresh does not fetch a transcript");
   await page.evaluate(() => {

@@ -60,6 +60,12 @@ export async function checkDeferredHome(browser, origin, identity, mode) {
       window.__homeDocument = document;
     });
     await page.locator("#library-new-file").click();
+    await page.locator("#text-prompt-input").waitFor();
+    assert.deepEqual(await unbooted(), expected, "naming a file stays in Home");
+    await page.locator("#text-prompt-input").press("Escape");
+    await page.locator("#text-prompt-input").waitFor({ state: "hidden" });
+    assert.deepEqual(await unbooted(), expected, "cancelling creation does not boot the editor");
+    await page.locator("#library-new-file").click();
     await page.locator("#text-prompt-input").fill("Deferred boot regression");
     await page.locator("#text-prompt-ok").click();
     await page.waitForFunction(

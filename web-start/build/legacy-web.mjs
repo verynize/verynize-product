@@ -130,7 +130,17 @@ function legacyUi({ webDir }) {
       building = config.command === "build";
     },
     enforce: "pre",
-    config: () => ({ resolve: { alias: { "@": srcDir } } }),
+    config: () => ({
+      resolve: { alias: { "@": srcDir } },
+      environments: {
+        client: {
+          // The virtual entry hides the deferred islands from Start's initial dependency scan.
+          // Scan them on the server up front so a cold Home → editor transition cannot trigger
+          // dependency optimization and reload the page mid-action. This does not load them on Home.
+          optimizeDeps: { entries: [entry, islands] },
+        },
+      },
+    }),
     resolveId(id, importer) {
       if (id === UI_ID) return RESOLVED_UI_ID;
       if (

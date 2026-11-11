@@ -480,10 +480,10 @@
     return file.id;
   }
   async function createFile() {
-    if (window.verynizeEditorBoot) await window.verynizeEditorBoot();
     if (!hydrated) await ready;
     const name = await window.askText("Name your file", "Untitled");
     if (!name?.trim()) return;
+    if (window.verynizeEditorBoot) await window.verynizeEditorBoot();
     const pageId = uid(),
       document = {
         version: 2,
