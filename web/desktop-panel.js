@@ -732,6 +732,10 @@
     if (!subscribers.size) {
       const messages = $("chat-messages");
       messages.replaceChildren();
+      if (conversation?.unloaded)
+        messages.append(
+          el("p", null, transcriptErrors.get(conversation.id) || "Loading conversation…"),
+        );
       for (const [index, message] of (conversation?.messages || []).entries())
         messages.append(renderMessage(message, index));
       messages.scrollTop = messages.scrollHeight;
@@ -753,24 +757,54 @@
       else renderHistory();
     });
   };
-  // Signed in, saved chats arrive as summaries (`unloaded`, no messages): the transcript is fetched when the chat
-  // opens, and account-store-changed then reloads the list with it.
+  // Restore summaries without downloading a transcript until it is needed. AccountStore owns
+  // the cached records; this map also keeps loading/error state stable across summary refreshes.
+  const transcriptLoads = new Map();
+  const transcriptErrors = new Map();
+  const chatVisible = () => {
+    const body = document.body.classList;
+    return (
+      !body.contains("files-view") &&
+      !body.contains("settings-open") &&
+      (body.contains("agent-chat-open") || body.contains("code-mode"))
+    );
+  };
   const fetchTranscript = (chat) => {
     if (!chat?.unloaded) return Promise.resolve(chat);
-    return Promise.resolve(window.accountStore?.load("chat:" + chat.id)).then(() => {
-      const loaded = conversations.find((c) => c.id === chat.id);
-      if (!loaded || loaded.unloaded)
-        throw Error("This chat could not be loaded. Check the connection and try again.");
-      return loaded;
-    });
+    if (transcriptLoads.has(chat.id)) return transcriptLoads.get(chat.id);
+    const key = projectKey;
+    transcriptErrors.delete(chat.id);
+    const promise = Promise.resolve()
+      .then(() => window.accountStore?.load("chat:" + chat.id))
+      .then(() => {
+        // Keep a pending turn from starting in a different project after navigation.
+        const loaded = key === projectKey && conversations.find((c) => c.id === chat.id);
+        if (!loaded || loaded.unloaded)
+          throw Error("This chat could not be loaded. Check the connection and try again.");
+        return loaded;
+      })
+      .catch((error) => {
+        transcriptErrors.set(chat.id, error.message);
+        throw error;
+      })
+      .finally(() => {
+        transcriptLoads.delete(chat.id);
+        renderHistory();
+      });
+    transcriptLoads.set(chat.id, promise);
+    notify();
+    return promise;
   };
-  const switchTo = (chat) => {
-    if (chat?.unloaded) fetchTranscript(chat).catch((e) => status(e.message));
+  const loadSelectedTranscript = () => {
+    if (conversation?.unloaded) void fetchTranscript(conversation).catch(() => {});
+  };
+  const switchTo = (chat, { explicit = true } = {}) => {
     const prompt = $("project-prompt");
     if (conversation && conversation !== chat) setDraft(prompt.value, conversation);
     const changed = conversation !== chat;
     if (changed) for (const controller of imageJobs.keys()) controller.abort();
     conversation = chat;
+    if (explicit || chatVisible()) loadSelectedTranscript();
     showAccess();
     if (changed) {
       prompt.value = drafts[chat?.id] || "";
@@ -837,7 +871,7 @@
     return chat;
   };
   const forkAt = (index) => {
-    if (!conversation || isRunning(conversation)) return;
+    if (!conversation || conversation.unloaded || isRunning(conversation)) return;
     const copied = conversation.messages.slice(0, index + 1).map(cloneMessage);
     const chat = {
       id: crypto.randomUUID(),
@@ -906,7 +940,7 @@
       }
     conversation = null;
     const pick = conversations.find((c) => c.id === options.select) || conversations.at(-1);
-    if (pick) switchTo(pick);
+    if (pick) switchTo(pick, { explicit: !!options.explicit });
     else if (options.create !== false) newChat();
     else {
       renderHistory();
@@ -924,6 +958,7 @@
       conversations = [];
       conversation = null;
       drafts = {};
+      transcriptErrors.clear();
       attachments = [];
       prompt.value = "";
       setDefaults({ model: "", effort: "", access: "edit", instructions: "" }, true);
@@ -996,6 +1031,7 @@
     setCodeMode(false);
     dock.append(agentSection);
     document.body.classList.add("agent-chat-open");
+    loadSelectedTranscript();
     requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
   };
   // Code mode: a full-window workspace (web/src/islands/code) hosts the chat section in its center column.
@@ -1013,6 +1049,7 @@
   };
   // Web app: Start's Code route owns body.code-mode and the workspace; it reports the mode here (chat section host, launch restore, layout, listeners).
   const syncCodeMode = (on) => {
+    if (on) loadSelectedTranscript();
     if (on && codeHost) codeHost.append(agentSection);
     else if (!on) dock.append(agentSection);
     try {
@@ -1021,6 +1058,12 @@
     requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
     notify();
   };
+  let wasChatVisible = chatVisible();
+  new MutationObserver(() => {
+    const visible = chatVisible();
+    if (visible && !wasChatVisible) loadSelectedTranscript();
+    wasChatVisible = visible;
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   const openProject = () => setCodeMode(true);
   const attachCodeHost = (el) => {
     codeHost = el;
@@ -1061,6 +1104,8 @@
       queued: q.length,
       session: $("chat-session")?.textContent || "",
       conversationId: conversation?.id || null,
+      transcriptPending: !!conversation?.unloaded,
+      transcriptError: transcriptErrors.get(conversation?.id) || "",
       conversations: conversations
         .map((c) => ({
           id: c.id,
@@ -1087,7 +1132,7 @@
       ...(conversation?.usage ? { usage: { ...conversation.usage } } : {}),
       mentions: currentMentions(),
       draft: drafts[conversation?.id] || "",
-      suggestions: conversation?.messages.length ? [] : SUGGESTIONS,
+      suggestions: conversation?.unloaded || conversation?.messages.length ? [] : SUGGESTIONS,
       chatRoot: rootOf(conversation),
       activeRoot,
       repoId: conversation?.repoId || null,
@@ -1134,7 +1179,7 @@
         }
         return;
       }
-      loadChats(key, options);
+      loadChats(key, { ...options, explicit: !!options.select });
     },
     chatSummaries,
     removeChat,
@@ -2629,16 +2674,18 @@
       attachments
         .filter((a) => a.kind === "image" && a.path)
         .map((a) => ({ path: a.path, name: a.name })),
-    clearSession: () => {
+    clearSession: run(async () => {
       if (!conversation) return;
-      if (isRunning(conversation)) throw Error("Stop the chat first");
-      conversation.sessionId = null;
-      conversation.forkFrom = null;
-      conversation.seedFrom = conversation.messages.length;
-      persist();
+      const key = projectKey;
+      const chat = await fetchTranscript(conversation);
+      if (isRunning(chat)) throw Error("Stop the chat first");
+      chat.sessionId = null;
+      chat.forkFrom = null;
+      chat.seedFrom = chat.messages.length;
+      persistChat({ chat, key });
       status("The next message starts a fresh agent session");
       notify();
-    },
+    }),
     getQueue: () => queueView(queueOf(conversation)),
   });
   // The platform's AgentService: its events reach handleEvent, and the agents it offers enable the picker's options. Rebound

@@ -104,6 +104,9 @@ export type ChatState = {
     /** A run is in progress in this chat. */ busy?: boolean;
   }[];
   messages: ChatMessage[];
+  /** A saved summary whose transcript has not arrived yet. */
+  transcriptPending?: boolean;
+  transcriptError?: string;
   /** kind: image | file | folder | figma | chat | text. */
   attachments: { kind: string; name: string; url?: string }[];
   defaults: ChatDefaults;
