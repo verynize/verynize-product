@@ -305,6 +305,53 @@
       emit();
     }
   }
+  // Match the server's aggregate value and request budgets; a full-size chat still fits alone.
+  function writeBatches(entries) {
+    const batches = [];
+    let batch = [],
+      bytes = 0,
+      requestBytes = 14;
+    const encoder = new TextEncoder();
+    for (const [key, change] of entries) {
+      const write = { key, value: change.value, revision: change.revision };
+      const size = change.value === null ? 0 : encoder.encode(change.value).byteLength;
+      const encoded = encoder.encode(JSON.stringify(write)).byteLength + 1;
+      if (
+        batch.length &&
+        (batch.length === 64 ||
+          bytes + size > 20 * 1024 * 1024 ||
+          requestBytes + encoded > 40 * 1024 * 1024 + 1024)
+      ) {
+        batches.push(batch);
+        batch = [];
+        bytes = 0;
+        requestBytes = 14;
+      }
+      batch.push([key, change]);
+      bytes += size;
+      requestBytes += encoded;
+    }
+    if (batch.length) batches.push(batch);
+    return batches;
+  }
+  async function writeBatch(batch) {
+    try {
+      const { results } = await request("/api/me/state/batch", {
+        method: "POST",
+        body: JSON.stringify({
+          writes: batch.map(([key, change]) => ({
+            key,
+            value: change.value,
+            revision: change.revision,
+          })),
+        }),
+      });
+      return results;
+    } catch (failure) {
+      if (failure.status !== 404 && failure.status !== 405) throw failure;
+      return null; // Older Workers still accept independent PUTs.
+    }
+  }
   async function sync(read = true) {
     if (!identity) return;
     if (syncing) return read ? syncing.then(() => sync(true)) : syncing;
@@ -360,52 +407,66 @@
         }
         // A snapshot: `pending` changes while each write is awaited.
         const sent = new Set(pending.values());
-        for (const [key, change] of Array.from(pending)) {
-          let item;
-          try {
-            ({ item } = await request("/api/me/state/" + encodeURIComponent(key), {
-              method: "PUT",
-              body: JSON.stringify({ value: change.value, revision: change.revision }),
-            }));
-          } catch (failure) {
-            if (failure.status !== 409) throw failure;
-            const remote = await record(key);
-            if (identity !== expected) return;
-            if (!remote) throw failure;
-            const latest = pending.get(key);
-            if (!latest) continue;
-            remember(remote);
-            if (latest.value === remote.value) pending.delete(key);
-            else if (key.startsWith("chat:") && latest.value !== null) {
-              // Two devices edited one transcript. Keep the server's history and save this
-              // device's history as a separate conversation instead of losing either reply.
-              const copy = JSON.parse(latest.value),
-                id = crypto.randomUUID();
-              copy.chat = { ...copy.chat, id, title: `${copy.chat.title} (conflict copy)` };
-              pending.delete(key);
-              put("chat:" + id, JSON.stringify(copy));
-            } else {
-              let value = latest.value;
-              if (key.startsWith("file:") && value !== null && remote.value !== null) {
-                const base = JSON.parse(latest.base || "{}"),
-                  local = JSON.parse(value),
-                  merged = JSON.parse(remote.value);
-                for (const field of Object.keys(local))
-                  if (JSON.stringify(local[field]) !== JSON.stringify(base[field]))
-                    merged[field] = local[field];
-                value = JSON.stringify(merged);
-              }
-              pending.set(key, { value, revision: remote.revision, base: remote.value });
-            }
-            emit();
-            continue;
-          }
+        for (const batch of writeBatches(Array.from(pending))) {
+          const results = await writeBatch(batch);
           if (identity !== expected) return;
-          records.set(key, item);
-          if (pending.get(key) === change) pending.delete(key);
-          else if (pending.has(key)) {
-            pending.get(key).revision = item.revision;
-            pending.get(key).base = item.value;
+          for (const [key, change] of batch) {
+            let item;
+            try {
+              if (results) {
+                const result = results.find((entry) => entry.key === key);
+                if (result?.conflict)
+                  throw Object.assign(Error("Account state conflict"), {
+                    status: 409,
+                    current: { ...result.current, key },
+                  });
+                if (!result?.ok) throw Error("Missing account batch result");
+                item = { key, value: change.value, revision: result.revision };
+              } else
+                ({ item } = await request("/api/me/state/" + encodeURIComponent(key), {
+                  method: "PUT",
+                  body: JSON.stringify({ value: change.value, revision: change.revision }),
+                }));
+            } catch (failure) {
+              if (failure.status !== 409) throw failure;
+              const remote = failure.current || (await record(key));
+              if (identity !== expected) return;
+              if (!remote) throw failure;
+              const latest = pending.get(key);
+              if (!latest) continue;
+              remember(remote);
+              if (latest.value === remote.value) pending.delete(key);
+              else if (key.startsWith("chat:") && latest.value !== null) {
+                // Two devices edited one transcript. Keep the server's history and save this
+                // device's history as a separate conversation instead of losing either reply.
+                const copy = JSON.parse(latest.value),
+                  id = crypto.randomUUID();
+                copy.chat = { ...copy.chat, id, title: `${copy.chat.title} (conflict copy)` };
+                pending.delete(key);
+                put("chat:" + id, JSON.stringify(copy));
+              } else {
+                let value = latest.value;
+                if (key.startsWith("file:") && value !== null && remote.value !== null) {
+                  const base = JSON.parse(latest.base || "{}"),
+                    local = JSON.parse(value),
+                    merged = JSON.parse(remote.value);
+                  for (const field of Object.keys(local))
+                    if (JSON.stringify(local[field]) !== JSON.stringify(base[field]))
+                      merged[field] = local[field];
+                  value = JSON.stringify(merged);
+                }
+                pending.set(key, { value, revision: remote.revision, base: remote.value });
+              }
+              emit();
+              continue;
+            }
+            if (identity !== expected) return;
+            records.set(key, item);
+            if (pending.get(key) === change) pending.delete(key);
+            else if (pending.has(key)) {
+              pending.get(key).revision = item.revision;
+              pending.get(key).base = item.value;
+            }
           }
         }
         if (!pending.size) {
