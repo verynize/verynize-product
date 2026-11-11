@@ -25,7 +25,11 @@ export async function checkWebRouter(browser, origin, context = browser) {
       errors.push(message.text());
   });
   const ready = async () => {
-    await page.waitForFunction(() => document.documentElement.dataset.legacyEditor === "ready");
+    await page.waitForFunction(
+      () =>
+        document.documentElement.dataset.legacyEditor === "ready" ||
+        (location.pathname === "/" && document.documentElement.dataset.legacyHome === "ready"),
+    );
     await page.waitForFunction(() => document.documentElement.dataset.uiReady === "true", null, {
       timeout: 20000,
     });

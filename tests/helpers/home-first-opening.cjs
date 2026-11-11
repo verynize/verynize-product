@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 // No timers or replacement library/lifecycle methods are used to fake a slow load.
 exports.checkHomeOpening = async (page, { detached = false } = {}) => {
   const id = await page.evaluate(async (detached) => {
+    await window.verynizeEditorBoot?.();
     const doc = window.design.getDocument();
     doc.name = "Opening fixture";
     const options = detached

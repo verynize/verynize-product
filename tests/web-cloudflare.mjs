@@ -34,6 +34,7 @@ import {
   freePort,
   openStarterFile,
 } from "./helpers/web-app.mjs";
+import { checkDeferredHome } from "./helpers/web-home-boot.mjs";
 import { checkWebRouter } from "./helpers/web-router.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -235,6 +236,7 @@ async function checkApp(origin, mode) {
   const session = signedIn.headers.get("set-auth-token");
   const me = await (await get("/api/me", { headers: { "x-verynize-session": session } })).json();
   assert.equal(me.account.email, EMAIL);
+  await checkDeferredHome(browser, origin, { session, account: me.account }, mode);
 
   // ---- signed out: the sign-in screen at the requested address, with the invite fragment ----
   const anonymous = await browser.newContext({ viewport });
