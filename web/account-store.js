@@ -533,9 +533,13 @@
   });
   // Initial read happens after the legacy consumers have installed their listeners.
   identity = scope();
-  window.addEventListener("DOMContentLoaded", () => {
-    starting = false;
-    void sync();
-    schedule(POLL_MS);
-  });
+  window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+      starting = false;
+      void sync();
+      schedule(POLL_MS);
+    },
+    { once: true },
+  );
 })();

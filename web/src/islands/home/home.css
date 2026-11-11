@@ -61,3 +61,24 @@
     --home-list-cols: minmax(0, 1fr) 120px 110px 140px;
   }
 }
+
+/* Before the editor starts, only the island stylesheet is loaded. Keep the legacy
+ * skeleton inert and out of layout without loading any canvas/editor stylesheets. */
+html[data-legacy-home]:not([data-legacy-editor]) body {
+  margin: 0;
+  background: var(--background);
+}
+html[data-legacy-home]:not([data-legacy-editor])
+  body
+  > :is(header, main, #cloud-panel, #settings-screen) {
+  display: none;
+}
+html[data-legacy-home]:not([data-legacy-editor]) #file-home {
+  position: fixed;
+  inset: var(--spacing-chrome, 40px) 0 0;
+  overflow: auto;
+}
+html[data-legacy-home]:not([data-legacy-editor]) #bd-home-chrome {
+  position: fixed;
+  inset: 0 0 auto;
+}

@@ -79,7 +79,8 @@ export function parseLegacyShell(html) {
     if (match[2] !== undefined) styles.push({ text: match[2] });
     else {
       const attrs = attributes(match[1]);
-      if (attrs.rel === "stylesheet" && attrs.href) styles.push({ href: attrs.href });
+      if (attrs.rel === "stylesheet" && attrs.href)
+        styles.push({ href: attrs.href, boot: attrs["data-boot"] });
     }
   }
   return {
@@ -118,8 +119,13 @@ export function contentType(file) {
 function legacyUi({ webDir }) {
   const srcDir = path.join(webDir, "src");
   const entry = path.join(srcDir, "web-app.tsx").split(path.sep).join("/");
+  const islands = path.join(srcDir, "ui.tsx").split(path.sep).join("/");
+  let building = false;
   return {
     name: "verynize:legacy-ui",
+    configResolved(config) {
+      building = config.command === "build";
+    },
     enforce: "pre",
     config: () => ({ resolve: { alias: { "@": srcDir } } }),
     resolveId(id, importer) {
@@ -131,12 +137,22 @@ function legacyUi({ webDir }) {
       )
         return EMPTY_CSS_ID;
     },
+    generateBundle(_options, bundle) {
+      // emitFile provides a stable code reference, but this remains a dynamically imported
+      // editor module, not a second Start application entry (Start requires exactly one).
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type === "chunk" && chunk.facadeModuleId === islands) chunk.isEntry = false;
+      }
+    },
     load(id) {
       if (id === EMPTY_CSS_ID) return "";
       if (id !== RESOLVED_UI_ID) return;
-      return this.environment?.name === "client"
-        ? `export * from ${JSON.stringify(entry)};`
-        : "export {};";
+      if (this.environment?.name !== "client") return "export {};";
+      // Warm the island chunk without evaluating it; the bundler still owns its URL.
+      const url = building
+        ? `import.meta.ROLLUP_FILE_URL_${this.emitFile({ type: "chunk", id: islands })}`
+        : JSON.stringify("/@fs/" + islands);
+      return `export * from ${JSON.stringify(entry)}; export const editorIslandUrl = ${url};`;
     },
   };
 }

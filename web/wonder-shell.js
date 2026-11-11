@@ -154,7 +154,7 @@
   // The edit count (window.design.editCount) when the document shown was last a library file, or was reset (launch, the
   // account reset below). A document that is no file (startup placeholder, deleted or unavailable open file) becomes
   // one only after a later edit, never on its own (signed in, that would also create a cloud room).
-  let filedEdits = window.design.editCount?.() ?? 0;
+  let filedEdits = window.design?.editCount?.() ?? 0;
   const legacyIds = new Set(library.files.map((file) => file.id));
   const lastSerialized = new Map();
   let hydrated = false;
@@ -238,7 +238,7 @@
   // Whether the document the editor shows, which is no library file, becomes one now: after a user edit in the editor, or
   // as a signed-out profile's first starter file (not when the page opens a shared room link).
   function mayFile() {
-    const edits = window.design.editCount?.() ?? 0;
+    const edits = window.design?.editCount?.() ?? 0;
     if (
       !library.seeded &&
       !library.files.length &&
@@ -279,7 +279,7 @@
       library.active = file.id;
       library.seeded = true;
     }
-    filedEdits = window.design.editCount?.() ?? 0;
+    filedEdits = window.design?.editCount?.() ?? 0;
     const serialized = document;
     if (lastSerialized.get(file.id) === serialized) return;
     file.name = document.name;
@@ -320,6 +320,8 @@
   // The user-initiated open in progress: a repeated open of the same file joins it instead of starting over.
   let inflight = null;
   async function openFile(id, options = {}) {
+    if (window.verynizeEditorBoot && document.documentElement.dataset.legacyEditor !== "ready")
+      await window.verynizeEditorBoot();
     if (!hydrated) await ready;
     const file = library.files.find((file) => file.id === id);
     if (!file) return;
@@ -478,6 +480,7 @@
     return file.id;
   }
   async function createFile() {
+    if (window.verynizeEditorBoot) await window.verynizeEditorBoot();
     if (!hydrated) await ready;
     const name = await window.askText("Name your file", "Untitled");
     if (!name?.trim()) return;
@@ -619,14 +622,14 @@
       saving = true;
       try {
         library.active = null;
-        window.design.setDocument({
+        window.design?.setDocument({
           version: 2,
           name: "Untitled",
           activePage: "empty",
           pages: [{ id: "empty", name: "Page 1", nodes: [] }],
           tokens: {},
         });
-        filedEdits = window.design.editCount?.() ?? 0;
+        filedEdits = window.design?.editCount?.() ?? 0;
       } finally {
         saving = false;
       }
@@ -658,7 +661,7 @@
       await window.cloudWorkspace.renameFile(file.cloud, name);
     file.name = name;
     file.document = { ...file.document, name };
-    if (file.id === library.active && !file.cloud) {
+    if (window.design && file.id === library.active && !file.cloud) {
       saving = true;
       try {
         window.design.setDocument(file.document);
@@ -915,17 +918,27 @@
     });
     if (library.files.length) library.seeded = true;
     hydrated = true;
-    sync(window.design.getSnapshot());
+    if (window.design) sync(window.design.getSnapshot());
     emit();
   });
-  window.design.subscribe((snapshot) => {
-    if (!saving) sync(snapshot);
-  });
+  // The web Files route owns the same library before the canvas exists. Attach once, only
+  // when the editor starts; never sync its startup placeholder over a stored active file.
+  let designAttached = false;
+  function attachDesign() {
+    if (designAttached || !window.design) return;
+    designAttached = true;
+    window.design.subscribe((snapshot) => {
+      if (!saving) sync(snapshot);
+    });
+  }
+  attachDesign();
+  window.addEventListener("verynize:editor-started", attachDesign, { once: true });
   window.fileLibrary = {
     ready: () => ready,
     isReady: () => hydrated,
     flush: () => ready.then(() => storage.flush()),
     createFromDocument: async (document, options = {}) => {
+      if (window.verynizeEditorBoot) await window.verynizeEditorBoot();
       if (!hydrated) await ready;
       const doc = structuredClone(document),
         file = {
@@ -959,6 +972,7 @@
       }
     },
     openNative: async ({ document, path }) => {
+      if (window.verynizeEditorBoot) await window.verynizeEditorBoot();
       const invalid = window.documentSafety.check(document);
       if (invalid) {
         window.documentSafety.reportOpenFailure({

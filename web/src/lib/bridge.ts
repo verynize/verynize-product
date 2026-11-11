@@ -90,6 +90,8 @@ export type FileCloud = {
 
 declare global {
   interface Window {
+    /** Start host: lazily initialize the editor before a file operation. Absent on desktop. */
+    verynizeEditorBoot?: () => Promise<void>;
     design: DesignApi;
     verynize: DesignApi;
     agentWorkspace?: Record<string, (...args: never[]) => unknown>;
@@ -284,8 +286,8 @@ function checkUiReady() {
 
 /** mountIsland() calls this before it renders: the island holds back the UI-ready signal until it commits. */
 export function registerIsland(name: string) {
-  if (uiReady) return;
   mounting.add(name);
+  if (uiReady) return;
   if (uiReadyStarted) return;
   uiReadyStarted = true;
   // Never sets the signal itself; it only names what is stuck so a missing claim is diagnosable.
