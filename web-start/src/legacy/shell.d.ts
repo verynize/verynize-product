@@ -2,6 +2,7 @@
 declare module "virtual:verynize/legacy-shell" {
   const shell: {
     title: string;
+    assetUrls: Record<string, string>;
     styles: { href?: string; text?: string }[];
     bodyAttributes: Record<string, string>;
     bodyHtml: string;
