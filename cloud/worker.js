@@ -8,6 +8,7 @@ import {
   readAccountItem,
   readAccountState,
   writeAccountState,
+  writeAccountBatch,
 } from "./account-state.js";
 // Verynize collaboration Worker: routes the HTTP API to the room, account and app Durable Objects.
 // API reference: cloud/README.md.
@@ -317,6 +318,12 @@ async function handleAuth(request, env, url) {
       since: since === null ? -1 : Number(since),
     });
     return jsonWithEtag(request, { ...state, account });
+  }
+  if (path === "/api/me/state/batch" && request.method === "POST") {
+    const account = await requireAccount(env, request, url);
+    return json(
+      await writeAccountBatch(env, account.id, await readJson(request, ACCOUNT_REQUEST_BYTES)),
+    );
   }
   if (path.startsWith("/api/me/state/") && request.method === "GET") {
     const account = await requireAccount(env, request, url);

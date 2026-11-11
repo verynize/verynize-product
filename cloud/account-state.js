@@ -11,6 +11,7 @@ import { fail } from "./http.js";
 export const ACCOUNT_VALUE_BYTES = 20 * 1024 * 1024;
 // The API wraps a JSON string in JSON: quotes and backslashes can double its encoded size.
 export const ACCOUNT_REQUEST_BYTES = 2 * ACCOUNT_VALUE_BYTES + 1024;
+export const ACCOUNT_BATCH_COUNT = 64;
 const CHUNK_CHARS = 128 * 1024;
 const SUMMARY = "@summary:";
 const SUMMARY_CHARS = 4096;
@@ -20,7 +21,7 @@ const isChat = (key) => key.startsWith("chat:");
 const NEXT_UPDATED_AT =
   "MAX(?, COALESCE((SELECT MAX(updatedAt) FROM account_state WHERE accountId = ?), 0) + 1)";
 
-export const validKey = (key) => KEY.test(key);
+export const validKey = (key) => typeof key === "string" && KEY.test(key);
 
 /** The list entry of a stored chat (`{project, chat}`): every field but the messages, plus their count. */
 export function chatSummary(text) {
@@ -170,7 +171,8 @@ function storeSummary(db, accountId, key, summary, revision) {
   ).run();
 }
 
-export async function writeAccountState(env, accountId, key, data) {
+function validateWrite(key, data) {
+  if (!data || typeof data !== "object") fail(400, "Invalid account state write");
   if (!validKey(key)) fail(400, "Invalid account state key");
   if (!Number.isSafeInteger(data.revision) || data.revision < 0)
     fail(400, "A nonnegative revision is required");
@@ -185,11 +187,10 @@ export async function writeAccountState(env, accountId, key, data) {
       fail(400, "value must contain valid JSON");
     }
   }
+}
+
+function prepareWrite(env, accountId, key, data, previous) {
   const db = env.DB;
-  const previous = await db
-    .prepare("SELECT value FROM account_state WHERE accountId = ? AND key = ?")
-    .bind(accountId, key)
-    .first();
   const parts = [];
   if (data.value?.length > CHUNK_CHARS) {
     for (let start = 0; start < data.value.length;) {
@@ -256,10 +257,61 @@ export async function writeAccountState(env, accountId, key, data) {
             wonArgs,
           ),
     );
+  return statements;
+}
+
+export async function writeAccountState(env, accountId, key, data) {
+  validateWrite(key, data);
+  const previous = await env.DB.prepare(
+    "SELECT value FROM account_state WHERE accountId = ? AND key = ?",
+  )
+    .bind(accountId, key)
+    .first();
+  const statements = prepareWrite(env, accountId, key, data, previous);
   // D1 batch is a transaction: failed writes never publish a partial transcript. A stale
   // compare-and-swap cannot insert chunks or remove the current record's chunks.
-  const [result] = await db.batch(statements);
+  const [result] = await env.DB.batch(statements);
   const item = result.results[0];
   if (!item) fail(409, "This item changed on another device. Refresh before saving.");
   return { item: { ...item, value: data.value } };
+}
+
+/** Validate the entire envelope before writing; stale keys do not prevent independent edits. */
+export async function writeAccountBatch(env, accountId, data) {
+  const writes = data?.writes;
+  if (!Array.isArray(writes) || !writes.length || writes.length > ACCOUNT_BATCH_COUNT)
+    fail(400, `writes must contain 1–${ACCOUNT_BATCH_COUNT} records`);
+  const keys = new Set();
+  let bytes = 0;
+  for (const write of writes) {
+    validateWrite(write?.key, write);
+    if (keys.has(write.key)) fail(400, "Duplicate account state key");
+    keys.add(write.key);
+    bytes += write.value === null ? 0 : new TextEncoder().encode(write.value).byteLength;
+  }
+  if (bytes > ACCOUNT_VALUE_BYTES) fail(413, "Account batch exceeds 20 MB");
+  const { results: heads } = await env.DB.prepare(
+    `SELECT key, value FROM account_state WHERE accountId = ? AND key IN (${writes.map(() => "?").join(",")})`,
+  )
+    .bind(accountId, ...keys)
+    .all();
+  const previous = new Map(heads.map((head) => [head.key, head]));
+  const statements = [],
+    offsets = [];
+  for (const write of writes) {
+    offsets.push(statements.length);
+    statements.push(...prepareWrite(env, accountId, write.key, write, previous.get(write.key)));
+  }
+  // All heads, chunks and summaries commit together. A revision miss is a no-op, not a SQL error.
+  const results = await env.DB.batch(statements);
+  return {
+    results: await Promise.all(
+      writes.map(async (write, index) => {
+        const item = results[offsets[index]].results[0];
+        if (item) return { key: write.key, ok: true, revision: item.revision };
+        const current = await readAccountItem(env, accountId, write.key);
+        return { key: write.key, conflict: true, current: current || { value: null, revision: 0 } };
+      }),
+    ),
+  };
 }
