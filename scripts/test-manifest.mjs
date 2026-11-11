@@ -512,6 +512,7 @@ const desktop = [
   electron("tests/agent-workspace-ui.cjs", "desktop", [...AREA.chat, ...AREA.code]),
   electron("tests/chat-composer-menu.cjs", "desktop", AREA.chat),
   electron("tests/chat-indicators.cjs", "desktop", AREA.chat),
+  electron("tests/chat-lazy-transcript.mjs", "e2e-cloud", [...AREA.chat, "web/account-store.js"]),
   electron("tests/chat-markdown.cjs", "desktop", AREA.chat),
   electron("tests/capture-fidelity.cjs", "desktop", AREA.capture),
   electron("tests/capture-live-state.cjs", "desktop", AREA.capture),

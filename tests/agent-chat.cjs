@@ -62,7 +62,12 @@ const path = require("node:path");
     );
     await page.locator("#project-prompt").fill("Quick question");
     await page.locator("#project-run").click();
+    // Streaming keeps its live chat while the panel is closed.
+    await page.evaluate(() => {
+      window.agentWorkspace.closeChat();
+    });
     await completed(1);
+    await page.evaluate(() => window.agentWorkspace.openChat());
     assert.match(
       await page.locator(".chat-message.assistant").last().textContent(),
       /Reply to .*Quick question/,
