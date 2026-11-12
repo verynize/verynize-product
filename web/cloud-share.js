@@ -42,7 +42,8 @@
       .storeDocument(file.document)
       .then(async (cloud) => {
         lib.setCloud(id, cloud, true);
-        if (lib.currentId === id && !ws.room()) await ws.attachRoom(cloud, file.document);
+        if (window.design && lib.currentId === id && !ws.room())
+          await ws.attachRoom(cloud, file.document);
         return cloud;
       })
       .finally(() => uploads.delete(id));
@@ -282,6 +283,7 @@
   }
   window.addEventListener("cloud-account-changed", migrateFiles);
   window.addEventListener("online", migrateFiles);
-  window.addEventListener("DOMContentLoaded", migrateFiles);
+  // Home and the editor each dispatch DOMContentLoaded (web-start legacy boot); migrate once.
+  window.addEventListener("DOMContentLoaded", migrateFiles, { once: true });
   roomChanged();
 })();

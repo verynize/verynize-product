@@ -9,6 +9,7 @@
 // Desktop, once setup is done: the one-time crash-report question (onboarding/telemetry-prompt.tsx).
 import { useEffect, useState, type ReactNode } from "react";
 import { mountIsland, ensureContainer } from "@/lib/mount";
+import { getWebMe } from "@/lib/web-session";
 import { webAgentScope } from "@/lib/agent-transport";
 import { cloudAccount, useCloudAccount } from "@/lib/cloud-account";
 import { AccountStep } from "./onboarding/account-step";
@@ -138,7 +139,7 @@ function WebOnboarding() {
     const api = cloudAccount();
     if (!accountId || !api || doneLocally(accountId)) return;
     let live = true;
-    api.request<{ aiSetupAt?: number | null }>("/api/me").then(
+    getWebMe().then(
       (me) => {
         if (live && me.aiSetupAt == null) setStep((current) => current ?? "ai");
       },

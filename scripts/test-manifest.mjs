@@ -512,6 +512,7 @@ const desktop = [
   electron("tests/agent-workspace-ui.cjs", "desktop", [...AREA.chat, ...AREA.code]),
   electron("tests/chat-composer-menu.cjs", "desktop", AREA.chat),
   electron("tests/chat-indicators.cjs", "desktop", AREA.chat),
+  electron("tests/chat-lazy-transcript.mjs", "e2e-cloud", [...AREA.chat, "web/account-store.js"]),
   electron("tests/chat-markdown.cjs", "desktop", AREA.chat),
   electron("tests/capture-fidelity.cjs", "desktop", AREA.capture),
   electron("tests/capture-live-state.cjs", "desktop", AREA.capture),
@@ -682,6 +683,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-ai-durable.mjs",
   "tests/cloud-assets.mjs",
   "tests/cloud-pages-assets.mjs",
+  "tests/cloud-page-icons.mjs",
 ];
 const cloud = [
   ...CLOUD_SCENARIOS,
@@ -728,7 +730,9 @@ const webBuild = (file, covers, extra = {}) => ({
 });
 const AI = ["cloud/ai*.js", "web-start/**", "server/node.mjs", "tests/helpers/fake-openrouter.mjs"];
 const web = [
-  webBuild("tests/web-cloudflare.mjs", []),
+  webBuild("tests/web-legacy-assets.mjs", []),
+  webBuild("tests/web-cloudflare.mjs", ["tests/helpers/web-home-boot.mjs"]),
+  webBuild("tests/web-icons.mjs", []),
   webBuild("tests/web-node.mjs", []),
   webBuild("tests/env-build.mjs", [
     "scripts/env.mjs",

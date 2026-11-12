@@ -149,11 +149,12 @@ export async function createWebServer({ dist, backend, log = () => {} }) {
     res.writeHead(200, {
       "content-type": contentType(file),
       "content-length": stat.size,
-      // Start's client chunks (assets/<name>-<hash>.js|css) are content-hashed; web/ files,
-      // including web/assets/fonts, keep stable names.
-      "cache-control": /^assets\/[^/]+-[\w-]{8}\.(js|css)$/.test(relative)
-        ? "public, max-age=31536000, immutable"
-        : "no-cache",
+      // Start chunks and generated legacy copies are content-hashed. Fixed-name originals,
+      // including web/assets/fonts, keep revalidating.
+      "cache-control":
+        /^assets\/(?:[^/]+-[\w-]{8}\.(?:js|css)|legacy\/[^/]+-[a-f0-9]{16}\.[\w]+)$/.test(relative)
+          ? "public, max-age=31536000, immutable"
+          : "no-cache",
     });
     if (req.method === "HEAD") res.end();
     else fs.createReadStream(file).pipe(res);

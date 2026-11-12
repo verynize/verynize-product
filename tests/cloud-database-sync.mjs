@@ -61,7 +61,7 @@ try {
   await desktop.waitForFunction(() => window.accountStore.ready() && window.cloudWorkspace.room());
   await desktop.evaluate(() => window.cloudWorkspace.flush());
 
-  if (!process.env.VERYNIZE_WEB_NODE_BUILT)
+  if (!process.env.TEST_WEB_NODE_BUILT)
     execFileSync(
       process.execPath,
       ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
@@ -98,11 +98,24 @@ try {
   page.setDefaultTimeout(30000);
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("dialog", (dialog) => dialog.accept());
+  const transcriptReads = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "GET" &&
+      decodeURIComponent(new URL(request.url()).pathname).startsWith("/api/me/state/chat:")
+    )
+      transcriptReads.push(request.url());
+  });
   await page.goto(origin + "/");
 
   await waitForUiReady(page);
 
   await page.waitForFunction(() => window.accountStore?.ready());
+  assert.equal(transcriptReads.length, 0, "deferred Home does not fetch a transcript");
+  assert.equal(await page.evaluate(() => typeof window.agentWorkspace), "undefined");
+  // The chat runtime is editor-only. Initialize it explicitly while keeping its panel closed
+  // before checking summary hydration and transcript fetching below.
+  await page.evaluate(() => window.verynizeEditorBoot());
 
   await page.waitForFunction(() =>
     window.agentWorkspace.getState().conversations.some((chat) => chat.id === "legacy-history"),
@@ -115,7 +128,14 @@ try {
     ),
     2,
   );
-  await page.evaluate(() => window.agentWorkspace.selectChat("legacy-history"));
+  assert.equal(transcriptReads.length, 0, "closed chat initializes summaries only");
+  await page.evaluate(() => window.accountStore.refresh());
+  assert.equal(transcriptReads.length, 0, "closed-panel refresh does not fetch a transcript");
+  await page.evaluate(() => {
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.selectChat("legacy-history");
+  });
   await page.waitForFunction(() => window.agentWorkspace.getState().messages.length === 2);
   assert.deepEqual(
     await page.evaluate(() =>
@@ -123,6 +143,19 @@ try {
     ),
     ["Make a landing page", "The design is ready " + "🌴".repeat(300000)],
   );
+  assert.equal(transcriptReads.length, 1, "opening and selecting share one request");
+  await page
+    .locator(".chat-message.user")
+    .filter({ hasText: "Make a landing page" })
+    .waitFor({ state: "attached" });
+  await page.evaluate(() => {
+    window.agentWorkspace.closeChat();
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.selectChat("legacy-history");
+  });
+  await page.evaluate(() => window.accountStore.refresh());
+  assert.equal(transcriptReads.length, 1, "reopening uses the cached transcript");
+  await page.evaluate(() => window.agentWorkspace.closeChat());
   const fileId = await desktop.evaluate(async () => {
     const document = {
       version: 2,

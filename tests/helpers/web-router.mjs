@@ -25,7 +25,11 @@ export async function checkWebRouter(browser, origin, context = browser) {
       errors.push(message.text());
   });
   const ready = async () => {
-    await page.waitForFunction(() => document.documentElement.dataset.legacyEditor === "ready");
+    await page.waitForFunction(
+      () =>
+        document.documentElement.dataset.legacyEditor === "ready" ||
+        (location.pathname === "/" && document.documentElement.dataset.legacyHome === "ready"),
+    );
     await page.waitForFunction(() => document.documentElement.dataset.uiReady === "true", null, {
       timeout: 20000,
     });
@@ -185,7 +189,11 @@ export async function checkWebRouter(browser, origin, context = browser) {
     page.evaluate(() => ({
       marker: window.__routerMarker,
       canvas: window.__routerCanvas === document.getElementById("canvas"),
-      appScripts: document.querySelectorAll('script[src$="app.js"]').length,
+      appScripts: [...document.scripts].filter((script) =>
+        /^\/(?:app\.js|assets\/legacy\/app-[a-f0-9]{16}\.js)$/.test(
+          new URL(script.src, location.href).pathname,
+        ),
+      ).length,
       layouts: document.querySelectorAll("#canvas").length,
     }));
   const MOUNTED = { marker: "kept", canvas: true, appScripts: 1, layouts: 1 };

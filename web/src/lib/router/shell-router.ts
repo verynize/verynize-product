@@ -551,12 +551,14 @@ function applySettingsLocation(location: RenderedLocation) {
   // A reloaded or Back/Forward-reached settings entry restores the view it was opened over. Without state: a push
   // from a view entry opens over that view; a typed/shared URL over the shown view (the editor, the legacy startup
   // view, on a fresh load).
+  // Preserve the pending editor view while IndexedDB hydrates, just as a bare /editor launch does.
+  // An absent currentId before hydration does not mean this settings entry was opened over Files.
   let record: EntryState | null = null;
   if (!isView(state.settingsUnder))
     record =
       lastAction === "PUSH" && isView(fromPath)
         ? { settingsUnder: fromPath, settingsPushed: true }
-        : { settingsUnder: shown().view };
+        : { settingsUnder: fileStartView() };
   const view = record?.settingsUnder ?? state.settingsUnder ?? "/editor";
   applyShell({ view, settings: wanted });
   // Canonical URL (/settings and unknown sections become /settings/<section>) and recorded state, both in place.

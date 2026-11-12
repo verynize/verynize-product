@@ -293,6 +293,18 @@
       e.data = data;
       throw e;
     }
+    if (path === "/api/me" && options.method === "PATCH")
+      window.dispatchEvent(new Event("cloud-profile-updated"));
+    // Access and workspace mutations affect the Home listing even while its query is fresh.
+    if (
+      options.method &&
+      options.method !== "GET" &&
+      (/^\/api\/rooms\/[^/]+\/(members|visibility|share-invitations|organization)(?:\/|$)/.test(
+        path,
+      ) ||
+        (options.method === "DELETE" && /^\/api\/rooms\/[^/]+$/.test(path)))
+    )
+      window.dispatchEvent(new Event("cloud-files-changed"));
     return data;
   }
   // Owners share a role-limited link (web/cloud-invite.js), never their own owner token. Others
@@ -1583,7 +1595,7 @@
   // user leaves the Files home (the Code workspace counts: agents edit the open file there). Opening another file
   // connects through `library-file-opened`.
   const editorHidden = () =>
-    location.pathname === "/" || document.body.classList.contains("files-view");
+    !window.design || location.pathname === "/" || document.body.classList.contains("files-view");
   const reconnectOpenFile = async () => {
     await library()?.ready?.();
     if (editorHidden()) {
@@ -1602,12 +1614,17 @@
     if (switching?.kind === "file" && ["begin", "ready"].includes(switching.phase)) return;
     void reconnectOpenFile();
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("DOMContentLoaded", () => {
-    if (new URLSearchParams(location.hash.slice(1)).has("room")) return;
-    // At launch the shell router has not applied the URL yet, so the Files home path counts too.
-    if (editorHidden()) reconnectPending = true;
-    else void reconnectOpenFile();
-  });
+  // Once: the web boot dispatches DOMContentLoaded again when the editor phase follows Home.
+  window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+      if (new URLSearchParams(location.hash.slice(1)).has("room")) return;
+      // At launch the shell router has not applied the URL yet, so the Files home path counts too.
+      if (editorHidden()) reconnectPending = true;
+      else void reconnectOpenFile();
+    },
+    { once: true },
+  );
   window.cloudWorkspace = {
     flush: flushBeforeSwitch,
     storeDocument: (document) => storeDocument(document),

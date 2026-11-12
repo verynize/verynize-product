@@ -89,6 +89,17 @@ connection. Rejected edits stay on this device and retry after corrections or re
 - `GET /api/me/state/:key`: `{item}` with its full value (a transcript when a chat opens), 404 when absent.
   Summaries are internal `@summary:chat:<id>` rows written in the same transaction as the chat; chats
   saved before them are summarised on first read.
+- `POST /api/me/state/batch`: `{writes:[{key,value,revision}]}`; the same authenticated,
+  per-key revision checks and JSON-string/null values as PUT. Accepts 1–64 distinct keys,
+  at most 20 MiB of decoded values combined, and the same 40 MiB + 1024 byte request limit
+  as PUT. Invalid envelopes reject the entire request before writing. One D1 transaction
+  commits all matching writes, chunks and chat summaries; a database failure rolls it all back.
+  HTTP 200 returns `{results:[{key,ok:true,revision}|{key,conflict:true,current:{value,revision}}]}`
+  (current may also include key). Stale keys do not block other keys; a missing record has
+  current `{value:null,revision:0}`. Conflict values are read after the transaction and may
+  reflect a subsequent write. Authentication is identical to PUT; neither route has a dedicated
+  write-rate binding. Clients batch pending edits, splitting at these limits, rebase only
+  conflicting keys and fall back to PUT on 404/405 during rollout. Older PUT clients remain supported.
 - `PUT /api/me/state/:key`: `{value, revision}`; `value` is a JSON string or `null` (a tombstone),
   and revision zero means create. A stale revision returns 409. Values are limited to 20 MiB of UTF-8 JSON (the request allows 40 MiB plus envelope overhead for double JSON escaping). Large records are split into internal `@chunk:` rows in the same table and committed atomically with the revision check. Reads return the original value; chunks are private implementation details and are reclaimed on replacement or deletion. Existing records remain readable without a schema migration.
 - Keys are `preference:*`, `agent-default:*`, `chat:*`, `draft:*`, `folder:*`, and `file:*`.

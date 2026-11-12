@@ -1225,7 +1225,22 @@ export function Transcript({ state }: { state: ChatState }) {
     >
       <div ref={sessionSlot} className="contents" />
       {/* `--chat-column` is set by hosts with a centered column (Code workspace, 770px); unset in the dock. */}
-      {state.messages.length === 0 ? (
+      {state.transcriptPending ? (
+        <div
+          role="status"
+          className="mx-auto flex w-full max-w-(--chat-column) flex-col gap-2 text-sm text-muted-foreground"
+        >
+          <p>{state.transcriptError || "Loading conversation…"}</p>
+          {state.transcriptError && (
+            <ChatActionButton
+              variant="ghost"
+              onClick={() => state.conversationId && workspace()?.selectChat(state.conversationId)}
+            >
+              Retry loading conversation
+            </ChatActionButton>
+          )}
+        </div>
+      ) : state.messages.length === 0 ? (
         <EmptyState suggestions={state.suggestions ?? []} seed={state.conversationId} />
       ) : (
         <div className="mx-auto flex w-full max-w-(--chat-column) flex-col gap-5">

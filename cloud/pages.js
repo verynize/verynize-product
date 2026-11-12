@@ -4,17 +4,17 @@ import { escapeHtml } from "./http.js";
 
 const pageHeaders = {
   "content-type": "text/html; charset=utf-8",
-  "cache-control": "no-cache",
+  "cache-control": "no-store, no-transform",
   "x-content-type-options": "nosniff",
   "referrer-policy": "no-referrer",
   "content-security-policy":
-    "default-src 'none'; style-src 'unsafe-inline'; img-src https: data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+    "default-src 'none'; style-src 'unsafe-inline'; img-src 'self' https: data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
 };
 
 const shell = (
   title,
   body,
-) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>
+) => `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><link rel="icon" href="/favicon.ico" sizes="16x16 32x32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180"><style>
 body{margin:0;font:15px/1.55 Inter,system-ui,-apple-system,sans-serif;background:#141416;color:#e6e3ec}
 main{max-width:720px;margin:0 auto;padding:56px 24px}
 .head{display:flex;gap:18px;align-items:center;margin-bottom:36px}
