@@ -6,7 +6,7 @@ commit metadata must not contain:
 
 - personal email addresses (any address that is not a placeholder such as `you@…`, an
   `example.com`/`.test`/`.invalid` address, a `users.noreply.github.com` address, or a role address
-  like `noreply@anthropic.com` / `git@github.com`);
+  like `noreply@anthropic.com` / `noreply@openai.com` / `git@github.com`);
 - home-directory paths: `/Users/<name>`, `/home/<name>` (except `/home/runner`), `C:\Users\<name>`;
   write `~/…` instead;
 - terminal prompts such as `<user>@<host> ~ %` or `<user>@<host>:~$`;

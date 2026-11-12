@@ -42,6 +42,8 @@ const PLACEHOLDER_DOMAINS =
   /(?:^|\.)(?:example\.[a-z]{1,6}|example|test|invalid|localhost|local|domain\.com|email\.com|yourdomain\.com|company\.com|acme\.(?:com|test)|users\.noreply\.github\.com)$/i;
 const ALLOWED_EMAILS = new Set([
   "noreply@anthropic.com",
+  // Codex (OpenAI) co-author trailer on agent commits: a role mailbox, like Anthropic's above.
+  "noreply@openai.com",
   "noreply@github.com",
   "git@github.com",
   "git@gitlab.com",
