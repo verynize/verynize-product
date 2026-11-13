@@ -126,8 +126,12 @@ export async function checkWebRouter(browser, origin, context = browser) {
     folder: null,
     cloud: { ...cloud, roomId: "route-fixture-two" },
   });
+  // Write while no app instance runs: a running editor persists its in-memory library in an idle
+  // callback, which under load can land after this write and drop the fixture file.
+  const editorUrl = page.url();
+  await page.goto(new URL("/favicon.svg", editorUrl).href);
   await writeLibrary(page, library);
-  await page.reload();
+  await page.goto(editorUrl);
   await ready();
   await page.evaluate(
     (id) =>
