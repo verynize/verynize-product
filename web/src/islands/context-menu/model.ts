@@ -320,8 +320,19 @@ export function layerMenu(surface: "canvas" | "label" | "row", under: string[] =
         type: "item",
         command: "menu.setThumbnail",
         label: "Set as file thumbnail",
+        disabled: selected.length !== 1 || selected[0].type !== "frame",
         run: () => setFileThumbnail(selected[0].id),
       },
+      ...(doc.thumbnailNodeId
+        ? [
+            {
+              type: "item" as const,
+              command: "menu.restoreThumbnail",
+              label: "Restore default thumbnail",
+              run: () => setFileThumbnail(""),
+            },
+          ]
+        : []),
     ],
   ]);
 }

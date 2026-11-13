@@ -107,7 +107,7 @@
 
     // ---------- One layer (shared with export) ----------
     function draw(el, n, editing, parent, ctx) {
-      const tokens = ed.design.tokens,
+      const tokens = ctx.tokens || ed.design.tokens,
         S = NS(),
         selected = editing && ed.getSelection().has(n.id);
       el.className = editing
@@ -198,10 +198,10 @@
       el.querySelectorAll(":scope > .handle").forEach((h) => h.remove());
       draw(el, n, editing, parent, ctx);
       if (n.type === "frame" && !n.preview) {
-        const kids = ed.nodes().filter((c) => c.parentId === n.id),
+        const kids = (ctx.nodes || ed.nodes()).filter((c) => c.parentId === n.id),
           last = NS().lastInFlowId(kids);
         for (const child of kids)
-          el.append(layerElement(child, editing, n, { lastInFlow: child.id === last }));
+          el.append(layerElement(child, editing, n, { ...ctx, lastInFlow: child.id === last }));
       }
       if (editing && n.locked) lock(el);
       if (editing && ed.getSelection().has(n.id)) handles(el);

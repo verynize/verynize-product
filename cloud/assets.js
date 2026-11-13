@@ -14,7 +14,7 @@ import { and, count, eq } from "drizzle-orm";
 import "../web/room-limits.js";
 import "../web/storage-limits.js";
 import { database } from "./db.js";
-import { roomAsset } from "./schema.js";
+import { roomAsset, roomThumbnail } from "./schema.js";
 import {
   atLeast,
   bytesHex,
@@ -390,4 +390,74 @@ export async function handleRoomAssets(request, env, url, roomId, assetId, acces
   if (assetId && ["GET", "HEAD"].includes(request.method))
     return serveAsset(request, env, url, roomId, assetId, access);
   return json({ error: "Not found" }, 404);
+}
+
+/** A file cover references an uploaded raster asset; clearing it never removes shared bytes. */
+export async function handleRoomThumbnail(request, env, url, roomId, access) {
+  configured(env);
+  const { role } = await access();
+  if (!role) fail(401, "Unauthorized");
+  if (!["GET", "PUT", "DELETE"].includes(request.method)) return json({ error: "Not found" }, 404);
+  if (request.method !== "GET" && !atLeast(role, "editor"))
+    fail(403, `This needs the editor role; you are a ${role}`);
+  const db = database(env);
+  const answer = (thumbnail) => {
+    const response = json({ thumbnail });
+    response.headers.set("cache-control", "private, no-store");
+    return response;
+  };
+  const describeThumbnail = async (row, asset) => ({
+    assetId: asset.id,
+    nodeId: row.nodeId,
+    pageId: row.pageId,
+    ...(await describe(env, url.origin, asset)),
+    updatedAt: row.updatedAt,
+  });
+  if (request.method === "DELETE") {
+    await db.delete(roomThumbnail).where(eq(roomThumbnail.roomId, roomId));
+    return answer(null);
+  }
+  if (request.method === "PUT") {
+    const data = await readJson(request, 4096);
+    const validId = (value) =>
+      typeof value === "string" && value.trim().length > 0 && value.length <= 200;
+    if (
+      typeof data?.assetId !== "string" ||
+      !/^[0-9a-f-]{36}$/.test(data.assetId) ||
+      (data.nodeId === null ? !validId(data.pageId) : !validId(data.nodeId)) ||
+      (data.pageId != null && !validId(data.pageId))
+    )
+      fail(
+        400,
+        "A file thumbnail needs an assetId and a nodeId, or nodeId:null with a pageId (IDs up to 200 characters)",
+      );
+    const asset = await find(env, roomId, data.assetId);
+    if (!asset || asset.status !== "ready") fail(404, "Uploaded thumbnail asset not found");
+    if (!["image/png", "image/jpeg", "image/webp"].includes(asset.contentType))
+      fail(415, "File thumbnails must be PNG, JPEG or WebP images");
+    const row = {
+      roomId,
+      assetId: asset.id,
+      nodeId: data.nodeId,
+      pageId: data.pageId ?? null,
+      updatedAt: Date.now(),
+    };
+    await db
+      .insert(roomThumbnail)
+      .values(row)
+      .onConflictDoUpdate({
+        target: roomThumbnail.roomId,
+        set: {
+          assetId: row.assetId,
+          nodeId: row.nodeId,
+          pageId: row.pageId,
+          updatedAt: row.updatedAt,
+        },
+      });
+    return answer(await describeThumbnail(row, asset));
+  }
+  const row = await db.select().from(roomThumbnail).where(eq(roomThumbnail.roomId, roomId)).get();
+  if (!row) return answer(null);
+  const asset = await find(env, roomId, row.assetId);
+  return answer(asset?.status === "ready" ? await describeThumbnail(row, asset) : null);
 }

@@ -216,6 +216,17 @@ export const roomAsset = sqliteTable(
   ],
 );
 
+// File covers (migrations 0010/0011): bytes stay in room_asset/R2, one cover per room.
+export const roomThumbnail = sqliteTable("room_thumbnail", {
+  roomId: text("roomId").notNull().primaryKey(),
+  assetId: text("assetId")
+    .notNull()
+    .references(() => roomAsset.id),
+  nodeId: text("nodeId"),
+  pageId: text("pageId"),
+  updatedAt: integer("updatedAt").notNull(),
+});
+
 // Model API runtime (cloud/ai.js, migration 0005): runs, their events, approvals and the
 // recorded results of write tool calls. Times are epoch ms.
 export const aiRun = sqliteTable(

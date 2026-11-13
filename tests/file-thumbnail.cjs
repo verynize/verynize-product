@@ -1,7 +1,7 @@
 // "Set as file thumbnail" (Wonder P4, design/wonder/canvas-audit/wonder/notes-2026-10-31-b.md): the last row of the
-// layer menu stores the layer as `document.thumbnailNodeId`, toasts "Thumbnail updated", keeps its label, survives a
+// layer menu stores the layer as `document.thumbnailNodeId`, toasts "Thumbnail updated", offers restore, survives a
 // reload, and the Files card draws that layer alone, covering the thumbnail box. When the layer is deleted the card
-// falls back to the active page.
+// falls back to the first page.
 const { _electron } = require("@playwright/test");
 const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 const assert = require("node:assert/strict");
@@ -122,9 +122,15 @@ const fs = require("node:fs/promises"),
       ["card"],
       "the selection stays",
     );
-    // The label stays the same afterwards (no check mark, no remove variant).
+    // Restore is explicit and undoable; the set action remains available.
     await openMenu("card");
-    assert.equal((await items()).at(-1), "Set as file thumbnail", "the label is unchanged");
+    assert.equal((await items()).at(-1), "Restore default thumbnail");
+    await page.locator('#canvas-menu [data-command="menu.restoreThumbnail"]').click();
+    assert.equal(await page.evaluate(() => window.design.getDocument().thumbnailNodeId), undefined);
+    await openMenu("card");
+    await page.locator('#canvas-menu [data-command="menu.setThumbnail"]').click();
+    await openMenu("card");
+    assert.ok((await items()).includes("Set as file thumbnail"));
     await page.keyboard.press("Escape");
     // Text layers and the layer rows list it too (Wonder CM3 / CM7).
     await page.evaluate(() => window.design.setSelection(["label"]));
@@ -137,6 +143,28 @@ const fs = require("node:fs/promises"),
       "layer row menu",
     );
     await page.keyboard.press("Escape");
+
+    // New thumbnail choices require a frame, while existing document ids remain schema-compatible.
+    assert.ok(
+      await page.evaluate(() => {
+        try {
+          window.design.setThumbnail("label");
+          return false;
+        } catch (error) {
+          return /frame/.test(error.message);
+        }
+      }),
+    );
+    // A cover can be rendered from another page without changing the page or selection.
+    const detached = await page.evaluate(() => {
+      window.design.setActivePage("p2");
+      const before = JSON.stringify(window.design.getDocument());
+      const markup = window.design.thumbnailMarkup("card");
+      const unchanged = before === JSON.stringify(window.design.getDocument());
+      window.design.setActivePage("p1");
+      return { unchanged, width: markup.width, text: markup.html.includes("Canvas au") };
+    });
+    assert.deepEqual(detached, { unchanged: true, width: 420, text: true });
 
     // Invalid values are rejected by validate().
     const rejected = await page.evaluate(() => {
@@ -171,37 +199,22 @@ const fs = require("node:fs/promises"),
       await page.waitForTimeout(200);
     };
     await openFiles();
-    const shot = await cardThumb().evaluate((el) => {
-      const box = el.querySelector("[data-thumbnail-node]");
-      const art = box?.firstElementChild,
-        drawn = art?.firstElementChild;
-      const b = el.getBoundingClientRect(),
-        d = drawn?.getBoundingClientRect();
-      return {
-        node: box?.dataset.thumbnailNode,
-        children: art?.childElementCount,
-        text: drawn?.textContent,
-        box: [b.left, b.top, b.right, b.bottom],
-        drawn: d && [d.left, d.top, d.right, d.bottom],
-        bg: drawn && getComputedStyle(drawn).backgroundColor,
-      };
+    await page.waitForFunction((id) => {
+      const image = document.querySelector(`.file-card[data-file-id="${id}"] img[data-file-thumbnail-image]`);
+      return image?.complete && image.naturalWidth > 0;
+    }, fileId);
+    const shot = await cardThumb().evaluate(async (el) => {
+      const box = el.querySelector("[data-thumbnail-node]"), image = box?.querySelector("img");
+      const canvas = document.createElement("canvas"); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d"); context.drawImage(image, 0, 0);
+      return { node: box.dataset.thumbnailNode, width: image.naturalWidth, height: image.naturalHeight,
+        fit: getComputedStyle(image).objectFit, pixel: [...context.getImageData(10, 10, 1, 1).data],
+        miniature: !!el.querySelector(".thumbnail-artboard") };
     });
-    assert.equal(shot.node, "card", "the card uses the chosen frame");
-    assert.equal(shot.children, 1, "only the chosen frame is drawn");
-    assert.equal(shot.text, "Canvas au");
-    assert.equal(shot.bg, "rgb(255, 255, 255)");
-    const [bl, bt, br, bb] = shot.box,
-      [dl, dt, dr, db] = shot.drawn;
-    assert.ok(
-      dl <= bl + 0.5 && dt <= bt + 0.5 && dr >= br - 0.5 && db >= bb - 0.5,
-      "the frame covers the thumbnail box: " + JSON.stringify(shot),
-    );
-    assert.ok(
-      Math.abs((dl + dr) / 2 - (bl + br) / 2) < 1 && Math.abs((dt + db) / 2 - (bt + bb) / 2) < 1,
-      "and is centred",
-    );
+    assert.deepEqual(shot, { node: "card", width: 420, height: 392, fit: "cover",
+      pixel: [255, 255, 255, 255], miniature: false }, "local cover is a full raster image");
 
-    // Deleting the frame falls back to the active page.
+    // Deleting the frame falls back to the first page.
     await page.locator(`.file-card[data-file-id="${fileId}"] .file-open`).click();
     await ready();
     await page.waitForSelector('#canvas [data-id="card"]');
@@ -211,23 +224,28 @@ const fs = require("node:fs/promises"),
     await page.waitForFunction(
       () => !window.design.getDocument().pages[0].nodes.some((n) => n.id === "card"),
     );
+    await page.evaluate(() => window.design.setActivePage("p2"));
     await openFiles();
+    await page.waitForFunction((id) => {
+      const box = document.querySelector(`.file-card[data-file-id="${id}"] [data-thumbnail-page]`);
+      const image = box?.querySelector("img");
+      return box?.dataset.thumbnailPage === "p1" && !box.dataset.thumbnailNode && image?.complete && image.naturalWidth > 0;
+    }, fileId);
     const fallback = await cardThumb().evaluate((el) => {
-      const box = el.querySelector(".absolute.inset-0");
-      return {
-        node: box?.dataset.thumbnailNode ?? null,
-        children: box?.firstElementChild?.childElementCount ?? 0,
-      };
+      const box = el.querySelector("[data-thumbnail-page]"), image = box.querySelector("img");
+      const canvas = document.createElement("canvas"); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d"); context.drawImage(image, 0, 0);
+      return { node: box.dataset.thumbnailNode || null, page: box.dataset.thumbnailPage,
+        width: image.naturalWidth, height: image.naturalHeight, fit: getComputedStyle(image).objectFit,
+        pixel: [...context.getImageData(10, 10, 1, 1).data], miniature: !!el.querySelector(".thumbnail-artboard") };
     });
-    assert.deepEqual(
-      fallback,
-      { node: null, children: 1 },
-      "the card falls back to the active page (hero only)",
-    );
+    assert.deepEqual(fallback, { node: null, page: "p1", width: 600, height: 300, fit: "contain",
+      pixel: [30, 58, 138, 255], miniature: false },
+      "deleted cover renders the complete first page while page 2 is active");
 
     assert.deepEqual(errors, []);
     console.log(
-      "PASS file thumbnail: menu row last, toast, unchanged label, validation, reload, Files card cover, fallback after delete",
+      "PASS file thumbnail: menu row last, toast, restore, frames-only choices, detached rendering, validation, reload, Files card cover, fallback after delete",
     );
   } finally {
     await app.close();

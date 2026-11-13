@@ -71,7 +71,7 @@ declare global {
       };
     };
     cloudWorkspace: CloudWorkspace;
-    embeddedFontCss(markup?: string): string;
+    embeddedFontCss(markup?: string, doc?: import("../src/lib/bridge").DesignDocument): string;
     sanitizeSvg(source: string): Element | null;
     previewTabTarget(): string | null;
     webCapture: { open(): void };

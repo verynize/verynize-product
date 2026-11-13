@@ -312,6 +312,49 @@ Session tokens expire with the Better Auth session and are revoked by sign-out; 
 
 Run, event, approval and tool-result rows live in `env.DB` (migrations `0005_ai_runs.sql` and `0006_ai_approval_account.sql`; `cloud/ai-store.js`). The executor (`cloud/ai-executor.js`) offers the hosted tools of `cloud/design-backend.js` (the backend `cloud/mcp.js` uses, scoped to the run's room; `create_document` is not offered), re-checks the caller's room role before every tool call and again immediately before a write runs, counts tool calls against `maxToolCalls`, caps model turns with `maxIterations(maxTurns)` and stores each event before sending it. Under `access: "ask"` (default) every write waits for a decision stored in `ai_approval` (stored in the database, so the decision may arrive on any instance; the endpoint then notifies the run's `AiRun` object, and request-scoped runs poll), denied after `VERYNIZE_AI_APPROVAL_TIMEOUT_MS` (10 minutes) or when the run ends; `edit`/`auto`/`full` write without a prompt. A write is claimed in `ai_tool_result` before it runs, so it is applied at most once per `(runId, toolCallId)`. `plan: true` refuses write calls; `helper: true` offers no write tools. Optional variables: `OPENROUTER_BASE_URL` (tests point it at a local fake), `VERYNIZE_AI_MODELS` (`id[=Label],…`, first is the default; default `openrouter/auto`), `VERYNIZE_AI_MAX_TURNS` (12), `VERYNIZE_AI_MAX_TOOL_CALLS` (40), `VERYNIZE_AI_APPROVAL_TIMEOUT_MS` (600000). Hosting: Cloudflare and Node run each run in its `AiRun` object (`AI_RUNS` binding); Vercel runs it inside the starting request. Tests: `node tests/cloud-ai.mjs`, `node tests/cloud-ai-durable.mjs` (disconnect, late approval, timeout, cancel and concurrent subscribers; both also on Node and Vercel) and `node tests/ai-routing.mjs`.
 
+## File cover thumbnails
+
+Rendered file covers reuse the room asset upload protocol below. The client renders the full
+first page (default) or its chosen frame (custom) as PNG and uploads it as a room asset. Select
+a custom cover with `PUT /api/rooms/:id/thumbnail` `{assetId,nodeId}`. Select an automatic
+first-page cover with `{assetId,nodeId:null,pageId}`. The asset must be fully uploaded, belong to
+that room, and be PNG, JPEG or WebP (404 for a missing, pending or foreign asset; 415 for other
+types). Custom `nodeId` and default `pageId` are non-empty strings of at most 200 characters.
+Custom covers can optionally include `pageId` too. Only editors and owners can
+select or clear a cover; viewers and commenters can read it.
+
+`GET /api/rooms/:id/thumbnail` returns `{thumbnail:null}` when none is selected, otherwise
+`{thumbnail:{assetId,id,nodeId,pageId,url,contentType,size,sha256,updatedAt}}`. `nodeId:null`
+identifies a default cover; custom covers from older requests have `pageId:null`. The `url` uses the same
+signed, immutable asset read protocol as images. Metadata responses are private and not cached.
+The client compares custom `nodeId` with the document's `thumbnailNodeId`, or default `pageId`
+with the first page ID when no custom thumbnail is selected, before displaying a cover.
+An older render therefore cannot override a different current selection. The metadata endpoint does
+not change the document selection itself. `DELETE /api/rooms/:id/thumbnail` returns
+`{thumbnail:null}` and is idempotent. Clearing a cover retains the asset bytes because other
+document layers may reuse them. Metadata persists separately in D1's `room_thumbnail` table
+(migrations `0010_room_thumbnails.sql` and `0011_default_room_thumbnails.sql`); migration 0011
+preserves existing custom covers while adding nullable node and page references. Binary bytes
+stay in `ASSETS_BUCKET` R2. Restoring the default generates and uploads a new first-page cover;
+the DELETE endpoint itself only clears stored metadata.
+
+`node tests/cloud-thumbnails.mjs` verifies real R2 uploads and readback, role enforcement,
+pending and cross-room asset refusal, format validation, custom/default replacement, clearing and persistence
+across runtime restarts. It runs in the workerd, Node and Vercel cloud groups.
+
+The renderer service `window.fileThumbnails` (`web/file-thumbnails.js`) regenerates covers after
+frame, page-content, token or embedded-font changes settle. It renders a detached layer tree
+without changing the current page or selection, bounds PNGs to 1920×1080, and uploads through
+`cloudAssets.uploadTo`. Desktop uses its offscreen Chromium renderer; the web uses an SVG
+foreignObject raster fallback. In-flight work rechecks the room and document before selecting
+the uploaded asset. Failed/offline uploads keep the local miniature and can retry on reconnect
+or `fileThumbnails.refresh()`; `status()` exposes upload/error state. Home cards prefer the
+uploaded image and fall back when it cannot load. **Restore default thumbnail** clears the
+selection in one undo step and regenerates the cloud cover from the full first page; deleting
+its frame also restores that default. Default rendering uses the first page, independent of the
+currently active page, and includes every visible root rather than the legacy miniature's cap.
+Missing frames on unloaded lazy pages preserve the cloud cover until those pages load.
+
 ## Room assets (`cloud/assets.js`, `cloud/inline-binaries.js`, `web/cloud-assets.js`)
 
 Binary data never lives inside a shared document. Images, SVG, fonts and video in shared rooms are stored once in the `ASSETS_BUCKET` R2 bucket (named so that it does not clash with the static `ASSETS` binding) and referenced from the document by URL. Collaborators therefore receive a short URL operation instead of a data URI, and binaries do not count against the room's document size. Metadata lives in D1 (`room_asset`, migration `0004_room_assets.sql`: room, sha256, size, content type, status, creator, created and uploaded times). Objects are keyed `rooms/<roomId>/<sha256>`. Which data URIs count as binaries comes from one module shared by the editor, the islands and the server: `web/storage-limits.js` (`ASSET_LIMIT_BYTES` 20 MiB, `INLINE_LIMIT_BYTES` 8 KiB, `SVG_INLINE_LIMIT_BYTES` 256 KiB). The page and document limits it reports (`PAGE_LIMIT_BYTES` 20 MiB, `DOCUMENT_LIMIT_BYTES` 20 MiB) are read from `web/room-limits.js`, the values the room enforces (`cloud/limits.js`, "Page storage and lazy pages" above).
@@ -337,7 +380,7 @@ Published apps (`cloud/apps.js`) store the bytes of every file in the same bucke
 
 **Size limits in the editor.** `web/storage-limits.js` measures the open document after edits settle (debounced, never per pointer move) with binaries that will become assets counted as their URL. The storage island (`web/src/islands/storage*`) shows the size in the Share panel (`#storage-meter[data-level=ok|warn|over]`: file size against 20 MB, the largest page against the shared 20 MB budget, embedded files that will be stored separately, upload progress), a warning from 80 % of a limit naming the page (with a toast), and a blocking error when a share, sync or save is stopped by a limit (`#storage-limit-error` inside the Share panel, `#storage-limit-dialog` elsewhere, titled after the action). Server refusals for size (`exceeds`, `too large`, inline data, 413) reach the same error through the panel's status line, and a native save refused by the 20 MiB file limit of `integrations/design-store.mjs` through `web/desktop-panel.js`.
 
-**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export and file thumbnails show only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
+**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export and fallback DOM file miniatures show only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
 
 ## Email delivery (`cloud/mail.js`)
 
