@@ -42,6 +42,17 @@ const { cloudOptions, passwordUser } = await import("./cloud-harness.mjs");
 const { NodeCloud } = await import("./helpers/node-cloud.mjs");
 const { createWebServer } = await import("../web-start/node/server.mjs");
 
+async function themeShots(page, locator, name) {
+  if (!process.env.VERYNIZE_SCREENSHOTS) return;
+  await fsp.mkdir(process.env.VERYNIZE_SCREENSHOTS, { recursive: true });
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate((theme) => (document.documentElement.dataset.uiTheme = theme), theme);
+    await locator.screenshot({
+      path: path.join(process.env.VERYNIZE_SCREENSHOTS, `${name}-${theme}.png`),
+    });
+  }
+}
+
 const root = fileURLToPath(new URL("../", import.meta.url));
 if (!fs.existsSync(path.join(root, "web/dist/ui.js")))
   execFileSync(process.execPath, ["scripts/build-ui.cjs"], { cwd: root, stdio: "pipe" });
@@ -284,6 +295,14 @@ try {
       { viewport: { width: 1440, height: 870 } },
     );
   const context = await signedInContext();
+  // Explicitly exercise an older server even after the multi-provider backend lands.
+  await context.route("**/api/ai/config", async (route) => {
+    const response = await route.fetch();
+    const config = await response.json();
+    delete config.providers;
+    delete config.defaultProvider;
+    await route.fulfill({ response, json: config });
+  });
   const page = await context.newPage();
   watch(page);
   const requests = [];
@@ -430,6 +449,7 @@ try {
   assert.match(menuText, /OpenRouter default/);
   assert.match(menuText, /Fake Alpha/);
   assert.doesNotMatch(menuText, /Claude|Codex|Effort/);
+  await themeShots(page, menu, "legacy-picker");
   await menu.getByText("Fake Beta").click();
   // Let the menu finish closing and restore focus before typing/pressing Enter in the composer.
   await menu.waitFor({ state: "detached" });
@@ -719,10 +739,20 @@ try {
     await settings.waitForFunction(() => document.documentElement.dataset.uiReady === "true");
     const card = settings.locator("#settings-openrouter-card");
     await settings.locator('#settings-openrouter-card[data-status="connected"]').waitFor();
+    assert.equal(
+      await settings.locator('[id^="settings-ai-provider-"]').count(),
+      0,
+      "legacy config offers only OpenRouter",
+    );
     const status = await settings.locator("#settings-openrouter-status").innerText();
     assert.match(status, new RegExp(`Key ending ${connected.last4} · connected with OpenRouter`));
     assert.match(status, /\$1\.25 of \$10\.00 used/);
     assert.ok(!status.includes(oauthKey), "the key is never shown");
+    await themeShots(
+      settings,
+      settings.locator('section[aria-labelledby="settings-openrouter-label"]'),
+      "legacy-settings",
+    );
     await settings.locator("#settings-openrouter-reconnect").waitFor();
     await settings.locator("#settings-openrouter-disconnect").click();
     await settings.locator('#settings-openrouter-card[data-status="missing"]').waitFor();
@@ -763,6 +793,314 @@ try {
     await settings.close();
   }
   await context.close();
+
+  // Multi-provider contract: stub only the new API surface at the network boundary, retaining
+  // the real account, room, router, query cache and chat transport from the legacy checks above.
+  {
+    const multi = await signedInContext();
+    const providers = [
+      {
+        id: "openrouter",
+        label: "OpenRouter",
+        oauth: true,
+        fields: [{ name: "apiKey", label: "API key", secret: true, required: true }],
+        connected: "connected",
+        models: [{ id: "fake/alpha", label: "Router Alpha", tools: true }],
+        defaultModel: "fake/alpha",
+      },
+      {
+        id: "vercel",
+        label: "Vercel AI Gateway",
+        oauth: false,
+        fields: [{ name: "apiKey", label: "API key", secret: true, required: true }],
+        connected: "missing",
+        models: [
+          { id: "shared/model", label: "Gateway Tool Model", tools: true },
+          { id: "vercel/chat", label: "Gateway Chat Model", tools: false },
+        ],
+        defaultModel: "shared/model",
+      },
+      {
+        id: "cloudflare",
+        label: "Cloudflare AI Gateway",
+        oauth: false,
+        fields: [
+          {
+            name: "accountId",
+            label: "Account ID",
+            secret: false,
+            required: true,
+            help: "Your Cloudflare account ID",
+          },
+          { name: "apiToken", label: "API token", secret: true, required: true },
+          { name: "gatewayId", label: "Gateway ID", secret: false, required: false },
+        ],
+        connected: "missing",
+        models: [{ id: "cf/tool", label: "Cloudflare Tool Model", tools: true }],
+        defaultModel: "cf/tool",
+      },
+      {
+        id: "sumopod",
+        label: "Sumopod",
+        oauth: false,
+        fields: [{ name: "apiKey", label: "API key", secret: true, required: true }],
+        connected: "connected",
+        models: [{ id: "shared/model", label: "Sumopod Chat Model", tools: false }],
+        defaultModel: "shared/model",
+        capabilities: { tools: false },
+      },
+    ];
+    const credentials = {
+      openrouter: { connected: true, last4: "7777", source: "manual" },
+      vercel: { connected: false },
+      cloudflare: { connected: false },
+      sumopod: { connected: true, last4: "1234", label: "Chat account" },
+    };
+    const submitted = [];
+    const runs = [];
+    const heldTurn = Promise.withResolvers();
+    await multi.route("**/api/ai/config", async (route) =>
+      route.fulfill({
+        json: {
+          enabled: true,
+          provider: "openrouter",
+          models: providers[0].models,
+          defaultModel: "fake/alpha",
+          credentials: { openrouter: "connected" },
+          providers,
+          defaultProvider: "openrouter",
+        },
+      }),
+    );
+    await multi.route("**/api/ai/credentials**", async (route) => {
+      const request = route.request();
+      const id = new URL(request.url()).pathname.split("/")[4];
+      if (request.method() === "PUT") {
+        const values = request.postDataJSON();
+        submitted.push({ id, values });
+        if (id === "cloudflare" && values.accountId === "bad-account")
+          return route.fulfill({
+            status: 400,
+            json: {
+              error: "Account ID is invalid. Copy it from your Cloudflare dashboard.",
+              field: "accountId",
+            },
+          });
+        credentials[id] = { connected: true, last4: "9876", label: "Test credential" };
+        providers.find((provider) => provider.id === id).connected = "connected";
+      }
+      if (request.method() === "DELETE") {
+        credentials[id] = { connected: false };
+        providers.find((provider) => provider.id === id).connected = "missing";
+        return route.fulfill({ json: { ok: true, removed: true } });
+      }
+      return route.fulfill({ json: credentials });
+    });
+    await multi.route("**/api/ai/runs", async (route) => {
+      const body = route.request().postDataJSON();
+      runs.push(body);
+      if (body.prompt.includes("Hold this provider")) {
+        await heldTurn.promise;
+      }
+      const id = `multi-run-${runs.length}`;
+      const events = [
+        { id, chatId: body.chatId, seq: 1, type: "status", status: "running" },
+        {
+          id,
+          chatId: body.chatId,
+          seq: 2,
+          type: "assistant-text",
+          text: `Reply from ${body.provider}`,
+        },
+        { id, chatId: body.chatId, seq: 3, type: "done", code: "ok" },
+      ];
+      return route.fulfill({
+        contentType: "text/event-stream",
+        body: events.map((event) => `data: ${JSON.stringify(event)}\n\n`).join(""),
+      });
+    });
+    const settings = await multi.newPage();
+    watch(settings);
+    await settings.goto(origin + "/settings/agents");
+    await settings.locator('#settings-ai-provider-cloudflare[data-status="missing"]').waitFor();
+    for (const id of ["vercel", "cloudflare", "sumopod"])
+      assert.equal(await settings.locator(`#settings-ai-provider-${id}`).count(), 1);
+    await settings.locator('#settings-openrouter-card[data-status="connected"]').waitFor();
+    await settings.locator("#settings-openrouter-reconnect").waitFor();
+    await themeShots(
+      settings,
+      settings.locator('section[aria-labelledby="settings-openrouter-label"]'),
+      "providers-settings",
+    );
+    await settings.locator("#settings-ai-provider-cloudflare-connect").click();
+    const accountId = settings.locator("#settings-ai-provider-cloudflare-accountId");
+    const apiToken = settings.locator("#settings-ai-provider-cloudflare-apiToken");
+    assert.equal(await accountId.getAttribute("type"), "text");
+    assert.equal(await apiToken.getAttribute("type"), "password");
+    assert.equal(
+      await settings.locator("#settings-ai-provider-cloudflare-gatewayId").getAttribute("required"),
+      null,
+    );
+    await accountId.fill("bad-account");
+    await apiToken.fill("secret-test-token");
+    await settings.locator("#settings-ai-provider-cloudflare-save").click();
+    await settings
+      .locator('#settings-ai-provider-cloudflare-accountId[aria-invalid="true"]')
+      .waitFor();
+    assert.match(
+      await settings.locator("#settings-ai-provider-cloudflare-accountId-error").innerText(),
+      /Copy it from your Cloudflare dashboard/,
+    );
+    await accountId.fill("valid-account");
+    await settings.locator("#settings-ai-provider-cloudflare-gatewayId").fill("my-gateway");
+    await settings.locator("#settings-ai-provider-cloudflare-save").click();
+    await settings.locator('#settings-ai-provider-cloudflare[data-status="connected"]').waitFor();
+    assert.deepEqual(submitted.at(-1), {
+      id: "cloudflare",
+      values: {
+        accountId: "valid-account",
+        apiToken: "secret-test-token",
+        gatewayId: "my-gateway",
+      },
+    });
+    assert.equal(await apiToken.count(), 0, "secret form is cleared after connection");
+    await settings.locator("#settings-ai-provider-cloudflare-connect").click();
+    assert.equal(await apiToken.inputValue(), "", "Replace never echoes stored credentials");
+    await settings.locator("#settings-ai-provider-cloudflare-disconnect").click();
+    await settings.locator('#settings-ai-provider-cloudflare[data-status="missing"]').waitFor();
+    await settings.locator("#settings-ai-provider-vercel-connect").click();
+    await settings.locator("#settings-ai-provider-vercel-apiKey").fill("gateway-secret");
+    await settings.locator("#settings-ai-provider-vercel-save").click();
+    await settings.locator('#settings-ai-provider-vercel[data-status="connected"]').waitFor();
+    await settings.getByLabel("Vercel AI Gateway default model").selectOption("vercel/chat");
+    await settings.reload();
+    assert.equal(
+      await settings.getByLabel("Vercel AI Gateway default model").inputValue(),
+      "vercel/chat",
+    );
+    await settings.close();
+
+    const chat = await multi.newPage();
+    watch(chat);
+    await chat.goto(origin + `/editor#room=${room.id}`);
+    await ready(chat);
+    await chat.waitForFunction(() => window.cloudWorkspace?.room());
+    await chat.evaluate(() =>
+      window.agentWorkspace.setDefaults({ ...window.agentWorkspace.getDefaults(), access: "ask" }),
+    );
+    const openPicker = async () => {
+      await chat.locator(".agent-config summary").click();
+      return chat.getByRole("menu");
+    };
+    let picker = await openPicker();
+    await picker.getByText("Sumopod Chat Model", { exact: true }).waitFor();
+    assert.match(await picker.innerText(), /Vercel AI Gateway/);
+    assert.doesNotMatch(await picker.innerText(), /Cloudflare Tool Model/);
+    await themeShots(chat, picker, "providers-picker-ask");
+    await picker.getByText("Sumopod Chat Model", { exact: true }).click();
+    await picker.waitFor({ state: "detached" });
+    const sendMulti = async (text) => {
+      await chat.locator("#project-prompt").fill(text);
+      await chat.locator("#project-prompt").press("Enter");
+      await chat.waitForFunction(
+        () =>
+          !window.agentWorkspace.getState().busy &&
+          window.agentWorkspace.getState().messages.at(-1)?.state === "complete",
+      );
+    };
+    await sendMulti("Hello Sumopod");
+    assert.equal(runs.at(-1).provider, "sumopod");
+    assert.equal(runs.at(-1).model, "shared/model");
+    const firstChat = await chat.evaluate(() => window.agentWorkspace.getState().conversationId);
+    await chat.evaluate(() => window.agentWorkspace.newChat());
+    assert.notEqual(
+      await chat.locator("#bd-agent-model-label").innerText(),
+      "Sumopod Chat Model",
+      "new chats do not inherit another chat's selection",
+    );
+    await chat.evaluate((id) => window.agentWorkspace.selectChat(id), firstChat);
+    await chat.getByText("Sumopod Chat Model", { exact: true }).waitFor();
+    await chat.evaluate(() =>
+      window.agentWorkspace.setDefaults({ ...window.agentWorkspace.getDefaults(), access: "edit" }),
+    );
+    picker = await openPicker();
+    assert.equal(await picker.getByText("Sumopod Chat Model", { exact: true }).count(), 0);
+    assert.equal(await picker.getByText("Gateway Chat Model", { exact: true }).count(), 0);
+    assert.equal(
+      await picker
+        .getByText("Sumopod default · Chat-only", { exact: true })
+        .getAttribute("data-disabled"),
+      "",
+    );
+    await themeShots(chat, picker, "providers-picker-edit");
+    await picker.getByText("Gateway Tool Model", { exact: true }).click();
+    await picker.waitFor({ state: "detached" });
+    await sendMulti("Edit using the gateway");
+    assert.equal(runs.at(-1).provider, "vercel");
+    assert.equal(
+      runs.at(-1).model,
+      "shared/model",
+      "same model id stays scoped to the selected provider",
+    );
+    await chat.evaluate(() => window.accountStore.flush());
+    await chat.reload();
+    await ready(chat);
+    await chat.waitForFunction(
+      (id) => window.agentWorkspace.getState().conversations.some((entry) => entry.id === id),
+      firstChat,
+    );
+    await chat.evaluate((id) => window.agentWorkspace.selectChat(id), firstChat);
+    await chat.getByText("Gateway Tool Model", { exact: true }).waitFor();
+    await chat.evaluate(() =>
+      window.agentWorkspace.setDefaults({ ...window.agentWorkspace.getDefaults(), access: "ask" }),
+    );
+    const turnStarted = chat.waitForRequest(
+      (request) =>
+        new URL(request.url()).pathname === "/api/ai/runs" && request.method() === "POST",
+    );
+    await chat.locator("#project-prompt").fill("Hold this provider");
+    await chat.locator("#project-prompt").press("Enter");
+    assert.equal((await turnStarted).postDataJSON().provider, "vercel");
+    assert.equal(runs.at(-1).provider, "vercel");
+    picker = await openPicker();
+    await picker.getByText("Sumopod Chat Model", { exact: true }).click();
+    await picker.waitFor({ state: "detached" });
+    heldTurn.resolve();
+    await chat.waitForFunction(() => !window.agentWorkspace.getState().busy);
+    assert.equal(
+      runs.at(-1).provider,
+      "vercel",
+      "switching providers does not change an active request",
+    );
+    await sendMulti("Use the newly selected provider");
+    assert.equal(runs.at(-1).provider, "sumopod");
+    providers.find((provider) => provider.id === "sumopod").connected = "missing";
+    credentials.sumopod = { connected: false };
+    await chat.evaluate(() => window.accountStore.flush());
+    await chat.reload();
+    await ready(chat);
+    await chat.waitForFunction(
+      (id) => window.agentWorkspace.getState().conversations.some((entry) => entry.id === id),
+      firstChat,
+    );
+    await chat.evaluate((id) => window.agentWorkspace.selectChat(id), firstChat);
+    const beforeRejected = runs.length;
+    await chat.locator("#project-prompt").fill("No fallback please");
+    await chat.locator("#project-prompt").press("Enter");
+    await chat.waitForFunction(
+      () => window.agentWorkspace.getState().messages.at(-1)?.state === "error",
+    );
+    assert.match(
+      await chat.locator(".chat-message.assistant").last().innerText(),
+      /Connect Sumopod/,
+    );
+    assert.equal(
+      runs.length,
+      beforeRejected,
+      "a disconnected selection never falls back to another provider",
+    );
+    await multi.close();
+  }
 
   // ---- a server whose operator turned the model API off ----
   const worker = options.workers[0];

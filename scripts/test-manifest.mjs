@@ -748,7 +748,14 @@ const web = [
     "web/src/lib/telemetry/**",
   ]),
   webBuild("tests/ai-routing.mjs", [...AI, "api/**", "vercel.json", "cloud/platform/**"]),
-  webBuild("tests/web-ai-chat.mjs", [...AI, "web/src/lib/agent-service.ts", ...isl("chat")]),
+  webBuild("tests/web-ai-chat.mjs", [
+    ...AI,
+    "web/src/lib/agent-service.ts",
+    "web/src/lib/agent-transport.ts",
+    "web/src/lib/ai-*.ts",
+    ...isl("chat"),
+    ...isl("settings"),
+  ]),
   webBuild("tests/web-nitro.mjs", ["vite.nitro.config.ts", "web-start/nitro/**"], {
     group: "web-nitro",
     manual: "opt-in Nitro build; run with --group web-nitro (npm run test:web:nitro)",
