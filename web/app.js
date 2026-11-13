@@ -1311,15 +1311,23 @@ window.verynize = {
     const content = document.createElement("div");
     content.style.cssText = "position:relative;width:1000px;height:700px";
     const ctx = { nodes: source.nodes, tokens: doc.tokens || {} };
-    if (node) content.append(layerElement({ ...node, parentId: null, x: 0, y: 0, rotation: 0 }, false, null, ctx));
-    else for (const root of source.nodes.filter((n) => !n.parentId))
-      content.append(layerElement(root, false, null, ctx));
-    let x = 0, y = 0, width = node?.w || 1, height = node?.h || 1;
+    if (node)
+      content.append(
+        layerElement({ ...node, parentId: null, x: 0, y: 0, rotation: 0 }, false, null, ctx),
+      );
+    else
+      for (const root of source.nodes.filter((n) => !n.parentId))
+        content.append(layerElement(root, false, null, ctx));
+    let x = 0,
+      y = 0,
+      width = node?.w || 1,
+      height = node?.h || 1;
     if (!node && content.children.length) {
       // Measure the real layout, including negative positions, rotation and flow children.
       // The detached export tree never replaces the editor canvas or changes its page/selection.
       const host = document.createElement("div");
-      host.style.cssText = "position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1";
+      host.style.cssText =
+        "position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;z-index:-1";
       host.append(content);
       document.body.append(host);
       try {
@@ -1327,14 +1335,27 @@ window.verynize = {
         for (const element of content.querySelectorAll("[data-id]")) {
           let rect = element.getBoundingClientRect();
           if (!rect.width || !rect.height) continue;
-          let left = rect.left, top = rect.top, right = rect.right, bottom = rect.bottom;
+          let left = rect.left,
+            top = rect.top,
+            right = rect.right,
+            bottom = rect.bottom;
           // Clipped descendants do not enlarge a page's visible artwork bounds.
-          for (let parent = element.parentElement; parent && parent !== content; parent = parent.parentElement) {
+          for (
+            let parent = element.parentElement;
+            parent && parent !== content;
+            parent = parent.parentElement
+          ) {
             const style = getComputedStyle(parent);
             if (style.overflowX !== "visible" || style.overflowY !== "visible") {
               rect = parent.getBoundingClientRect();
-              if (style.overflowX !== "visible") { left = Math.max(left, rect.left); right = Math.min(right, rect.right); }
-              if (style.overflowY !== "visible") { top = Math.max(top, rect.top); bottom = Math.min(bottom, rect.bottom); }
+              if (style.overflowX !== "visible") {
+                left = Math.max(left, rect.left);
+                right = Math.min(right, rect.right);
+              }
+              if (style.overflowY !== "visible") {
+                top = Math.max(top, rect.top);
+                bottom = Math.min(bottom, rect.bottom);
+              }
             }
           }
           if (right > left && bottom > top) bounds.push({ left, top, right, bottom });
@@ -1345,19 +1366,29 @@ window.verynize = {
           width = Math.ceil(Math.max(...bounds.map((r) => r.right))) - x;
           height = Math.ceil(Math.max(...bounds.map((r) => r.bottom))) - y;
         }
-      } finally { host.remove(); }
+      } finally {
+        host.remove();
+      }
     }
-    width = Math.max(1, Math.ceil(width)); height = Math.max(1, Math.ceil(height));
-    content.style.left = `${-x}px`; content.style.top = `${-y}px`;
+    width = Math.max(1, Math.ceil(width));
+    height = Math.max(1, Math.ceil(height));
+    content.style.left = `${-x}px`;
+    content.style.top = `${-y}px`;
     const root = document.createElement("div");
     root.style.cssText = `position:relative;width:${width}px;height:${height}px;overflow:hidden`;
-    if (!node && !source.backgroundHidden) root.style.background = source.background || "transparent";
+    if (!node && !source.backgroundHidden)
+      root.style.background = source.background || "transparent";
     root.append(content);
     const body = root.outerHTML;
-    const shader = content.querySelector("[data-shader-preset]") && window.BetterShaders
-      ? `<script>${window.BetterShaders.runtimeSource()}</script>` : "";
+    const shader =
+      content.querySelector("[data-shader-preset]") && window.BetterShaders
+        ? `<script>${window.BetterShaders.runtimeSource()}</script>`
+        : "";
     return {
-      width, height, pageId: source.id, nodeId: node?.id || null,
+      width,
+      height,
+      pageId: source.id,
+      nodeId: node?.id || null,
       html: `<!doctype html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0}${window.embeddedFontCss?.(body, doc) || ""}</style></head><body>${body}${shader}</body></html>`,
     };
   },
@@ -1380,6 +1411,7 @@ window.verynize = {
     future = [];
     scheduleWorldNotice();
     render();
+    window.dispatchEvent(new Event("file-thumbnail-selected"));
     return true;
   },
   setActivePage: (id) => {

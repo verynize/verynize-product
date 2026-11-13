@@ -137,13 +137,12 @@ try {
   await waitForAsync(
     page,
     async () => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === "cover-frame";
     },
     null,
-    { timeout: 30000 },
+    { timeout: 5000 },
   );
   const first = (await metadata()).thumbnail;
   assert.match(first.url, /\/thumbnail\/image\?v=[0-9a-f]{64}&sig=[0-9a-f]{64}$/);
@@ -209,13 +208,12 @@ try {
   await waitForAsync(
     page,
     async () => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === null && result.thumbnail?.pageId === "cover-page";
     },
     null,
-    { timeout: 30000 },
+    { timeout: 5000 },
   );
   const restored = (await metadata()).thumbnail;
   const fullPage = await sample(restored.url);
@@ -227,7 +225,6 @@ try {
   await waitForAsync(
     page,
     async (sha) => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === null && result.thumbnail?.sha256 !== sha;
@@ -235,6 +232,38 @@ try {
     restored.sha256,
   );
   assert.deepEqual((await sample((await metadata()).thumbnail.url)).right, [255, 255, 0, 255]);
+  await page.waitForFunction(() => !window.fileThumbnails.status().uploading);
+  const beforeBurst = uploads.length;
+  await page.evaluate(() => {
+    for (let i = 0; i < 20; i++) window.design.updateNodes(["last-root"], { x: 1921 + i });
+  });
+  await page.waitForTimeout(1500);
+  assert.equal(uploads.length, beforeBurst, "rapid edits do not upload immediately");
+  await page.waitForTimeout(11000);
+  await page.waitForFunction(() => !window.fileThumbnails.status().uploading);
+  assert.equal(uploads.length, beforeBurst + 1, "20 rapid edits produce one idle upload");
+  await page.evaluate(() => {
+    window.design.setSelection(["last-root"]);
+    window.design.setCamera(20, 20, 1);
+  });
+  await page.waitForTimeout(11000);
+  assert.equal(uploads.length, beforeBurst + 1, "unchanged content does not upload");
+  const beforeLeave = (await metadata()).thumbnail.sha256;
+  await page.evaluate(() => {
+    window.design.updateNodes(["last-root"], { color: "#ff00ff" });
+    window.fileLibrary.showHome();
+  });
+  await waitForAsync(
+    page,
+    async (sha) => {
+      const room = window.cloudWorkspace.room();
+      const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
+      return !!result.thumbnail && result.thumbnail.sha256 !== sha;
+    },
+    beforeLeave,
+    { timeout: 5000 },
+  );
+  assert.equal(uploads.length, beforeBurst + 2, "leaving flushes the pending edit promptly");
   assert.ok(room.id);
   assert.equal(
     frames.some((frame) => frame.includes("data:image/png")),
