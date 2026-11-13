@@ -1,6 +1,15 @@
+import { sql } from "drizzle-orm";
 // D1 schema matching the existing SQL migrations. Auth dates remain ISO text for
 // compatibility with the original Better Auth adapter; room dates remain epoch ms.
-import { sqliteTable, text, integer, index, primaryKey, unique } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  primaryKey,
+  unique,
+  check,
+} from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -216,16 +225,25 @@ export const roomAsset = sqliteTable(
   ],
 );
 
-// File covers (migrations 0010/0011): bytes stay in room_asset/R2, one cover per room.
-export const roomThumbnail = sqliteTable("room_thumbnail", {
-  roomId: text("roomId").notNull().primaryKey(),
-  assetId: text("assetId")
-    .notNull()
-    .references(() => roomAsset.id),
-  nodeId: text("nodeId"),
-  pageId: text("pageId"),
-  updatedAt: integer("updatedAt").notNull(),
-});
+// File covers (migration 0010): one reserved R2 object per room, outside asset quotas.
+export const roomThumbnail = sqliteTable(
+  "room_thumbnail",
+  {
+    roomId: text("roomId").notNull().primaryKey(),
+    sha256: text("sha256").notNull(),
+    contentType: text("contentType").notNull(),
+    size: integer("size").notNull(),
+    nodeId: text("nodeId"),
+    pageId: text("pageId"),
+    updatedAt: integer("updatedAt").notNull(),
+  },
+  (table) => [
+    check(
+      "room_thumbnail_selection",
+      sql`${table.nodeId} IS NOT NULL OR ${table.pageId} IS NOT NULL`,
+    ),
+  ],
+);
 
 // Model API runtime (cloud/ai.js, migration 0005): runs, their events, approvals and the
 // recorded results of write tool calls. Times are epoch ms.

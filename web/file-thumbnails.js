@@ -1,5 +1,5 @@
-// File covers are derived images, never binary document properties. Reuse the room asset
-// uploader and store only its ready asset id in the room's thumbnail metadata.
+// File covers are derived images, never binary document properties. Use the thumbnail
+// endpoint and overwrite one dedicated R2 object per room.
 (() => {
   const cache = new Map();
   const loads = new Map();
@@ -147,15 +147,16 @@
     };
     const src = await raster(pick.node?.id || null, doc);
     if (!current()) { again = true; return; }
-    const url = await window.cloudAssets.uploadTo(request, room.id, src);
+    const bytes = await (await fetch(src)).arrayBuffer();
     if (!current()) {
       again = true;
       return;
     }
-    const assetId = new URL(url).pathname.split("/").pop();
-    const result = await request(`/api/rooms/${room.id}/thumbnail`, {
+    const query = new URLSearchParams({ nodeId: pick.node?.id || "", pageId: pick.page.id });
+    const result = await request(`/api/rooms/${room.id}/thumbnail?${query}`, {
       method: "PUT",
-      body: JSON.stringify({ assetId, nodeId: pick.node?.id || null, pageId: pick.page.id }),
+      headers: { "Content-Type": "image/png" },
+      body: bytes,
     });
     if (!current()) {
       again = true;

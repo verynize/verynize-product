@@ -10,7 +10,7 @@ const persistence = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-thumbnails
 const options = await cloudOptions(persistence);
 let mf = new Miniflare(options);
 const origin = "http://localhost";
-const call = (route, { method = "GET", body, token } = {}) =>
+const call = (route, { method = "GET", body, token, headers = {} } = {}) =>
   mf.dispatchFetch(route.startsWith("http") ? route : origin + route, {
     method,
     headers: {
@@ -18,6 +18,7 @@ const call = (route, { method = "GET", body, token } = {}) =>
       ...(body !== undefined && !(body instanceof Uint8Array)
         ? { "content-type": "application/json" }
         : {}),
+      ...headers,
     },
     ...(body !== undefined
       ? { body: body instanceof Uint8Array ? body : JSON.stringify(body) }
@@ -54,43 +55,72 @@ try {
   const other = await createRoom();
   const base = `/api/rooms/${room.id}`;
   const route = `${base}/thumbnail`;
-  const put = (body, token = room.token) => call(route, { method: "PUT", body, token });
+  const key = `rooms/${room.id}/thumbnail`;
+  const imageRoute = `${route}/image`;
+  const put = (
+    bytes = PNG,
+    query = "nodeId=cover",
+    token = room.token,
+    contentType = "image/png",
+  ) =>
+    call(`${route}?${query}`, {
+      method: "PUT",
+      body: bytes,
+      token,
+      headers: { "content-type": contentType },
+    });
   const read = () => call(route, { token: room.token });
+  const digest = (bytes) => crypto.createHash("sha256").update(bytes).digest("hex");
+  const bytesOf = async (url, options) => {
+    const response = await call(url, options);
+    assert.equal(response.status, 200);
+    return new Uint8Array(await response.arrayBuffer());
+  };
+  const inventory = async () => {
+    const db = await mf.getD1Database("DB");
+    const assets = await db
+      .prepare("SELECT count(*) AS total FROM room_asset WHERE roomId = ?")
+      .bind(room.id)
+      .first();
+    const bucket = await mf.getR2Bucket("ASSETS_BUCKET");
+    const objects = await bucket.list({ prefix: `rooms/${room.id}/` });
+    return { assets: assets.total, keys: objects.objects.map((object) => object.key) };
+  };
   assert.deepEqual(await (await read()).json(), { thumbnail: null });
-  assert.equal((await call(route)).status, 401);
-  assert.equal((await call(route, { token: other.token })).status, 401);
-  const asset = await register(room, PNG);
-  assert.equal(
-    (await put({ assetId: asset.id, nodeId: "cover" })).status,
-    404,
-    "pending upload refused",
-  );
-  assert.equal((await call(asset.uploadUrl, { method: "PUT", body: PNG })).status, 200);
-  assert.equal(
-    (
-      await call(`/api/rooms/${other.id}/thumbnail`, {
-        method: "PUT",
-        token: other.token,
-        body: { assetId: asset.id, nodeId: "cover" },
-      })
-    ).status,
-    404,
-    "cross-room reference refused",
-  );
-  for (const nodeId of [null, "", " ", 123, "x".repeat(201)])
-    assert.equal((await put({ assetId: asset.id, nodeId })).status, 400);
-  assert.equal((await put(null)).status, 400);
-  assert.equal((await put({ assetId: "invalid", nodeId: "cover" })).status, 400);
-  const response = await put({ assetId: asset.id, nodeId: "cover" });
+  for (const token of [undefined, other.token]) {
+    for (const endpoint of [route, imageRoute])
+      assert.equal((await call(endpoint, { token })).status, 401);
+    assert.equal((await put(PNG, "nodeId=cover", token || "invalid")).status, 401);
+    assert.equal((await call(route, { method: "DELETE", token })).status, 401);
+  }
+  const response = await put();
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("cache-control"), "private, no-store");
   const { thumbnail } = await response.json();
-  assert.equal(thumbnail.assetId, asset.id);
   assert.equal(thumbnail.nodeId, "cover");
-  assert.equal(thumbnail.pageId, null, "existing custom-cover requests remain compatible");
+  assert.equal(thumbnail.pageId, null);
+  assert.equal(thumbnail.sha256, digest(PNG));
+  assert.equal(thumbnail.size, PNG.length);
   assert.equal(thumbnail.contentType, "image/png");
-  assert.equal(thumbnail.url, asset.url);
-  assert.deepEqual(new Uint8Array(await (await call(thumbnail.url)).arrayBuffer()), PNG);
+  assert.ok(!("assetId" in thumbnail));
+  assert.deepEqual(await bytesOf(thumbnail.url), PNG);
+  assert.deepEqual(await bytesOf(imageRoute, { token: room.token }), PNG);
+  assert.deepEqual(await bytesOf(`${imageRoute}?token=${room.token}`), PNG);
+  const served = await call(thumbnail.url);
+  assert.equal(served.headers.get("etag"), `"${digest(PNG)}"`);
+  assert.equal(served.headers.get("cache-control"), "private, no-cache");
+  assert.equal(served.headers.get("x-content-type-options"), "nosniff");
+  assert.equal((await call(thumbnail.url, { method: "HEAD" })).status, 200);
+  assert.equal(
+    (await call(thumbnail.url, { headers: { "if-none-match": `W/"${digest(PNG)}"` } })).status,
+    304,
+  );
+  const forged = new URL(thumbnail.url);
+  forged.searchParams.set("sig", "0".repeat(64));
+  assert.equal((await call(forged.href)).status, 403);
+  forged.searchParams.set("sig", new URL(thumbnail.url).searchParams.get("sig"));
+  forged.pathname = forged.pathname.replace(room.id, other.id);
+  assert.equal((await call(forged.href)).status, 403);
   for (const role of ["viewer", "commenter", "editor"]) {
     const member = await (
       await call(`${base}/tokens`, {
@@ -100,106 +130,132 @@ try {
       })
     ).json();
     assert.equal((await call(route, { token: member.token })).status, 200);
+    assert.deepEqual(await bytesOf(imageRoute, { token: member.token }), PNG);
+    assert.deepEqual(await bytesOf(`${imageRoute}?token=${member.token}`), PNG);
     const expected = role === "editor" ? 200 : 403;
-    assert.equal(
-      (await put({ assetId: asset.id, nodeId: "cover" }, member.token)).status,
-      expected,
-    );
-    assert.equal(
-      (await put({ assetId: asset.id, nodeId: null, pageId: "first-page" }, member.token)).status,
-      expected,
-      "default covers use the same editor permissions",
-    );
-    if (role !== "editor")
-      assert.equal((await call(route, { method: "DELETE", token: member.token })).status, 403);
+    assert.equal((await put(PNG, "nodeId=cover", member.token)).status, expected);
+    assert.equal((await put(PNG, "pageId=first-page", member.token)).status, expected);
+    assert.equal((await call(route, { method: "DELETE", token: member.token })).status, expected);
+    if (role === "editor") assert.equal((await put()).status, 200);
   }
-  const svg = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
-  const vector = await register(room, svg, "image/svg+xml");
-  assert.equal((await call(vector.uploadUrl, { method: "PUT", body: svg })).status, 200);
-  assert.equal((await put({ assetId: vector.id, nodeId: "cover" })).status, 415);
+  for (const query of [
+    "",
+    "nodeId=",
+    "nodeId=%20",
+    "pageId=",
+    "pageId=%20",
+    `nodeId=${"x".repeat(201)}`,
+    `pageId=${"x".repeat(201)}`,
+    "nodeId=cover&pageId=%20",
+  ])
+    assert.equal((await put(PNG, query)).status, 400, query);
+  for (const type of ["application/json", "image/svg+xml", "image/gif", "text/plain", ""])
+    assert.equal((await put(PNG, "nodeId=cover", room.token, type)).status, 415, type);
+  assert.equal((await put(new Uint8Array([1, 2, 3]))).status, 415);
+  assert.equal((await put(PNG, "nodeId=cover", room.token, "image/jpeg")).status, 415);
+  assert.equal((await put(new Uint8Array())).status, 400);
+  assert.equal((await put(new Uint8Array(2 * 1024 * 1024 + 1))).status, 413);
+  assert.deepEqual(await bytesOf(thumbnail.url), PNG, "invalid writes preserve previous image");
+  // Exercise every accepted magic signature with real R2 byte roundtrips.
+  for (const [contentType, bytes] of [
+    ["image/jpeg", new Uint8Array([255, 216, 255, 224])],
+    ["image/webp", new TextEncoder().encode("RIFF1234WEBP")],
+  ]) {
+    const result = await put(bytes, "nodeId=cover", room.token, contentType);
+    assert.equal(result.status, 200);
+    const image = (await result.json()).thumbnail;
+    assert.equal(image.contentType, contentType);
+    assert.deepEqual(await bytesOf(image.url), bytes);
+  }
+  let latest;
+  let latestBytes;
+  for (let i = 0; i < 50; i++) {
+    latestBytes = new Uint8Array([...PNG, i]);
+    const result = await put(latestBytes, "nodeId=&pageId=first-page");
+    assert.equal(result.status, 200);
+    latest = (await result.json()).thumbnail;
+    assert.equal(latest.sha256, digest(latestBytes));
+    assert.deepEqual(await inventory(), { assets: 0, keys: [key] });
+  }
+  assert.equal(latest.nodeId, null);
+  assert.equal(latest.pageId, "first-page");
+  assert.notEqual(latest.url, thumbnail.url);
+  assert.equal((await call(thumbnail.url)).status, 404, "old bytes are gone");
+  const staleSignature = new URL(thumbnail.url);
+  staleSignature.searchParams.set("v", latest.sha256);
   assert.equal(
-    (await put({ assetId: asset.id, nodeId: "new-cover" })).status,
-    200,
-    "upsert replaces selection",
+    (await call(staleSignature.href)).status,
+    403,
+    "old signature cannot read replacement",
   );
+  assert.deepEqual(await bytesOf(latest.url), latestBytes);
+  const bucket = await mf.getR2Bucket("ASSETS_BUCKET");
+  assert.deepEqual(new Uint8Array(await (await bucket.get(key)).arrayBuffer()), latestBytes);
+  assert.equal((await read()).headers.get("cache-control"), "private, no-store");
   await mf.dispose();
   mf = new Miniflare(options);
-  const persisted = await (await read()).json();
-  assert.equal(persisted.thumbnail.nodeId, "new-cover");
-  assert.equal(persisted.thumbnail.url, asset.url);
-  assert.equal((await call(persisted.thumbnail.url)).status, 200);
-  // Apply the shipped upgrade to a populated 0010 table, rather than only testing a fresh DB.
-  const db = await mf.getD1Database("DB");
-  const previousSchema = await fs.readFile(
-    new URL("../cloud/migrations/0010_room_thumbnails.sql", import.meta.url),
-    "utf8",
+  assert.deepEqual((await (await read()).json()).thumbnail, latest);
+  assert.deepEqual(await bytesOf(latest.url), latestBytes);
+  assert.deepEqual(await inventory(), { assets: 0, keys: [key] });
+  const concurrent = await Promise.all(
+    Array.from({ length: 8 }, (_, i) => put(new Uint8Array([...PNG, 100 + i]))),
   );
-  await db.batch([
-    db.prepare("DROP TABLE room_thumbnail"),
-    db.prepare(previousSchema),
-    db
-      .prepare("INSERT INTO room_thumbnail (roomId,assetId,nodeId,updatedAt) VALUES (?,?,?,?)")
-      .bind(room.id, asset.id, "new-cover", persisted.thumbnail.updatedAt),
+  for (const result of concurrent) assert.equal(result.status, 200);
+  const winner = (await (await read()).json()).thumbnail;
+  assert.equal(
+    digest(await bytesOf(winner.url)),
+    winner.sha256,
+    "concurrent writes keep metadata and bytes together",
+  );
+  await Promise.all([
+    put(PNG),
+    call(route, { method: "DELETE", token: room.token }),
+    put(new Uint8Array([...PNG, 200])),
   ]);
-  const upgrade = await fs.readFile(
-    new URL("../cloud/migrations/0011_default_room_thumbnails.sql", import.meta.url),
-    "utf8",
-  );
-  await db.batch(
-    upgrade
-      .replace(/^--.*$/gm, "")
-      .split(";")
-      .map((sql) => sql.trim())
-      .filter(Boolean)
-      .map((sql) => db.prepare(sql)),
-  );
-  const upgraded = (await (await read()).json()).thumbnail;
-  assert.equal(upgraded.nodeId, "new-cover", "upgrade preserves existing custom selection");
-  assert.equal(upgraded.pageId, null);
-  assert.equal(upgraded.url, asset.url);
-  assert.equal(upgraded.updatedAt, persisted.thumbnail.updatedAt);
-  for (const pageId of [undefined, null, "", " ", 123, "x".repeat(201)])
-    assert.equal((await put({ assetId: asset.id, nodeId: null, pageId })).status, 400);
+  const afterRace = (await (await read()).json()).thumbnail;
+  if (afterRace) assert.equal(digest(await bytesOf(afterRace.url)), afterRace.sha256);
+  else assert.equal(await (await mf.getR2Bucket("ASSETS_BUCKET")).get(key), null);
+  const asset = await register(room, PNG);
+  assert.equal((await call(asset.uploadUrl, { method: "PUT", body: PNG })).status, 200);
+  assert.deepEqual(await bytesOf(asset.url), PNG);
+  assert.equal((await inventory()).assets, 1, "normal assets still upload after 50 covers");
+  assert.equal((await put(PNG, "nodeId=custom&pageId=first-page")).status, 200);
+  assert.equal((await (await read()).json()).thumbnail.nodeId, "custom");
   assert.equal(
-    (await put({ assetId: asset.id, nodeId: "cover", pageId: 123 })).status,
-    400,
-    "custom covers cannot carry an invalid optional page ID",
-  );
-  const defaultResponse = await put({ assetId: asset.id, nodeId: null, pageId: "first-page" });
-  assert.equal(defaultResponse.status, 200);
-  const automatic = (await defaultResponse.json()).thumbnail;
-  assert.equal(automatic.nodeId, null);
-  assert.equal(automatic.pageId, "first-page");
-  assert.equal(automatic.url, asset.url);
-  assert.deepEqual(new Uint8Array(await (await call(automatic.url)).arrayBuffer()), PNG);
-  await mf.dispose();
-  mf = new Miniflare(options);
-  const defaultPersisted = (await (await read()).json()).thumbnail;
-  assert.equal(defaultPersisted.nodeId, null, "default selection survives restart");
-  assert.equal(defaultPersisted.pageId, "first-page");
-  assert.equal(defaultPersisted.url, asset.url);
-  assert.equal(
-    (await put({ assetId: asset.id, nodeId: "cover" })).status,
+    (await put(PNG, "pageId=first-page")).status,
     200,
-    "a custom cover replaces a default cover",
+    "restore replaces custom with default",
   );
-  assert.equal((await (await read()).json()).thumbnail.pageId, null);
+  assert.equal((await (await read()).json()).thumbnail.nodeId, null);
+  for (let i = 0; i < 2; i++) {
+    assert.equal((await call(route, { method: "DELETE", token: room.token })).status, 200);
+    assert.deepEqual(await (await read()).json(), { thumbnail: null });
+    assert.equal(await (await mf.getR2Bucket("ASSETS_BUCKET")).get(key), null);
+  }
+  assert.equal((await call(latest.url)).status, 404);
+  assert.equal((await call(imageRoute, { token: room.token })).status, 404);
+  assert.deepEqual(await bytesOf(asset.url), PNG, "deleting cover preserves independent assets");
+  const db = await mf.getD1Database("DB");
   assert.equal(
-    (await put({ assetId: asset.id, nodeId: null, pageId: "new-first-page" })).status,
-    200,
-    "a new first page replaces an old default cover",
+    (
+      await db
+        .prepare("SELECT count(*) AS total FROM room_thumbnail WHERE roomId=?")
+        .bind(room.id)
+        .first()
+    ).total,
+    0,
   );
-  assert.equal((await (await read()).json()).thumbnail.pageId, "new-first-page");
-  assert.equal((await call(route, { method: "DELETE", token: room.token })).status, 200);
-  assert.deepEqual(await (await read()).json(), { thumbnail: null });
-  assert.equal(
-    (await call(route, { method: "DELETE", token: room.token })).status,
-    200,
-    "clear is idempotent",
+  await assert.rejects(
+    db
+      .prepare(
+        "INSERT INTO room_thumbnail(roomId,sha256,contentType,size,updatedAt) VALUES(?,?,?,?,?)",
+      )
+      .bind(room.id, digest(PNG), "image/png", PNG.length, Date.now())
+      .run(),
+    /CHECK/,
   );
-  assert.equal((await call(asset.url)).status, 200, "clearing keeps reused asset bytes");
   console.log(
-    "PASS cloud thumbnails: real R2 bytes, persistent custom/default metadata, permissions, validation, replace and restore",
+    "PASS cloud thumbnails: R2 readback, replace/delete, auth/signatures, validation, restart, 50 writes use zero asset slots and one object; normal assets work",
   );
 } finally {
   await mf.dispose();

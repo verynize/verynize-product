@@ -392,9 +392,65 @@ export async function handleRoomAssets(request, env, url, roomId, assetId, acces
   return json({ error: "Not found" }, 404);
 }
 
-/** A file cover references an uploaded raster asset; clearing it never removes shared bytes. */
+// Covers have a reserved, mutable key: never a room_asset row or a SHA-256 asset key.
+export const MAX_THUMBNAIL = 2 * 1024 * 1024;
+const thumbnailKey = (roomId) => `rooms/${roomId}/thumbnail`;
+const thumbnailSignature = (env, roomId, sha256) => sign(env, "thumbnail-read", roomId, sha256);
+
+async function serveThumbnail(request, env, url, roomId, access) {
+  const version = url.searchParams.get("v");
+  const sig = url.searchParams.get("sig");
+  if (sig !== null) {
+    if (
+      !SHA256.test(version || "") ||
+      !SIGNATURE.test(sig) ||
+      !sameDigest(sig, await thumbnailSignature(env, roomId, version))
+    )
+      fail(403, "Thumbnail URL is invalid");
+  } else if (!(await access()).role) fail(401, "Unauthorized");
+  const row = await database(env)
+    .select()
+    .from(roomThumbnail)
+    .where(eq(roomThumbnail.roomId, roomId))
+    .get();
+  if (!row || (version !== null && version !== row.sha256)) fail(404, "Thumbnail not found");
+  const object = await env.ASSETS_BUCKET.get(thumbnailKey(roomId));
+  if (!object) fail(404, "Thumbnail not found");
+  // Never label bytes from a concurrent overwrite with another version's hash.
+  if (object.customMetadata?.sha256 !== row.sha256) fail(409, "Thumbnail is changing; retry");
+  const etag = `"${row.sha256}"`;
+  const headers = new Headers({
+    ...corsHeaders,
+    "content-type": row.contentType,
+    "content-length": String(object.size),
+    "x-content-type-options": "nosniff",
+    "cache-control": "private, no-cache",
+    "content-security-policy": "default-src 'none'; sandbox",
+    "content-disposition": "inline",
+    "cross-origin-resource-policy": "cross-origin",
+    "referrer-policy": "no-referrer",
+    etag,
+  });
+  const matches = (request.headers.get("if-none-match") || "")
+    .split(",")
+    .some((value) => value.trim().replace(/^W\//, "") === etag || value.trim() === "*");
+  if (matches) {
+    headers.delete("content-length");
+    await object.body.cancel();
+    return new Response(null, { status: 304, headers });
+  }
+  if (request.method === "HEAD") await object.body.cancel();
+  return new Response(request.method === "HEAD" ? null : object.body, { headers });
+}
+
+/** One independently stored raster cover per room; metadata never enters the document. */
 export async function handleRoomThumbnail(request, env, url, roomId, access) {
   configured(env);
+  if (url.pathname.endsWith("/image")) {
+    if (["GET", "HEAD"].includes(request.method))
+      return serveThumbnail(request, env, url, roomId, access);
+    return json({ error: "Not found" }, 404);
+  }
   const { role } = await access();
   if (!role) fail(401, "Unauthorized");
   if (!["GET", "PUT", "DELETE"].includes(request.method)) return json({ error: "Not found" }, 404);
@@ -406,58 +462,74 @@ export async function handleRoomThumbnail(request, env, url, roomId, access) {
     response.headers.set("cache-control", "private, no-store");
     return response;
   };
-  const describeThumbnail = async (row, asset) => ({
-    assetId: asset.id,
+  const describeThumbnail = async (row) => ({
+    url: `${url.origin}/api/rooms/${roomId}/thumbnail/image?v=${row.sha256}&sig=${await thumbnailSignature(env, roomId, row.sha256)}`,
     nodeId: row.nodeId,
     pageId: row.pageId,
-    ...(await describe(env, url.origin, asset)),
+    sha256: row.sha256,
+    contentType: row.contentType,
+    size: row.size,
     updatedAt: row.updatedAt,
   });
   if (request.method === "DELETE") {
-    await db.delete(roomThumbnail).where(eq(roomThumbnail.roomId, roomId));
+    await env.ROOMS.getByName(roomId).writeThumbnail(roomId, null, null);
     return answer(null);
   }
   if (request.method === "PUT") {
-    const data = await readJson(request, 4096);
+    const nodeId = url.searchParams.get("nodeId") || null;
+    const pageId = url.searchParams.get("pageId");
     const validId = (value) =>
       typeof value === "string" && value.trim().length > 0 && value.length <= 200;
     if (
-      typeof data?.assetId !== "string" ||
-      !/^[0-9a-f-]{36}$/.test(data.assetId) ||
-      (data.nodeId === null ? !validId(data.pageId) : !validId(data.nodeId)) ||
-      (data.pageId != null && !validId(data.pageId))
+      (nodeId === null ? !validId(pageId) : !validId(nodeId)) ||
+      (pageId !== null && !validId(pageId))
     )
       fail(
         400,
-        "A file thumbnail needs an assetId and a nodeId, or nodeId:null with a pageId (IDs up to 200 characters)",
+        "A thumbnail needs nodeId, or pageId when nodeId is empty (IDs up to 200 characters)",
       );
-    const asset = await find(env, roomId, data.assetId);
-    if (!asset || asset.status !== "ready") fail(404, "Uploaded thumbnail asset not found");
-    if (!["image/png", "image/jpeg", "image/webp"].includes(asset.contentType))
+    const contentType = (request.headers.get("content-type") || "")
+      .split(";")[0]
+      .trim()
+      .toLowerCase();
+    if (!["image/png", "image/jpeg", "image/webp"].includes(contentType))
       fail(415, "File thumbnails must be PNG, JPEG or WebP images");
+    const bytes = await readBytes(request, MAX_THUMBNAIL);
+    if (!bytes.length) fail(400, "Thumbnail image body is empty");
+    checkSniffed(bytes, contentType);
+    const sha256 = await bytesHex(bytes);
     const row = {
       roomId,
-      assetId: asset.id,
-      nodeId: data.nodeId,
-      pageId: data.pageId ?? null,
+      sha256,
+      contentType,
+      size: bytes.length,
+      nodeId,
+      pageId,
       updatedAt: Date.now(),
     };
-    await db
-      .insert(roomThumbnail)
-      .values(row)
-      .onConflictDoUpdate({
-        target: roomThumbnail.roomId,
-        set: {
-          assetId: row.assetId,
-          nodeId: row.nodeId,
-          pageId: row.pageId,
-          updatedAt: row.updatedAt,
-        },
-      });
-    return answer(await describeThumbnail(row, asset));
+    // Resolve signing configuration before making any storage changes.
+    const description = await describeThumbnail(row);
+    await env.ROOMS.getByName(roomId).writeThumbnail(roomId, row, bytes);
+    return answer(description);
   }
   const row = await db.select().from(roomThumbnail).where(eq(roomThumbnail.roomId, roomId)).get();
-  if (!row) return answer(null);
-  const asset = await find(env, roomId, row.assetId);
-  return answer(asset?.status === "ready" ? await describeThumbnail(row, asset) : null);
+  return answer(row ? await describeThumbnail(row) : null);
+}
+
+/** Called only by the room's serialized writer, after the Worker validates access and bytes. */
+export async function storeRoomThumbnail(env, roomId, row, bytes) {
+  const db = database(env);
+  if (!row) {
+    await env.ASSETS_BUCKET.delete(thumbnailKey(roomId));
+    await db.delete(roomThumbnail).where(eq(roomThumbnail.roomId, roomId));
+    return;
+  }
+  await env.ASSETS_BUCKET.put(thumbnailKey(roomId), bytes, {
+    httpMetadata: { contentType: row.contentType },
+    customMetadata: { sha256: row.sha256 },
+  });
+  await db.insert(roomThumbnail).values(row).onConflictDoUpdate({
+    target: roomThumbnail.roomId,
+    set: row,
+  });
 }

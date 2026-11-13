@@ -71,7 +71,7 @@ const APP_ROUTE = new RegExp(
 );
 // Room assets (cloud/assets.js).
 const ASSET_ROUTE = new RegExp(`^/api/rooms/(${UUID})/assets(?:/(${UUID}))?$`);
-const THUMBNAIL_ROUTE = new RegExp(`^/api/rooms/(${UUID})/thumbnail$`);
+const THUMBNAIL_ROUTE = new RegExp(`^/api/rooms/(${UUID})/thumbnail(?:/image)?$`);
 const SERVE_ROUTE =
   /^\/apps\/([a-z0-9][a-z0-9-]{2,29})\/([a-z0-9][a-z0-9-]{0,62})(?:@(\d+))?(\/.*)?$/;
 
@@ -586,8 +586,11 @@ async function handleRooms(request, env, url) {
         ? await orgRoomRole(env, assetRoom, account.authUser.id)
         : null;
       const asGet = new Request(request.url, { method: "GET", headers: request.headers });
+      const accessUrl = new URL("https://room/access");
+      if (thumbnailMatch && url.searchParams.has("token"))
+        accessUrl.searchParams.set("token", url.searchParams.get("token"));
       const checked = await env.ROOMS.getByName(assetRoom).fetch(
-        roomRequest(new URL("https://room/access"), asGet, account, undefined, orgRole),
+        roomRequest(accessUrl, asGet, account, undefined, orgRole),
       );
       return { role: checked.ok ? (await checked.json()).role : null, account };
     };

@@ -1,4 +1,4 @@
-// Real Electron -> room asset upload -> R2 -> home cover image, including refresh and restore.
+// Real Electron -> dedicated thumbnail upload -> R2 -> home cover image, including refresh and restore.
 import { Miniflare, cloudOptions } from "./cloud-harness.mjs";
 import { _electron as electron } from "@playwright/test";
 import { openSharedDesign } from "./helpers/shared-design.cjs";
@@ -91,7 +91,7 @@ try {
     });
   const uploads = [];
   page.on("request", (request) => {
-    if (request.method() === "PUT" && request.url().includes("/assets/"))
+    if (request.method() === "PUT" && request.url().includes("/thumbnail?"))
       uploads.push(request.url());
   });
   await waitForAsync(page, async () => {
@@ -101,7 +101,7 @@ try {
     return result.thumbnail?.nodeId === null && result.thumbnail?.pageId === "cover-page";
   });
   const automatic = (await metadata()).thumbnail;
-  assert.match(automatic.url, /\/assets\//);
+  assert.match(automatic.url, /\/thumbnail\/image\?/);
   assert.equal(
     await page.evaluate(() => window.design.getDocument().activePage),
     "other-page",
@@ -146,11 +146,11 @@ try {
     { timeout: 30000 },
   );
   const first = (await metadata()).thumbnail;
-  assert.match(first.url, /\/assets\/[0-9a-f-]+\?sig=[0-9a-f]{64}$/);
+  assert.match(first.url, /\/thumbnail\/image\?v=[0-9a-f]{64}&sig=[0-9a-f]{64}$/);
   assert.equal(first.contentType, "image/png");
-  assert.ok(uploads.length > 0, "cover bytes were uploaded through the room asset API");
+  assert.ok(uploads.length > 0, "cover bytes were uploaded through the thumbnail API");
   const bytes = new Uint8Array(await (await fetch(first.url)).arrayBuffer());
-  assert.deepEqual([...bytes.slice(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.deepEqual(Array.from(bytes.subarray(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
   const colorOf = (url) =>
     page.evaluate(async (url) => {
       const img = new Image();
@@ -164,7 +164,7 @@ try {
       return [...ctx.getImageData(0, 0, 1, 1).data];
     }, url);
   const red = await colorOf(first.url);
-  assert.ok(red[0] > 220 && red[1] < 30 && red[2] < 30, `cover is red: ${red}`);
+  assert.ok(red[0] > 220 && red[1] < 30 && red[2] < 30, `cover is red: ${red.join(",")}`);
   await page.locator("#files-home").click();
   const image = page
     .locator(`.file-card[data-file-id="${fileId}"] img[data-file-thumbnail-image]`)
@@ -201,7 +201,10 @@ try {
   );
   const second = (await metadata()).thumbnail;
   const blue = await colorOf(second.url);
-  assert.ok(blue[0] < 30 && blue[1] < 30 && blue[2] > 220, `updated cover is blue: ${blue}`);
+  assert.ok(
+    blue[0] < 30 && blue[1] < 30 && blue[2] > 220,
+    `updated cover is blue: ${blue.join(",")}`,
+  );
   await page.evaluate(() => window.design.setThumbnail(null));
   await waitForAsync(
     page,
@@ -240,6 +243,21 @@ try {
   console.log(
     "PASS desktop cloud thumbnail: full default first page includes root 40 in R2, custom cover, home reload, edits and restored automatic cover refresh, no binary socket payload",
   );
+} catch (error) {
+  if (app) {
+    const page = await app.firstWindow();
+    console.error(
+      "Thumbnail state:",
+      await page
+        .evaluate(() => ({
+          status: window.fileThumbnails?.status(),
+          connected: window.cloudWorkspace?.isConnected(),
+          role: window.cloudWorkspace?.role(),
+        }))
+        .catch(() => null),
+    );
+  }
+  throw error;
 } finally {
   await app?.close().catch(() => {});
   await mf?.dispose();

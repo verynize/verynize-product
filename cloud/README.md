@@ -314,40 +314,47 @@ Run, event, approval and tool-result rows live in `env.DB` (migrations `0005_ai_
 
 ## File cover thumbnails
 
-Rendered file covers reuse the room asset upload protocol below. The client renders the full
-first page (default) or its chosen frame (custom) as PNG and uploads it as a room asset. Select
-a custom cover with `PUT /api/rooms/:id/thumbnail` `{assetId,nodeId}`. Select an automatic
-first-page cover with `{assetId,nodeId:null,pageId}`. The asset must be fully uploaded, belong to
-that room, and be PNG, JPEG or WebP (404 for a missing, pending or foreign asset; 415 for other
-types). Custom `nodeId` and default `pageId` are non-empty strings of at most 200 characters.
-Custom covers can optionally include `pageId` too. Only editors and owners can
-select or clear a cover; viewers and commenters can read it.
+Covers overwrite a single R2 key `rooms/<roomId>/thumbnail`. This reserved non-hash key
+cannot collide with regular assets. Covers have no `room_asset` rows and consume neither
+asset slots nor asset storage quotas. The maximum cover size is 2 MiB.
 
-`GET /api/rooms/:id/thumbnail` returns `{thumbnail:null}` when none is selected, otherwise
-`{thumbnail:{assetId,id,nodeId,pageId,url,contentType,size,sha256,updatedAt}}`. `nodeId:null`
-identifies a default cover; custom covers from older requests have `pageId:null`. The `url` uses the same
-signed, immutable asset read protocol as images. Metadata responses are private and not cached.
-The client compares custom `nodeId` with the document's `thumbnailNodeId`, or default `pageId`
-with the first page ID when no custom thumbnail is selected, before displaying a cover.
-An older render therefore cannot override a different current selection. The metadata endpoint does
-not change the document selection itself. `DELETE /api/rooms/:id/thumbnail` returns
-`{thumbnail:null}` and is idempotent. Clearing a cover retains the asset bytes because other
-document layers may reuse them. Metadata persists separately in D1's `room_thumbnail` table
-(migrations `0010_room_thumbnails.sql` and `0011_default_room_thumbnails.sql`); migration 0011
-preserves existing custom covers while adding nullable node and page references. Binary bytes
-stay in `ASSETS_BUCKET` R2. Restoring the default generates and uploads a new first-page cover;
-the DELETE endpoint itself only clears stored metadata.
+- `PUT /api/rooms/:id/thumbnail?nodeId=<frameId>&pageId=<pageId>` (editor or owner):
+  raw image bytes with `Content-Type: image/png`, `image/jpeg` or `image/webp`.
+  Magic numbers must match the declared type. `nodeId` may be absent or empty for an
+  automatic first-page cover, in which case `pageId` is required. Nonempty IDs must be
+  non-whitespace strings of at most 200 characters; `pageId` is otherwise optional.
+  Returns `{thumbnail:{url,nodeId,pageId,sha256,contentType,size,updatedAt}}` (200).
+  Unspecified IDs are null; `updatedAt` is epoch milliseconds. Empty bodies or invalid
+  IDs return 400, unsupported/mismatched image types 415, oversized bodies 413.
+- `GET /api/rooms/:id/thumbnail` (any room role): returns the same metadata, or
+  `{thumbnail:null}`. Metadata responses use `Cache-Control: private, no-store`.
+- `GET|HEAD /api/rooms/:id/thumbnail/image?v=<sha256>&sig=<signature>`: image bytes,
+  quoted SHA-256 ETag, `Cache-Control: private, no-cache`, CORS and `nosniff` headers.
+  `If-None-Match` supports 304. Returned URLs carry an HMAC bound to this room and
+  byte version, so Home images load without headers. Without a signature, room access
+  is required (capability bearer header, session, or `?token=<roomToken>`).
+  Invalid signatures return 403; missing access returns 401. Old version URLs return
+  404 after replacement: old bytes are not retained and old signatures do not authorize
+  the replacement. URLs change whenever bytes change. Like asset URLs, anyone holding
+  a valid signed URL may read that version until replacement/deletion or signing-key rotation.
+- `DELETE /api/rooms/:id/thumbnail` (editor or owner): removes both the R2 object and
+  D1 row, returning `{thumbnail:null}` (200); repeat calls are safe.
 
-`node tests/cloud-thumbnails.mjs` verifies real R2 uploads and readback, role enforcement,
-pending and cross-room asset refusal, format validation, custom/default replacement, clearing and persistence
-across runtime restarts. It runs in the workerd, Node and Vercel cloud groups.
+D1 metadata uses `room_thumbnail` (migration `0010_room_thumbnails.sql`), with a check
+requiring a node or page selection. The previous asset-reference migrations were never
+deployed and are replaced by this single migration. There is currently no room deletion
+endpoint/lifecycle cleanup; any future room deletion must remove this reserved object too.
+Restoring the default in the editor generates a new automatic cover; DELETE clears it entirely.
+
+`node tests/cloud-thumbnails.mjs` covers real R2 readback/replacement/deletion, permissions,
+validation, restart persistence, and 50 replacements without consuming any asset slots.
 
 The renderer service `window.fileThumbnails` (`web/file-thumbnails.js`) regenerates covers after
 frame, page-content, token or embedded-font changes settle. It renders a detached layer tree
 without changing the current page or selection, bounds PNGs to 1920×1080, and uploads through
-`cloudAssets.uploadTo`. Desktop uses its offscreen Chromium renderer; the web uses an SVG
-foreignObject raster fallback. In-flight work rechecks the room and document before selecting
-the uploaded asset. Failed/offline uploads keep the local miniature and can retry on reconnect
+one raw PNG PUT to the thumbnail endpoint. Desktop uses its offscreen Chromium renderer; the web uses an SVG
+foreignObject raster fallback. In-flight work rechecks the room and document before uploading
+the rendered cover. Failed/offline uploads keep the local miniature and can retry on reconnect
 or `fileThumbnails.refresh()`; `status()` exposes upload/error state. Home cards prefer the
 uploaded image and fall back when it cannot load. **Restore default thumbnail** clears the
 selection in one undo step and regenerates the cloud cover from the full first page; deleting

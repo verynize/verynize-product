@@ -1,7 +1,11 @@
--- A rendered file cover references an existing room asset, never binary document data.
+-- One mutable R2 object at rooms/<roomId>/thumbnail, independent of room assets.
 CREATE TABLE room_thumbnail (
   roomId TEXT PRIMARY KEY NOT NULL,
-  assetId TEXT NOT NULL REFERENCES room_asset(id),
-  nodeId TEXT NOT NULL,
-  updatedAt INTEGER NOT NULL
+  sha256 TEXT NOT NULL,
+  contentType TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  nodeId TEXT,
+  pageId TEXT,
+  updatedAt INTEGER NOT NULL,
+  CHECK (nodeId IS NOT NULL OR pageId IS NOT NULL)
 );
