@@ -709,6 +709,7 @@ export async function handleAi(request, env, url, { accountOf, limited, ctx }) {
           label: provider.label,
           oauth: provider.oauth === true,
           fields: provider.fields,
+          ...(provider.capabilities ? { capabilities: provider.capabilities } : {}),
           connected: await credentialState(env, account, provider.id),
           models,
           defaultModel: models.find((model) => model.tools)?.id || null,

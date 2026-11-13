@@ -1,5 +1,7 @@
 import openrouter from "./openrouter.js";
 import vercel from "./vercel.js";
-// Import cloudflare and sumopod here, then append them to PROVIDERS in that order.
-export const PROVIDERS = [openrouter, vercel];
+import cloudflare from "./cloudflare.js";
+import sumopod from "./sumopod.js";
+
+export const PROVIDERS = [openrouter, vercel, cloudflare, sumopod];
 export const getProvider = (id) => PROVIDERS.find((provider) => provider.id === id);
