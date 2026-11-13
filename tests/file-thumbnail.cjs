@@ -166,6 +166,29 @@ const fs = require("node:fs/promises"),
     });
     assert.deepEqual(detached, { unchanged: true, width: 420, text: true });
 
+    // A background cover render never makes a user export fail; two exports still refuse.
+    const overlap = await page.evaluate(async () => {
+      window.design.setSelection(["card"]);
+      const cover = window.fileThumbnails.render("card");
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const exported = await window.design.exportArtwork({ format: "PNG", selectionOnly: true });
+      const settled = await Promise.allSettled([cover]);
+      const job = { html: "<!doctype html><body>x</body>", width: 40, height: 40 };
+      const both = await Promise.allSettled([
+        window.desktop.renderDesign(job),
+        window.desktop.renderDesign(job),
+      ]);
+      return {
+        exported: (exported.dataURL || "").startsWith("data:image/png"),
+        cover: settled[0].status === "fulfilled" && settled[0].value.startsWith("data:image/png"),
+        refused: both.filter((r) => r.status === "rejected").map((r) => r.reason.message),
+      };
+    });
+    assert.equal(overlap.exported, true, "export succeeds while a cover renders");
+    assert.equal(overlap.cover, true);
+    assert.equal(overlap.refused.length, 1);
+    assert.match(overlap.refused[0], /already rendering/);
+
     // Invalid values are rejected by validate().
     const rejected = await page.evaluate(() => {
       const d = window.design.getDocument();
