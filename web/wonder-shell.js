@@ -512,74 +512,17 @@
   function makeThumbnail(file) {
     const thumb = document.createElement("div");
     thumb.className = "file-thumbnail";
-    const pickId = file.document.thumbnailNodeId,
-      pickPage =
-        typeof pickId === "string"
-          ? file.document.pages.find((p) => p.nodes.some((n) => n.id === pickId))
-          : null,
-      pick = pickPage?.nodes.find((n) => n.id === pickId);
-    const page =
-      pickPage ||
-      file.document.pages.find((p) => p.id === file.document.activePage) ||
-      file.document.pages[0];
-    const nodes = page?.nodes || [];
-    if (!nodes.length) {
-      const image = icon("file");
-      image.className = "empty-file-icon";
+    // Legacy callers use the same raster service as the React cards; no simplified node tree.
+    void window.fileThumbnails?.load(file).then((cover) => {
+      if (!cover) return;
+      const image = document.createElement("img");
+      image.src = cover.url;
+      image.alt = "";
+      image.dataset.fileThumbnailImage = "";
+      image.style.cssText = `width:100%;height:100%;object-fit:${cover.nodeId ? "cover" : "contain"}`;
+      if (cover.nodeId) thumb.dataset.thumbnailNode = cover.nodeId;
       thumb.append(image);
-      return thumb;
-    }
-    const miniature = document.createElement("div");
-    miniature.className = "thumbnail-artboard";
-    function draw(node, parent = null, depth = 0) {
-      if (depth > 30) return document.createElement("div");
-      const element = document.createElement(node.type === "image" ? "img" : "div"),
-        flow = parent && parent.layout && parent.layout !== "free";
-      const color = file.document.tokens?.[node.token] || node.color;
-      Object.assign(element.style, {
-        position: flow ? "relative" : "absolute",
-        left: flow ? "" : node.x + "px",
-        top: flow ? "" : node.y + "px",
-        width: node.w + "px",
-        height: node.h + "px",
-        borderRadius: (node.radius || 0) + "px",
-        color: color || "#222",
-        background: node.type === "text" ? "transparent" : color || "#aaa",
-        fontSize: (node.fontSize || 24) + "px",
-        fontFamily: node.fontFamily || "system-ui",
-        fontWeight: node.fontWeight || "400",
-        whiteSpace: "pre-wrap",
-        overflow: "hidden",
-        flexShrink: "0",
-        boxSizing: "border-box",
-      });
-      if (node.type === "text") element.textContent = node.text || "";
-      if (node.type === "image" && String(node.src || "").startsWith("data:image/"))
-        element.src = node.src;
-      if (node.gradient && !/url\(/i.test(node.gradient))
-        element.style.backgroundImage = node.gradient;
-      if (node.type === "frame") {
-        Object.assign(element.style, {
-          display: ["flex", "grid"].includes(node.layout) ? node.layout : "block",
-          gap: (node.gap || 0) + "px",
-          padding: node.layout === "free" ? "0" : (node.padding || 0) + "px",
-          flexDirection: node.direction || "row",
-          gridTemplateColumns: `repeat(${node.columns || 2},1fr)`,
-        });
-        for (const child of nodes.filter((n) => n.parentId === node.id).slice(0, 80))
-          element.append(draw(child, node, depth + 1));
-      }
-      return element;
-    }
-    if (pick) {
-      const element = draw(pick);
-      Object.assign(element.style, { position: "absolute", left: "0px", top: "0px" });
-      thumb.dataset.thumbnailNode = pick.id;
-      miniature.append(element);
-    } else
-      for (const node of nodes.filter((n) => !n.parentId).slice(0, 35))
-        miniature.append(draw(node));
-    thumb.append(miniature);
+    });
     return thumb;
   }
   const fileById = (id) => library.files.find((f) => f.id === id);

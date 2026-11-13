@@ -793,8 +793,8 @@
           `@font-face{font-family:${JSON.stringify(f.family)};font-weight:${f.weight};font-style:${f.style};font-display:block;src:url(${f.src})${f.unicodeRange ? ";unicode-range:" + f.unicodeRange : ""}}`,
       )
       .join("\n");
-  window.embeddedFontCss = (markup) => {
-    const faces = window.design.getDocument().fontFaces || [];
+  window.embeddedFontCss = (markup, doc = window.design.getDocument()) => {
+    const faces = doc.fontFaces || [];
     const text =
       markup === undefined
         ? null

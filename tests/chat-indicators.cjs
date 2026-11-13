@@ -45,7 +45,10 @@ const path = require("node:path");
     // Stub provider account usage (Settings › Usage data) and this week's AI layers in the main process.
     const resetsAt = Date.now() + 3 * 3600_000;
     await app.evaluate(({ BrowserWindow }, resetsAt) => {
-      const ipc = BrowserWindow.getAllWindows()[0].webContents.ipc;
+      // Home renders file covers in offscreen windows; stub the editor window's handlers.
+      const ipc = BrowserWindow.getAllWindows().find((w) =>
+        w.webContents.getURL().startsWith("app://verynize"),
+      ).webContents.ipc;
       ipc.removeHandler("desktop:agentUsage");
       ipc.removeHandler("desktop:agentLayerUsage");
       ipc.handle("desktop:agentUsage", (_e, options) => ({

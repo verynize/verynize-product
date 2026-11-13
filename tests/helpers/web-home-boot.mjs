@@ -47,6 +47,17 @@ export async function checkDeferredHome(browser, origin, identity, mode) {
       chat: "undefined",
     };
     assert.deepEqual(await unbooted(), expected);
+    assert.equal(await page.evaluate(() => typeof window.fileThumbnails?.load), "function");
+    assert.equal(
+      await page.evaluate(async () => {
+        return window.fileThumbnails.local({
+          id: "cold-local",
+          document: { pages: [{ id: "page", nodes: [] }] },
+        });
+      }),
+      null,
+      "local covers defer rendering until the editor boots",
+    );
     // Idle prefetch must not evaluate the canvas or mount the editor islands.
     await page.waitForFunction(
       () => !!document.querySelector('link[rel="prefetch"][href*="canvas-interactions"]'),
@@ -117,6 +128,7 @@ export async function checkDeferredHome(browser, origin, identity, mode) {
     await page.evaluate(async () => {
       await window.cloudWorkspace.flush();
       await window.fileLibrary.flush();
+      await window.fileThumbnails.refresh();
       window.fileLibrary.showHome();
     });
     await page.waitForURL(origin + "/");
@@ -125,6 +137,10 @@ export async function checkDeferredHome(browser, origin, identity, mode) {
       .locator("#library-files .file-card")
       .filter({ hasText: "Deferred boot regression" });
     await coldCard.waitFor();
+    const remoteCover = coldCard.locator("img[data-file-thumbnail-image]");
+    await remoteCover.waitFor();
+    await remoteCover.evaluate((image) => image.decode());
+    assert.ok(await remoteCover.getAttribute("src"), "cold Home loads the stored remote cover");
     assert.deepEqual(await unbooted(), expected);
     await coldCard.hover();
     await page.waitForFunction(

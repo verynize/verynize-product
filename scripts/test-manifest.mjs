@@ -326,6 +326,7 @@ const canvas = [
   electron("tests/canvas-context-menu.cjs", "canvas", AREA.canvas, CLIP),
   electron("tests/file-thumbnail.cjs", "canvas", [
     ...isl("home"),
+    "web/file-thumbnails.js",
     "desktop/design-files.cjs",
     "desktop/render.cjs",
   ]),
@@ -639,6 +640,7 @@ const ux = [
   electron("tests/sidebar-scroll.cjs", "ux", [...AREA.shell, ...AREA.inspector, ...isl("chat")]),
   electron("tests/web-platform.cjs", "ux", [
     ...AREA.shell,
+    "web/file-thumbnails.js",
     "web/platform.js",
     "web/src/lib/platform.ts",
   ]),
@@ -682,6 +684,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-ai-cancel.mjs",
   "tests/cloud-ai-durable.mjs",
   "tests/cloud-assets.mjs",
+  "tests/cloud-thumbnails.mjs",
   "tests/cloud-pages-assets.mjs",
   "tests/cloud-page-icons.mjs",
 ];
@@ -805,6 +808,14 @@ const e2eCloud = [
   electron("tests/cloud-assets-desktop.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,
     "integrations/assets.mjs",
+  ]),
+  electron("tests/cloud-thumbnail-desktop.mjs", "e2e-cloud", [
+    ...AREA.cloudRenderer,
+    ...isl("home"),
+    "web/file-thumbnails.js",
+    "cloud/assets.js",
+    "cloud/schema.js",
+    "cloud/migrations/*",
   ]),
   electron("tests/cloud-accounts-desktop.mjs", "e2e-cloud", [
     ...AREA.cloudRenderer,

@@ -312,6 +312,61 @@ Session tokens expire with the Better Auth session and are revoked by sign-out; 
 
 Run, event, approval and tool-result rows live in `env.DB` (migrations `0005_ai_runs.sql` and `0006_ai_approval_account.sql`; `cloud/ai-store.js`). The executor (`cloud/ai-executor.js`) offers the hosted tools of `cloud/design-backend.js` (the backend `cloud/mcp.js` uses, scoped to the run's room; `create_document` is not offered), re-checks the caller's room role before every tool call and again immediately before a write runs, counts tool calls against `maxToolCalls`, caps model turns with `maxIterations(maxTurns)` and stores each event before sending it. Under `access: "ask"` (default) every write waits for a decision stored in `ai_approval` (stored in the database, so the decision may arrive on any instance; the endpoint then notifies the run's `AiRun` object, and request-scoped runs poll), denied after `VERYNIZE_AI_APPROVAL_TIMEOUT_MS` (10 minutes) or when the run ends; `edit`/`auto`/`full` write without a prompt. A write is claimed in `ai_tool_result` before it runs, so it is applied at most once per `(runId, toolCallId)`. `plan: true` refuses write calls; `helper: true` offers no write tools. Optional variables: `OPENROUTER_BASE_URL` (tests point it at a local fake), `VERYNIZE_AI_MODELS` (`id[=Label],…`, first is the default; default `openrouter/auto`), `VERYNIZE_AI_MAX_TURNS` (12), `VERYNIZE_AI_MAX_TOOL_CALLS` (40), `VERYNIZE_AI_APPROVAL_TIMEOUT_MS` (600000). Hosting: Cloudflare and Node run each run in its `AiRun` object (`AI_RUNS` binding); Vercel runs it inside the starting request. Tests: `node tests/cloud-ai.mjs`, `node tests/cloud-ai-durable.mjs` (disconnect, late approval, timeout, cancel and concurrent subscribers; both also on Node and Vercel) and `node tests/ai-routing.mjs`.
 
+## File cover thumbnails
+
+Covers overwrite a single R2 key `rooms/<roomId>/thumbnail`. This reserved non-hash key
+cannot collide with regular assets. Covers have no `room_asset` rows and consume neither
+asset slots nor asset storage quotas. The maximum cover size is 2 MiB.
+
+- `PUT /api/rooms/:id/thumbnail?nodeId=<frameId>&pageId=<pageId>` (editor or owner):
+  raw image bytes with `Content-Type: image/png`, `image/jpeg` or `image/webp`.
+  Magic numbers must match the declared type. `nodeId` may be absent or empty for an
+  automatic first-page cover, in which case `pageId` is required. Nonempty IDs must be
+  non-whitespace strings of at most 200 characters; `pageId` is otherwise optional.
+  Returns `{thumbnail:{url,nodeId,pageId,sha256,contentType,size,updatedAt}}` (200).
+  Unspecified IDs are null; `updatedAt` is epoch milliseconds. Empty bodies or invalid
+  IDs return 400, unsupported/mismatched image types 415, oversized bodies 413.
+- `GET /api/rooms/:id/thumbnail` (any room role): returns the same metadata, or
+  `{thumbnail:null}`. Metadata responses use `Cache-Control: private, no-store`.
+- `GET|HEAD /api/rooms/:id/thumbnail/image?v=<sha256>&sig=<signature>`: image bytes,
+  quoted SHA-256 ETag, `Cache-Control: private, no-cache`, CORS and `nosniff` headers.
+  `If-None-Match` supports 304. Returned URLs carry an HMAC bound to this room and
+  byte version, so Home images load without headers. Without a signature, room access
+  is required (capability bearer header, session, or `?token=<roomToken>`).
+  Invalid signatures return 403; missing access returns 401. Old version URLs return
+  404 after replacement: old bytes are not retained and old signatures do not authorize
+  the replacement. URLs change whenever bytes change. Like asset URLs, anyone holding
+  a valid signed URL may read that version until replacement/deletion or signing-key rotation.
+- `DELETE /api/rooms/:id/thumbnail` (editor or owner): removes both the R2 object and
+  D1 row, returning `{thumbnail:null}` (200); repeat calls are safe.
+
+D1 metadata uses `room_thumbnail` (migration `0010_room_thumbnails.sql`), with a check
+requiring a node or page selection. The previous asset-reference migrations were never
+deployed and are replaced by this single migration. There is currently no room deletion
+endpoint/lifecycle cleanup; any future room deletion must remove this reserved object too.
+Restoring the default in the editor generates a new automatic cover; DELETE clears it entirely.
+
+`node tests/cloud-thumbnails.mjs` covers real R2 readback/replacement/deletion, permissions,
+validation, restart persistence, and 50 replacements without consuming any asset slots.
+
+The renderer service `window.fileThumbnails` (`web/file-thumbnails.js`) regenerates covers after
+frame, page-content, token or embedded-font changes settle: 10 seconds after the last edit, at
+most every 45 seconds while editing continues, and at once on set/restore, leaving the file,
+hiding the window or switching documents. It renders a detached layer tree without changing the
+current page or selection and bounds the raster to 1920×1080. Desktop uses its offscreen Chromium
+renderer; the web uses an SVG foreignObject raster fallback. The PNG is uploaded raw, re-encoded
+as WebP (or JPEG) when it exceeds 2 MiB, and skipped when the server already holds the same
+SHA-256 and selection. Each job keeps the room, its request credentials and the document
+snapshot it was captured with, and jobs run one at a time per room, so a switch mid-upload
+writes the old room's cover to the old room and an older job never finishes after a newer one.
+Failed or offline uploads show the local render and retry on the next edit, on reconnect or on
+`fileThumbnails.refresh()`; `status()` exposes upload/error state. Home cards prefer the
+uploaded image and fall back to a local render when it cannot load. **Restore default thumbnail**
+clears the selection in one undo step and regenerates the cloud cover from the full first page;
+deleting its frame also restores that default. Default rendering uses the first page,
+independent of the currently active page, and includes every visible root. A chosen frame that
+is missing from the loaded pages makes the job load the unloaded lazy pages before choosing.
+
 ## Room assets (`cloud/assets.js`, `cloud/inline-binaries.js`, `web/cloud-assets.js`)
 
 Binary data never lives inside a shared document. Images, SVG, fonts and video in shared rooms are stored once in the `ASSETS_BUCKET` R2 bucket (named so that it does not clash with the static `ASSETS` binding) and referenced from the document by URL. Collaborators therefore receive a short URL operation instead of a data URI, and binaries do not count against the room's document size. Metadata lives in D1 (`room_asset`, migration `0004_room_assets.sql`: room, sha256, size, content type, status, creator, created and uploaded times). Objects are keyed `rooms/<roomId>/<sha256>`. Which data URIs count as binaries comes from one module shared by the editor, the islands and the server: `web/storage-limits.js` (`ASSET_LIMIT_BYTES` 20 MiB, `INLINE_LIMIT_BYTES` 8 KiB, `SVG_INLINE_LIMIT_BYTES` 256 KiB). The page and document limits it reports (`PAGE_LIMIT_BYTES` 20 MiB, `DOCUMENT_LIMIT_BYTES` 20 MiB) are read from `web/room-limits.js`, the values the room enforces (`cloud/limits.js`, "Page storage and lazy pages" above).
@@ -337,7 +392,7 @@ Published apps (`cloud/apps.js`) store the bytes of every file in the same bucke
 
 **Size limits in the editor.** `web/storage-limits.js` measures the open document after edits settle (debounced, never per pointer move) with binaries that will become assets counted as their URL. The storage island (`web/src/islands/storage*`) shows the size in the Share panel (`#storage-meter[data-level=ok|warn|over]`: file size against 20 MB, the largest page against the shared 20 MB budget, embedded files that will be stored separately, upload progress), a warning from 80 % of a limit naming the page (with a toast), and a blocking error when a share, sync or save is stopped by a limit (`#storage-limit-error` inside the Share panel, `#storage-limit-dialog` elsewhere, titled after the action). Server refusals for size (`exceeds`, `too large`, inline data, 413) reach the same error through the panel's status line, and a native save refused by the 20 MiB file limit of `integrations/design-store.mjs` through `web/desktop-panel.js`.
 
-**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export and file thumbnails show only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
+**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export shows only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
 
 ## Email delivery (`cloud/mail.js`)
 

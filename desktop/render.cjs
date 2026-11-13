@@ -455,19 +455,27 @@ async function renderNow(
   }
 }
 function registerRendering(handle, parent) {
-  let active = false;
+  let active = null;
   // Validate the renderer on demand through renderHTML/renderPDF. A startup capture
   // creates a second BrowserWindow while the editor initializes, racing window/IPC
   // discovery and spending compositor resources before the user requests a render.
   registerArtworkExport(handle, parent);
   handle("renderDesign", async (input) => {
-    if (active) throw Error("An export is already rendering");
     renderOptions(input);
-    active = true;
+    // One render at a time. `background` renders (file covers) wait their turn, and an
+    // export waits for a background render instead of failing; two exports still refuse.
+    const background = input.background === true;
+    while (active) {
+      if (!background && !active.background) throw Error("An export is already rendering");
+      await active.done;
+    }
+    let finish;
+    active = { background, done: new Promise((resolve) => (finish = resolve)) };
     try {
       return await renderHTML(input, parent);
     } finally {
-      active = false;
+      active = null;
+      finish();
     }
   });
   // Editor canvas fonts: the renderer asks for embedded @font-face CSS for the families a document uses.

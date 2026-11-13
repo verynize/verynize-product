@@ -1,6 +1,15 @@
+import { sql } from "drizzle-orm";
 // D1 schema matching the existing SQL migrations. Auth dates remain ISO text for
 // compatibility with the original Better Auth adapter; room dates remain epoch ms.
-import { sqliteTable, text, integer, index, primaryKey, unique } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  primaryKey,
+  unique,
+  check,
+} from "drizzle-orm/sqlite-core";
 
 export const user = sqliteTable("user", {
   id: text("id").notNull().primaryKey(),
@@ -213,6 +222,26 @@ export const roomAsset = sqliteTable(
   (table) => [
     unique().on(table.roomId, table.sha256),
     index("room_asset_roomId_idx").on(table.roomId),
+  ],
+);
+
+// File covers (migration 0010): one reserved R2 object per room, outside asset quotas.
+export const roomThumbnail = sqliteTable(
+  "room_thumbnail",
+  {
+    roomId: text("roomId").notNull().primaryKey(),
+    sha256: text("sha256").notNull(),
+    contentType: text("contentType").notNull(),
+    size: integer("size").notNull(),
+    nodeId: text("nodeId"),
+    pageId: text("pageId"),
+    updatedAt: integer("updatedAt").notNull(),
+  },
+  (table) => [
+    check(
+      "room_thumbnail_selection",
+      sql`${table.nodeId} IS NOT NULL OR ${table.pageId} IS NOT NULL`,
+    ),
   ],
 );
 

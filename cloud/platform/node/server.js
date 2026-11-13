@@ -88,6 +88,17 @@ export function createServer({ worker, env, assets, publicUrl, trustProxy, clien
     try {
       const request = toRequest(incoming);
       await send(await respond(request), outgoing, request.method);
+      // A refusal answered before reading the body (413 from Content-Length) must not reset
+      // the connection while the client is still sending: discard the rest, up to a bound.
+      if (!incoming.complete && !incoming.destroyed) {
+        let discarded = 0;
+        incoming.removeAllListeners("data");
+        incoming.on("data", (chunk) => {
+          discarded += chunk.length;
+          if (discarded > 64 * 1024 * 1024) incoming.destroy();
+        });
+        incoming.resume();
+      }
     } catch (error) {
       console.error("request failed", incoming.url?.split("?")[0], error?.message);
       if (!outgoing.headersSent) {

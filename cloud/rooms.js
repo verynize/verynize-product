@@ -5,6 +5,7 @@
 import { DurableObject, acceptWebSocket } from "#cloud-runtime";
 import "../web/cloud-ops.js";
 import "../web/room-sync.js";
+import { storeRoomThumbnail } from "./assets.js";
 import { RoomStore } from "./room-store.js";
 import { RoomHistory } from "./room-history.js";
 import {
@@ -99,6 +100,15 @@ export class DesignRoom extends DurableObject {
     // Rooms that kept the whole document in room.document move to per-page records once, and
     // pages stored as one node text move to node rows; all or nothing.
     ctx.storage.transactionSync(() => this.store.migrate(this.row()));
+  }
+
+  // R2 and D1 are separate writes. Serialize cover mutations per room so simultaneous
+  // renders/deletes cannot leave the final row describing another request's bytes.
+  async writeThumbnail(roomId, row, bytes) {
+    const previous = this.thumbnailWrite || Promise.resolve();
+    const pending = previous.then(() => storeRoomThumbnail(this.env, roomId, row, bytes));
+    this.thumbnailWrite = pending.catch(() => {});
+    await pending;
   }
 
   // Rooms created before roles stored one capability hash as a JSON byte array on the room row.

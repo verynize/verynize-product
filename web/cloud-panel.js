@@ -1694,6 +1694,17 @@
     account: () => (account ? { ...account.account } : null),
     // cloud-assets (web/cloud-assets.js): the connected room and authenticated room requests.
     request: (path, options) => request(path, options),
+    // Capture authentication before an async cover render/upload: switching files must not change its room.
+    requestForRoom: (room) => {
+      const lib = library();
+      const fileId = lib?.findCloud?.(room.server, room.id);
+      const stored = fileId ? lib.cloudOf?.(fileId) : null;
+      const info =
+        connection?.id === room.id && connection?.server === room.server
+          ? { ...connection }
+          : { server: room.server, id: room.id, token: stored?.token || null };
+      return (path, options) => request(path, options, info);
+    },
     // Share popover (web/cloud-share.js builds ensureRoom/access/setVisibility/invite/shareLink on these).
     createRoom: (server) => createRoom(server),
     /** The connection settings' server (the field in the legacy dialog), or "". */
