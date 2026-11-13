@@ -32,7 +32,15 @@ export type OpenRouterCredential = {
   /** No key of its own, but the server's opted-in shared key covers runs. */
   serverFallback?: boolean;
 };
-export type AiCredentials = { openrouter: OpenRouterCredential };
+export type AiCredentials = Record<string, OpenRouterCredential>;
+export class AiCredentialError extends Error {
+  constructor(
+    message: string,
+    readonly field?: string,
+  ) {
+    super(message);
+  }
+}
 
 const OAUTH_START = "/api/ai/credentials/openrouter/oauth/start";
 const RETURN_HASH = "verynize.openrouter.return-hash";
@@ -47,10 +55,11 @@ function scopeNow(): AccountScope | null {
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const api = window.cloudAccount;
-  if (!api || !scopeNow()) throw Error("Sign in to connect OpenRouter");
+  if (!api || !scopeNow()) throw Error("Sign in to connect an AI provider");
   const response = await api.fetch(path, init);
   const data = await response.json().catch(() => null);
-  if (!response.ok) throw Error(data?.error || `Server returned ${response.status}`);
+  if (!response.ok)
+    throw new AiCredentialError(data?.error || `Server returned ${response.status}`, data?.field);
   return data as T;
 }
 
@@ -96,16 +105,26 @@ export async function connectOpenRouter(returnTo?: string) {
 
 /** The pasted-key fallback: the backend checks the key with OpenRouter before it stores it. */
 export async function saveOpenRouterKey(apiKey: string) {
-  const result = await call<AiCredentials>("/api/ai/credentials/openrouter", {
+  return saveAiCredential("openrouter", { apiKey });
+}
+
+export async function saveAiCredential(provider: string, fields: Record<string, string>) {
+  const result = await call<AiCredentials>(`/api/ai/credentials/${encodeURIComponent(provider)}`, {
     method: "PUT",
-    body: JSON.stringify({ apiKey }),
+    body: JSON.stringify(fields),
   });
   await credentialsChanged();
   return result;
 }
 
 export async function disconnectOpenRouter() {
-  await call<{ ok: boolean }>("/api/ai/credentials/openrouter", { method: "DELETE" });
+  return disconnectAiProvider("openrouter");
+}
+
+export async function disconnectAiProvider(provider: string) {
+  await call<{ ok: boolean }>(`/api/ai/credentials/${encodeURIComponent(provider)}`, {
+    method: "DELETE",
+  });
   await credentialsChanged();
 }
 

@@ -10,7 +10,7 @@ import { TelemetrySection } from "./telemetry";
 import { useToolsInfo } from "./agent-memory";
 import { AgentAccessSection, AgentToolsSection, ProviderAccountList } from "./agents-tools";
 import { AgentBehaviorSections } from "./agents-behavior";
-import { OpenRouterSection } from "./openrouter";
+import { ModelApiSection } from "./ai-providers";
 import { MemoryView } from "./memory";
 import { UsageView } from "./usage";
 import { agentWorkspace, type AgentInfo, type Preferences, type SettingsApi } from "./api";
@@ -313,7 +313,7 @@ export function AgentsPage({ api, accounts }: PageProps) {
         >
           <ProviderAccountList api={api} agents={agents} error={error} accounts={accounts} />
         </Section>
-        <OpenRouterSection />
+        <ModelApiSection />
         <AgentToolsSection />
         <AgentAccessSection />
         <Section

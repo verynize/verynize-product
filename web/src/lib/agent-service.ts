@@ -28,6 +28,7 @@ export type AgentRunOptions = {
   prompt: string;
   chatId: string;
   model?: string;
+  provider?: string;
   access?: string;
   designStyle?: string;
   /** Web: earlier turns of the chat (the model API keeps no provider session). */
@@ -80,7 +81,27 @@ export function createDesktopAgentService(desktop: DesktopApi): AgentService {
 /* ---------- web: /api/ai/* ---------- */
 
 /** `GET /api/ai/config` (cloud/ai.js aiConfig). */
+export type AiProvider = {
+  id: string;
+  label: string;
+  oauth: boolean;
+  fields: {
+    name: string;
+    label: string;
+    secret: boolean;
+    required: boolean;
+    placeholder?: string;
+    help?: string;
+  }[];
+  connected: "connected" | "server" | "missing";
+  models: { id: string; label: string; tools: boolean }[];
+  defaultModel: string | null;
+  capabilities?: { tools: boolean; streaming?: string };
+};
+export type AiSelection = { provider: string; model: string };
 export type AiConfig = {
+  providers?: AiProvider[];
+  defaultProvider?: string;
   enabled: boolean;
   provider: string;
   models: { id: string; label: string }[];
@@ -95,7 +116,34 @@ export type AiConfig = {
 
 /** True when the config lets the account start a run (runtime on and a credential to run with). */
 export const canRun = (config: AiConfig | null | undefined) =>
-  !!config?.enabled && config.credentials?.openrouter !== "missing";
+  !!config?.enabled &&
+  (config.providers
+    ? config.providers.some((provider) => provider.connected !== "missing")
+    : config.credentials?.openrouter !== "missing");
+
+/** Normalize old servers without changing their OpenRouter behaviour. */
+export function aiProviders(config: AiConfig): AiProvider[] {
+  return (
+    config.providers ?? [
+      {
+        ...WEB_AGENT,
+        oauth: true,
+        fields: [
+          {
+            name: "apiKey",
+            label: "API key",
+            secret: true,
+            required: true,
+            placeholder: "sk-or-v1-…",
+          },
+        ],
+        connected: config.credentials?.openrouter ?? (config.enabled ? "server" : "missing"),
+        models: config.models.map((model) => ({ ...model, tools: true })),
+        defaultModel: config.defaultModel,
+      },
+    ]
+  );
+}
 
 /** What the chat says when the model API cannot run a turn. Shown verbatim (tests match them). */
 export const WEB_AGENT_MESSAGES = {
@@ -117,6 +165,8 @@ export type WebAgentDeps = {
   ready(): boolean;
   /** Waits between reconnect attempts after a dropped stream (ms); the last one ends the run as failed. */
   retryDelays?: number[];
+  selection?(chatId: string): AiSelection | null;
+  defaultModel?(provider: string): string;
   /** The server refused a start for want of a credential (`credentials_required`): refresh the config. */
   credentialsRequired?(): void;
 };
@@ -271,17 +321,42 @@ export function createWebAgentService(deps: WebAgentDeps): AgentService {
   };
 
   async function start(options: AgentRunOptions): Promise<AgentRunResult> {
+    const selection = deps.selection?.(options.chatId);
     const config = await deps.config();
     if (!config) throw Error(WEB_AGENT_MESSAGES.signedOut);
     if (!config.enabled) throw Error(WEB_AGENT_MESSAGES.notConfigured);
     if (!canRun(config)) throw Error(WEB_AGENT_MESSAGES.needsCredentials);
     const roomId = deps.room();
     if (!roomId) throw Error(WEB_AGENT_MESSAGES.noRoom);
-    const model =
-      options.model && config.models.some((entry) => entry.id === options.model)
-        ? options.model
-        : undefined;
+    const providerId =
+      selection?.provider ||
+      (typeof options.provider === "string"
+        ? options.provider
+        : config.defaultProvider || WEB_AGENT.id);
+    const provider = aiProviders(config).find((entry) => entry.id === providerId);
+    if (!provider)
+      throw Error("This provider is no longer available. Choose a provider in the model picker.");
+    if (provider.connected === "missing")
+      throw Error(`Connect ${provider.label} in Settings › Agents before sending.`);
+    const requestedModel = selection?.model ?? options.model;
+    const requestedDefault = deps.defaultModel?.(providerId);
+    const model = config.providers
+      ? requestedModel || requestedDefault || provider.defaultModel || undefined
+      : provider.models.find((entry) => entry.id === (requestedModel || requestedDefault))?.id;
+    const selectedModel = provider.models.find((entry) => entry.id === model);
+    if (config.providers && !selectedModel)
+      throw Error("This model is no longer available. Choose a model in the picker.");
+    if (
+      config.providers &&
+      options.access &&
+      options.access !== "ask" &&
+      (provider.capabilities?.tools === false || !selectedModel?.tools)
+    )
+      throw Error(
+        `${provider.label}: this model is chat-only. Switch to Ask or choose a model with tools for edits.`,
+      );
     const body = {
+      provider: providerId,
       chatId: options.chatId,
       roomId,
       prompt: options.prompt,
@@ -316,7 +391,8 @@ export function createWebAgentService(deps: WebAgentDeps): AgentService {
             id: run.runId,
             runtime: WEB_AGENT.id,
             access: body.access ?? "ask",
-            model: model ?? config.defaultModel,
+            provider: providerId,
+            model: model ?? provider.defaultModel,
             roomId,
           });
         }

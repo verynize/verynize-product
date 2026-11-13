@@ -22,6 +22,7 @@ import {
   canRun,
   type AiConfig,
 } from "./agent-service";
+import { aiSelection, aiDefaultModel } from "./ai-preferences";
 import { completeOpenRouterReturn, credentialsChanged } from "./ai-credentials";
 
 type CloudRoom = { server: string; id: string };
@@ -88,6 +89,8 @@ export function installAgentTransport() {
       const scope = currentWebScope();
       return scope ? queryClient.fetchQuery(aiConfigQuery(scope)) : null;
     },
+    selection: (chatId) => aiSelection(currentWebScope(), chatId),
+    defaultModel: (provider) => aiDefaultModel(currentWebScope(), provider),
     room: () => currentRoom()?.id ?? null,
     ready: () => canRun(configFor(currentWebScope())),
     credentialsRequired: () => void credentialsChanged(),
