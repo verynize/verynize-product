@@ -46,7 +46,13 @@ const path = require("node:path");
                   },
                 }),
               })
-            : new Promise((resolve) => window.__requests.push({ url, options, resolve }));
+            : /\/thumbnail(\?|$)/.test(url instanceof Request ? url.url : String(url))
+              ? /* Home's file cover metadata, also background. */ Promise.resolve({
+                  ok: true,
+                  status: 200,
+                  json: async () => ({ thumbnail: null }),
+                })
+              : new Promise((resolve) => window.__requests.push({ url, options, resolve }));
       window.__reply = (data) => {
         const r = window.__requests.shift();
         r.resolve({ ok: true, status: 200, json: async () => data });
