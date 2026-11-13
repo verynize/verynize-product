@@ -513,7 +513,7 @@
     const thumb = document.createElement("div");
     thumb.className = "file-thumbnail";
     // Legacy callers use the same raster service as the React cards; no simplified node tree.
-    window.fileThumbnails?.load(file).then((cover) => {
+    void window.fileThumbnails?.load(file).then((cover) => {
       if (!cover) return;
       const image = document.createElement("img");
       image.src = cover.url;

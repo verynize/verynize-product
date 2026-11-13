@@ -47,6 +47,11 @@ export type DesignApi = {
   updatePage(patch: Partial<Omit<DesignPage, "id" | "nodes">>, id?: string): boolean;
   /** Set (or with an empty id clear) the file's thumbnail layer, `document.thumbnailNodeId` (validated, one undo step). */
   setThumbnail(id: string): boolean;
+  /** Detached render markup of a frame (or, with no id, the whole first page) for the file cover. */
+  thumbnailMarkup(
+    id?: string | null,
+    doc?: DesignDocument,
+  ): { width: number; height: number; pageId: string; nodeId: string | null; html: string };
   setActivePage(id: string): void;
   canUndo(): boolean;
   /** Undo history writes made by edits since launch (loading a document is not counted). */

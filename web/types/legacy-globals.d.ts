@@ -5,7 +5,9 @@ import "../src/lib/platform";
 import "../src/lib/cloud-account";
 import "../src/lib/account-store";
 import "../src/lib/image-upload";
+import "../src/lib/file-covers";
 import type { DesktopApi } from "../src/lib/desktop-api";
+import type { FileCoverMeta } from "../src/lib/file-covers";
 import type {
   CloudState,
   RoomAccess,
@@ -28,6 +30,11 @@ export interface CloudWorkspace {
   hasSession(server: string): boolean;
   pendingCount(): number;
   request(path: string, options?: RequestInit): Promise<unknown>;
+  /** Requests authenticated for `room`, captured now so a later room switch cannot redirect them. */
+  requestForRoom(room: {
+    server: string;
+    id: string;
+  }): (path: string, options?: RequestInit) => Promise<{ thumbnail: FileCoverMeta | null }>;
   openRoom(info: {
     server: string;
     id: string;

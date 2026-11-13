@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
+import type { FileCover } from "@/lib/file-covers";
 import type { LibraryFile } from "./library";
 
 /** Both local and shared cards display the same full raster renderer, never a miniature node tree. */
@@ -116,18 +117,4 @@ function EmptyMark({ compact }: { compact: boolean }) {
       <ellipse cx="76" cy="66" rx="8" ry="16" />
     </svg>
   );
-}
-
-type FileCover = { url: string; nodeId: string | null; pageId?: string | null };
-
-declare global {
-  interface Window {
-    fileThumbnails: {
-      cached(file: LibraryFile): FileCover | null;
-      load(file: LibraryFile): Promise<FileCover | null>;
-      local(file: LibraryFile): Promise<FileCover | null>;
-      refresh(): Promise<void>;
-      status(): { uploading: boolean; lastError: string };
-    };
-  }
 }

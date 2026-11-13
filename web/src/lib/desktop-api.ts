@@ -170,6 +170,8 @@ export interface DesktopApi {
   // Rendering, fonts and export (desktop/render.cjs).
   renderDesign(options: {
     screenshot?: boolean;
+    /** File covers: waits its turn, and an export waits for it instead of failing. */
+    background?: boolean;
     html: string;
     width: number;
     height: number;

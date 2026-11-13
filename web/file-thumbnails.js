@@ -12,6 +12,11 @@
   const jobs = new Map();
   const uploads = new Map();
   let pending = null;
+  // Globals of web/lazy-document.js and web/cloud-assets.js, typed here only for this script.
+  /** @type {() => { unloadedIds(): string[]; ensure(ids: string[]): Promise<unknown> } | undefined} */
+  const pageLoader = () => /** @type {any} */ (window).pageLoader;
+  /** @type {() => { inlineHtml(html: string): Promise<string> }} */
+  const cloudAssets = () => /** @type {any} */ (window).cloudAssets;
   const roomKey = (room) => `${room.server}|${room.id}`;
   const changed = () => window.dispatchEvent(new Event("file-thumbnail-changed"));
   const fileRoom = (file) =>
@@ -119,6 +124,7 @@
     loads.set(key, promise);
     return promise;
   }
+  /** @type {Promise<unknown>} */
   let renderQueue = Promise.resolve();
   function raster(id = null, doc = window.design.getDocument()) {
     const snapshot = structuredClone(doc);
@@ -137,7 +143,7 @@
     const markup = artwork.html
       .replace("<body>", `<body><div style="transform:scale(${ratio});transform-origin:0 0">`)
       .replace("</body>", "</div></body>");
-    const inlined = await window.cloudAssets.inlineHtml(markup);
+    const inlined = await cloudAssets().inlineHtml(markup);
     const html = window.assetStore ? await window.assetStore.inlineMarkup(inlined) : inlined;
     if (window.verynizePlatform.can("rasterExport")) {
       const result = await window.verynizePlatform.desktop.renderDesign({
@@ -221,7 +227,7 @@
       key = roomKey(room);
     if (completed.get(key) === mark) return;
     let pick = target(doc);
-    const unloaded = window.pageLoader?.unloadedIds?.() || [];
+    const unloaded = pageLoader()?.unloadedIds?.() || [];
     const needed =
       !pick.node && doc.thumbnailNodeId
         ? unloaded
@@ -231,7 +237,7 @@
     if (needed.length) {
       // A switched-away lazy page cannot be hydrated against the next room.
       if (roomKey(window.cloudWorkspace.room() || {}) !== key) return;
-      await window.pageLoader.ensure(needed);
+      await pageLoader().ensure(needed);
       if (roomKey(window.cloudWorkspace.room() || {}) !== key) return;
       doc = window.design.getSnapshot();
       mark = fingerprint(doc);
