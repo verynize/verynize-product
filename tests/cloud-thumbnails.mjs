@@ -10,6 +10,37 @@ const persistence = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-thumbnails
 const options = await cloudOptions(persistence);
 let mf = new Miniflare(options);
 const origin = "http://localhost";
+/** Object keys under a prefix of the asset bucket (R2 on workerd, the blob directory on Node). */
+async function roomObjects(prefix) {
+  if (typeof mf.getR2Bucket === "function") {
+    const bucket = await mf.getR2Bucket("ASSETS_BUCKET");
+    return (await bucket.list({ prefix })).objects.map((object) => object.key);
+  }
+  const root = path.join(persistence, "blobs", "verynize-assets");
+  const found = [];
+  const walk = async (folder) => {
+    for (const entry of await fs.readdir(folder, { withFileTypes: true }).catch(() => [])) {
+      const file = path.join(folder, entry.name);
+      if (entry.isDirectory()) await walk(file);
+      else if (!/\.(meta\.json|tmp)$/.test(entry.name))
+        found.push(path.relative(root, file).split(path.sep).join("/"));
+    }
+  };
+  await walk(path.join(root, prefix));
+  return found.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+}
+/** One object's bytes, or null when it does not exist. */
+async function objectBytes(key) {
+  if (typeof mf.getR2Bucket === "function") {
+    const object = await (await mf.getR2Bucket("ASSETS_BUCKET")).get(key);
+    return object ? new Uint8Array(await object.arrayBuffer()) : null;
+  }
+  const file = path.join(persistence, "blobs", "verynize-assets", ...key.split("/"));
+  return fs.readFile(file).then(
+    (bytes) => new Uint8Array(bytes),
+    () => null,
+  );
+}
 const call = (route, { method = "GET", body, token, headers = {} } = {}) =>
   mf.dispatchFetch(route.startsWith("http") ? route : origin + route, {
     method,
@@ -82,9 +113,7 @@ try {
       .prepare("SELECT count(*) AS total FROM room_asset WHERE roomId = ?")
       .bind(room.id)
       .first();
-    const bucket = await mf.getR2Bucket("ASSETS_BUCKET");
-    const objects = await bucket.list({ prefix: `rooms/${room.id}/` });
-    return { assets: assets.total, keys: objects.objects.map((object) => object.key) };
+    return { assets: assets.total, keys: await roomObjects(`rooms/${room.id}/`) };
   };
   assert.deepEqual(await (await read()).json(), { thumbnail: null });
   for (const token of [undefined, other.token]) {
@@ -189,8 +218,7 @@ try {
     "old signature cannot read replacement",
   );
   assert.deepEqual(await bytesOf(latest.url), latestBytes);
-  const bucket = await mf.getR2Bucket("ASSETS_BUCKET");
-  assert.deepEqual(new Uint8Array(await (await bucket.get(key)).arrayBuffer()), latestBytes);
+  assert.deepEqual(await objectBytes(key), latestBytes);
   assert.equal((await read()).headers.get("cache-control"), "private, no-store");
   await mf.dispose();
   mf = new Miniflare(options);
@@ -214,7 +242,7 @@ try {
   ]);
   const afterRace = (await (await read()).json()).thumbnail;
   if (afterRace) assert.equal(digest(await bytesOf(afterRace.url)), afterRace.sha256);
-  else assert.equal(await (await mf.getR2Bucket("ASSETS_BUCKET")).get(key), null);
+  else assert.equal(await objectBytes(key), null);
   const asset = await register(room, PNG);
   assert.equal((await call(asset.uploadUrl, { method: "PUT", body: PNG })).status, 200);
   assert.deepEqual(await bytesOf(asset.url), PNG);
@@ -230,7 +258,7 @@ try {
   for (let i = 0; i < 2; i++) {
     assert.equal((await call(route, { method: "DELETE", token: room.token })).status, 200);
     assert.deepEqual(await (await read()).json(), { thumbnail: null });
-    assert.equal(await (await mf.getR2Bucket("ASSETS_BUCKET")).get(key), null);
+    assert.equal(await objectBytes(key), null);
   }
   assert.equal((await call(latest.url)).status, 404);
   assert.equal((await call(imageRoute, { token: room.token })).status, 404);
