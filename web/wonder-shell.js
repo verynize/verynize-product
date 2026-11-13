@@ -519,7 +519,7 @@
       image.src = cover.url;
       image.alt = "";
       image.dataset.fileThumbnailImage = "";
-      image.style.cssText = "width:100%;height:100%;object-fit:contain";
+      image.style.cssText = `width:100%;height:100%;object-fit:${cover.nodeId ? "cover" : "contain"}`;
       if (cover.nodeId) thumb.dataset.thumbnailNode = cover.nodeId;
       thumb.append(image);
     });
