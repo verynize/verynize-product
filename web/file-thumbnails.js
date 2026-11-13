@@ -145,6 +145,7 @@
         width,
         height,
         scale: 1,
+        background: true,
       });
       return result.dataURL;
     }
