@@ -1,4 +1,4 @@
-// Real Electron -> room asset upload -> R2 -> home cover image, including refresh and restore.
+// Real Electron -> raw PNG upload -> R2 -> home cover image, including refresh and restore.
 import { Miniflare, cloudOptions } from "./cloud-harness.mjs";
 import { _electron as electron } from "@playwright/test";
 import { openSharedDesign } from "./helpers/shared-design.cjs";
@@ -91,7 +91,7 @@ try {
     });
   const uploads = [];
   page.on("request", (request) => {
-    if (request.method() === "PUT" && request.url().includes("/assets/"))
+    if (request.method() === "PUT" && request.url().includes("/thumbnail"))
       uploads.push(request.url());
   });
   await waitForAsync(page, async () => {
@@ -101,7 +101,7 @@ try {
     return result.thumbnail?.nodeId === null && result.thumbnail?.pageId === "cover-page";
   });
   const automatic = (await metadata()).thumbnail;
-  assert.match(automatic.url, /\/assets\//);
+  assert.ok(automatic.url);
   assert.equal(
     await page.evaluate(() => window.design.getDocument().activePage),
     "other-page",
@@ -137,20 +137,21 @@ try {
   await waitForAsync(
     page,
     async () => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === "cover-frame";
     },
     null,
-    { timeout: 30000 },
+    { timeout: 5000 },
   );
   const first = (await metadata()).thumbnail;
-  assert.match(first.url, /\/assets\/[0-9a-f-]+\?sig=[0-9a-f]{64}$/);
-  assert.equal(first.contentType, "image/png");
-  assert.ok(uploads.length > 0, "cover bytes were uploaded through the room asset API");
-  const bytes = new Uint8Array(await (await fetch(first.url)).arrayBuffer());
-  assert.deepEqual([...bytes.slice(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+  assert.match(first.url, /^https?:\/\//);
+  assert.ok(new URL(first.url).search, "cover URL has a cache-busting query");
+  assert.ok(uploads.length > 0, "cover bytes were uploaded through the thumbnail API");
+  const imageResponse = await fetch(first.url);
+  assert.equal(imageResponse.headers.get("content-type"), "image/png");
+  const bytes = new Uint8Array(await imageResponse.arrayBuffer());
+  assert.deepEqual(Array.from(bytes.slice(0, 8)), [137, 80, 78, 71, 13, 10, 26, 10]);
   const colorOf = (url) =>
     page.evaluate(async (url) => {
       const img = new Image();
@@ -164,7 +165,7 @@ try {
       return [...ctx.getImageData(0, 0, 1, 1).data];
     }, url);
   const red = await colorOf(first.url);
-  assert.ok(red[0] > 220 && red[1] < 30 && red[2] < 30, `cover is red: ${red}`);
+  assert.ok(red[0] > 220 && red[1] < 30 && red[2] < 30, `cover is red: ${String(red)}`);
   await page.locator("#files-home").click();
   const image = page
     .locator(`.file-card[data-file-id="${fileId}"] img[data-file-thumbnail-image]`)
@@ -201,18 +202,20 @@ try {
   );
   const second = (await metadata()).thumbnail;
   const blue = await colorOf(second.url);
-  assert.ok(blue[0] < 30 && blue[1] < 30 && blue[2] > 220, `updated cover is blue: ${blue}`);
+  assert.ok(
+    blue[0] < 30 && blue[1] < 30 && blue[2] > 220,
+    `updated cover is blue: ${String(blue)}`,
+  );
   await page.evaluate(() => window.design.setThumbnail(null));
   await waitForAsync(
     page,
     async () => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === null && result.thumbnail?.pageId === "cover-page";
     },
     null,
-    { timeout: 30000 },
+    { timeout: 5000 },
   );
   const restored = (await metadata()).thumbnail;
   const fullPage = await sample(restored.url);
@@ -224,7 +227,6 @@ try {
   await waitForAsync(
     page,
     async (sha) => {
-      await window.fileThumbnails.refresh();
       const room = window.cloudWorkspace.room();
       const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
       return result.thumbnail?.nodeId === null && result.thumbnail?.sha256 !== sha;
@@ -232,6 +234,38 @@ try {
     restored.sha256,
   );
   assert.deepEqual((await sample((await metadata()).thumbnail.url)).right, [255, 255, 0, 255]);
+  await page.waitForFunction(() => !window.fileThumbnails.status().uploading);
+  const beforeBurst = uploads.length;
+  await page.evaluate(() => {
+    for (let i = 0; i < 20; i++) window.design.updateNodes(["last-root"], { x: 1921 + i });
+  });
+  await page.waitForTimeout(1500);
+  assert.equal(uploads.length, beforeBurst, "rapid edits do not upload immediately");
+  await page.waitForTimeout(11000);
+  await page.waitForFunction(() => !window.fileThumbnails.status().uploading);
+  assert.equal(uploads.length, beforeBurst + 1, "20 rapid edits produce one idle upload");
+  await page.evaluate(() => {
+    window.design.setSelection(["last-root"]);
+    window.design.setCamera(20, 20, 1);
+  });
+  await page.waitForTimeout(11000);
+  assert.equal(uploads.length, beforeBurst + 1, "unchanged content does not upload");
+  const beforeLeave = (await metadata()).thumbnail.sha256;
+  await page.evaluate(() => {
+    window.design.updateNodes(["last-root"], { color: "#ff00ff" });
+    window.fileLibrary.showHome();
+  });
+  await waitForAsync(
+    page,
+    async (sha) => {
+      const room = window.cloudWorkspace.room();
+      const result = await window.cloudWorkspace.request(`/api/rooms/${room.id}/thumbnail`);
+      return !!result.thumbnail && result.thumbnail.sha256 !== sha;
+    },
+    beforeLeave,
+    { timeout: 5000 },
+  );
+  assert.equal(uploads.length, beforeBurst + 2, "leaving flushes the pending edit promptly");
   assert.ok(room.id);
   assert.equal(
     frames.some((frame) => frame.includes("data:image/png")),

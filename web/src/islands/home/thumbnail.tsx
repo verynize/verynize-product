@@ -3,8 +3,14 @@ import { cn } from "@/lib/utils";
 import type { LibraryFile } from "./library";
 
 /** Both local and shared cards display the same full raster renderer, never a miniature node tree. */
-export function Thumbnail({ file, className, compact = false }: {
-  file: LibraryFile; className?: string; compact?: boolean;
+export function Thumbnail({
+  file,
+  className,
+  compact = false,
+}: {
+  file: LibraryFile;
+  className?: string;
+  compact?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [empty, setEmpty] = useState(true);
@@ -12,39 +18,56 @@ export function Thumbnail({ file, className, compact = false }: {
     const box = ref.current;
     if (!box) return;
     const covers = window.fileThumbnails;
-    let disposed = false, serial = 0;
+    let disposed = false,
+      serial = 0;
     const show = (cover: FileCover | null) => {
       const version = ++serial;
       if (disposed) return;
-      if (!cover) { box.replaceChildren(); setEmpty(true); return; }
+      if (!cover) {
+        box.replaceChildren();
+        setEmpty(true);
+        return;
+      }
       const image = new Image();
-      image.dataset.fileThumbnailImage = ""; image.alt = "";
-      Object.assign(image.style, { width: "100%", height: "100%", objectFit: cover.nodeId ? "cover" : "contain" });
+      image.dataset.fileThumbnailImage = "";
+      image.alt = "";
+      image.className = cn("size-full", cover.nodeId ? "object-cover" : "object-contain");
       image.onload = () => {
         if (disposed || serial !== version) return;
         if (cover.nodeId) box.dataset.thumbnailNode = cover.nodeId;
         else delete box.dataset.thumbnailNode;
         if (cover.pageId) box.dataset.thumbnailPage = cover.pageId;
-        box.replaceChildren(image); setEmpty(false);
+        box.replaceChildren(image);
+        setEmpty(false);
       };
       image.onerror = () => {
         if (disposed || serial !== version) return;
-        box.replaceChildren(); setEmpty(true);
-        if (!cover.url.startsWith("data:")) void covers.local(file).then((fallback) => {
-          if (!disposed && serial === version) show(fallback);
-        });
+        box.replaceChildren();
+        setEmpty(true);
+        if (!cover.url.startsWith("data:"))
+          void covers.local(file).then((fallback) => {
+            if (!disposed && serial === version) show(fallback);
+          });
       };
       image.src = cover.url;
     };
     const paint = () => {
       const cover = covers.cached(file);
       show(cover);
-      if (!cover) void covers.local(file).then((fallback) => { if (!disposed) show(fallback); });
+      if (!cover)
+        void covers.local(file).then((fallback) => {
+          if (!disposed) show(fallback);
+        });
     };
     window.addEventListener("file-thumbnail-changed", paint);
     paint();
-    void covers.load(file).then((cover) => { if (!disposed) show(cover); });
-    return () => { disposed = true; window.removeEventListener("file-thumbnail-changed", paint); };
+    void covers.load(file).then((cover) => {
+      if (!disposed) show(cover);
+    });
+    return () => {
+      disposed = true;
+      window.removeEventListener("file-thumbnail-changed", paint);
+    };
   }, [file]);
   return (
     <div className={cn("relative overflow-hidden bg-background", className)}>
