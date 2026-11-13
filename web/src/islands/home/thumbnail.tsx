@@ -65,18 +65,30 @@ export function Thumbnail({
       show(cover);
       // Only an unpainted card asks for a local render, so more than 64 local files (the
       // local cache size) cannot evict each other into an endless re-render loop.
-      if (!cover && !shown)
+      if (!cover && !shown && visible)
         void covers.local(file).then((fallback) => {
           if (!disposed) show(fallback);
         });
     };
-    window.addEventListener("file-thumbnail-changed", paint);
-    paint();
-    void covers.load(file).then((cover) => {
-      if (!disposed) show(cover);
+    // Home stays mounted (hidden) behind the editor and may list hundreds of files: fetch
+    // and render covers only for cards on screen, never in the background while editing.
+    let visible = false,
+      started = false;
+    const observer = new IntersectionObserver((entries) => {
+      visible = entries.some((entry) => entry.isIntersecting);
+      if (!visible) return;
+      if (started) return paint();
+      started = true;
+      window.addEventListener("file-thumbnail-changed", paint);
+      paint();
+      void covers.load(file).then((cover) => {
+        if (!disposed) show(cover);
+      });
     });
+    observer.observe(box);
     return () => {
       disposed = true;
+      observer.disconnect();
       window.removeEventListener("file-thumbnail-changed", paint);
     };
   }, [file]);
