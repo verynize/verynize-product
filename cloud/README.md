@@ -301,7 +301,22 @@ Session tokens expire with the Better Auth session and are revoked by sign-out; 
 
 ## Model API runtime (`cloud/ai.js`)
 
-`/api/ai/*` runs a chat turn against an OpenRouter model (TanStack AI `@tanstack/ai` + `@tanstack/ai-openrouter`, pinned to 1.0.1) with the Verynize design tools of one room. The contract (events, policy, clients) is [docs/ai-runtime.md](../docs/ai-runtime.md). All endpoints need a signed-in account (same auth as Hosted MCP); browser requests from another origin get 403.
+`/api/ai/*` runs a chat turn against an OpenRouter or Vercel AI Gateway model (TanStack AI `@tanstack/ai` 1.2.0; native OpenRouter adapter or `@tanstack/openai-base` 1.0.2 Chat Completions adapter) with the Verynize design tools of one room. The contract (events, policy, clients) is [docs/ai-runtime.md](../docs/ai-runtime.md). All endpoints need a signed-in account (same auth as Hosted MCP); browser requests from another origin get 403.
+
+Provider registry: `cloud/ai-providers/index.js`. Config also returns `defaultProvider: "openrouter"`
+and `providers: [{id,label,oauth,fields,connected,models,defaultModel}]`, with `tools` on each
+provider model and `connected: "connected"|"server"|"missing"`. Credential GET returns a status
+entry for every provider; PUT/DELETE accept `/api/ai/credentials/:provider`. Vercel accepts
+`{apiKey}` and verifies it with authenticated `GET /v1/credits` before encrypting JSON `{v:1,apiKey}` under AAD
+`<accountId>:vercel`; OpenRouter retains its encrypted raw-key format and OAuth behavior.
+`GET /api/ai/models?provider=<id>` returns a live catalog when credentials are connected, falling
+back to curated models. Vercel's live catalog has `tools:true` only for curated models.
+Runs accept optional `provider` (default `openrouter`), persisted by migration
+`0011_ai_run_provider.sql`. Replay keeps the stored provider; no automatic provider fallback.
+Unknown providers return 404 JSON. `VERYNIZE_AI_MODELS` remains OpenRouter-only; Vercel's
+allowlist is its curated tool-capable models. `VERCEL_AI_GATEWAY_BASE_URL` overrides Vercel's
+`https://ai-gateway.vercel.sh/v1` endpoint for tests. Only OpenRouter supports server-key opt-in.
+See [provider contract](../docs/ai-runtime.md#providers) and `tests/cloud-ai-providers.mjs`.
 
 - `GET /api/ai/config` → `{enabled, provider: "openrouter", models: [{id,label}], defaultModel, limits: {maxTurns, maxToolCalls}, credentials: {openrouter: "connected"|"server"|"missing"}}`. `enabled` is true unless `VERYNIZE_AI=off`; each account brings its own OpenRouter key (`credentials`).
 - Credentials (per account, never returned): `GET /api/ai/credentials` → `{openrouter: {connected, source, last4, label, state, limit?, usage?, …}}`; `PUT /api/ai/credentials/openrouter` `{apiKey}` (checked with OpenRouter's `GET /key`; 400 `invalid_key`); `DELETE /api/ai/credentials/openrouter`; `POST /api/ai/credentials/openrouter/oauth/start` `{returnTo?}` → `{authorizeUrl}` + HttpOnly cookie; `GET /api/ai/credentials/openrouter/oauth/callback?code=&state=` (OpenRouter OAuth PKCE; authenticated by the one-time pending state bound to the account and the browser cookie) → 303 to a same-origin path. Keys are stored AES-GCM encrypted in `ai_credential` under a key derived (HKDF-SHA256) from `BETTER_AUTH_SECRET`; pending sign-ins in `ai_oauth_state` (migration `0007_ai_credentials.sql`, `cloud/ai-credentials.js`). `OPENROUTER_API_KEY` is used only with `VERYNIZE_AI_SERVER_KEY=1`, for accounts without a key. Details: [docs/ai-runtime.md](../docs/ai-runtime.md#credentials).

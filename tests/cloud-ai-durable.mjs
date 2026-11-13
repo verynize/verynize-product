@@ -63,6 +63,7 @@ const enabledEnv = {
   VERYNIZE_AI_SERVER_KEY: { type: "text", value: "1" },
   OPENROUTER_API_KEY: { type: "text", value: "test-openrouter-key" },
   OPENROUTER_BASE_URL: { type: "text", value: fake.baseUrl },
+  VERCEL_AI_GATEWAY_BASE_URL: { type: "text", value: fake.baseUrl },
   VERYNIZE_AI_MODELS: { type: "text", value: "fake/model-a" },
 };
 config.env = enabledEnv;
@@ -223,6 +224,32 @@ try {
   assert.equal(resumed.at(-1).type, "done");
   assert.equal(resumed.at(-1).code, "ok");
   assert.ok(labels(await roomDoc(room.id, ana)).includes("Durable card"), "the write landed");
+
+  // A non-default provider survives disconnect/reconnect through the same durable host.
+  fake.keys.add("durable-vercel-key");
+  const connected = await request("/api/ai/credentials/vercel", {
+    method: "PUT",
+    token: ana,
+    body: { apiKey: "durable-vercel-key" },
+  });
+  assert.equal(connected.status, 200, await connected.text());
+  const gatewayResponse = await startRun(ana, {
+    provider: "vercel",
+    chatId: "gateway-leave",
+    roomId: room.id,
+    prompt: "[scenario:long]",
+  });
+  assertHosted(gatewayResponse, "Vercel gateway run");
+  const gateway = sseReader(gatewayResponse);
+  await gateway.next((event) => event.type === "assistant-text-delta");
+  const gatewayId = gateway.events[0].id;
+  await gateway.cancel();
+  await sleep(3500);
+  const gatewayReplay = await sseReader(await events(ana, gatewayId)).all();
+  assertSequence(gatewayReplay, gatewayId);
+  assert.equal(gatewayReplay.at(-1).code, "ok");
+  assert.equal(textOf(gatewayReplay), "First part.Second part.Third part.The end.");
+  assert.equal(fake.requests.at(-1).headers.authorization, "Bearer durable-vercel-key");
 
   // 5. Approval timeout with no client connected (VERYNIZE_AI_APPROVAL_TIMEOUT_MS).
   config.env = {

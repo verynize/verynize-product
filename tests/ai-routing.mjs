@@ -23,6 +23,8 @@ import { restorePath, REWRITTEN_PATH } from "../cloud/platform/vercel/handler.js
 const root = fileURLToPath(new URL("../", import.meta.url));
 const AI_PATHS = [
   "/api/ai/config",
+  "/api/ai/models",
+  "/api/ai/credentials/vercel",
   "/api/ai/runs",
   "/api/ai/runs/0b7f2a4e-3c1d-4e5f-8a9b-0c1d2e3f4a5b/events",
   "/api/ai/runs/0b7f2a4e-3c1d-4e5f-8a9b-0c1d2e3f4a5b/cancel",
@@ -112,6 +114,13 @@ async function vercel() {
     assert.equal(target.pathname, route);
     assert.equal(target.search, "?after=3");
   }
+  // Vercel matches only the pathname; the provider query remains a separate search parameter.
+  const catalog = new URL(
+    "https://example.vercel.app/api/server?__vz_path=/api/ai/models&provider=vercel&path=ai/models",
+  );
+  restorePath(catalog, catalog.searchParams.get(REWRITTEN_PATH));
+  assert.equal(catalog.pathname, "/api/ai/models");
+  assert.equal(catalog.search, "?provider=vercel");
   assert.ok(config.functions["api/server.mjs"].maxDuration >= 60, "runs need a long function");
   console.log("PASS Vercel: vercel.json sends /api/ai/* to api/server.mjs with the original path");
 }

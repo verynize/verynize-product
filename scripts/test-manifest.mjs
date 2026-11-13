@@ -681,6 +681,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-email.mjs",
   "tests/cloud-mcp.mjs",
   "tests/cloud-ai.mjs",
+  "tests/cloud-ai-providers.mjs",
   "tests/cloud-ai-cancel.mjs",
   "tests/cloud-ai-durable.mjs",
   "tests/cloud-assets.mjs",
@@ -731,7 +732,14 @@ const webBuild = (file, covers, extra = {}) => ({
   timeoutMs: 15 * 60_000,
   ...extra,
 });
-const AI = ["cloud/ai*.js", "web-start/**", "server/node.mjs", "tests/helpers/fake-openrouter.mjs"];
+const AI = [
+  "cloud/ai*.js",
+  "cloud/ai-providers/**",
+  "web-start/**",
+  "server/node.mjs",
+  "tests/helpers/fake-openrouter.mjs",
+  "tests/helpers/fake-chat-completions.mjs",
+];
 const web = [
   webBuild("tests/web-legacy-assets.mjs", []),
   webBuild("tests/web-cloudflare.mjs", ["tests/helpers/web-home-boot.mjs"]),
