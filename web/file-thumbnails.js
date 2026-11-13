@@ -168,6 +168,14 @@
   // The server keeps covers up to 2 MiB. Photographic pages can exceed that as PNG, so
   // re-encode them as WebP (JPEG where WebP encoding is unavailable) at falling quality.
   const MAX_COVER = 2 * 1024 * 1024;
+  // Decoded in place: a data URL needs no network stack (and no fetch a page may wrap).
+  function dataBlob(url) {
+    const match = /^data:([^;,]+);base64,(.*)$/s.exec(url);
+    if (!match) throw Error("Could not read the rendered cover");
+    return new Blob([Uint8Array.from(atob(match[2]), (c) => c.charCodeAt(0))], {
+      type: match[1],
+    });
+  }
   async function fitCover(blob) {
     if (blob.size <= MAX_COVER) return blob;
     const bitmap = await createImageBitmap(blob);
@@ -232,9 +240,7 @@
     if (!pick.page || completed.get(key) === mark) return;
     const src = await raster(pick.node?.id || null, doc);
     // The server digest also deduplicates reopening a file after a reload.
-    const response = await fetch(src);
-    if (!response.ok) throw Error("Could not read the rendered cover");
-    const body = await fitCover(await response.blob());
+    const body = await fitCover(dataBlob(src));
     const digest = await crypto.subtle.digest("SHA-256", await body.arrayBuffer());
     const sha256 = Array.from(new Uint8Array(digest), (n) => n.toString(16).padStart(2, "0")).join(
       "",
