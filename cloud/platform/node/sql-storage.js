@@ -113,6 +113,19 @@ export class SqlStorage {
     else fn();
   }
 
+  transactionSync(callback) {
+    this.#begin();
+    this.#db.exec("SAVEPOINT actor_sync");
+    try {
+      const result = callback();
+      this.#db.exec("RELEASE actor_sync");
+      return result;
+    } catch (error) {
+      this.#db.exec("ROLLBACK TO actor_sync; RELEASE actor_sync");
+      throw error;
+    }
+  }
+
   close() {
     try {
       this.commit();

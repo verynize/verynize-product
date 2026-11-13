@@ -1,97 +1,506 @@
 /* Infinite canvas viewport: the camera transform lives on #canvas, chrome is drawn in screen space. */
-#workspace{position:relative;overflow:hidden!important;padding:0!important;overscroll-behavior:none}
-#workspace>.canvas-title{position:absolute;top:8px;left:12px;right:12px;margin:0;z-index:6}
-#workspace>footer{position:absolute;left:12px;bottom:8px;padding:0!important;z-index:6;pointer-events:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#canvas-wrap{position:absolute!important;inset:0;width:auto!important;height:auto!important;margin:0!important;overflow:hidden;touch-action:none}
+#workspace {
+  position: relative;
+  overflow: hidden !important;
+  padding: 0 !important;
+  overscroll-behavior: none;
+}
+#workspace > .canvas-title {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  right: 12px;
+  margin: 0;
+  z-index: 6;
+}
+#workspace > footer {
+  position: absolute;
+  left: 12px;
+  bottom: 8px;
+  padding: 0 !important;
+  z-index: 6;
+  pointer-events: none;
+  max-width: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#canvas-wrap {
+  position: absolute !important;
+  inset: 0;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  overflow: hidden;
+  touch-action: none;
+}
 /* Canvas selection chrome colours, sampled from Wonder (canvas-audit S1-hover-final, S4-frame-ready): outline, handle
    border, name label and hover #c468f7 (196,104,247); size badge #a245d3 (162,69,211). The app accent (buttons, focus)
    stays --shell-accent. */
-:root{--canvas-select:#c468f7;--canvas-select-badge:#a245d3}
-#canvas{--iz:1;position:absolute;left:0;top:0;width:1000px;height:700px;transform-origin:0 0;overflow:visible!important}
+:root {
+  --canvas-select: #c468f7;
+  --canvas-select-badge: #a245d3;
+}
+#canvas {
+  --iz: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1000px;
+  height: 700px;
+  transform-origin: 0 0;
+  overflow: visible !important;
+}
 /* Promoted only while panning (see applyCamera in canvas-interactions.js): a permanent layer keeps a stale raster scale and exhausts tile memory. */
-#canvas.camera-moving{will-change:transform}
-#canvas .layer{cursor:default}
-#canvas .layer.selected:not([data-outline]){outline-width:calc(1px * var(--iz))!important;outline-offset:calc(-.5px * var(--iz))!important;outline-color:var(--canvas-select)!important}
+#canvas.camera-moving {
+  will-change: transform;
+}
+#canvas .layer {
+  cursor: default;
+}
+#canvas .layer.selected:not([data-outline]) {
+  outline-width: calc(1px * var(--iz)) !important;
+  outline-offset: calc(-0.5px * var(--iz)) !important;
+  outline-color: var(--canvas-select) !important;
+}
 /* A layer with its own outline keeps it while selected; the selection ring is drawn inside the box instead. */
-#canvas .layer.selected[data-outline]::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;outline:calc(1px * var(--iz)) solid var(--canvas-select);outline-offset:calc(-.5px * var(--iz));z-index:2147483647}
+#canvas .layer.selected[data-outline]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  outline: calc(1px * var(--iz)) solid var(--canvas-select);
+  outline-offset: calc(-0.5px * var(--iz));
+  z-index: 2147483647;
+}
 
 /* Wonder S4 handles: 9×9 white squares with a 1px border, centred on the edge. */
-#canvas .layer>.handle{width:calc(9px * var(--iz))!important;height:calc(9px * var(--iz))!important;border-width:calc(1px * var(--iz))!important;border-color:var(--canvas-select)!important;background:#fff!important}
-#canvas .layer>.handle[data-corner=nw]{left:calc(-4.5px * var(--iz))!important;top:calc(-4.5px * var(--iz))!important}
-#canvas .layer>.handle[data-corner=ne]{right:calc(-4.5px * var(--iz))!important;top:calc(-4.5px * var(--iz))!important}
-#canvas .layer>.handle[data-corner=sw]{left:calc(-4.5px * var(--iz))!important;bottom:calc(-4.5px * var(--iz))!important}
-#canvas .layer>.handle[data-corner=se]{right:calc(-4.5px * var(--iz))!important;bottom:calc(-4.5px * var(--iz))!important}
-#workspace[data-tool=frame] #canvas-wrap,#workspace[data-tool=rectangle] #canvas-wrap,#workspace[data-tool=shader] #canvas-wrap,#workspace[data-tool=frame] #canvas .layer,#workspace[data-tool=rectangle] #canvas .layer,#workspace[data-tool=shader] #canvas .layer{cursor:crosshair}
-#workspace[data-tool=text] #canvas-wrap,#workspace[data-tool=text] #canvas .layer{cursor:text}
-#workspace[data-tool=hand] #canvas-wrap,#workspace[data-tool=hand] #canvas .layer,#workspace.space-pan #canvas-wrap,#workspace.space-pan #canvas .layer{cursor:grab}
-#workspace.panning #canvas-wrap,#workspace.panning #canvas .layer{cursor:grabbing!important}
+#canvas .layer > .handle {
+  width: calc(9px * var(--iz)) !important;
+  height: calc(9px * var(--iz)) !important;
+  border-width: calc(1px * var(--iz)) !important;
+  border-color: var(--canvas-select) !important;
+  background: #fff !important;
+}
+#canvas .layer > .handle[data-corner="nw"] {
+  left: calc(-4.5px * var(--iz)) !important;
+  top: calc(-4.5px * var(--iz)) !important;
+}
+#canvas .layer > .handle[data-corner="ne"] {
+  right: calc(-4.5px * var(--iz)) !important;
+  top: calc(-4.5px * var(--iz)) !important;
+}
+#canvas .layer > .handle[data-corner="sw"] {
+  left: calc(-4.5px * var(--iz)) !important;
+  bottom: calc(-4.5px * var(--iz)) !important;
+}
+#canvas .layer > .handle[data-corner="se"] {
+  right: calc(-4.5px * var(--iz)) !important;
+  bottom: calc(-4.5px * var(--iz)) !important;
+}
+#workspace[data-tool="frame"] #canvas-wrap,
+#workspace[data-tool="rectangle"] #canvas-wrap,
+#workspace[data-tool="shader"] #canvas-wrap,
+#workspace[data-tool="frame"] #canvas .layer,
+#workspace[data-tool="rectangle"] #canvas .layer,
+#workspace[data-tool="shader"] #canvas .layer {
+  cursor: crosshair;
+}
+#workspace[data-tool="text"] #canvas-wrap,
+#workspace[data-tool="text"] #canvas .layer {
+  cursor: text;
+}
+#workspace[data-tool="hand"] #canvas-wrap,
+#workspace[data-tool="hand"] #canvas .layer,
+#workspace.space-pan #canvas-wrap,
+#workspace.space-pan #canvas .layer {
+  cursor: grab;
+}
+#workspace.panning #canvas-wrap,
+#workspace.panning #canvas .layer {
+  cursor: grabbing !important;
+}
 
-#canvas-overlay{position:absolute;inset:0;pointer-events:none;z-index:5}
-#canvas-overlay .guide-layer{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+/* Containment: the chrome redrawn on every pointer move (labels, badge, guides) is laid out alone, not with the page. */
+#canvas-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  contain: size layout;
+}
+#canvas-overlay .guide-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
 /* Guides and Alt distances use Wonder's measurement blue (TR4/TR5: 1px rgba(102,160,248,.9) lines, 4px end dots,
    #66a0f8 chips with white 11px numbers beside the line, dashed 8/4 edge extensions). */
-#canvas-overlay{--guide-blue:rgba(102,160,248,.9);--guide-chip:#66a0f8}
-#canvas-overlay .guide{stroke:var(--guide-blue);stroke-width:1;shape-rendering:crispEdges}
-#canvas-overlay .guide-dot{fill:var(--guide-blue)}
-#canvas-overlay .guide-gap{stroke-dasharray:3 2}
-#canvas-overlay .guide-extend{stroke-dasharray:8 4}
-#canvas-overlay .guide-label{position:absolute;transform:translate(-50%,-50%);background:var(--guide-chip);color:#fff;font:10px/14px Inter,system-ui,sans-serif;padding:0 4px;border-radius:3px;white-space:nowrap}
-#canvas-overlay .guide-label.measure{font:500 11px/20px Inter,system-ui,sans-serif;min-width:20px;box-sizing:border-box;text-align:center;border-radius:4px}
-#canvas-overlay .guide-label.measure[data-axis=x]{transform:translate(-50%,4px)}
-#canvas-overlay .guide-label.measure[data-axis=y]{transform:translate(5px,-50%)}
-#canvas-overlay[data-measuring="1"] .hover-box{border:1px solid var(--guide-blue)}
-#canvas-overlay .marquee{position:absolute;border:1px solid #c468f7;background:rgba(196,104,247,.1)}
-#canvas-overlay .marquee[data-kind=draw]{background:transparent}
+#canvas-overlay {
+  --guide-blue: rgba(102, 160, 248, 0.9);
+  --guide-chip: #66a0f8;
+}
+#canvas-overlay .guide {
+  stroke: var(--guide-blue);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+#canvas-overlay .guide-dot {
+  fill: var(--guide-blue);
+}
+#canvas-overlay .guide-gap {
+  stroke-dasharray: 3 2;
+}
+#canvas-overlay .guide-extend {
+  stroke-dasharray: 8 4;
+}
+#canvas-overlay .guide-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: var(--guide-chip);
+  color: #fff;
+  font:
+    10px/14px Inter,
+    system-ui,
+    sans-serif;
+  padding: 0 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+#canvas-overlay .guide-label.measure {
+  font:
+    500 11px/20px Inter,
+    system-ui,
+    sans-serif;
+  min-width: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  border-radius: 4px;
+}
+#canvas-overlay .guide-label.measure[data-axis="x"] {
+  transform: translate(-50%, 4px);
+}
+#canvas-overlay .guide-label.measure[data-axis="y"] {
+  transform: translate(5px, -50%);
+}
+#canvas-overlay[data-measuring="1"] .hover-box {
+  border: 1px solid var(--guide-blue);
+}
+#canvas-overlay .marquee {
+  position: absolute;
+  border: 1px solid #c468f7;
+  background: rgba(196, 104, 247, 0.1);
+}
+#canvas-overlay .marquee[data-kind="draw"] {
+  background: transparent;
+}
 /* Hover (S1-hover-final) and the clip-proof ring: 1px straddling the edge, turned with the layer (frameOf in
    selection-chrome.js). An outline with a -0.5px offset keeps the box itself at the layer's exact bounds. */
-#canvas-overlay .hover-box,#canvas-overlay .selection-ring{position:absolute;box-sizing:border-box;outline:1px solid var(--canvas-select);outline-offset:-.5px;transform-origin:50% 50%}
-#canvas-overlay .drop-target{position:absolute;box-sizing:border-box;outline:1px solid var(--canvas-select);outline-offset:-.5px}
-#canvas-overlay .selection-ring>.handle{position:absolute;width:9px;height:9px;box-sizing:border-box;background:#fff;border:1px solid var(--canvas-select);pointer-events:auto}
-#canvas-overlay .selection-ring>.handle[data-corner=nw]{left:-4.5px;top:-4.5px;cursor:nwse-resize}#canvas-overlay .selection-ring>.handle[data-corner=ne]{right:-4.5px;top:-4.5px;cursor:nesw-resize}#canvas-overlay .selection-ring>.handle[data-corner=sw]{left:-4.5px;bottom:-4.5px;cursor:nesw-resize}#canvas-overlay .selection-ring>.handle[data-corner=se]{right:-4.5px;bottom:-4.5px;cursor:nwse-resize}
-.moving #canvas-overlay .clipped-selection,#canvas.spacing-measure~#canvas-overlay .clipped-selection{display:none}
-#canvas-overlay .drop-line{position:absolute;background:var(--canvas-select);border-radius:1px}
-#canvas-overlay [hidden]{display:none}
+#canvas-overlay .hover-box,
+#canvas-overlay .selection-ring {
+  position: absolute;
+  box-sizing: border-box;
+  outline: 1px solid var(--canvas-select);
+  outline-offset: -0.5px;
+  transform-origin: 50% 50%;
+}
+#canvas-overlay .drop-target {
+  position: absolute;
+  box-sizing: border-box;
+  outline: 1px solid var(--canvas-select);
+  outline-offset: -0.5px;
+}
+#canvas-overlay .selection-ring > .handle {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid var(--canvas-select);
+  pointer-events: auto;
+}
+#canvas-overlay .selection-ring > .handle[data-corner="nw"] {
+  left: -4.5px;
+  top: -4.5px;
+  cursor: nwse-resize;
+}
+#canvas-overlay .selection-ring > .handle[data-corner="ne"] {
+  right: -4.5px;
+  top: -4.5px;
+  cursor: nesw-resize;
+}
+#canvas-overlay .selection-ring > .handle[data-corner="sw"] {
+  left: -4.5px;
+  bottom: -4.5px;
+  cursor: nesw-resize;
+}
+#canvas-overlay .selection-ring > .handle[data-corner="se"] {
+  right: -4.5px;
+  bottom: -4.5px;
+  cursor: nwse-resize;
+}
+#canvas-overlay[data-moving] .clipped-selection,
+#canvas.spacing-measure ~ #canvas-overlay .clipped-selection {
+  display: none;
+}
+#canvas-overlay .drop-line {
+  position: absolute;
+  background: var(--canvas-select);
+  border-radius: 1px;
+}
+#canvas-overlay [hidden] {
+  display: none;
+}
 /* Spacing handles (selected auto-layout frame). At rest only Wonder's short ticks show (TR8: 10×1.5px, padding #66a0f8,
    gap #e25727); hovering or dragging a band hatches it and shows the value badge. */
-#canvas-overlay .spacing-layer{position:absolute;inset:0}
-#canvas-overlay .spacing-band{--spacing:#e25727;position:absolute;box-sizing:border-box;pointer-events:auto;display:flex;align-items:center;justify-content:center}
-#canvas-overlay .spacing-padding{--spacing:#66a0f8}
-#canvas-overlay .spacing-band:hover,#canvas-overlay .spacing-band.active{background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--spacing) 45%,transparent) 0 1px,transparent 1px 5px)}
-#canvas-overlay .spacing-gap:hover,#canvas-overlay .spacing-gap.active{background-color:color-mix(in srgb,var(--spacing) 14%,transparent)}
-#canvas-overlay .spacing-band[data-axis=y]{cursor:row-resize}
-#canvas-overlay .spacing-band[data-axis=x]{cursor:col-resize}
-#canvas-overlay .spacing-padding[data-axis=y]{cursor:ns-resize}
-#canvas-overlay .spacing-padding[data-axis=x]{cursor:ew-resize}
-#canvas-overlay .spacing-bar{display:block;flex:none;background:var(--spacing);border-radius:1px;pointer-events:none}
-#canvas-overlay .spacing-band[data-axis=y] .spacing-bar{width:10px;height:1.5px}
-#canvas-overlay .spacing-band[data-axis=x] .spacing-bar{width:1.5px;height:10px}
-#canvas-overlay .spacing-badge{display:none;position:absolute;left:50%;top:50%;transform:translate(6px,6px);min-width:18px;padding:0 5px;border-radius:4px;background:var(--spacing);color:#fff;font:600 10px/18px Inter,system-ui,sans-serif;text-align:center;white-space:nowrap;pointer-events:none;z-index:1}
-#canvas-overlay .spacing-band:hover .spacing-badge,#canvas-overlay .spacing-band.active .spacing-badge{display:block}
-#workspace[data-spacing-drag=y] #canvas-wrap,#workspace[data-spacing-drag=y] #canvas-wrap *{cursor:row-resize!important}
-#workspace[data-spacing-drag=x] #canvas-wrap,#workspace[data-spacing-drag=x] #canvas-wrap *{cursor:col-resize!important}
-#canvas-overlay .frame-label{position:absolute;pointer-events:auto;cursor:default;color:#9a9a9a;font:11px/16px Inter,system-ui,sans-serif;white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;user-select:none}
-#canvas-overlay .frame-label:hover,#canvas-overlay .frame-label.hovered{color:var(--canvas-select)}
+#canvas-overlay .spacing-layer {
+  position: absolute;
+  inset: 0;
+}
+#canvas-overlay .spacing-band {
+  --spacing: #e25727;
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#canvas-overlay .spacing-padding {
+  --spacing: #66a0f8;
+}
+#canvas-overlay .spacing-band:hover,
+#canvas-overlay .spacing-band.active {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--spacing) 45%, transparent) 0 1px,
+    transparent 1px 5px
+  );
+}
+#canvas-overlay .spacing-gap:hover,
+#canvas-overlay .spacing-gap.active {
+  background-color: color-mix(in srgb, var(--spacing) 14%, transparent);
+}
+#canvas-overlay .spacing-band[data-axis="y"] {
+  cursor: row-resize;
+}
+#canvas-overlay .spacing-band[data-axis="x"] {
+  cursor: col-resize;
+}
+#canvas-overlay .spacing-padding[data-axis="y"] {
+  cursor: ns-resize;
+}
+#canvas-overlay .spacing-padding[data-axis="x"] {
+  cursor: ew-resize;
+}
+#canvas-overlay .spacing-bar {
+  display: block;
+  flex: none;
+  background: var(--spacing);
+  border-radius: 1px;
+  pointer-events: none;
+}
+#canvas-overlay .spacing-band[data-axis="y"] .spacing-bar {
+  width: 10px;
+  height: 1.5px;
+}
+#canvas-overlay .spacing-band[data-axis="x"] .spacing-bar {
+  width: 1.5px;
+  height: 10px;
+}
+#canvas-overlay .spacing-badge {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(6px, 6px);
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--spacing);
+  color: #fff;
+  font:
+    600 10px/18px Inter,
+    system-ui,
+    sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+#canvas-overlay .spacing-band:hover .spacing-badge,
+#canvas-overlay .spacing-band.active .spacing-badge {
+  display: block;
+}
+#workspace[data-spacing-drag="y"] #canvas-wrap,
+#workspace[data-spacing-drag="y"] #canvas-wrap * {
+  cursor: row-resize !important;
+}
+#workspace[data-spacing-drag="x"] #canvas-wrap,
+#workspace[data-spacing-drag="x"] #canvas-wrap * {
+  cursor: col-resize !important;
+}
+#canvas-overlay .frame-label {
+  position: absolute;
+  pointer-events: auto;
+  cursor: default;
+  color: #9a9a9a;
+  font:
+    11px/16px Inter,
+    system-ui,
+    sans-serif;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+#canvas-overlay .frame-label:hover,
+#canvas-overlay .frame-label.hovered {
+  color: var(--canvas-select);
+}
 
-#canvas-toolbar button.tool-active,#canvas-toolbar #select-tool.tool-active{background:#3d3d3d}
-#canvas-toolbar #select-tool:not(.tool-active){background:transparent}
-#canvas-toolbar button.tool-active img{opacity:1}
+#canvas-toolbar button.tool-active,
+#canvas-toolbar #select-tool.tool-active {
+  background: #3d3d3d;
+}
+#canvas-toolbar #select-tool:not(.tool-active) {
+  background: transparent;
+}
+#canvas-toolbar button.tool-active img {
+  opacity: 1;
+}
 
-
-#layers .layer-row{position:relative}
-#layers .layer-row.is-hidden{opacity:.45}
-.layer-row-toggles{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;gap:2px}
-.layer-toggle{display:none;width:20px;height:20px;align-items:center;justify-content:center;border-radius:4px;cursor:pointer}
-.layer-toggle img{width:13px!important;height:13px!important}
-.layer-toggle:hover{background:#ffffff14}
-.layer-row:hover .layer-toggle,.layer-toggle.on{display:flex}
-.layer-toggle.on img{opacity:1!important}
-#inspector select.sizing-mode{margin-top:4px;height:24px!important;font-size:10px!important;padding:2px 6px!important}
+#layers .layer-row {
+  position: relative;
+}
+#layers .layer-row.is-hidden {
+  opacity: 0.45;
+}
+.layer-row-toggles {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 2px;
+}
+.layer-toggle {
+  display: none;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.layer-toggle img {
+  width: 13px !important;
+  height: 13px !important;
+}
+.layer-toggle:hover {
+  background: #ffffff14;
+}
+.layer-row:hover .layer-toggle,
+.layer-toggle.on {
+  display: flex;
+}
+.layer-toggle.on img {
+  opacity: 1 !important;
+}
+#inspector select.sizing-mode {
+  margin-top: 4px;
+  height: 24px !important;
+  font-size: 10px !important;
+  padding: 2px 6px !important;
+}
 
 /* Measuring a child's smallest width for spacing drags: words do not break mid-word. */
-#canvas.measuring-min .layer{overflow-wrap:normal!important;word-break:normal!important}
-#canvas.spacing-measure .layer>.handle{display:none!important}
+#canvas.measuring-min .layer {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+#canvas.spacing-measure .layer > .handle {
+  display: none !important;
+}
 /* Hidden page background (Wonder H8): the page is transparent, shown as a checkerboard (tokens in globals.css);
    outranks the chrome island's body.bd-chrome>main>#workspace background. */
-html>body>main>#workspace.page-transparent{background-color:var(--page-checker-a);background-image:repeating-conic-gradient(var(--page-checker-b) 0% 25%,var(--page-checker-a) 0% 50%);background-size:12px 12px}
+html > body > main > #workspace.page-transparent {
+  background-color: var(--page-checker-a);
+  background-image: repeating-conic-gradient(
+    var(--page-checker-b) 0% 25%,
+    var(--page-checker-a) 0% 50%
+  );
+  background-size: 12px 12px;
+}
 /* A new empty text layer (Text tool, Wonder TX1) hugs nothing: keep one caret-wide line so the caret shows. */
-#canvas .layer[data-text-editing]:empty{min-width:1px;min-height:1lh}
+#canvas .layer[data-text-editing]:empty {
+  min-width: 1px;
+  min-height: 1lh;
+}
+/* Offscreen visual bounds (web/canvas-render.js): retain geometry, skip contents and the box's own paint. */
+#canvas > .layer[data-culled] {
+  content-visibility: hidden;
+  visibility: hidden;
+}
+/* Components (design/component-audit/README.md "Canvas"; Figma 02/09/25): a selected main or instance gets the
+   component purple outline and handles (dashed for an instance), a selected slot the slot pink; their name labels
+   take the same colour with a ❖ (main) or ◇ (instance) mark. An empty slot shows a "+" in its centre. --iz keeps
+   the chrome a constant size on screen. Tokens: --component / --slot in web/src/styles/globals.css. */
+#canvas .layer.selected[data-component="main"]:not([data-outline]),
+#canvas .layer.selected[data-component="instance"]:not([data-outline]) {
+  outline-color: var(--component, #8f4ff0) !important;
+}
+#canvas .layer.selected[data-component="instance"]:not([data-outline]) {
+  outline-style: dashed !important;
+}
+#canvas .layer.selected[data-component="slot"]:not([data-outline]),
+#canvas .layer.selected[data-component="instance-slot"]:not([data-outline]) {
+  outline-color: var(--slot, #df37ac) !important;
+}
+#canvas .layer[data-component="main"] > .handle,
+#canvas .layer[data-component="instance"] > .handle {
+  border-color: var(--component, #8f4ff0) !important;
+}
+#canvas .layer[data-component="slot"] > .handle,
+#canvas .layer[data-component="instance-slot"] > .handle {
+  border-color: var(--slot, #df37ac) !important;
+}
+#canvas .layer[data-component="instance-slot"]:not(:has(> .layer))::before,
+#canvas .layer.selected[data-component="slot"]:not(:has(> .layer))::before {
+  content: "+";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(20px * var(--iz));
+  height: calc(20px * var(--iz));
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: calc(1px * var(--iz)) solid var(--slot, #df37ac);
+  color: var(--slot, #df37ac);
+  background: color-mix(in srgb, var(--slot, #df37ac) 10%, transparent);
+  font:
+    400 calc(15px * var(--iz))/calc(18px * var(--iz)) Inter,
+    system-ui,
+    sans-serif;
+  text-align: center;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+#canvas-overlay .frame-label.is-main,
+#canvas-overlay .frame-label.is-instance,
+#canvas-overlay #selection-name[data-component="main"],
+#canvas-overlay #selection-name[data-component="instance"] {
+  color: var(--component-foreground, #cbaaf9);
+}
+#canvas-overlay .frame-label.is-main::before,
+#canvas-overlay #selection-name[data-component="main"]::before {
+  content: "❖ ";
+}
+#canvas-overlay .frame-label.is-instance::before,
+#canvas-overlay #selection-name[data-component="instance"]::before {
+  content: "◇ ";
+}

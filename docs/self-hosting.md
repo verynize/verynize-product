@@ -4,7 +4,7 @@ The collaboration backend also runs as a single Node process: `server/node.mjs` 
 
 ## Run
 
-Node 22.18 or newer (the server uses the built-in `node:sqlite`; Node 22 prints an experimental warning for it).
+Node 24.11 or newer (the server uses the built-in `node:sqlite`).
 
 ```sh
 npm install

@@ -44,7 +44,10 @@
   }
   /** True for a data URI this module stores as a room asset. */
   const uploadable = (value) =>
-    typeof value === "string" && (RASTER.test(value) || Limits.classify(value) === "asset");
+    typeof value === "string" &&
+    (window.VerynizeDocument?.isAssetRef?.(value) ||
+      RASTER.test(value) ||
+      Limits.classify(value) === "asset");
 
   // Uploads per room and source: {status: 'uploading'|'done'|'failed', url?, error?}.
   const entries = new Map();
@@ -109,10 +112,15 @@
    * room request). Returns the asset URL.
    */
   async function uploadTo(request, roomId, src) {
-    const contentType = Limits.parseDataUrl(src)?.mime;
+    const response =
+      window.VerynizeDocument?.isAssetRef?.(src) && window.assetStore
+        ? new Response(await window.assetStore.get(src))
+        : await fetch(src);
+    if (!response.ok) throw Error("Asset unavailable for upload");
+    const contentType = Limits.parseDataUrl(src)?.mime || response.headers.get("content-type");
     if (!contentType || !Limits.ASSET_TYPES.includes(contentType))
       throw Error(`Embedded ${contentType || "data"} cannot be uploaded`);
-    const bytes = new Uint8Array(await (await fetch(src)).arrayBuffer());
+    const bytes = new Uint8Array(await response.arrayBuffer());
     if (bytes.byteLength > Limits.ASSET_LIMIT_BYTES)
       throw Object.assign(
         Error(

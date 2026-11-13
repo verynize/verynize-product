@@ -1,0 +1,1881 @@
+{
+  "n": 50000,
+  "nodesPerPage": 5000,
+  "node": "n1",
+  "css": "",
+  "pages": 10,
+  "activePageNodes": 5000,
+  "at": "2026-11-06T11:21:07.760Z",
+  "uptime": "18:21  up  9:27, 1 user, load averages: 17.74 20.57 17.05",
+  "loadAverage": [17.74365234375, 20.57373046875, 17.0458984375],
+  "commit": "44aa430ff81be2297c49aa25469204b3e1228f5c",
+  "moves": [
+    168.2, 5.3, 1.7, 1.2, 1.2, 1.1, 1.3, 1.2, 1.2, 1, 1, 1, 1.1, 1.1, 1.1, 1, 1.1, 0.9, 1, 0.9, 1,
+    1.3, 0.9, 0.9, 1, 0.9, 1, 1.1, 1.1, 0.9, 1, 1.1, 1.1, 1, 1.1, 0.9, 0.9, 1.1, 0.9, 0.9, 1.1, 1.1,
+    1, 1.1, 1, 0.9, 1, 1, 1.1, 1.1, 1.3, 1, 1, 1.1, 1.1, 1, 1.1, 1, 0.9, 0.9
+  ],
+  "downMs": 5.300000004470348,
+  "releaseMs": 1752.8999999985099,
+  "handler": {
+    "count": 60,
+    "p50": 1,
+    "p95": 1.3000000044703484,
+    "max": 168.20000000298023
+  },
+  "before": {
+    "x": 180,
+    "y": 20,
+    "parentId": "n0"
+  },
+  "after": {
+    "x": 32.78,
+    "y": 55,
+    "parentId": "n10"
+  },
+  "all": {
+    "trace": {
+      "FunctionCall": 224.1,
+      "MinorGC": 0.6,
+      "V8.GC_SCAVENGER": 0.6,
+      "UpdateLayoutTree": 22.6,
+      "Layout": 2.2,
+      "PrePaint": 0.2,
+      "HitTest": 4.7,
+      "FireAnimationFrame": 12.5
+    },
+    "cpu": {
+      "self": [
+        {
+          "name": "snapshot app.js:87:247",
+          "ms": 115.1
+        },
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 59.1
+        },
+        {
+          "name": "elementsFromPoint :0:0",
+          "ms": 5.6
+        },
+        {
+          "name": "visit canvas-render.js:259:19",
+          "ms": 4.7
+        },
+        {
+          "name": "compare canvas-render.js:67:19",
+          "ms": 3.8
+        },
+        {
+          "name": "follow canvas-interactions.js:805:20",
+          "ms": 3.5
+        },
+        {
+          "name": "measure canvas-drop-hits.js:32:21",
+          "ms": 3.1
+        },
+        {
+          "name": "draw selection-chrome.js:166:18",
+          "ms": 2.9
+        },
+        {
+          "name": "hasComponents component-core.js:144:25",
+          "ms": 2.8
+        },
+        {
+          "name": "updateMeasurement app.js:101:27",
+          "ms": 2.8
+        },
+        {
+          "name": "(anon) canvas-interactions.js:857:16",
+          "ms": 2.3
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "append :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "createElementNS :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "moving canvas-interactions.js:526:22",
+          "ms": 1.6
+        },
+        {
+          "name": "setAttribute :0:0",
+          "ms": 1.5
+        },
+        {
+          "name": "drawGuides canvas-interactions.js:1056:24",
+          "ms": 1.5
+        },
+        {
+          "name": "(program) :0:0",
+          "ms": 1.5
+        },
+        {
+          "name": "snapBox canvas-interactions.js:1014:21",
+          "ms": 1.4
+        },
+        {
+          "name": "current node-index.js:30:19",
+          "ms": 1.1
+        },
+        {
+          "name": "render canvas-render.js:321:20",
+          "ms": 1
+        },
+        {
+          "name": "measure :0:0",
+          "ms": 0.9
+        },
+        {
+          "name": "relocate canvas-interactions.js:971:22",
+          "ms": 0.8
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 0.8
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 0.8
+        }
+      ],
+      "inclusive": [
+        {
+          "name": "(root) :0:0",
+          "ms": 235.1
+        },
+        {
+          "name": "moving canvas-interactions.js:526:22",
+          "ms": 233.7
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 232.8
+        },
+        {
+          "name": "(anon) canvas-interactions.js:857:16",
+          "ms": 231.4
+        },
+        {
+          "name": "dispatchEvent :0:0",
+          "ms": 230.4
+        },
+        {
+          "name": "begin canvas-interactions.js:840:21",
+          "ms": 130.1
+        },
+        {
+          "name": "snapshot app.js:87:247",
+          "ms": 115.1
+        },
+        {
+          "name": "commit canvas-interactions.js:511:21",
+          "ms": 115.1
+        },
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 59.1
+        },
+        {
+          "name": "ed.updateMeasurement canvas-interactions.js:1087:74",
+          "ms": 50.3
+        },
+        {
+          "name": "draw selection-chrome.js:166:18",
+          "ms": 50
+        },
+        {
+          "name": "screenFrame selection-chrome.js:122:25",
+          "ms": 41.1
+        },
+        {
+          "name": "viewport selection-chrome.js:121:22",
+          "ms": 40.6
+        },
+        {
+          "name": "render app.js:24:16",
+          "ms": 21.5
+        },
+        {
+          "name": "renderCanvas app.js:23:349",
+          "ms": 21.5
+        },
+        {
+          "name": "worldRect canvas-interactions.js:316:23",
+          "ms": 15.5
+        },
+        {
+          "name": "(anon) canvas-interactions.js:848:34",
+          "ms": 14
+        },
+        {
+          "name": "dropTarget canvas-interactions.js:910:24",
+          "ms": 12.7
+        },
+        {
+          "name": "render canvas-render.js:321:20",
+          "ms": 11.5
+        },
+        {
+          "name": "(anon) canvas-render.js:349:29",
+          "ms": 10.3
+        },
+        {
+          "name": "visit canvas-render.js:259:19",
+          "ms": 10
+        },
+        {
+          "name": "frameAt canvas-drop-hits.js:90:14",
+          "ms": 9.9
+        },
+        {
+          "name": "(anon) canvas-render.js:312:20",
+          "ms": 8.7
+        },
+        {
+          "name": "(anon) canvas-interactions.js:916:67",
+          "ms": 5.8
+        },
+        {
+          "name": "elementsFromPoint :0:0",
+          "ms": 5.6
+        },
+        {
+          "name": "drawGuides canvas-interactions.js:1056:24",
+          "ms": 5.1
+        },
+        {
+          "name": "updateMeasurement app.js:101:27",
+          "ms": 4.5
+        },
+        {
+          "name": "afterRender canvas-interactions.js:1867:25",
+          "ms": 4.3
+        },
+        {
+          "name": "compare canvas-render.js:67:19",
+          "ms": 3.8
+        },
+        {
+          "name": "measure canvas-drop-hits.js:32:21",
+          "ms": 3.8
+        },
+        {
+          "name": "follow canvas-interactions.js:805:20",
+          "ms": 3.5
+        },
+        {
+          "name": "sync component-core.js:1066:11",
+          "ms": 3.3
+        },
+        {
+          "name": "guideTargets canvas-interactions.js:776:26",
+          "ms": 3.2
+        },
+        {
+          "name": "drawConstraintGuides selection-chrome.js:144:34",
+          "ms": 2.8
+        },
+        {
+          "name": "hasComponents component-core.js:144:25",
+          "ms": 2.8
+        },
+        {
+          "name": "viewport canvas-interactions.js:275:22",
+          "ms": 2.8
+        },
+        {
+          "name": "screenToWorld canvas-interactions.js:299:27",
+          "ms": 2.8
+        },
+        {
+          "name": "line selection-chrome.js:153:20",
+          "ms": 2
+        },
+        {
+          "name": "stateOf node-index.js:41:19",
+          "ms": 1.9
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "append :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "createElementNS :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "snapBox canvas-interactions.js:1014:21",
+          "ms": 1.6
+        },
+        {
+          "name": "setAttribute :0:0",
+          "ms": 1.5
+        },
+        {
+          "name": "(anon) canvas-interactions.js:779:137",
+          "ms": 1.5
+        }
+      ]
+    }
+  },
+  "steady": {
+    "trace": {
+      "FunctionCall": 49.1,
+      "UpdateLayoutTree": 6.6,
+      "Layout": 0,
+      "FireAnimationFrame": 10.6
+    },
+    "cpu": {
+      "self": [
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 37.3
+        },
+        {
+          "name": "follow canvas-interactions.js:805:20",
+          "ms": 3.5
+        },
+        {
+          "name": "updateMeasurement app.js:101:27",
+          "ms": 2.5
+        },
+        {
+          "name": "draw selection-chrome.js:166:18",
+          "ms": 2.1
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "append :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "drawGuides canvas-interactions.js:1056:24",
+          "ms": 1.5
+        },
+        {
+          "name": "(anon) canvas-interactions.js:857:16",
+          "ms": 1.5
+        },
+        {
+          "name": "snapBox canvas-interactions.js:1014:21",
+          "ms": 1.4
+        },
+        {
+          "name": "createElementNS :0:0",
+          "ms": 1
+        },
+        {
+          "name": "moving canvas-interactions.js:526:22",
+          "ms": 1
+        },
+        {
+          "name": "setAttribute :0:0",
+          "ms": 1
+        },
+        {
+          "name": "measure :0:0",
+          "ms": 0.9
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 0.8
+        },
+        {
+          "name": "pointer :11:19",
+          "ms": 0.5
+        },
+        {
+          "name": "querySelectorAll :0:0",
+          "ms": 0.5
+        },
+        {
+          "name": "(program) :0:0",
+          "ms": 0.4
+        },
+        {
+          "name": "constraintsOf node-style.js:158:25",
+          "ms": 0.3
+        },
+        {
+          "name": "drawConstraintGuides selection-chrome.js:144:34",
+          "ms": 0.3
+        },
+        {
+          "name": "line selection-chrome.js:153:20",
+          "ms": 0.3
+        },
+        {
+          "name": "place selection-chrome.js:123:19",
+          "ms": 0.3
+        },
+        {
+          "name": "elementOf canvas-interactions.js:54:23",
+          "ms": 0.3
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "setLayerPreview canvas-interactions.js:796:29",
+          "ms": 0.3
+        },
+        {
+          "name": "frameOf selection-chrome.js:33:19",
+          "ms": 0.3
+        }
+      ],
+      "inclusive": [
+        {
+          "name": "moving canvas-interactions.js:526:22",
+          "ms": 60.1
+        },
+        {
+          "name": "(root) :0:0",
+          "ms": 59.6
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 58.9
+        },
+        {
+          "name": "(anon) canvas-interactions.js:857:16",
+          "ms": 58.6
+        },
+        {
+          "name": "dispatchEvent :0:0",
+          "ms": 56.6
+        },
+        {
+          "name": "ed.updateMeasurement canvas-interactions.js:1087:74",
+          "ms": 46.6
+        },
+        {
+          "name": "draw selection-chrome.js:166:18",
+          "ms": 43.8
+        },
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 37.3
+        },
+        {
+          "name": "screenFrame selection-chrome.js:122:25",
+          "ms": 37.1
+        },
+        {
+          "name": "viewport selection-chrome.js:121:22",
+          "ms": 36.8
+        },
+        {
+          "name": "drawGuides canvas-interactions.js:1056:24",
+          "ms": 4.9
+        },
+        {
+          "name": "follow canvas-interactions.js:805:20",
+          "ms": 3.5
+        },
+        {
+          "name": "updateMeasurement app.js:101:27",
+          "ms": 3
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "append :0:0",
+          "ms": 1.8
+        },
+        {
+          "name": "snapBox canvas-interactions.js:1014:21",
+          "ms": 1.6
+        },
+        {
+          "name": "drawConstraintGuides selection-chrome.js:144:34",
+          "ms": 1.5
+        },
+        {
+          "name": "createElementNS :0:0",
+          "ms": 1
+        },
+        {
+          "name": "setAttribute :0:0",
+          "ms": 1
+        },
+        {
+          "name": "line selection-chrome.js:153:20",
+          "ms": 1
+        },
+        {
+          "name": "measure :0:0",
+          "ms": 0.9
+        },
+        {
+          "name": "pointer :11:19",
+          "ms": 0.7
+        },
+        {
+          "name": "viewport canvas-interactions.js:275:22",
+          "ms": 0.5
+        },
+        {
+          "name": "screenToWorld canvas-interactions.js:299:27",
+          "ms": 0.5
+        },
+        {
+          "name": "dropTarget canvas-interactions.js:910:24",
+          "ms": 0.5
+        },
+        {
+          "name": "querySelectorAll :0:0",
+          "ms": 0.5
+        },
+        {
+          "name": "place selection-chrome.js:123:19",
+          "ms": 0.4
+        },
+        {
+          "name": "(program) :0:0",
+          "ms": 0.4
+        },
+        {
+          "name": "constraintsOf node-style.js:158:25",
+          "ms": 0.3
+        },
+        {
+          "name": "elementOf canvas-interactions.js:54:23",
+          "ms": 0.3
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "setLayerPreview canvas-interactions.js:796:29",
+          "ms": 0.3
+        },
+        {
+          "name": "frameOf selection-chrome.js:33:19",
+          "ms": 0.3
+        },
+        {
+          "name": "set value :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "set ui.js:13:6789",
+          "ms": 0.3
+        },
+        {
+          "name": "getElementById :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "layerOf canvas-render.js:559:16",
+          "ms": 0.2
+        },
+        {
+          "name": "PointerEvent :0:0",
+          "ms": 0.2
+        },
+        {
+          "name": "toggleAttribute :0:0",
+          "ms": 0.2
+        },
+        {
+          "name": "edges canvas-interactions.js:1018:23",
+          "ms": 0.2
+        },
+        {
+          "name": "placeFrame selection-chrome.js:38:22",
+          "ms": 0.1
+        }
+      ]
+    }
+  },
+  "down": {
+    "trace": {
+      "EventDispatch": 4.1
+    },
+    "cpu": {
+      "self": [
+        {
+          "name": "PointerEvent :0:0",
+          "ms": 1.1
+        },
+        {
+          "name": "selectedNodes canvas-interactions.js:51:27",
+          "ms": 0.8
+        },
+        {
+          "name": "dispatchEvent :0:0",
+          "ms": 0.5
+        },
+        {
+          "name": "(anon) canvas-interactions.js:539:42",
+          "ms": 0.5
+        },
+        {
+          "name": "aB ui.js:61:133216",
+          "ms": 0.5
+        },
+        {
+          "name": "preventDefault :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "showHover canvas-interactions.js:104:23",
+          "ms": 0.3
+        },
+        {
+          "name": "topSelected canvas-interactions.js:500:25",
+          "ms": 0.3
+        },
+        {
+          "name": "current node-index.js:30:19",
+          "ms": 0.3
+        },
+        {
+          "name": "addEventListener :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "(anon) canvas-interactions.js:51:51",
+          "ms": 0.3
+        },
+        {
+          "name": "stateOf node-index.js:41:19",
+          "ms": 0.2
+        },
+        {
+          "name": "pointer :11:19",
+          "ms": 0.2
+        }
+      ],
+      "inclusive": [
+        {
+          "name": "drag :1:21",
+          "ms": 5.4
+        },
+        {
+          "name": "evaluate :364:11",
+          "ms": 5.4
+        },
+        {
+          "name": "(anon) :1:2",
+          "ms": 5.4
+        },
+        {
+          "name": "(root) :0:0",
+          "ms": 5.4
+        },
+        {
+          "name": "dispatchEvent :0:0",
+          "ms": 4.1
+        },
+        {
+          "name": "(anon) canvas-interactions.js:539:42",
+          "ms": 3.1
+        },
+        {
+          "name": "startMove canvas-interactions.js:829:23",
+          "ms": 1.6
+        },
+        {
+          "name": "pointer :11:19",
+          "ms": 1.3
+        },
+        {
+          "name": "PointerEvent :0:0",
+          "ms": 1.1
+        },
+        {
+          "name": "selectedNodes canvas-interactions.js:51:27",
+          "ms": 1
+        },
+        {
+          "name": "topSelected canvas-interactions.js:500:25",
+          "ms": 1
+        },
+        {
+          "name": "resolveHit canvas-interactions.js:478:24",
+          "ms": 0.8
+        },
+        {
+          "name": "track canvas-interactions.js:515:19",
+          "ms": 0.6
+        },
+        {
+          "name": "aB ui.js:61:133216",
+          "ms": 0.5
+        },
+        {
+          "name": "(anon) ui.js:61:133362",
+          "ms": 0.5
+        },
+        {
+          "name": "stateOf node-index.js:41:19",
+          "ms": 0.5
+        },
+        {
+          "name": "of node-index.js:82:14",
+          "ms": 0.5
+        },
+        {
+          "name": "preventDefault :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "showHover canvas-interactions.js:104:23",
+          "ms": 0.3
+        },
+        {
+          "name": "current node-index.js:30:19",
+          "ms": 0.3
+        },
+        {
+          "name": "addEventListener :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "(anon) canvas-interactions.js:51:51",
+          "ms": 0.3
+        }
+      ]
+    }
+  },
+  "release": {
+    "trace": {
+      "FunctionCall": 1752.7,
+      "UpdateLayoutTree": 0.3,
+      "Layout": 0.6,
+      "MinorGC": 66.7,
+      "V8.GC_SCAVENGER": 65.2
+    },
+    "cpu": {
+      "self": [
+        {
+          "name": "render app.js:24:16",
+          "ms": 1241.2
+        },
+        {
+          "name": "getDocument app.js:88:3107",
+          "ms": 159
+        },
+        {
+          "name": "sync wonder-shell.js:46:16",
+          "ms": 157
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 67.2
+        },
+        {
+          "name": "setItem :0:0",
+          "ms": 65.5
+        },
+        {
+          "name": "persist wonder-shell.js:38:19",
+          "ms": 34
+        },
+        {
+          "name": "visit canvas-render.js:259:19",
+          "ms": 4.8
+        },
+        {
+          "name": "PA ui.js:59:141663",
+          "ms": 4.2
+        },
+        {
+          "name": "compare canvas-render.js:67:19",
+          "ms": 3.8
+        },
+        {
+          "name": "hasComponents component-core.js:144:25",
+          "ms": 3.1
+        },
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 1.3
+        },
+        {
+          "name": "(anon) ui.js:59:195674",
+          "ms": 1.1
+        },
+        {
+          "name": "options app.js:17:17",
+          "ms": 1.1
+        },
+        {
+          "name": "structuredClone :0:0",
+          "ms": 1
+        },
+        {
+          "name": "(anon) ui.js:59:169365",
+          "ms": 0.9
+        },
+        {
+          "name": "render canvas-render.js:321:20",
+          "ms": 0.8
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 0.8
+        },
+        {
+          "name": "(anon) ui.js:59:169768",
+          "ms": 0.8
+        },
+        {
+          "name": "(anon) node-style.js:977:52",
+          "ms": 0.5
+        },
+        {
+          "name": "find canvas-interactions.js:49:18",
+          "ms": 0.5
+        },
+        {
+          "name": "removeEventListener :0:0",
+          "ms": 0.4
+        },
+        {
+          "name": "stateOf node-index.js:41:19",
+          "ms": 0.3
+        },
+        {
+          "name": "get ui.js:13:6753",
+          "ms": 0.3
+        },
+        {
+          "name": "set value :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "(anon) live-preview.js:233:85",
+          "ms": 0.3
+        }
+      ],
+      "inclusive": [
+        {
+          "name": "(root) :0:0",
+          "ms": 1752.9
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 1685.4
+        },
+        {
+          "name": "up canvas-interactions.js:518:18",
+          "ms": 1685.4
+        },
+        {
+          "name": "dispatchEvent :0:0",
+          "ms": 1685.3
+        },
+        {
+          "name": "(anon) canvas-interactions.js:892:10",
+          "ms": 1685
+        },
+        {
+          "name": "render app.js:24:16",
+          "ms": 1684.9
+        },
+        {
+          "name": "(anon) wonder-shell.js:97:215",
+          "ms": 416.3
+        },
+        {
+          "name": "sync wonder-shell.js:46:16",
+          "ms": 257.3
+        },
+        {
+          "name": "getDocument app.js:88:3107",
+          "ms": 159
+        },
+        {
+          "name": "persist wonder-shell.js:38:19",
+          "ms": 99.7
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 67.2
+        },
+        {
+          "name": "setItem :0:0",
+          "ms": 65.5
+        },
+        {
+          "name": "render canvas-render.js:321:20",
+          "ms": 10.4
+        },
+        {
+          "name": "visit canvas-render.js:259:19",
+          "ms": 9.4
+        },
+        {
+          "name": "(anon) canvas-render.js:349:29",
+          "ms": 9.4
+        },
+        {
+          "name": "(anon) canvas-render.js:312:20",
+          "ms": 8.4
+        },
+        {
+          "name": "(anon) ui.js:59:169365",
+          "ms": 7.3
+        },
+        {
+          "name": "(anon) ui.js:59:195674",
+          "ms": 5.4
+        },
+        {
+          "name": "PA ui.js:59:141663",
+          "ms": 4.2
+        },
+        {
+          "name": "compare canvas-render.js:67:19",
+          "ms": 3.8
+        },
+        {
+          "name": "afterRender canvas-interactions.js:1867:25",
+          "ms": 3.3
+        },
+        {
+          "name": "hasComponents component-core.js:144:25",
+          "ms": 3.1
+        },
+        {
+          "name": "sync component-core.js:1066:11",
+          "ms": 3.1
+        },
+        {
+          "name": "options app.js:17:17",
+          "ms": 1.6
+        },
+        {
+          "name": "screenFrame selection-chrome.js:122:25",
+          "ms": 1.5
+        },
+        {
+          "name": "draw selection-chrome.js:166:18",
+          "ms": 1.5
+        },
+        {
+          "name": "getBoundingClientRect :0:0",
+          "ms": 1.3
+        },
+        {
+          "name": "viewport selection-chrome.js:121:22",
+          "ms": 1.3
+        },
+        {
+          "name": "find canvas-interactions.js:49:18",
+          "ms": 1
+        },
+        {
+          "name": "syncAnchored canvas-interactions.js:1840:26",
+          "ms": 1
+        },
+        {
+          "name": "(anon) ui.js:59:169768",
+          "ms": 1
+        },
+        {
+          "name": "structuredClone :0:0",
+          "ms": 1
+        },
+        {
+          "name": "replaceChildren :0:0",
+          "ms": 0.8
+        },
+        {
+          "name": "find node-index.js:87:16",
+          "ms": 0.5
+        },
+        {
+          "name": "(anon) node-style.js:977:52",
+          "ms": 0.5
+        },
+        {
+          "name": "lastInFlowId node-style.js:977:24",
+          "ms": 0.5
+        },
+        {
+          "name": "stateOf node-index.js:41:19",
+          "ms": 0.5
+        },
+        {
+          "name": "removeEventListener :0:0",
+          "ms": 0.4
+        },
+        {
+          "name": "get ui.js:13:6753",
+          "ms": 0.3
+        },
+        {
+          "name": "set value :0:0",
+          "ms": 0.3
+        },
+        {
+          "name": "(anon) live-preview.js:233:85",
+          "ms": 0.3
+        },
+        {
+          "name": "index canvas-render.js:418:19",
+          "ms": 0.3
+        },
+        {
+          "name": "(anon) ui.js:59:169794",
+          "ms": 0.3
+        },
+        {
+          "name": "sizingAllowed app.js:19:23",
+          "ms": 0.3
+        },
+        {
+          "name": "sizingMode app.js:20:20",
+          "ms": 0.3
+        }
+      ]
+    }
+  },
+  "between": {
+    "trace": {
+      "FunctionCall": 61.3,
+      "UpdateLayoutTree": 12.8,
+      "Layout": 6.7,
+      "PrePaint": 9.9,
+      "Paint": 25.5,
+      "Layerize": 64.3,
+      "TimerFire": 0.3,
+      "EventDispatch": 0.1,
+      "MinorGC": 2.5,
+      "V8.GC_SCAVENGER": 2.4,
+      "HitTest": 102.9,
+      "FireAnimationFrame": 1892.3
+    },
+    "cpu": {
+      "self": [
+        {
+          "name": "(idle) :0:0",
+          "ms": 617.4
+        },
+        {
+          "name": "(program) :0:0",
+          "ms": 280.5
+        },
+        {
+          "name": "_ ui.js:13:43416",
+          "ms": 3.1
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 2.7
+        },
+        {
+          "name": "Fl ui.js:13:97185",
+          "ms": 2.5
+        },
+        {
+          "name": "mp ui.js:14:7986",
+          "ms": 2.3
+        },
+        {
+          "name": "(anon) ui.js:54:60456",
+          "ms": 2
+        },
+        {
+          "name": "(anon) ui.js:59:40283",
+          "ms": 1.9
+        },
+        {
+          "name": "(anon) ui.js:59:41617",
+          "ms": 1.5
+        },
+        {
+          "name": "(anon) ui.js:14:54165",
+          "ms": 1.4
+        },
+        {
+          "name": "Eh ui.js:14:55150",
+          "ms": 1.4
+        },
+        {
+          "name": "Ic ui.js:13:68571",
+          "ms": 1.3
+        },
+        {
+          "name": "Nu ui.js:13:109504",
+          "ms": 1.3
+        },
+        {
+          "name": "Ma ui.js:6:37044",
+          "ms": 1.3
+        },
+        {
+          "name": "(anon) ui.js:6:38537",
+          "ms": 1.2
+        },
+        {
+          "name": "Og ui.js:14:70654",
+          "ms": 1.2
+        },
+        {
+          "name": "e.createElement ui.js:1:6790",
+          "ms": 1.1
+        },
+        {
+          "name": "Ru ui.js:13:115983",
+          "ms": 1
+        },
+        {
+          "name": "set toTemporalInstant :0:0",
+          "ms": 1
+        },
+        {
+          "name": "(anon) ui.js:14:58236",
+          "ms": 1
+        },
+        {
+          "name": "up ui.js:14:72",
+          "ms": 1
+        },
+        {
+          "name": "(anon) ui.js:14:56956",
+          "ms": 0.8
+        },
+        {
+          "name": "(anon) ui.js:13:44801",
+          "ms": 0.8
+        },
+        {
+          "name": "e.cloneElement ui.js:1:6176",
+          "ms": 0.8
+        },
+        {
+          "name": "Ys ui.js:13:57910",
+          "ms": 0.8
+        }
+      ],
+      "inclusive": [
+        {
+          "name": "(root) :0:0",
+          "ms": 951.2
+        },
+        {
+          "name": "(idle) :0:0",
+          "ms": 617.4
+        },
+        {
+          "name": "(program) :0:0",
+          "ms": 280.5
+        },
+        {
+          "name": "Ud ui.js:13:123515",
+          "ms": 49.1
+        },
+        {
+          "name": "Bf ui.js:13:136175",
+          "ms": 49.1
+        },
+        {
+          "name": "D ui.js:6:107525",
+          "ms": 49.1
+        },
+        {
+          "name": "nf ui.js:13:127407",
+          "ms": 38.6
+        },
+        {
+          "name": "tf ui.js:13:126933",
+          "ms": 38.6
+        },
+        {
+          "name": "pl ui.js:13:82349",
+          "ms": 37.4
+        },
+        {
+          "name": "Ic ui.js:13:68571",
+          "ms": 19.5
+        },
+        {
+          "name": "$o ui.js:13:49106",
+          "ms": 13
+        },
+        {
+          "name": "ff ui.js:13:129871",
+          "ms": 10.5
+        },
+        {
+          "name": "df ui.js:13:129637",
+          "ms": 10.5
+        },
+        {
+          "name": "Wd ui.js:13:124620",
+          "ms": 10.5
+        },
+        {
+          "name": "ju ui.js:13:109017",
+          "ms": 8.1
+        },
+        {
+          "name": "Nu ui.js:13:109504",
+          "ms": 8.1
+        },
+        {
+          "name": "hf ui.js:13:130519",
+          "ms": 8.1
+        },
+        {
+          "name": "Fl ui.js:13:97185",
+          "ms": 5.8
+        },
+        {
+          "name": "(anon) ui.js:6:38537",
+          "ms": 5.6
+        },
+        {
+          "name": "(anon) ui.js:14:54165",
+          "ms": 4.5
+        },
+        {
+          "name": "(anon) ui.js:13:44801",
+          "ms": 3.9
+        },
+        {
+          "name": "_ ui.js:13:43416",
+          "ms": 3.6
+        },
+        {
+          "name": "(anon) ui.js:59:40283",
+          "ms": 3.5
+        },
+        {
+          "name": "mp ui.js:14:7986",
+          "ms": 3.3
+        },
+        {
+          "name": "(anon) ui.js:54:60456",
+          "ms": 3
+        },
+        {
+          "name": "Ma ui.js:6:37044",
+          "ms": 2.8
+        },
+        {
+          "name": "(garbage collector) :0:0",
+          "ms": 2.7
+        },
+        {
+          "name": "(anon) ui.js:59:41617",
+          "ms": 2.5
+        },
+        {
+          "name": "(anon) ui.js:14:59041",
+          "ms": 1.8
+        },
+        {
+          "name": "(anon) ui.js:14:59022",
+          "ms": 1.8
+        },
+        {
+          "name": "(anon) ui.js:14:70433",
+          "ms": 1.7
+        },
+        {
+          "name": "Xs ui.js:13:58039",
+          "ms": 1.6
+        },
+        {
+          "name": "xg ui.js:14:69137",
+          "ms": 1.5
+        },
+        {
+          "name": "vu ui.js:13:104641",
+          "ms": 1.5
+        },
+        {
+          "name": "(anon) ui.js:54:46885",
+          "ms": 1.5
+        },
+        {
+          "name": "Og ui.js:14:70654",
+          "ms": 1.4
+        },
+        {
+          "name": "Eh ui.js:14:55150",
+          "ms": 1.4
+        },
+        {
+          "name": "e.useMemo ui.js:1:8200",
+          "ms": 1.3
+        },
+        {
+          "name": "(anon) ui.js:54:60071",
+          "ms": 1.3
+        },
+        {
+          "name": "(anon) ui.js:14:58236",
+          "ms": 1.3
+        },
+        {
+          "name": "Ru ui.js:13:115983",
+          "ms": 1.3
+        },
+        {
+          "name": "gf ui.js:13:131788",
+          "ms": 1.3
+        },
+        {
+          "name": "drag :1:21",
+          "ms": 1.2
+        },
+        {
+          "name": "e.createElement ui.js:1:6790",
+          "ms": 1.1
+        },
+        {
+          "name": "uoe ui.js:59:189871",
+          "ms": 1
+        }
+      ]
+    }
+  },
+  "slowest": [
+    {
+      "i": 0,
+      "ms": 168.2,
+      "trace": {
+        "FunctionCall": 168.1,
+        "MinorGC": 0.6,
+        "V8.GC_SCAVENGER": 0.6,
+        "UpdateLayoutTree": 15.7,
+        "Layout": 2.2,
+        "PrePaint": 0.2,
+        "HitTest": 2.9
+      },
+      "cpu": {
+        "self": [
+          {
+            "name": "snapshot app.js:87:247",
+            "ms": 115.1
+          },
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 20.4
+          },
+          {
+            "name": "visit canvas-render.js:259:19",
+            "ms": 4.7
+          },
+          {
+            "name": "compare canvas-render.js:67:19",
+            "ms": 3.8
+          },
+          {
+            "name": "elementsFromPoint :0:0",
+            "ms": 3.8
+          },
+          {
+            "name": "hasComponents component-core.js:144:25",
+            "ms": 2.8
+          },
+          {
+            "name": "measure canvas-drop-hits.js:32:21",
+            "ms": 1.5
+          },
+          {
+            "name": "current node-index.js:30:19",
+            "ms": 1.1
+          },
+          {
+            "name": "(program) :0:0",
+            "ms": 1.1
+          },
+          {
+            "name": "render canvas-render.js:321:20",
+            "ms": 1
+          },
+          {
+            "name": "relocate canvas-interactions.js:971:22",
+            "ms": 0.8
+          },
+          {
+            "name": "find canvas-interactions.js:49:18",
+            "ms": 0.8
+          },
+          {
+            "name": "find node-index.js:87:16",
+            "ms": 0.7
+          },
+          {
+            "name": "drawFrameLabels canvas-interactions.js:1208:29",
+            "ms": 0.6
+          },
+          {
+            "name": "setAttribute :0:0",
+            "ms": 0.6
+          },
+          {
+            "name": "draw selection-chrome.js:166:18",
+            "ms": 0.5
+          },
+          {
+            "name": "render app.js:24:16",
+            "ms": 0.5
+          },
+          {
+            "name": "build node-index.js:12:17",
+            "ms": 0.5
+          },
+          {
+            "name": "(garbage collector) :0:0",
+            "ms": 0.5
+          },
+          {
+            "name": "moveBefore :0:0",
+            "ms": 0.5
+          },
+          {
+            "name": "(anon) node-style.js:977:52",
+            "ms": 0.5
+          },
+          {
+            "name": "createElementNS :0:0",
+            "ms": 0.5
+          },
+          {
+            "name": "sync component-core.js:1066:11",
+            "ms": 0.5
+          },
+          {
+            "name": "beforeRender canvas-interactions.js:1836:26",
+            "ms": 0.5
+          },
+          {
+            "name": "sizingAllowed app.js:19:23",
+            "ms": 0.3
+          }
+        ],
+        "inclusive": [
+          {
+            "name": "(root) :0:0",
+            "ms": 168.5
+          },
+          {
+            "name": "drag :1:21",
+            "ms": 166.9
+          },
+          {
+            "name": "dispatchEvent :0:0",
+            "ms": 166.9
+          },
+          {
+            "name": "moving canvas-interactions.js:526:22",
+            "ms": 166.6
+          },
+          {
+            "name": "(anon) canvas-interactions.js:857:16",
+            "ms": 166.1
+          },
+          {
+            "name": "begin canvas-interactions.js:840:21",
+            "ms": 130.1
+          },
+          {
+            "name": "snapshot app.js:87:247",
+            "ms": 115.1
+          },
+          {
+            "name": "commit canvas-interactions.js:511:21",
+            "ms": 115.1
+          },
+          {
+            "name": "render app.js:24:16",
+            "ms": 21.5
+          },
+          {
+            "name": "renderCanvas app.js:23:349",
+            "ms": 21.5
+          },
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 20.4
+          },
+          {
+            "name": "worldRect canvas-interactions.js:316:23",
+            "ms": 15.5
+          },
+          {
+            "name": "(anon) canvas-interactions.js:848:34",
+            "ms": 14
+          },
+          {
+            "name": "render canvas-render.js:321:20",
+            "ms": 11.5
+          },
+          {
+            "name": "(anon) canvas-render.js:349:29",
+            "ms": 10.3
+          },
+          {
+            "name": "visit canvas-render.js:259:19",
+            "ms": 10
+          },
+          {
+            "name": "(anon) canvas-render.js:312:20",
+            "ms": 8.7
+          },
+          {
+            "name": "dropTarget canvas-interactions.js:910:24",
+            "ms": 8.6
+          },
+          {
+            "name": "frameAt canvas-drop-hits.js:90:14",
+            "ms": 6.4
+          },
+          {
+            "name": "afterRender canvas-interactions.js:1867:25",
+            "ms": 4.3
+          },
+          {
+            "name": "draw selection-chrome.js:166:18",
+            "ms": 4.2
+          },
+          {
+            "name": "(anon) canvas-interactions.js:916:67",
+            "ms": 4.1
+          },
+          {
+            "name": "compare canvas-render.js:67:19",
+            "ms": 3.8
+          },
+          {
+            "name": "elementsFromPoint :0:0",
+            "ms": 3.8
+          },
+          {
+            "name": "sync component-core.js:1066:11",
+            "ms": 3.3
+          },
+          {
+            "name": "guideTargets canvas-interactions.js:776:26",
+            "ms": 3.2
+          },
+          {
+            "name": "hasComponents component-core.js:144:25",
+            "ms": 2.8
+          },
+          {
+            "name": "screenFrame selection-chrome.js:122:25",
+            "ms": 2.6
+          },
+          {
+            "name": "viewport selection-chrome.js:121:22",
+            "ms": 2.3
+          },
+          {
+            "name": "measure canvas-drop-hits.js:32:21",
+            "ms": 2.3
+          },
+          {
+            "name": "viewport canvas-interactions.js:275:22",
+            "ms": 2.3
+          },
+          {
+            "name": "screenToWorld canvas-interactions.js:299:27",
+            "ms": 2.3
+          },
+          {
+            "name": "stateOf node-index.js:41:19",
+            "ms": 1.9
+          },
+          {
+            "name": "ed.updateMeasurement canvas-interactions.js:1087:74",
+            "ms": 1.6
+          },
+          {
+            "name": "(anon) canvas-interactions.js:779:137",
+            "ms": 1.5
+          },
+          {
+            "name": "find node-index.js:87:16",
+            "ms": 1.5
+          },
+          {
+            "name": "find canvas-interactions.js:49:18",
+            "ms": 1.3
+          },
+          {
+            "name": "chosen app.js:12:93",
+            "ms": 1.2
+          },
+          {
+            "name": "updateMeasurement app.js:101:27",
+            "ms": 1.2
+          },
+          {
+            "name": "current node-index.js:30:19",
+            "ms": 1.1
+          },
+          {
+            "name": "of node-index.js:82:14",
+            "ms": 1.1
+          },
+          {
+            "name": "descendants app.js:16:21",
+            "ms": 1.1
+          },
+          {
+            "name": "(anon) canvas-interactions.js:778:47",
+            "ms": 1.1
+          },
+          {
+            "name": "line selection-chrome.js:153:20",
+            "ms": 1.1
+          },
+          {
+            "name": "drawConstraintGuides selection-chrome.js:144:34",
+            "ms": 1.1
+          }
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "ms": 5.3,
+      "trace": {
+        "FunctionCall": 5.3,
+        "PrePaint": 0,
+        "HitTest": 1.8,
+        "UpdateLayoutTree": 0.2,
+        "Layout": 0
+      },
+      "cpu": {
+        "self": [
+          {
+            "name": "elementsFromPoint :0:0",
+            "ms": 1.8
+          },
+          {
+            "name": "measure canvas-drop-hits.js:32:21",
+            "ms": 1.5
+          },
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 0.6
+          },
+          {
+            "name": "(anon) canvas-interactions.js:857:16",
+            "ms": 0.5
+          },
+          {
+            "name": "createElementNS :0:0",
+            "ms": 0.3
+          },
+          {
+            "name": "get checked :0:0",
+            "ms": 0.3
+          },
+          {
+            "name": "draw selection-chrome.js:166:18",
+            "ms": 0.3
+          },
+          {
+            "name": "frameAt canvas-drop-hits.js:90:14",
+            "ms": 0.3
+          },
+          {
+            "name": "dispatchEvent :0:0",
+            "ms": 0.2
+          }
+        ],
+        "inclusive": [
+          {
+            "name": "dispatchEvent :0:0",
+            "ms": 5.6
+          },
+          {
+            "name": "drag :1:21",
+            "ms": 5.6
+          },
+          {
+            "name": "(root) :0:0",
+            "ms": 5.6
+          },
+          {
+            "name": "(anon) canvas-interactions.js:857:16",
+            "ms": 5.4
+          },
+          {
+            "name": "moving canvas-interactions.js:526:22",
+            "ms": 5.4
+          },
+          {
+            "name": "frameAt canvas-drop-hits.js:90:14",
+            "ms": 3.6
+          },
+          {
+            "name": "dropTarget canvas-interactions.js:910:24",
+            "ms": 3.6
+          },
+          {
+            "name": "elementsFromPoint :0:0",
+            "ms": 1.8
+          },
+          {
+            "name": "(anon) canvas-interactions.js:916:67",
+            "ms": 1.8
+          },
+          {
+            "name": "measure canvas-drop-hits.js:32:21",
+            "ms": 1.5
+          },
+          {
+            "name": "draw selection-chrome.js:166:18",
+            "ms": 0.9
+          },
+          {
+            "name": "ed.updateMeasurement canvas-interactions.js:1087:74",
+            "ms": 0.9
+          },
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 0.6
+          },
+          {
+            "name": "viewport selection-chrome.js:121:22",
+            "ms": 0.6
+          },
+          {
+            "name": "screenFrame selection-chrome.js:122:25",
+            "ms": 0.6
+          },
+          {
+            "name": "createElementNS :0:0",
+            "ms": 0.3
+          },
+          {
+            "name": "drawGuides canvas-interactions.js:1056:24",
+            "ms": 0.3
+          },
+          {
+            "name": "get checked :0:0",
+            "ms": 0.3
+          },
+          {
+            "name": "get ui.js:13:6753",
+            "ms": 0.3
+          }
+        ]
+      }
+    },
+    {
+      "i": 2,
+      "ms": 1.7,
+      "trace": {
+        "FireAnimationFrame": 1.9,
+        "FunctionCall": 1.6,
+        "UpdateLayoutTree": 0.2,
+        "Layout": 0
+      },
+      "cpu": {
+        "self": [
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 0.8
+          },
+          {
+            "name": "moving canvas-interactions.js:526:22",
+            "ms": 0.3
+          },
+          {
+            "name": "drawConstraintGuides selection-chrome.js:144:34",
+            "ms": 0.3
+          },
+          {
+            "name": "updateMeasurement app.js:101:27",
+            "ms": 0.3
+          },
+          {
+            "name": "(program) :0:0",
+            "ms": 0.1
+          },
+          {
+            "name": "dispatchEvent :0:0",
+            "ms": -0.2
+          }
+        ],
+        "inclusive": [
+          {
+            "name": "moving canvas-interactions.js:526:22",
+            "ms": 1.6
+          },
+          {
+            "name": "(root) :0:0",
+            "ms": 1.4
+          },
+          {
+            "name": "dispatchEvent :0:0",
+            "ms": 1.3
+          },
+          {
+            "name": "drag :1:21",
+            "ms": 1.3
+          },
+          {
+            "name": "ed.updateMeasurement canvas-interactions.js:1087:74",
+            "ms": 1.3
+          },
+          {
+            "name": "(anon) canvas-interactions.js:857:16",
+            "ms": 1.3
+          },
+          {
+            "name": "draw selection-chrome.js:166:18",
+            "ms": 1
+          },
+          {
+            "name": "getBoundingClientRect :0:0",
+            "ms": 0.8
+          },
+          {
+            "name": "viewport selection-chrome.js:121:22",
+            "ms": 0.8
+          },
+          {
+            "name": "screenFrame selection-chrome.js:122:25",
+            "ms": 0.8
+          },
+          {
+            "name": "drawConstraintGuides selection-chrome.js:144:34",
+            "ms": 0.3
+          },
+          {
+            "name": "updateMeasurement app.js:101:27",
+            "ms": 0.3
+          },
+          {
+            "name": "(program) :0:0",
+            "ms": 0.1
+          }
+        ]
+      }
+    }
+  ]
+}

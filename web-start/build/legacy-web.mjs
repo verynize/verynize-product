@@ -12,8 +12,13 @@
 //   The server build gets an empty module: the editor is client-only. Styles still come from
 //   web/dist/ui.css (built by scripts/build-ui.cjs with Tailwind), so CSS imported under web/src is
 //   an empty module here and the web and desktop pages load the same stylesheet.
+// - With `staticHeaders`, the client build also gets Cloudflare's `_headers`: Vite's content-hashed
+//   `/assets/<name>-<hash>.*` never change, so browsers keep them for a year without asking again.
+//   Legacy scripts/styles and their CSS dependencies get hashed copies under /assets/legacy/.
+//   Fixed-name originals remain reachable with default revalidation for frames and other callers.
 import fs from "node:fs";
 import path from "node:path";
+import { buildLegacyAssets } from "./legacy-assets.mjs";
 
 const VIRTUAL_ID = "virtual:verynize/legacy-shell";
 const RESOLVED_ID = "\0" + VIRTUAL_ID;
@@ -76,7 +81,8 @@ export function parseLegacyShell(html) {
     if (match[2] !== undefined) styles.push({ text: match[2] });
     else {
       const attrs = attributes(match[1]);
-      if (attrs.rel === "stylesheet" && attrs.href) styles.push({ href: attrs.href });
+      if (attrs.rel === "stylesheet" && attrs.href)
+        styles.push({ href: attrs.href, boot: attrs["data-boot"] });
     }
   }
   return {
@@ -94,6 +100,7 @@ const CONTENT_TYPES = {
   ".json": "application/json",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".ico": "image/x-icon",
   ".jpg": "image/jpeg",
   ".webp": "image/webp",
   ".woff": "font/woff",
@@ -115,10 +122,25 @@ export function contentType(file) {
 function legacyUi({ webDir }) {
   const srcDir = path.join(webDir, "src");
   const entry = path.join(srcDir, "web-app.tsx").split(path.sep).join("/");
+  const islands = path.join(srcDir, "ui.tsx").split(path.sep).join("/");
+  let building = false;
   return {
     name: "verynize:legacy-ui",
+    configResolved(config) {
+      building = config.command === "build";
+    },
     enforce: "pre",
-    config: () => ({ resolve: { alias: { "@": srcDir } } }),
+    config: () => ({
+      resolve: { alias: { "@": srcDir } },
+      environments: {
+        client: {
+          // The virtual entry hides the deferred islands from Start's initial dependency scan.
+          // Scan them on the server up front so a cold Home → editor transition cannot trigger
+          // dependency optimization and reload the page mid-action. This does not load them on Home.
+          optimizeDeps: { entries: [entry, islands] },
+        },
+      },
+    }),
     resolveId(id, importer) {
       if (id === UI_ID) return RESOLVED_UI_ID;
       if (
@@ -128,33 +150,65 @@ function legacyUi({ webDir }) {
       )
         return EMPTY_CSS_ID;
     },
+    generateBundle(_options, bundle) {
+      // emitFile provides a stable code reference, but this remains a dynamically imported
+      // editor module, not a second Start application entry (Start requires exactly one).
+      for (const chunk of Object.values(bundle)) {
+        if (chunk.type === "chunk" && chunk.facadeModuleId === islands) chunk.isEntry = false;
+      }
+    },
     load(id) {
       if (id === EMPTY_CSS_ID) return "";
       if (id !== RESOLVED_UI_ID) return;
-      return this.environment?.name === "client"
-        ? `export * from ${JSON.stringify(entry)};`
-        : "export {};";
+      if (this.environment?.name !== "client") return "export {};";
+      // Warm the island chunk without evaluating it; the bundler still owns its URL.
+      const url = building
+        ? `import.meta.ROLLUP_FILE_URL_${this.emitFile({ type: "chunk", id: islands })}`
+        : JSON.stringify("/@fs/" + islands);
+      return `export * from ${JSON.stringify(entry)}; export const editorIslandUrl = ${url};`;
     },
   };
 }
 
-/** @param {{ webDir: string }} options */
-export function legacyWeb({ webDir }) {
-  return [legacyUi({ webDir }), legacyWebFiles({ webDir })];
+/** `_headers` of the Cloudflare static assets (one path segment: `:file` never matches a `/`). */
+export const STATIC_HEADERS = `/assets/:file
+  Cache-Control: public, max-age=31536000, immutable
+/assets/legacy/:file
+  Cache-Control: public, max-age=31536000, immutable
+/favicon.ico
+  Cache-Control: public, max-age=86400
+/favicon.svg
+  Cache-Control: public, max-age=86400
+/apple-touch-icon.png
+  Cache-Control: public, max-age=86400
+`;
+/** Public web/ files the immutable rule would match: their names never change, so they must not. */
+const HASHED_ONLY = /^assets\/(?:[^/]+|legacy\/.*)$/;
+
+/** @param {{ webDir: string, staticHeaders?: boolean }} options */
+export function legacyWeb({ webDir, staticHeaders = false }) {
+  return [legacyUi({ webDir }), legacyWebFiles({ webDir, staticHeaders })];
 }
 
-/** @param {{ webDir: string }} options */
-function legacyWebFiles({ webDir }) {
+/** @param {{ webDir: string, staticHeaders: boolean }} options */
+function legacyWebFiles({ webDir, staticHeaders }) {
   const indexHtml = path.join(webDir, "index.html");
+  let building = false;
+  let assets;
+  const shell = () => parseLegacyShell(fs.readFileSync(indexHtml, "utf8"));
+  const hashedAssets = () => (assets ??= buildLegacyAssets(webDir, shell()));
   return {
     name: "verynize:legacy-web",
+    configResolved(config) {
+      building = config.command === "build";
+    },
     resolveId(id) {
       if (id === VIRTUAL_ID) return RESOLVED_ID;
     },
     load(id) {
       if (id !== RESOLVED_ID) return;
       this.addWatchFile(indexHtml);
-      return `export default ${JSON.stringify(parseLegacyShell(fs.readFileSync(indexHtml, "utf8")))};`;
+      return `export default ${JSON.stringify({ ...shell(), assetUrls: building ? hashedAssets().assetUrls : {} })};`;
     },
     configureServer(server) {
       server.watcher.add(indexHtml);
@@ -188,18 +242,31 @@ function legacyWebFiles({ webDir }) {
       });
     },
     buildStart() {
+      assets = undefined;
       if (this.environment?.name !== "client") return;
       if (!fs.existsSync(path.join(webDir, "dist", "ui.js")))
         this.warn("web/dist/ui.js is missing: run `npm run build:ui` before building the web app.");
     },
     generateBundle() {
       if (this.environment?.name !== "client") return;
-      for (const fileName of publicWebFiles(webDir))
+      for (const fileName of publicWebFiles(webDir)) {
+        if (staticHeaders && HASHED_ONLY.test(fileName))
+          this.error(`web/${fileName} would be cached as immutable: move it out of web/assets/.`);
         this.emitFile({
           type: "asset",
           fileName,
           source: fs.readFileSync(path.join(webDir, fileName)),
         });
+      }
+      for (const [fileName, source] of hashedAssets().files)
+        this.emitFile({ type: "asset", fileName, source });
+      this.emitFile({
+        type: "asset",
+        fileName: "legacy-assets.json",
+        source: JSON.stringify(hashedAssets().assetUrls, null, 2),
+      });
+      if (staticHeaders)
+        this.emitFile({ type: "asset", fileName: "_headers", source: STATIC_HEADERS });
     },
   };
 }

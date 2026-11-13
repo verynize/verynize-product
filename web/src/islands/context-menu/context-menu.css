@@ -19,7 +19,9 @@
     column-gap: 4px !important;
     padding-right: 6px !important;
   }
-  #canvas-menu[data-target="preview"] [data-command="preview.clearDataAndLogins"] > span:first-child {
+  #canvas-menu[data-target="preview"]
+    [data-command="preview.clearDataAndLogins"]
+    > span:first-child {
     max-width: 150px !important;
   }
 }

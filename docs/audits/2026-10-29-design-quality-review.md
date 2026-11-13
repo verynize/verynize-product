@@ -8,25 +8,25 @@ Klaim kode Astra sebagian besar benar, tetapi **diagnosis dan prioritasnya meles
 
 1. Astra menganggap masalah codec = "padding/radius per sisi hilang". Itu kosmetik. Akar masalah yang jauh lebih besar: **codec memproduksi layout absolut fixed-pixel**, bukan auto-layout. Ini yang membuat hasil terlihat "halusinasi" dan rusak saat diedit.
 2. Astra menyimpulkan orchestrator Wonder "hosted, tidak bisa diketahui". **Salah.** Plumbing Wonder hampir identik dengan Verynize (Claude Agent SDK lokal, preset `claude_code` + persona, Tailwind JSX, tool `create_artboard`/`update_elements`/`take_screenshot`/`finish_artboard`). Pembedanya adalah **lapisan pengetahuan desain** (fundamentals + skills + style guides) yang dilayani `mcp.wonder.so` — dan sebagian besar teksnya sudah tercache lokal.
-3. Karena itu prioritas Astra (codec → verifikasi → *baru* grounding) kurang tepat. Lapisan taste (fundamentals/archetype/skill) adalah **P0 setara codec**, bukan P1. Kedua pembanding utama menaruh taste di sana, bukan di orchestrator.
+3. Karena itu prioritas Astra (codec → verifikasi → _baru_ grounding) kurang tepat. Lapisan taste (fundamentals/archetype/skill) adalah **P0 setara codec**, bukan P1. Kedua pembanding utama menaruh taste di sana, bukan di orchestrator.
 
 ## Klaim Astra: hasil verifikasi
 
-| Klaim | Status | Catatan |
-|---|---|---|
-| `px-8 py-3` → padding 32 semua sisi, tanpa warning (`jsx-codec.mjs:124`) | **Benar, understated** | `pt-10` saja → padding 40 di *semua* sisi. |
-| Radius per sudut diratakan (`:148-149`) | Benar | |
-| `gap-x/gap-y`, `md:`, `flex-1` diabaikan "tanpa warning" | **Imprecise** | Ketiganya *masuk* warnings. Yang benar-benar silent: padding, radius, `min-w-0`. |
-| `finish_artboard` tidak memverifikasi (`design-tools.mjs:231-239`) | Benar | |
-| Ukuran teks diestimasi (`design-edit.mjs:110-117`) | Benar | |
-| Ikon di-skip, gambar remote → placeholder | Benar | Tambahan: 89 ikon Lucide di `web/assets/icons/lucide` adalah glyph UI app (`wonder-parity.js:16`), bukan library yang bisa dipetakan codec. |
-| Guidelines di `design-tools.mjs:39-44` | Imprecise | Ada di `:41-45` dan hanya muncul di hasil `get_design_context`. |
-| Image attachment hanya "paths" | **Salah sebagian** | Claude SDK mengirim base64 image block (`agent-runtime.cjs:302-309`), Codex app-server `localImage` (`:434`). Hanya fallback CLI yang path. |
-| Screenshot "bila tersedia" (implisit: model mungkin tidak melihat) | Perlu koreksi | `take_screenshot` sudah mengembalikan MCP `image` block (`design-tools.mjs:187`). Model Claude **sudah bisa melihat**. Gap-nya enforcement, bukan kemampuan. |
-| Orchestrator Wonder hosted, tidak bisa diekstrak | **Salah** | Lihat bagian Wonder di bawah. |
-| Pen: 26 archetype | **Tidak lengkap** | `SKILL.md` mendaftar 26, bundle mendefinisikan **34** archetype + **88 preset** (archetype × palette). |
-| Pen `ctx.problems` sebagai pemeriksa layout | **Overstated** | Di kode bundle, `ctx.problems` hanya mendeteksi *clipping*. Kontras, overlap, overflow teks diserahkan ke agent/screenshot. |
-| Riset hooks: PostToolUse untuk enforcement | Kurang tepat | Yang bisa menolak agent selesai adalah **`Stop` hook** (`decision:"block"` + `reason`). PostToolUse tidak bisa memaksa. |
+| Klaim                                                                    | Status                 | Catatan                                                                                                                                                      |
+| ------------------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `px-8 py-3` → padding 32 semua sisi, tanpa warning (`jsx-codec.mjs:124`) | **Benar, understated** | `pt-10` saja → padding 40 di _semua_ sisi.                                                                                                                   |
+| Radius per sudut diratakan (`:148-149`)                                  | Benar                  |                                                                                                                                                              |
+| `gap-x/gap-y`, `md:`, `flex-1` diabaikan "tanpa warning"                 | **Imprecise**          | Ketiganya _masuk_ warnings. Yang benar-benar silent: padding, radius, `min-w-0`.                                                                             |
+| `finish_artboard` tidak memverifikasi (`design-tools.mjs:231-239`)       | Benar                  |                                                                                                                                                              |
+| Ukuran teks diestimasi (`design-edit.mjs:110-117`)                       | Benar                  |                                                                                                                                                              |
+| Ikon di-skip, gambar remote → placeholder                                | Benar                  | Tambahan: 89 ikon Lucide di `web/assets/icons/lucide` adalah glyph UI app (`wonder-parity.js:16`), bukan library yang bisa dipetakan codec.                  |
+| Guidelines di `design-tools.mjs:39-44`                                   | Imprecise              | Ada di `:41-45` dan hanya muncul di hasil `get_design_context`.                                                                                              |
+| Image attachment hanya "paths"                                           | **Salah sebagian**     | Claude SDK mengirim base64 image block (`agent-runtime.cjs:302-309`), Codex app-server `localImage` (`:434`). Hanya fallback CLI yang path.                  |
+| Screenshot "bila tersedia" (implisit: model mungkin tidak melihat)       | Perlu koreksi          | `take_screenshot` sudah mengembalikan MCP `image` block (`design-tools.mjs:187`). Model Claude **sudah bisa melihat**. Gap-nya enforcement, bukan kemampuan. |
+| Orchestrator Wonder hosted, tidak bisa diekstrak                         | **Salah**              | Lihat bagian Wonder di bawah.                                                                                                                                |
+| Pen: 26 archetype                                                        | **Tidak lengkap**      | `SKILL.md` mendaftar 26, bundle mendefinisikan **34** archetype + **88 preset** (archetype × palette).                                                       |
+| Pen `ctx.problems` sebagai pemeriksa layout                              | **Overstated**         | Di kode bundle, `ctx.problems` hanya mendeteksi _clipping_. Kontras, overlap, overflow teks diserahkan ke agent/screenshot.                                  |
+| Riset hooks: PostToolUse untuk enforcement                               | Kurang tepat           | Yang bisa menolak agent selesai adalah **`Stop` hook** (`decision:"block"` + `reason`). PostToolUse tidak bisa memaksa.                                      |
 
 ## Temuan baru yang terlewat (Verynize)
 
@@ -38,7 +38,7 @@ Klaim kode Astra sebagian besar benar, tetapi **diagnosis dan prioritasnya meles
 
 **P0-4 — Palette warna Tailwind tidak didukung.** `bg-slate-900`, `text-gray-500`, `bg-white/80`, `from-*/to-*`, `ring-*`, `divide-*` diabaikan (ber-warning), fallback `transparent` / `#25252e`. Model dilatih menulis kelas ini; sistem diam-diam menggantinya.
 
-**P0-5 — Tidak ada lapisan pengetahuan desain sama sekali.** Tidak ada archetype, type scale, spacing tier, anti-slop rules, palette, font pairing. Persona (`agent-runtime.cjs:33-45`) hanya "work in small verifiable steps… prefer tokens". Ini persis kondisi yang Anthropic sebut *distributional convergence* (model kembali ke gaya paling umum) — [sumber](https://claude.com/resources/articles/improving-frontend-design-through-skills).
+**P0-5 — Tidak ada lapisan pengetahuan desain sama sekali.** Tidak ada archetype, type scale, spacing tier, anti-slop rules, palette, font pairing. Persona (`agent-runtime.cjs:33-45`) hanya "work in small verifiable steps… prefer tokens". Ini persis kondisi yang Anthropic sebut _distributional convergence_ (model kembali ke gaya paling umum) — [sumber](https://claude.com/resources/articles/improving-frontend-design-through-skills).
 
 **P1-1 — Shorthand tipografi umum hilang:** `text-sm/6`, `text-5xl/tight`, `leading-7`, `uppercase`, `line-clamp`, `text-balance`.
 **P1-2 — Margin dan centering diabaikan:** `m-*`, `mx-auto`, `grow`, `basis-*`, `col-span-*`, `-translate-x-1/2`; `max-w-*`, `aspect-*`, `truncate`, `object-cover`, `flex-wrap` hilang **tanpa** warning.
@@ -58,7 +58,7 @@ Klaim kode Astra sebagian besar benar, tetapi **diagnosis dan prioritasnya meles
 - **Bukti loop**: satu sesi transcript: 45 `take_screenshot`, 44 `update_elements`, 30 `finish_artboard`.
 - **Belum didapat**: skill design-review, references, arrange, design-library, generate-assets, dan named style guides. Bisa diambil read-only setelah Wonder MCP login (saat ini tidak memuat tool di sesi ini).
 
-Kesimpulan: Verynize sudah meniru *plumbing* Wonder, tapi tidak meniru *isi* yang membuat Wonder bagus — dan codec-nya jauh lebih lemah daripada yang Wonder pakai di server.
+Kesimpulan: Verynize sudah meniru _plumbing_ Wonder, tapi tidak meniru _isi_ yang membuat Wonder bagus — dan codec-nya jauh lebih lemah daripada yang Wonder pakai di server.
 
 ## Pen 1.2.20: apa yang Astra lewatkan
 
@@ -71,7 +71,7 @@ Kesimpulan: Verynize sudah meniru *plumbing* Wonder, tapi tidak meniru *isi* yan
 
 ## Figma dan FigCraft: koreksi riset eksternal
 
-- Figma punya **`html_to_figma`**: HTML self-contained → layer polos, *tanpa* komponen/variables. Skill resmi Figma memakainya untuk desain baru ([tools](https://developers.figma.com/docs/figma-mcp-server/tools-and-prompts/), [skill](https://github.com/figma/mcp-server-guide)). Artinya pendekatan JSX/HTML → canvas Verynize **valid**; yang salah adalah eksekusinya (regex codec) dan output yang tidak ter-bind.
+- Figma punya **`html_to_figma`**: HTML self-contained → layer polos, _tanpa_ komponen/variables. Skill resmi Figma memakainya untuk desain baru ([tools](https://developers.figma.com/docs/figma-mcp-server/tools-and-prompts/), [skill](https://github.com/figma/mcp-server-guide)). Artinya pendekatan JSX/HTML → canvas Verynize **valid**; yang salah adalah eksekusinya (regex codec) dan output yang tidak ter-bind.
 - Penyebab "halusinasi" Figma yang terdokumentasi: First Draft tidak bisa memakai design system user ([help](https://help.figma.com/hc/en-us/articles/23955143044247)), `use_figma` beta dan font harus diupload ([write-to-canvas](https://developers.figma.com/docs/figma-mcp-server/write-to-canvas/)), dan insiden Make Designs berasal dari korpus contoh yang tidak dikurasi ([retrospektif](https://www.figma.com/blog/inside-figma-a-retrospective-on-make-designs/)). Pelajaran: kurasi referensi, bukan "model lebih pintar".
 - Gate Figma yang patut ditiru: **dilarang mutasi canvas sebelum tabel komponen/variables/styles terisi**; wrapper + placeholder section dulu, lalu satu section per call; screenshot **per section** (full-page downscale menyembunyikan clipping dan sisa teks "Title"/"Button").
 - **FigCraft** ([repo](https://github.com/storytold/figcraft)): agent tidak menulis JSX, tapi memanggil ~455 command bertipe; layout engine Rust sendiri (hug/fill/fixed, wrap, grid, baseline); text shaping harfrust; satu renderer untuk canvas, export, dan screenshot MCP; `batch` atomik dengan `$ref` antar langkah; prompt MCP (`landing_page`, `mobile_screen`) yang diakhiri "screenshot, lihat, perbaiki"; `text.fit`, `text.missingFonts`. Riset Astra hanya membaca deskripsi repo.
@@ -88,12 +88,14 @@ Kesimpulan: Verynize sudah meniru *plumbing* Wonder, tapi tidak meniru *isi* yan
 ## Rencana perbaikan yang direkomendasikan
 
 **Tahap 1 — Fidelity yang jujur (P0)**
+
 - Codec berbasis Tailwind v4 asli + layout Chromium offscreen → node dengan flex, hug/fill, padding per sisi, warna palette, inheritance teks, absolute di dalam flow. Kelas invalid → diagnostic eksplisit.
 - Serializer `get_element_code` mengeluarkan flex/hug/fill, bukan `absolute left/top`.
 - Font: Fontsource/Google Fonts dimuat dan di-embed ke renderer screenshot; `missingFonts` sebagai gate.
 - Fixture: kartu, header, hero gelap, badge absolut, edit-reflow — semua harus round-trip.
 
 **Tahap 2 — Lapisan pengetahuan desain (P0, paralel dengan Tahap 1)** — ditulis sendiri, bukan disalin:
+
 - `get_design_guidelines`: fundamentals dikembalikan di setiap context call.
 - 20–30 archetype dengan parameter mengikat (font per role, radius, elevation, imagery) + palette semantik + elevation dua lapis.
 - Playbook domain bernumerik: landing, web-app, mobile, dashboard/table, slides.
@@ -101,17 +103,20 @@ Kesimpulan: Verynize sudah meniru *plumbing* Wonder, tapi tidak meniru *isi* yan
 - Persona baru yang menetapkan brief singkat (impress vs present, audience, density) sebelum menggambar.
 
 **Tahap 3 — Loop verifikasi yang dipaksa (P0)**
+
 - `take_screenshot` per section; receipt terikat ke revision; edit membatalkan receipt.
 - Lint terukur selain clipping: overflow teks, kontras terhadap backdrop nyata, overlap sibling, card-in-card, grid identik berulang, shadow keras, body <14px, accent dipakai di luar aksi.
 - `finish_artboard` menolak tanpa receipt valid; `Stop` hook untuk Claude.
 - Repair dibatasi 3 iterasi dan ditulis ke laporan.
 
 **Tahap 4 — Aset (P1)**
+
 - `get_icons` via Iconify offline (satu set per desain).
 - Stock Unsplash + generate image dengan art direction; barrier readiness sebelum screenshot.
 - Ekspos `generate.cjs` (SVG) sebagai MCP tool.
 
 **Tahap 5 — Default runtime (P1)**
+
 - Default model/effort yang direkomendasikan.
 - Profil agent desain yang membatasi tool non-desain bila tidak dibutuhkan.
 
@@ -128,16 +133,17 @@ Kesimpulan: Verynize sudah meniru *plumbing* Wonder, tapi tidak meniru *isi* yan
 
 Semua tahap diimplementasikan oleh agent paralel, lalu diverifikasi ulang: `npm test` EXIT 0, `node --test integrations/*.test.mjs` 91/91, `eval/run-fidelity.mjs` 26/26 fixture (105/105 cek, tanpa mengubah ekspektasi fixture), `scripts/check.cjs` lulus.
 
-| Tahap | Implementasi |
-|---|---|
-| 1 Fidelity | Codec memakai engine Tailwind v4 asli (`tailwind-engine.mjs`, `tailwind-map.mjs`, `codec-css.mjs`, `codec-text.mjs`, `codec-layout.mjs`). Block flow, hug/fill, padding/radius per sisi, inheritance teks, absolute + inset, reflow setelah edit, warning eksplisit untuk kelas tak didukung. Satu fungsi style bersama (`web/node-style.js` / `integrations/node-style.mjs`) untuk canvas, export, dan screenshot. |
-| 2 Pengetahuan | `integrations/design-knowledge/`: fundamentals, 27 archetype (palette lolos kontras), 8 playbook, 6 skill, persona baru. Tool `get_design_guidelines`, `get_skills`, `apply_style_tokens`. |
-| 3 Verifikasi | `design-lint.mjs` (struktural, kontras terhadap backdrop nyata, taste) + `verification.mjs` (receipt per revision, finish gate, budget repair 3). `take_screenshot` merekam receipt + lint dengan box terukur (editor dan fallback offscreen); `finish_artboard` mewajibkan `reviewNote` dan memblok critical; `Stop` hook Claude. |
-| 4 Aset | Ikon Iconify offline (lucide/ph/tabler) → `<Icon name=…>`; `get_icons`; `search_images` (Unsplash bila `UNSPLASH_ACCESS_KEY`, else Openverse) + unduh async ke data URL; font Fontsource di-embed ke screenshot dan canvas live. |
-| 5 Runtime | Default Claude `claude-opus-5-5` effort `high` (bisa dioverride); persona dari knowledge layer; packaging macOS kini menyertakan `node_modules` produksi. |
-| 6 Evaluasi | `eval/`: 8 brief beku, fidelity gate, judge checklist (`claude`/`codex`), blind pairwise + Bradley-Terry. Script `npm run eval:*`. |
+| Tahap         | Implementasi                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 Fidelity    | Codec memakai engine Tailwind v4 asli (`tailwind-engine.mjs`, `tailwind-map.mjs`, `codec-css.mjs`, `codec-text.mjs`, `codec-layout.mjs`). Block flow, hug/fill, padding/radius per sisi, inheritance teks, absolute + inset, reflow setelah edit, warning eksplisit untuk kelas tak didukung. Satu fungsi style bersama (`web/node-style.js` / `integrations/node-style.mjs`) untuk canvas, export, dan screenshot. |
+| 2 Pengetahuan | `integrations/design-knowledge/`: fundamentals, 27 archetype (palette lolos kontras), 8 playbook, 6 skill, persona baru. Tool `get_design_guidelines`, `get_skills`, `apply_style_tokens`.                                                                                                                                                                                                                          |
+| 3 Verifikasi  | `design-lint.mjs` (struktural, kontras terhadap backdrop nyata, taste) + `verification.mjs` (receipt per revision, finish gate, budget repair 3). `take_screenshot` merekam receipt + lint dengan box terukur (editor dan fallback offscreen); `finish_artboard` mewajibkan `reviewNote` dan memblok critical; `Stop` hook Claude.                                                                                  |
+| 4 Aset        | Ikon Iconify offline (lucide/ph/tabler) → `<Icon name=…>`; `get_icons`; `search_images` (Unsplash bila `UNSPLASH_ACCESS_KEY`, else Openverse) + unduh async ke data URL; font Fontsource di-embed ke screenshot dan canvas live.                                                                                                                                                                                    |
+| 5 Runtime     | Default Claude `claude-opus-5-5` effort `high` (bisa dioverride); persona dari knowledge layer; packaging macOS kini menyertakan `node_modules` produksi.                                                                                                                                                                                                                                                           |
+| 6 Evaluasi    | `eval/`: 8 brief beku, fidelity gate, judge checklist (`claude`/`codex`), blind pairwise + Bradley-Terry. Script `npm run eval:*`.                                                                                                                                                                                                                                                                                  |
 
 Sisa gap yang diketahui:
+
 - **Belum ada bukti parity 1:1.** Taste baru bisa dibuktikan dengan pilot `eval/` melawan Wonder dan Pen. Satu smoke judge memakan ~$0.69, jadi pilot 48 gambar ≈ $30.
 - **Codec:**
   - h1–h6 memakai default ukuran tag, sedangkan preflight Tailwind mewarisi ukuran body.

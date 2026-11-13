@@ -1,0 +1,1335 @@
+{
+  "audit": {
+    "start": 10482.300000000047,
+    "longTasks": [
+      {
+        "start": 46661.30000000005,
+        "duration": 1906
+      },
+      {
+        "start": 48568,
+        "duration": 141
+      },
+      {
+        "start": 48719.90000000014,
+        "duration": 65
+      },
+      {
+        "start": 48785,
+        "duration": 79
+      },
+      {
+        "start": 48874.69999999995,
+        "duration": 498
+      },
+      {
+        "start": 49373.30000000005,
+        "duration": 7057
+      },
+      {
+        "start": 56463.5,
+        "duration": 3436
+      },
+      {
+        "start": 59899.90000000014,
+        "duration": 690
+      },
+      {
+        "start": 60590.69999999995,
+        "duration": 459
+      },
+      {
+        "start": 61309.5,
+        "duration": 63
+      },
+      {
+        "start": 61376.60000000009,
+        "duration": 458
+      },
+      {
+        "start": 61835.5,
+        "duration": 3383
+      },
+      {
+        "start": 65273.60000000009,
+        "duration": 538
+      },
+      {
+        "start": 65812.5,
+        "duration": 66
+      },
+      {
+        "start": 65879.19999999995,
+        "duration": 84
+      },
+      {
+        "start": 65963.80000000005,
+        "duration": 101
+      },
+      {
+        "start": 66095,
+        "duration": 98
+      },
+      {
+        "start": 66204.30000000005,
+        "duration": 490
+      },
+      {
+        "start": 66694.90000000014,
+        "duration": 145
+      }
+    ],
+    "events": [],
+    "lcp": [
+      {
+        "start": 1280,
+        "size": 8787
+      }
+    ],
+    "ws": [],
+    "frames": [],
+    "click": 10482.300000000047,
+    "nodes": [7699, 0],
+    "observedReadyAt": 16731.40000000014,
+    "domNodes": 14647,
+    "interactions": [
+      {
+        "name": "spaces-select-1000",
+        "start": 46661.5,
+        "sync": 1128.9000000001397,
+        "fence": 2712.4000000001397,
+        "selected": 1000,
+        "nodes": 7699
+      },
+      {
+        "name": "spaces-select-all",
+        "start": 49436.19999999995,
+        "sync": 1969.1000000000931,
+        "fence": 12400.5,
+        "selected": 7699,
+        "nodes": 7699
+      },
+      {
+        "name": "spaces-clear-selection",
+        "start": 61897.69999999995,
+        "sync": 1192.2000000001863,
+        "fence": 4068.9000000001397,
+        "selected": 0,
+        "nodes": 7699
+      },
+      {
+        "name": "spaces-pan",
+        "start": 66034,
+        "sync": 1.1999999999534339,
+        "fence": 61.9000000001397,
+        "selected": 0,
+        "nodes": 7699
+      },
+      {
+        "name": "spaces-zoom",
+        "start": 66171.40000000014,
+        "sync": 1.0999999998603016,
+        "fence": 524.5,
+        "selected": 0,
+        "nodes": 7699
+      }
+    ],
+    "documentPagesUnchanged": true
+  },
+  "navigation": [
+    {
+      "ttfb": 170.5,
+      "responseStart": 210.69999999995343,
+      "domContentLoaded": 545.1999999999534,
+      "load": 581.5,
+      "transferSize": 1359,
+      "encodedBodySize": 1059
+    }
+  ],
+  "paint": [
+    {
+      "name": "first-paint",
+      "startTime": 764
+    },
+    {
+      "name": "first-contentful-paint",
+      "startTime": 1280
+    }
+  ],
+  "resources": [
+    {
+      "path": "/assets/editor_._fileId-DW-g8J60.js",
+      "type": "script",
+      "start": 10494.800000000047,
+      "duration": 84.69999999995343,
+      "ttfb": 79.89999999990687,
+      "transfer": 583,
+      "encoded": 283,
+      "decoded": 447
+    },
+    {
+      "path": "/api/rooms/[id]",
+      "type": "fetch",
+      "start": 10503,
+      "duration": 1281.6000000000931,
+      "ttfb": 1095.5,
+      "transfer": 430567,
+      "encoded": 430267,
+      "decoded": 6692835
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 10610.300000000047,
+      "duration": 434.80000000004657,
+      "ttfb": 231.60000000009313,
+      "transfer": 556847,
+      "encoded": 556547,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 11847.199999999953,
+      "duration": 199.70000000018626,
+      "ttfb": 198.5,
+      "transfer": 644,
+      "encoded": 344,
+      "decoded": 486
+    },
+    {
+      "path": "/api/rooms/[id]/access",
+      "type": "fetch",
+      "start": 11850,
+      "duration": 590.9000000001397,
+      "ttfb": 587.5,
+      "transfer": 644,
+      "encoded": 344,
+      "decoded": 486
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 13603.800000000047,
+      "duration": 483.5,
+      "ttfb": 266,
+      "transfer": 556295,
+      "encoded": 555995,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16035.90000000014,
+      "duration": 4400.299999999814,
+      "ttfb": 256.60000000009313,
+      "transfer": 84254,
+      "encoded": 83954,
+      "decoded": 83954
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036,
+      "duration": 5616.800000000047,
+      "ttfb": 1166.3999999999069,
+      "transfer": 119888,
+      "encoded": 119588,
+      "decoded": 119588
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036,
+      "duration": 5608.5,
+      "ttfb": 262.39999999990687,
+      "transfer": 93141,
+      "encoded": 92841,
+      "decoded": 92841
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.100000000093,
+      "duration": 6322.699999999953,
+      "ttfb": 245.80000000004657,
+      "transfer": 97955,
+      "encoded": 97655,
+      "decoded": 97655
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.100000000093,
+      "duration": 6374.09999999986,
+      "ttfb": 1182.8999999999069,
+      "transfer": 113139,
+      "encoded": 112839,
+      "decoded": 112839
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.199999999953,
+      "duration": 5745.200000000186,
+      "ttfb": 565.6000000000931,
+      "transfer": 106602,
+      "encoded": 106302,
+      "decoded": 106302
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.199999999953,
+      "duration": 6358.40000000014,
+      "ttfb": 1249.8999999999069,
+      "transfer": 98406,
+      "encoded": 98106,
+      "decoded": 98106
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.300000000047,
+      "duration": 1422.3999999999069,
+      "ttfb": 1255.6000000000931,
+      "transfer": 52513,
+      "encoded": 52213,
+      "decoded": 52213
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.300000000047,
+      "duration": 3919.6999999999534,
+      "ttfb": 621.2999999998137,
+      "transfer": 115757,
+      "encoded": 115457,
+      "decoded": 115457
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.40000000014,
+      "duration": 2995,
+      "ttfb": 1168.3000000000466,
+      "transfer": 83092,
+      "encoded": 82792,
+      "decoded": 82792
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.40000000014,
+      "duration": 3920.0999999998603,
+      "ttfb": 622.0999999998603,
+      "transfer": 90878,
+      "encoded": 90578,
+      "decoded": 90578
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.5,
+      "duration": 2144.1999999999534,
+      "ttfb": 603.3000000000466,
+      "transfer": 94176,
+      "encoded": 93876,
+      "decoded": 93876
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.600000000093,
+      "duration": 3005.3000000000466,
+      "ttfb": 1255.1999999999534,
+      "transfer": 133533,
+      "encoded": 133233,
+      "decoded": 133233
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.600000000093,
+      "duration": 3906.3000000000466,
+      "ttfb": 675.5999999998603,
+      "transfer": 123837,
+      "encoded": 123537,
+      "decoded": 123537
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 560.9000000001397,
+      "ttfb": 209,
+      "transfer": 90910,
+      "encoded": 90610,
+      "decoded": 90610
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 2328.7000000001863,
+      "ttfb": 264.9000000001397,
+      "transfer": 95426,
+      "encoded": 95126,
+      "decoded": 95126
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.699999999953,
+      "duration": 2800.100000000093,
+      "ttfb": 264.80000000004657,
+      "transfer": 123837,
+      "encoded": 123537,
+      "decoded": 123537
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.800000000047,
+      "duration": 6400.300000000047,
+      "ttfb": 265.19999999995343,
+      "transfer": 114878,
+      "encoded": 114578,
+      "decoded": 114578
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16036.90000000014,
+      "duration": 6411.299999999814,
+      "ttfb": 1255.6999999999534,
+      "transfer": 126204,
+      "encoded": 125904,
+      "decoded": 125904
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16037,
+      "duration": 2340.4000000001397,
+      "ttfb": 278.60000000009313,
+      "transfer": 99372,
+      "encoded": 99072,
+      "decoded": 99072
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16037,
+      "duration": 5117.5,
+      "ttfb": 1332.3999999999069,
+      "transfer": 119607,
+      "encoded": 119307,
+      "decoded": 119307
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.100000000093,
+      "duration": 2814,
+      "ttfb": 1314,
+      "transfer": 88994,
+      "encoded": 88694,
+      "decoded": 88694
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.100000000093,
+      "duration": 5103.59999999986,
+      "ttfb": 266.0999999998603,
+      "transfer": 122447,
+      "encoded": 122147,
+      "decoded": 122147
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.199999999953,
+      "duration": 4493.200000000186,
+      "ttfb": 354.39999999990687,
+      "transfer": 120071,
+      "encoded": 119771,
+      "decoded": 119771
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.199999999953,
+      "duration": 5594.700000000186,
+      "ttfb": 1312.6999999999534,
+      "transfer": 88746,
+      "encoded": 88446,
+      "decoded": 88446
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.300000000047,
+      "duration": 2761.100000000093,
+      "ttfb": 309.19999999995343,
+      "transfer": 86959,
+      "encoded": 86659,
+      "decoded": 86659
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.40000000014,
+      "duration": 2454.5999999998603,
+      "ttfb": 1311.8999999999069,
+      "transfer": 91047,
+      "encoded": 90747,
+      "decoded": 90747
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.5,
+      "duration": 528.6000000000931,
+      "ttfb": 186.0999999998603,
+      "transfer": 87514,
+      "encoded": 87214,
+      "decoded": 87214
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.5,
+      "duration": 4346.300000000047,
+      "ttfb": 1360.6999999999534,
+      "transfer": 72497,
+      "encoded": 72197,
+      "decoded": 72197
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.5,
+      "duration": 5380.100000000093,
+      "ttfb": 654.4000000001397,
+      "transfer": 74906,
+      "encoded": 74606,
+      "decoded": 74606
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.699999999953,
+      "duration": 2022.4000000001397,
+      "ttfb": 608.8999999999069,
+      "transfer": 87459,
+      "encoded": 87159,
+      "decoded": 87159
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.699999999953,
+      "duration": 6385.40000000014,
+      "ttfb": 683.4000000001397,
+      "transfer": 93459,
+      "encoded": 93159,
+      "decoded": 93159
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.800000000047,
+      "duration": 2405,
+      "ttfb": 609.4000000001397,
+      "transfer": 94885,
+      "encoded": 94585,
+      "decoded": 94585
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.800000000047,
+      "duration": 3514.600000000093,
+      "ttfb": 185,
+      "transfer": 73702,
+      "encoded": 73402,
+      "decoded": 73402
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16060.90000000014,
+      "duration": 3116.399999999907,
+      "ttfb": 1369,
+      "transfer": 110364,
+      "encoded": 110064,
+      "decoded": 110064
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061,
+      "duration": 1135.1000000000931,
+      "ttfb": 375.19999999995343,
+      "transfer": 82198,
+      "encoded": 81898,
+      "decoded": 81898
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061,
+      "duration": 3895.1999999999534,
+      "ttfb": 723.7000000001863,
+      "transfer": 71778,
+      "encoded": 71478,
+      "decoded": 71478
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.100000000093,
+      "duration": 1313.0999999998603,
+      "ttfb": 434.5999999998603,
+      "transfer": 81145,
+      "encoded": 80845,
+      "decoded": 80845
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.100000000093,
+      "duration": 5186.59999999986,
+      "ttfb": 1395.1000000000931,
+      "transfer": 102834,
+      "encoded": 102534,
+      "decoded": 102534
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.100000000093,
+      "duration": 5744,
+      "ttfb": 1399.2999999998137,
+      "transfer": 76539,
+      "encoded": 76239,
+      "decoded": 76239
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.300000000047,
+      "duration": 4694.699999999953,
+      "ttfb": 1467.3999999999069,
+      "transfer": 91148,
+      "encoded": 90848,
+      "decoded": 90848
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.300000000047,
+      "duration": 5083.699999999953,
+      "ttfb": 1467.3000000000466,
+      "transfer": 96098,
+      "encoded": 95798,
+      "decoded": 95798
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.300000000047,
+      "duration": 5589.5,
+      "ttfb": 722.6999999999534,
+      "transfer": 95993,
+      "encoded": 95693,
+      "decoded": 95693
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.300000000047,
+      "duration": 5548.399999999907,
+      "ttfb": 1428.5,
+      "transfer": 90962,
+      "encoded": 90662,
+      "decoded": 90662
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.5,
+      "duration": 4374.90000000014,
+      "ttfb": 729.6000000000931,
+      "transfer": 64135,
+      "encoded": 63835,
+      "decoded": 63835
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.5,
+      "duration": 6385.300000000047,
+      "ttfb": 1467.3999999999069,
+      "transfer": 99463,
+      "encoded": 99163,
+      "decoded": 99163
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.600000000093,
+      "duration": 844.6999999999534,
+      "ttfb": 476.30000000004657,
+      "transfer": 82314,
+      "encoded": 82014,
+      "decoded": 82014
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.600000000093,
+      "duration": 2230.899999999907,
+      "ttfb": 724,
+      "transfer": 76278,
+      "encoded": 75978,
+      "decoded": 75978
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.600000000093,
+      "duration": 4797.699999999953,
+      "ttfb": 1481.3000000000466,
+      "transfer": 77468,
+      "encoded": 77168,
+      "decoded": 77168
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16061.699999999953,
+      "duration": 4986.300000000047,
+      "ttfb": 1495.4000000001397,
+      "transfer": 79245,
+      "encoded": 78945,
+      "decoded": 78945
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.100000000093,
+      "duration": 3956.5,
+      "ttfb": 740.3999999999069,
+      "transfer": 88585,
+      "encoded": 88285,
+      "decoded": 88285
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.100000000093,
+      "duration": 6273.699999999953,
+      "ttfb": 1496.1999999999534,
+      "transfer": 63026,
+      "encoded": 62726,
+      "decoded": 62726
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.300000000047,
+      "duration": 4483.100000000093,
+      "ttfb": 746.1000000000931,
+      "transfer": 82947,
+      "encoded": 82647,
+      "decoded": 82647
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.300000000047,
+      "duration": 4374.600000000093,
+      "ttfb": 475.69999999995343,
+      "transfer": 99943,
+      "encoded": 99643,
+      "decoded": 99643
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.300000000047,
+      "duration": 5703.5,
+      "ttfb": 506.20000000018626,
+      "transfer": 71886,
+      "encoded": 71586,
+      "decoded": 71586
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.40000000014,
+      "duration": 6372.899999999907,
+      "ttfb": 1509.3999999999069,
+      "transfer": 120029,
+      "encoded": 119729,
+      "decoded": 119729
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 265.19999999995343,
+      "ttfb": 147.29999999981374,
+      "transfer": 83030,
+      "encoded": 82730,
+      "decoded": 82730
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 620.9000000001397,
+      "ttfb": 179.9000000001397,
+      "transfer": 103814,
+      "encoded": 103514,
+      "decoded": 103514
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 2261.1999999999534,
+      "ttfb": 775.7000000001863,
+      "transfer": 54292,
+      "encoded": 53992,
+      "decoded": 53992
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.5,
+      "duration": 2316.8000000000466,
+      "ttfb": 505.9000000001397,
+      "transfer": 163944,
+      "encoded": 163644,
+      "decoded": 163644
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.600000000093,
+      "duration": 2239.8000000000466,
+      "ttfb": 782.0999999998603,
+      "transfer": 67550,
+      "encoded": 67250,
+      "decoded": 67250
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.600000000093,
+      "duration": 6270.300000000047,
+      "ttfb": 780.8000000000466,
+      "transfer": 74776,
+      "encoded": 74476,
+      "decoded": 74476
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.800000000047,
+      "duration": 1928.1999999999534,
+      "ttfb": 1545.8999999999069,
+      "transfer": 74411,
+      "encoded": 74111,
+      "decoded": 74111
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.800000000047,
+      "duration": 5591.899999999907,
+      "ttfb": 1580.6000000000931,
+      "transfer": 87191,
+      "encoded": 86891,
+      "decoded": 86891
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.800000000047,
+      "duration": 6242.199999999953,
+      "ttfb": 1546.0999999998603,
+      "transfer": 115018,
+      "encoded": 114718,
+      "decoded": 114718
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16062.90000000014,
+      "duration": 4345.799999999814,
+      "ttfb": 1613.0999999998603,
+      "transfer": 98459,
+      "encoded": 98159,
+      "decoded": 98159
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063,
+      "duration": 5397,
+      "ttfb": 891.3000000000466,
+      "transfer": 129050,
+      "encoded": 128750,
+      "decoded": 128750
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063,
+      "duration": 5456.199999999953,
+      "ttfb": 1575.9000000001397,
+      "transfer": 138716,
+      "encoded": 138416,
+      "decoded": 138416
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.100000000093,
+      "duration": 4372.59999999986,
+      "ttfb": 895.7999999998137,
+      "transfer": 42429,
+      "encoded": 42129,
+      "decoded": 42129
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.100000000093,
+      "duration": 5407.300000000047,
+      "ttfb": 1558.2999999998137,
+      "transfer": 74824,
+      "encoded": 74524,
+      "decoded": 74524
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.199999999953,
+      "duration": 2169.100000000093,
+      "ttfb": 1670.8000000000466,
+      "transfer": 103207,
+      "encoded": 102907,
+      "decoded": 102907
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.199999999953,
+      "duration": 5699.600000000093,
+      "ttfb": 1576,
+      "transfer": 97596,
+      "encoded": 97296,
+      "decoded": 97296
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.300000000047,
+      "duration": 5700.100000000093,
+      "ttfb": 1670.9000000001397,
+      "transfer": 107594,
+      "encoded": 107294,
+      "decoded": 107294
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.300000000047,
+      "duration": 5451.399999999907,
+      "ttfb": 1694.8999999999069,
+      "transfer": 76843,
+      "encoded": 76543,
+      "decoded": 76543
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.40000000014,
+      "duration": 5409.799999999814,
+      "ttfb": 1629.7000000001863,
+      "transfer": 113149,
+      "encoded": 112849,
+      "decoded": 112849
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.40000000014,
+      "duration": 5742.09999999986,
+      "ttfb": 1633.5,
+      "transfer": 105056,
+      "encoded": 104756,
+      "decoded": 104756
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.5,
+      "duration": 5409,
+      "ttfb": 1711.8999999999069,
+      "transfer": 104360,
+      "encoded": 104060,
+      "decoded": 104060
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "css",
+      "start": 16063.5,
+      "duration": 6324.199999999953,
+      "ttfb": 921,
+      "transfer": 92129,
+      "encoded": 91829,
+      "decoded": 91829
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16532.300000000047,
+      "duration": 764.1999999999534,
+      "ttfb": 506.79999999981374,
+      "transfer": 35009,
+      "encoded": 34709,
+      "decoded": 34709
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16532.5,
+      "duration": 1279.3000000000466,
+      "ttfb": 1182.2000000001863,
+      "transfer": 6669,
+      "encoded": 6369,
+      "decoded": 6369
+    },
+    {
+      "path": "/api/rooms/[id]/assets/[id]",
+      "type": "img",
+      "start": 16535,
+      "duration": 1275.1999999999534,
+      "ttfb": 1182.2999999998137,
+      "transfer": 3175,
+      "encoded": 2875,
+      "decoded": 2875
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 16791.100000000093,
+      "duration": 6071.899999999907,
+      "ttfb": 1007.3000000000466,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 25603.699999999953,
+      "duration": 685.1000000000931,
+      "ttfb": 312,
+      "transfer": 556113,
+      "encoded": 555813,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 28603.600000000093,
+      "duration": 648.0999999998603,
+      "ttfb": 336.10000000009313,
+      "transfer": 556550,
+      "encoded": 556250,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 31603.5,
+      "duration": 643.9000000001397,
+      "ttfb": 401.89999999990687,
+      "transfer": 556365,
+      "encoded": 556065,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 34603.30000000005,
+      "duration": 1391.5,
+      "ttfb": 720.6999999999534,
+      "transfer": 556119,
+      "encoded": 555819,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 37601.80000000005,
+      "duration": 651.3999999999069,
+      "ttfb": 333.10000000009313,
+      "transfer": 556766,
+      "encoded": 556466,
+      "decoded": 4083883
+    },
+    {
+      "path": "/desktop-panel.css",
+      "type": "link",
+      "start": 40356.80000000005,
+      "duration": 50.199999999953434,
+      "ttfb": 42,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/style.css",
+      "type": "link",
+      "start": 40356.80000000005,
+      "duration": 61.300000000046566,
+      "ttfb": 53.9000000001397,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/cloud-panel.css",
+      "type": "link",
+      "start": 40356.90000000014,
+      "duration": 49.799999999813735,
+      "ttfb": 41.10000000009313,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/live-preview.css",
+      "type": "link",
+      "start": 40356.90000000014,
+      "duration": 61.0999999998603,
+      "ttfb": 51.5,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/page-loader.css",
+      "type": "link",
+      "start": 40356.90000000014,
+      "duration": 61.699999999953434,
+      "ttfb": 53.89999999990687,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/wonder-shell.css",
+      "type": "link",
+      "start": 40356.90000000014,
+      "duration": 365.5999999998603,
+      "ttfb": 356.5,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/settings.css",
+      "type": "link",
+      "start": 40356.90000000014,
+      "duration": 365.79999999981374,
+      "ttfb": 358.79999999981374,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/preview-edit.css",
+      "type": "link",
+      "start": 40357,
+      "duration": 61.5,
+      "ttfb": 51.5999999998603,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/preview-frame-chrome.css",
+      "type": "link",
+      "start": 40357,
+      "duration": 61.5,
+      "ttfb": 51.699999999953434,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/canvas.css",
+      "type": "link",
+      "start": 40357.10000000009,
+      "duration": 61.0999999998603,
+      "ttfb": 51.799999999813735,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/dist/ui.css",
+      "type": "link",
+      "start": 40357.10000000009,
+      "duration": 61.199999999953434,
+      "ttfb": 50.5,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/vector-edit.css",
+      "type": "link",
+      "start": 40357.10000000009,
+      "duration": 71,
+      "ttfb": 61.5,
+      "transfer": 300,
+      "encoded": 0,
+      "decoded": 0
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 40612.69999999995,
+      "duration": 601.1000000000931,
+      "ttfb": 335.5,
+      "transfer": 556342,
+      "encoded": 556042,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 43600.90000000014,
+      "duration": 706.1999999999534,
+      "ttfb": 344.80000000004657,
+      "transfer": 557096,
+      "encoded": 556796,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 46601,
+      "duration": 2271.100000000093,
+      "ttfb": 350.69999999995343,
+      "transfer": 556953,
+      "encoded": 556653,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 65270.19999999995,
+      "duration": 827.3000000000466,
+      "ttfb": 250.19999999995343,
+      "transfer": 556916,
+      "encoded": 556616,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 67602.40000000014,
+      "duration": 759.0999999998603,
+      "ttfb": 352.5999999998603,
+      "transfer": 556155,
+      "encoded": 555855,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 70604.40000000014,
+      "duration": 619.3999999999069,
+      "ttfb": 342.60000000009313,
+      "transfer": 556868,
+      "encoded": 556568,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 73603.69999999995,
+      "duration": 647.1000000000931,
+      "ttfb": 254.60000000009313,
+      "transfer": 556104,
+      "encoded": 555804,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 76603.40000000014,
+      "duration": 1360.8999999999069,
+      "ttfb": 255.9000000001397,
+      "transfer": 556930,
+      "encoded": 556630,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 79603.90000000014,
+      "duration": 1302.7999999998137,
+      "ttfb": 1045.6000000000931,
+      "transfer": 556859,
+      "encoded": 556559,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 82603.6000000001,
+      "duration": 783.0999999998603,
+      "ttfb": 278.69999999995343,
+      "transfer": 556192,
+      "encoded": 555892,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 85603.69999999995,
+      "duration": 794.6000000000931,
+      "ttfb": 467.69999999995343,
+      "transfer": 557015,
+      "encoded": 556715,
+      "decoded": 4083883
+    },
+    {
+      "path": "/api/me/state",
+      "type": "fetch",
+      "start": 88601.80000000005,
+      "duration": 745,
+      "ttfb": 272.69999999995343,
+      "transfer": 556880,
+      "encoded": 556580,
+      "decoded": 4083883
+    }
+  ],
+  "heap": {
+    "used": 1133078119,
+    "total": 1281972499
+  }
+}

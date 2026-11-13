@@ -1,0 +1,39 @@
+/* Pen tool and anchor editing overlay (web/vector-edit.js). */
+#vector-edit-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 6;
+  --vector-edit-blue: #0d99ff;
+}
+#vector-edit-overlay .vector-edit-path {
+  fill: none;
+  stroke: var(--vector-edit-blue);
+  stroke-width: 1;
+}
+#vector-edit-overlay .vector-edit-handle-line {
+  stroke: var(--vector-edit-blue);
+  stroke-width: 1;
+}
+#vector-edit-overlay .vector-edit-anchor,
+#vector-edit-overlay .vector-edit-handle {
+  fill: #ffffff;
+  stroke: var(--vector-edit-blue);
+  stroke-width: 1.5;
+}
+#vector-edit-overlay .vector-edit-anchor.selected,
+#vector-edit-overlay .vector-edit-anchor.first {
+  fill: var(--vector-edit-blue);
+}
+#workspace[data-tool="pen"] #canvas-wrap,
+#workspace[data-tool="pen"] #canvas .layer {
+  cursor: crosshair;
+}
+/* While anchors are edited the layer's resize handles would compete with them. */
+body.vector-editing #canvas .layer.selected > .handle,
+body.vector-editing #canvas-overlay .handle {
+  display: none;
+}

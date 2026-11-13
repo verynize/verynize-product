@@ -1,10 +1,20 @@
+// First: the design engine's resources must be in place before any chunk that holds the engine
+// evaluates, and the bundler may split the engine into a chunk shared with lazily loaded importers.
+import "#mcp-env";
 import { sql } from "drizzle-orm";
 import { database } from "./db.js";
-import { ACCOUNT_REQUEST_BYTES, readAccountState, writeAccountState } from "./account-state.js";
+import {
+  ACCOUNT_REQUEST_BYTES,
+  readAccountItem,
+  readAccountState,
+  writeAccountState,
+  writeAccountBatch,
+} from "./account-state.js";
 // Verynize collaboration Worker: routes the HTTP API to the room, account and app Durable Objects.
 // API reference: cloud/README.md.
 import {
   json,
+  jsonWithEtag,
   corsHeaders,
   fail,
   readJson,
@@ -13,11 +23,12 @@ import {
   rpc,
   roleRank,
   atLeast,
-  HttpError,
+  errorStatus,
 } from "./http.js";
 import { MESSAGE_BYTES, REQUEST_BYTES } from "./limits.js";
 import { SESSION } from "./accounts.js";
-import { AUTH_BASE_PATH, createAuth } from "./auth.js";
+import { APIError } from "better-auth/api";
+import { AUTH_BASE_PATH, activeSessionCount, createAuth } from "./auth.js";
 import {
   addRoom,
   ensurePersonalOrganization,
@@ -41,8 +52,9 @@ import { profilePage, missingApp } from "./pages.js";
 import { passkeyPage, passkeyScript } from "./passkey-page.js";
 import { verifiedPage, resetPasswordPage, resetPasswordScript } from "./account-pages.js";
 import * as profiles from "./profiles.js";
-import { handleRoomAssets } from "./assets.js";
+import { handleRoomAssets, handleRoomThumbnail } from "./assets.js";
 import { requireRoomAccount } from "./web-access.js";
+import { reportError } from "./telemetry.js";
 import { extractInline, migrateRoomInline } from "./inline-binaries.js";
 
 export { DesignRoom } from "./rooms.js";
@@ -52,13 +64,14 @@ export { AiRun } from "./ai-run.js";
 
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 const ROOM_ROUTE = new RegExp(
-  `^/api/rooms/(${UUID})(/socket|/publish|/ops|/pages|/access|/members(?:/${UUID})?|/claim|/organization|/visibility|/share-invitations|/invitation|/tokens(?:/rotate|/${UUID})?|/comments)?$`,
+  `^/api/rooms/(${UUID})(/socket|/publish|/ops|/pages|/access|/members(?:/${UUID})?|/claim|/organization|/visibility|/share-invitations|/invitation|/tokens(?:/rotate|/${UUID})?|/comments|/versions(?:/[A-Za-z0-9_-]{1,64})?)?$`,
 );
 const APP_ROUTE = new RegExp(
   `^/api/apps/(${UUID})(/versions(?:/(\\d+)(/finalize|/files/(.+))?)?|/activate|/publish)?$`,
 );
 // Room assets (cloud/assets.js).
 const ASSET_ROUTE = new RegExp(`^/api/rooms/(${UUID})/assets(?:/(${UUID}))?$`);
+const THUMBNAIL_ROUTE = new RegExp(`^/api/rooms/(${UUID})/thumbnail(?:/image)?$`);
 const SERVE_ROUTE =
   /^\/apps\/([a-z0-9][a-z0-9-]{2,29})\/([a-z0-9][a-z0-9-]{0,62})(?:@(\d+))?(\/.*)?$/;
 
@@ -248,8 +261,15 @@ async function handleAuth(request, env, url) {
     let revoked = 0;
     if (!SESSION.test(session)) {
       const auth = createAuth(env, request);
-      revoked = (await auth.api.listSessions({ headers: authHeaders(session) })).length;
-      await auth.api.revokeSessions({ headers: authHeaders(session) });
+      try {
+        // listSessions also supplies the freshness guard for this sensitive operation.
+        revoked = (await auth.api.listSessions({ headers: authHeaders(session) })).length;
+        await auth.api.revokeSessions({ headers: authHeaders(session) });
+      } catch (error) {
+        if (error instanceof APIError && error.body?.code === "SESSION_NOT_FRESH")
+          fail(403, "Sign in again to sign out other devices");
+        throw error;
+      }
     }
     const legacy = await rpc(directory(env).signOutEverywhere(account.id));
     return json({ signedOut: true, sessions: legacy.sessions + revoked });
@@ -259,7 +279,7 @@ async function handleAuth(request, env, url) {
     const session = sessionOf(request, url);
     const authSessions = SESSION.test(session)
       ? 0
-      : (await createAuth(env, request).api.listSessions({ headers: authHeaders(session) })).length;
+      : await activeSessionCount(env, account.authUser.id);
     const personalOrganizationId = account.authUser
       ? await ensurePersonalOrganization(env, createAuth(env, request), account.authUser)
       : null;
@@ -292,7 +312,26 @@ async function handleAuth(request, env, url) {
   }
   if (path === "/api/me/state" && request.method === "GET") {
     const account = await requireAccount(env, request, url);
-    return json({ ...(await readAccountState(env, account.id)), account });
+    const since = url.searchParams.get("since");
+    if (since !== null && !/^\d{1,16}$/.test(since)) fail(400, "Invalid change cursor");
+    const state = await readAccountState(env, account.id, {
+      chats: url.searchParams.get("chats") === "summary" ? "summary" : "full",
+      since: since === null ? -1 : Number(since),
+    });
+    return jsonWithEtag(request, { ...state, account });
+  }
+  if (path === "/api/me/state/batch" && request.method === "POST") {
+    const account = await requireAccount(env, request, url);
+    return json(
+      await writeAccountBatch(env, account.id, await readJson(request, ACCOUNT_REQUEST_BYTES)),
+    );
+  }
+  if (path.startsWith("/api/me/state/") && request.method === "GET") {
+    const account = await requireAccount(env, request, url);
+    const key = decodeURIComponent(path.slice("/api/me/state/".length));
+    const item = await readAccountItem(env, account.id, key);
+    if (!item) fail(404, "No such account record");
+    return jsonWithEtag(request, { item });
   }
   if (path.startsWith("/api/me/state/") && request.method === "PUT") {
     const account = await requireAccount(env, request, url);
@@ -537,8 +576,9 @@ async function handleRooms(request, env, url) {
     );
   // ---- Room assets (cloud/assets.js): R2 images referenced by URL from room documents. ----
   const assetMatch = url.pathname.match(ASSET_ROUTE);
-  if (assetMatch) {
-    const [, assetRoom, assetId] = assetMatch;
+  const thumbnailMatch = url.pathname.match(THUMBNAIL_ROUTE);
+  if (assetMatch || thumbnailMatch) {
+    const [, assetRoom, assetId] = assetMatch || thumbnailMatch;
     // The caller's room role, computed by the room exactly as for /access.
     const access = async () => {
       const account = await accountOf(env, request, url);
@@ -546,12 +586,17 @@ async function handleRooms(request, env, url) {
         ? await orgRoomRole(env, assetRoom, account.authUser.id)
         : null;
       const asGet = new Request(request.url, { method: "GET", headers: request.headers });
+      const accessUrl = new URL("https://room/access");
+      if (thumbnailMatch && url.searchParams.has("token"))
+        accessUrl.searchParams.set("token", url.searchParams.get("token"));
       const checked = await env.ROOMS.getByName(assetRoom).fetch(
-        roomRequest(new URL("https://room/access"), asGet, account, undefined, orgRole),
+        roomRequest(accessUrl, asGet, account, undefined, orgRole),
       );
       return { role: checked.ok ? (await checked.json()).role : null, account };
     };
-    return handleRoomAssets(request, env, url, assetRoom, assetId || null, access);
+    return thumbnailMatch
+      ? handleRoomThumbnail(request, env, url, assetRoom, access)
+      : handleRoomAssets(request, env, url, assetRoom, assetId || null, access);
   }
   // ---- end room assets ----
   const match = url.pathname.match(ROOM_ROUTE);
@@ -567,9 +612,11 @@ async function handleRooms(request, env, url) {
   const orgRole = account?.authUser ? await orgRoomRole(env, roomId, account.authUser.id) : null;
   const forward = new URL("https://room" + action);
   if (action === "/socket")
-    for (const key of ["token", "client", "lazy"])
+    for (const key of ["token", "client", "lazy", "presence"])
       if (url.searchParams.get(key)) forward.searchParams.set(key, url.searchParams.get(key));
   // Lazy page loading (cloud/room-store.js): `lazy=1&page=<id>` on GET /room, `id=<page>` on /pages.
+  if (action === "/versions" && url.searchParams.get("artboard"))
+    forward.searchParams.set("artboard", url.searchParams.get("artboard").slice(0, 200));
   if (action === "/room" || action === "/pages")
     for (const key of ["lazy", "page", "id"])
       for (const value of url.searchParams.getAll(key).slice(0, 200))
@@ -913,8 +960,12 @@ async function serveApp(request, env, url) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // Desktop requests are cross-origin with a session header: let browsers reuse one preflight.
     if (request.method === "OPTIONS")
-      return new Response(null, { status: 204, headers: corsHeaders });
+      return new Response(null, {
+        status: 204,
+        headers: { ...corsHeaders, "access-control-max-age": "7200" },
+      });
     try {
       // The directory moved to D1: copy the AccountDirectory data once, before it is read.
       if (/^\/(api|u|apps)\//.test(url.pathname)) await profiles.migrateDirectory(env);
@@ -950,8 +1001,10 @@ export default {
         return (await serveApp(request, env, url)) || missingApp();
       return env.ASSETS ? env.ASSETS.fetch(request) : new Response("Verynize API", { status: 200 });
     } catch (error) {
-      if (!(error instanceof HttpError))
+      if (errorStatus(error) >= 500) {
         console.error("request failed", url.pathname, error?.message);
+        reportError(error, "worker");
+      }
       return errorResponse(error);
     }
   },

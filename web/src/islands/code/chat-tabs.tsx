@@ -19,7 +19,12 @@ export function ChatTabs({ state }: { state: ChatState }) {
   // Oldest first, like opening tabs left to right.
   const tabs = chats.filter((c) => chatFolder(c, key) === folder).reverse();
   return (
-    <div id="code-chat-tabs" role="tablist" aria-label="Chats in this worktree" className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2">
+    <div
+      id="code-chat-tabs"
+      role="tablist"
+      aria-label="Chats in this worktree"
+      className="flex h-9 shrink-0 items-center gap-1 overflow-x-auto border-b border-border px-2"
+    >
       {tabs.map((chat) => {
         const active = chat.id === current.id;
         return (
@@ -27,7 +32,9 @@ export function ChatTabs({ state }: { state: ChatState }) {
             key={chat.id}
             className={cn(
               "group/tab flex h-7 max-w-48 min-w-0 shrink-0 items-center rounded-md text-sm",
-              active ? "bg-input text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground-2",
+              active
+                ? "bg-input text-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground-2",
             )}
           >
             <button
@@ -40,7 +47,13 @@ export function ChatTabs({ state }: { state: ChatState }) {
               className="flex h-full min-w-0 items-center gap-1.5 rounded-md pr-1 pl-2.5 outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <span className="truncate">{chat.title}</span>
-              {chat.busy && <span aria-label="Running" role="img" className="size-1.5 shrink-0 rounded-full bg-primary-text" />}
+              {chat.busy && (
+                <span
+                  aria-label="Running"
+                  role="img"
+                  className="size-1.5 shrink-0 rounded-full bg-primary-text"
+                />
+              )}
             </button>
             {tabs.length > 1 && (
               <button

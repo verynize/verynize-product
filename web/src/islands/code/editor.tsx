@@ -23,13 +23,22 @@ export function FileEditor({ file }: { file: OpenFile }) {
   };
   const lines = file.text.split("\n").length;
   return (
-    <section aria-label={`Editing ${file.path}`} id="code-editor-pane" className="flex min-h-0 flex-1 flex-col">
+    <section
+      aria-label={`Editing ${file.path}`}
+      id="code-editor-pane"
+      className="flex min-h-0 flex-1 flex-col"
+    >
       <div className="flex h-9 shrink-0 items-center gap-2 border-b border-border px-4">
         <span id="code-editor-path" className="min-w-0 truncate text-sm text-foreground">
           {file.kind === "memory" ? "Project memory · VERYNIZE.md" : file.path}
         </span>
         {dirty && (
-          <span role="img" aria-label="Unsaved changes" title="Unsaved changes" className="size-1.5 shrink-0 rounded-full bg-foreground-3" />
+          <span
+            role="img"
+            aria-label="Unsaved changes"
+            title="Unsaved changes"
+            className="size-1.5 shrink-0 rounded-full bg-foreground-3"
+          />
         )}
         <span className="flex-1" />
         <span className="shrink-0 text-xs text-subtle-foreground">{lines} lines</span>
@@ -63,7 +72,11 @@ export function FileEditor({ file }: { file: OpenFile }) {
         readOnly={file.loading}
         onChange={(event) => editText(event.target.value)}
         onKeyDown={onKey}
-        placeholder={file.kind === "memory" ? "Notes for agents working in this repository (VERYNIZE.md)" : undefined}
+        placeholder={
+          file.kind === "memory"
+            ? "Notes for agents working in this repository (VERYNIZE.md)"
+            : undefined
+        }
         className={cn(
           "min-h-0 flex-1 resize-none bg-code-editor px-4 py-3 font-mono text-xs whitespace-pre text-foreground-2 outline-none",
           file.loading && "opacity-60",

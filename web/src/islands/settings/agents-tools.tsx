@@ -41,7 +41,13 @@ import { Card, IconTile, Row, Section, SettingsButton, TextField, Toggle } from 
 import { platform } from "@/lib/platform";
 
 /* ---------- desktop contract (desktop/agent-tools.cjs) ---------- */
-export type ProviderAccount = { email: string; organization: string; plan: string; method: string; default?: boolean };
+export type ProviderAccount = {
+  email: string;
+  organization: string;
+  plan: string;
+  method: string;
+  default?: boolean;
+};
 export type Provider = {
   id: string;
   name: string;
@@ -61,7 +67,13 @@ export type McpServer = {
   removable?: boolean;
   source?: string;
 };
-export type ServerList = { agent: string; installed: boolean; servers: McpServer[]; checked: boolean; error?: string };
+export type ServerList = {
+  agent: string;
+  installed: boolean;
+  servers: McpServer[];
+  checked: boolean;
+  error?: string;
+};
 export type AccessSettings = {
   createFiles: boolean;
   shareMemory: boolean;
@@ -72,7 +84,14 @@ export type AccessSettings = {
   codexApps: boolean;
   codexComputerUse: boolean;
 };
-export type AddServer = { agent: string; name: string; transport: "stdio" | "http"; command?: string; args?: string[]; url?: string };
+export type AddServer = {
+  agent: string;
+  name: string;
+  transport: "stdio" | "http";
+  command?: string;
+  args?: string[];
+  url?: string;
+};
 export type AgentToolsIpc = {
   accounts(): Promise<Provider[]>;
   listServers(options: { agent: string; check?: boolean }): Promise<ServerList>;
@@ -80,12 +99,17 @@ export type AgentToolsIpc = {
   removeServer(options: { agent: string; name: string }): Promise<unknown>;
   loginServer(options: { agent: string; name: string }): Promise<unknown>;
   getAccess(): Promise<AccessSettings>;
-  setAccess(changes: Partial<AccessSettings>): Promise<{ settings: AccessSettings; stopped: number }>;
+  setAccess(
+    changes: Partial<AccessSettings>,
+  ): Promise<{ settings: AccessSettings; stopped: number }>;
 };
 const desktop = () => platform.desktop;
 const toolsIpc = () => desktop()?.agentTools ?? null;
 const message = (error: unknown) =>
-  (error instanceof Error ? error.message : String(error)).replace(/^Error invoking remote method '[^']+': (Error: )?/, "");
+  (error instanceof Error ? error.message : String(error)).replace(
+    /^Error invoking remote method '[^']+': (Error: )?/,
+    "",
+  );
 
 const MCP_AGENTS = [
   { id: "claude", name: "Claude Code" },
@@ -115,7 +139,15 @@ function Badge({ kind }: { kind: "ok" | "off" | "locked" }) {
 }
 
 /* ---------- Provider accounts ---------- */
-function AccountMenu({ name, run, signedIn }: { name: string; run(kind: AuthKind): void; signedIn: boolean }) {
+function AccountMenu({
+  name,
+  run,
+  signedIn,
+}: {
+  name: string;
+  run: (kind: AuthKind) => void;
+  signedIn: boolean;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -125,7 +157,12 @@ function AccountMenu({ name, run, signedIn }: { name: string; run(kind: AuthKind
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onEscapeKeyDown={(event) => event.stopPropagation()}>
         <DropdownMenuItem onSelect={() => run("check")}>Check account</DropdownMenuItem>
-        <DropdownMenuItem data-oai-siwc-button={name === "Codex" ? "" : undefined} onSelect={() => run("login")}>{name === "Codex" ? "Continue with ChatGPT" : signedIn ? "Switch account…" : "Sign in…"}</DropdownMenuItem>
+        <DropdownMenuItem
+          data-oai-siwc-button={name === "Codex" ? "" : undefined}
+          onSelect={() => run("login")}
+        >
+          {name === "Codex" ? "Continue with ChatGPT" : signedIn ? "Switch account…" : "Sign in…"}
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => run("cancel")}>Cancel sign-in</DropdownMenuItem>
         {signedIn && (
           <>
@@ -140,7 +177,15 @@ function AccountMenu({ name, run, signedIn }: { name: string; run(kind: AuthKind
   );
 }
 
-function ProviderCard({ provider, api, legacyStatus }: { provider: Provider; api: SettingsApi; legacyStatus?: string }) {
+function ProviderCard({
+  provider,
+  api,
+  legacyStatus,
+}: {
+  provider: Provider;
+  api: SettingsApi;
+  legacyStatus?: string;
+}) {
   const run = (kind: AuthKind) => void api.actions.auth(kind, provider.id);
   const count = provider.accounts.length;
   if (provider.comingSoon)
@@ -153,7 +198,9 @@ function ProviderCard({ provider, api, legacyStatus }: { provider: Provider; api
             </IconTile>
           }
           title={provider.name}
-          description={provider.installed ? "Installed on this computer · coming soon" : "Coming soon"}
+          description={
+            provider.installed ? "Installed on this computer · coming soon" : "Coming soon"
+          }
         />
       </Card>
     );
@@ -219,9 +266,18 @@ function ProviderCard({ provider, api, legacyStatus }: { provider: Provider; api
               </span>
             }
             title={<span id={`account-status-${provider.id}`}>{legacyStatus ?? "Signed out"}</span>}
-            description={provider.id === "codex" ? "Connect ChatGPT to Verynize. Eligible requests use your ChatGPT plan; tokens stay on this Mac." : `Sign in with the ${provider.name} CLI to use it in chats.`}
+            description={
+              provider.id === "codex"
+                ? "Connect ChatGPT to Verynize. Eligible requests use your ChatGPT plan; tokens stay on this Mac."
+                : `Sign in with the ${provider.name} CLI to use it in chats.`
+            }
           >
-            <SettingsButton data-oai-siwc-button={provider.id === "codex" ? "" : undefined} onClick={() => run("login")}>{provider.id === "codex" ? "Continue with ChatGPT" : "Sign in"}</SettingsButton>
+            <SettingsButton
+              data-oai-siwc-button={provider.id === "codex" ? "" : undefined}
+              onClick={() => run("login")}
+            >
+              {provider.id === "codex" ? "Continue with ChatGPT" : "Sign in"}
+            </SettingsButton>
             <AccountMenu name={provider.name} run={run} signedIn={false} />
           </Row>
         ))}
@@ -252,7 +308,10 @@ export function ProviderAccountList({
   }, [ipc]);
   useEffect(reload, [reload]);
   // Re-read the accounts after a sign-in finishes or the legacy auth actions report a change.
-  useEffect(() => desktop()?.onAuthEvent?.((event) => event.type === "complete" && reload()), [reload]);
+  useEffect(
+    () => desktop()?.onAuthEvent?.((event) => event.type === "complete" && reload()),
+    [reload],
+  );
   const statusKey = JSON.stringify(accounts);
   useEffect(() => {
     if (statusKey !== "{}") reload();
@@ -261,7 +320,12 @@ export function ProviderAccountList({
   let body: ReactNode;
   if (ipc && providers)
     body = providers.map((provider) => (
-      <ProviderCard key={provider.id} provider={provider} api={api} legacyStatus={accounts[provider.id]} />
+      <ProviderCard
+        key={provider.id}
+        provider={provider}
+        api={api}
+        legacyStatus={accounts[provider.id]}
+      />
     ));
   else if (agents === undefined || (ipc && !providers))
     body = (
@@ -272,13 +336,19 @@ export function ProviderAccountList({
   else if (agents === null)
     body = (
       <Card>
-        <Row title="Desktop app required" description="Open Verynize as a desktop app to use local agents." />
+        <Row
+          title="Desktop app required"
+          description="Open Verynize as a desktop app to use local agents."
+        />
       </Card>
     );
   else if (!agents.length)
     body = (
       <Card>
-        <Row title="No agents found" description={error || "Install Claude Code or Codex, then reopen settings."} />
+        <Row
+          title="No agents found"
+          description={error || "Install Claude Code or Codex, then reopen settings."}
+        />
       </Card>
     );
   else
@@ -331,9 +401,20 @@ export function splitCommandLine(text: string) {
 // REPLs; those follow the "Computer Use in Codex chats" switch below).
 const MANAGED_BY_APP = ["/Applications/ChatGPT.app/", "/Applications/Codex.app/"];
 const hidden = (server: McpServer) =>
-  server.status === "disabled" || MANAGED_BY_APP.some((prefix) => (server.command || "").startsWith(prefix));
+  server.status === "disabled" ||
+  MANAGED_BY_APP.some((prefix) => (server.command || "").startsWith(prefix));
 
-function ServerStatus({ server, checking, onSignIn, signingIn }: { server: McpServer; checking: boolean; onSignIn(): void; signingIn: boolean }) {
+function ServerStatus({
+  server,
+  checking,
+  onSignIn,
+  signingIn,
+}: {
+  server: McpServer;
+  checking: boolean;
+  onSignIn: () => void;
+  signingIn: boolean;
+}) {
   if (server.status === "needs-auth")
     return (
       <SettingsButton className="h-6" disabled={signingIn} onClick={onSignIn}>
@@ -342,7 +423,12 @@ function ServerStatus({ server, checking, onSignIn, signingIn }: { server: McpSe
     );
   if (server.status === "connected")
     return (
-      <span role="img" aria-label="Connected" title={server.detail || "Connected"} className="flex size-6 items-center justify-center text-success">
+      <span
+        role="img"
+        aria-label="Connected"
+        title={server.detail || "Connected"}
+        className="flex size-6 items-center justify-center text-success"
+      >
         <CheckIcon className="size-4" />
       </span>
     );
@@ -352,13 +438,20 @@ function ServerStatus({ server, checking, onSignIn, signingIn }: { server: McpSe
         role="img"
         aria-label={server.detail || "Could not connect"}
         title={server.detail || "Could not connect"}
-        className={cn("flex size-6 items-center justify-center", server.status === "error" ? "text-destructive" : "text-muted-foreground")}
+        className={cn(
+          "flex size-6 items-center justify-center",
+          server.status === "error" ? "text-destructive" : "text-muted-foreground",
+        )}
       >
         <AlertCircleIcon className="size-4" />
       </span>
     );
   return checking ? (
-    <span role="img" aria-label="Checking" className="flex size-6 items-center justify-center text-muted-foreground">
+    <span
+      role="img"
+      aria-label="Checking"
+      className="flex size-6 items-center justify-center text-muted-foreground"
+    >
       <LoaderCircleIcon className="size-3.5 animate-spin" />
     </span>
   ) : null;
@@ -423,9 +516,15 @@ function AgentServers({ agent, name }: { agent: string; name: string }) {
           Add tool
         </SettingsButton>
       </div>
-      {list?.installed === false && <p className="py-2 text-sm text-muted-foreground">{name} is not installed on this computer.</p>}
+      {list?.installed === false && (
+        <p className="py-2 text-sm text-muted-foreground">
+          {name} is not installed on this computer.
+        </p>
+      )}
       {list?.installed !== false && list && !visible.length && (
-        <p className="py-2 text-sm text-muted-foreground">No MCP servers in {name}’s settings yet.</p>
+        <p className="py-2 text-sm text-muted-foreground">
+          No MCP servers in {name}’s settings yet.
+        </p>
       )}
       {visible.map((server) => (
         <div key={server.name} data-server={server.name} className="flex h-8.5 items-center gap-3">
@@ -457,8 +556,17 @@ function AgentServers({ agent, name }: { agent: string; name: string }) {
               aria-label={`Remove ${server.name} from ${name}`}
               disabled={busy === `remove:${server.name}`}
               onClick={() => {
-                if (!window.confirm(`Remove ${server.name} from ${name}? This changes ${name}’s own settings on this computer.`)) return;
-                void act(`remove:${server.name}`, () => ipc.removeServer({ agent, name: server.name }), `Removed ${server.name}`);
+                if (
+                  !window.confirm(
+                    `Remove ${server.name} from ${name}? This changes ${name}’s own settings on this computer.`,
+                  )
+                )
+                  return;
+                void act(
+                  `remove:${server.name}`,
+                  () => ipc.removeServer({ agent, name: server.name }),
+                  `Removed ${server.name}`,
+                );
               }}
             >
               <Trash2Icon />
@@ -468,7 +576,8 @@ function AgentServers({ agent, name }: { agent: string; name: string }) {
       ))}
       {hiddenCount > 0 && (
         <p className="pt-1 text-xs text-muted-foreground">
-          {hiddenCount} more {hiddenCount === 1 ? "server is" : "servers are"} turned off or managed by another app.
+          {hiddenCount} more {hiddenCount === 1 ? "server is" : "servers are"} turned off or managed
+          by another app.
         </p>
       )}
       <AddToolDialog
@@ -494,8 +603,8 @@ function AddToolDialog({
 }: {
   open: boolean;
   agentName: string;
-  onOpenChange(open: boolean): void;
-  onSubmit(server: Omit<AddServer, "agent">): Promise<void>;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (server: Omit<AddServer, "agent">) => Promise<void>;
 }) {
   const [name, setName] = useState("");
   const [transport, setTransport] = useState<"stdio" | "http">("http");
@@ -552,7 +661,11 @@ function AddToolDialog({
               onChange={(event) => setName(event.target.value)}
             />
           </label>
-          <div role="radiogroup" aria-label="Connection" className="flex gap-1 rounded-md bg-input p-0.5">
+          <div
+            role="radiogroup"
+            aria-label="Connection"
+            className="flex gap-1 rounded-md bg-input p-0.5"
+          >
             {(
               [
                 ["http", "Server URL"],
@@ -581,7 +694,9 @@ function AddToolDialog({
               id="settings-add-tool-target"
               required
               type={transport === "http" ? "url" : "text"}
-              placeholder={transport === "http" ? "https://example.com/mcp" : "npx -y @scope/mcp-server --flag"}
+              placeholder={
+                transport === "http" ? "https://example.com/mcp" : "npx -y @scope/mcp-server --flag"
+              }
               value={target}
               onChange={(event) => setTarget(event.target.value)}
             />
@@ -594,7 +709,13 @@ function AddToolDialog({
         </form>
         <DialogFooter>
           <SettingsButton onClick={() => onOpenChange(false)}>Cancel</SettingsButton>
-          <SettingsButton id="settings-add-tool-save" type="submit" form="settings-add-tool-form" variant="primary" disabled={busy}>
+          <SettingsButton
+            id="settings-add-tool-save"
+            type="submit"
+            form="settings-add-tool-form"
+            variant="primary"
+            disabled={busy}
+          >
             {busy ? "Adding…" : "Add tool"}
           </SettingsButton>
         </DialogFooter>
@@ -607,12 +728,21 @@ export function AgentToolsSection() {
   const { connected: codexConnected } = useCodexConnection();
   const ipc = toolsIpc();
   return (
-    <Section id="settings-agent-tools" title="Tools" description="MCP servers from your agents’ own settings on this computer.">
+    <Section
+      id="settings-agent-tools"
+      title="Tools"
+      description="MCP servers from your agents’ own settings on this computer."
+    >
       <Card>
         {ipc ? (
-          MCP_AGENTS.filter((agent) => agent.id !== "codex" || codexConnected).map((agent) => <AgentServers key={agent.id} agent={agent.id} name={agent.name} />)
+          MCP_AGENTS.filter((agent) => agent.id !== "codex" || codexConnected).map((agent) => (
+            <AgentServers key={agent.id} agent={agent.id} name={agent.name} />
+          ))
         ) : (
-          <Row title="Available in the desktop app" description="Tools come from Claude Code and Codex settings on this computer." />
+          <Row
+            title="Available in the desktop app"
+            description="Tools come from Claude Code and Codex settings on this computer."
+          />
         )}
       </Card>
     </Section>
@@ -622,11 +752,31 @@ export function AgentToolsSection() {
 /* ---------- Access ---------- */
 const CHROME_EXTENSION_URL = "https://claude.ai/chrome";
 const ACCESS_ROWS: { key: keyof AccessSettings; title: string; description: ReactNode }[] = [
-  { key: "createFiles", title: "Let agents create files, folders and pages", description: "Agents create what a task or Preview needs, instead of asking." },
-  { key: "shareMemory", title: "Share memory between your agents", description: "Each chat sees what your other agents remember." },
-  { key: "askAgents", title: "Let agents ask other agents", description: "Read-only second opinions from other models." },
-  { key: "claudeConnectors", title: "Claude connectors", description: "Use your claude.ai connectors in Claude chats." },
-  { key: "claudeArtifacts", title: "Claude artifacts", description: "Read, publish and update artifacts through your Claude account." },
+  {
+    key: "createFiles",
+    title: "Let agents create files, folders and pages",
+    description: "Agents create what a task or Preview needs, instead of asking.",
+  },
+  {
+    key: "shareMemory",
+    title: "Share memory between your agents",
+    description: "Each chat sees what your other agents remember.",
+  },
+  {
+    key: "askAgents",
+    title: "Let agents ask other agents",
+    description: "Read-only second opinions from other models.",
+  },
+  {
+    key: "claudeConnectors",
+    title: "Claude connectors",
+    description: "Use your claude.ai connectors in Claude chats.",
+  },
+  {
+    key: "claudeArtifacts",
+    title: "Claude artifacts",
+    description: "Read, publish and update artifacts through your Claude account.",
+  },
   {
     key: "claudeChrome",
     title: "Use Chrome in Claude chats",
@@ -647,7 +797,11 @@ const ACCESS_ROWS: { key: keyof AccessSettings; title: string; description: Reac
       </span>
     ),
   },
-  { key: "codexApps", title: "ChatGPT apps in Codex chats", description: "Use your ChatGPT apps in Codex chats." },
+  {
+    key: "codexApps",
+    title: "ChatGPT apps in Codex chats",
+    description: "Use your ChatGPT apps in Codex chats.",
+  },
   {
     key: "codexComputerUse",
     title: "Computer Use in Codex chats",
@@ -669,18 +823,33 @@ export function AgentAccessSection() {
     try {
       const result = await ipc.setAccess({ [key]: value });
       setSettings(result.settings);
-      if (result.stopped) toast(`Stopped ${result.stopped} chat${result.stopped === 1 ? "" : "s"} using Computer Use`);
+      if (result.stopped)
+        toast(
+          `Stopped ${result.stopped} chat${result.stopped === 1 ? "" : "s"} using Computer Use`,
+        );
     } catch (error) {
       setSettings(settings);
       toast(message(error));
     }
   };
   return (
-    <Section id="settings-agent-access" title="Access" description="Changes apply when a chat’s agent next starts.">
+    <Section
+      id="settings-agent-access"
+      title="Access"
+      description="Changes apply when a chat’s agent next starts."
+    >
       <Card>
         {ipc ? (
           ACCESS_ROWS.filter((row) => !row.key.startsWith("codex") || codexConnected).map((row) => (
-            <Row key={row.key} title={row.title} description={row.key === "codexApps" || row.key === "codexComputerUse" ? "Unavailable with Sign in with ChatGPT. Local canvas and MCP tools remain available." : row.description}>
+            <Row
+              key={row.key}
+              title={row.title}
+              description={
+                row.key === "codexApps" || row.key === "codexComputerUse"
+                  ? "Unavailable with Sign in with ChatGPT. Local canvas and MCP tools remain available."
+                  : row.description
+              }
+            >
               <Toggle
                 aria-label={row.title}
                 data-access={row.key}
@@ -691,7 +860,10 @@ export function AgentAccessSection() {
             </Row>
           ))
         ) : (
-          <Row title="Available in the desktop app" description="Access settings apply to the agents installed on this computer." />
+          <Row
+            title="Available in the desktop app"
+            description="Access settings apply to the agents installed on this computer."
+          />
         )}
       </Card>
     </Section>

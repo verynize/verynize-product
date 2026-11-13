@@ -348,11 +348,14 @@ rl.on('line', line => {
   const rpc = new JsonRpcChild(child);
   // Consume stderr so a verbose CLI cannot fill the pipe.
   child.stderr.on("data", () => {});
+  const exited = new Promise((resolve) => child.once("exit", resolve));
   t.after(async () => {
     rpc.close();
+    // Codex keeps cloning plugins under HOME until it exits; removing the directory earlier races it (ENOTEMPTY).
+    await Promise.race([exited, new Promise((resolve) => setTimeout(resolve, 10000))]);
     server.closeAllConnections();
     await new Promise((resolve) => server.close(resolve));
-    await fs.rm(root, { recursive: true, force: true });
+    await fs.rm(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
   });
   await rpc.request("initialize", {
     clientInfo: { name: "Verynize", title: "Verynize", version: "0.0.0-test" },

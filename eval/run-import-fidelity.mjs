@@ -43,7 +43,7 @@ function tag(html) {
     }
     if (t === "svg") {
       if (close) inSvg--;
-      else if (!/\/$/.test(rest)) inSvg++;
+      else if (!rest.endsWith("/")) inSvg++;
       if (close || inSvg > 1) return all;
     } else if (inSvg) return all;
     if (

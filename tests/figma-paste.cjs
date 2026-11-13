@@ -13,6 +13,7 @@ const path = require("node:path");
     env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     timeout: 20000,
     env,
@@ -33,9 +34,9 @@ const path = require("node:path");
     });
     // Paste from the real system clipboard (Figma only writes text/html).
     await app.evaluate(
-      ({ clipboard }, html) => {
+      async ({ clipboard, ClipboardItem }, html) => {
         clipboard.clear();
-        clipboard.write({ html });
+        await clipboard.write([new ClipboardItem({ "text/html": html })]);
       },
       clipboardHtml({ compression: "zstd" }),
     );
@@ -75,7 +76,7 @@ const path = require("node:path");
     assert.equal(pasted.find((n) => n.name === "Row").layout, "flex");
     assert.equal(pasted.find((n) => n.name === "Label").text, "Checkout");
     // Pasted layers are selected and rendered: the vector is an SVG image, the text renders its characters.
-    assert.deepEqual(await p.evaluate((id) => window.design.getSelection(), card.id), [card.id]);
+    assert.deepEqual(await p.evaluate(() => window.design.getSelection()), [card.id]);
     const tri = pasted.find((n) => n.name === "Triangle");
     assert.match(
       await p.locator(`#canvas [data-id="${tri.id}"] img`).getAttribute("src"),
@@ -98,9 +99,11 @@ const path = require("node:path");
       return d.pages.find((x) => x.id === d.activePage).nodes.length === n;
     }, before);
     // Corrupt Figma clipboard data reports an error and pastes nothing.
-    await app.evaluate(({ clipboard }) => {
+    await app.evaluate(async ({ clipboard, ClipboardItem }) => {
       clipboard.clear();
-      clipboard.write({ html: "<span>(figma)AAAA(/figma)</span>" });
+      await clipboard.write([
+        new ClipboardItem({ "text/html": "<span>(figma)AAAA(/figma)</span>" }),
+      ]);
     });
     await p.locator("#workspace").click({ position: { x: 40, y: 300 } });
     await p.keyboard.press(mod("V"));
@@ -143,8 +146,34 @@ const path = require("node:path");
     assert.equal(photo.type, "image");
     assert.equal(photo.src, "data:image/png;base64," + Buffer.from(png).toString("base64"));
     await drop("Secret.pen", Buffer.from("encrypted").toString("base64"));
-    await p.waitForFunction(() => /encrypted by their vendor/.test(window.figmaPaste.lastError));
+    await p.waitForFunction(() =>
+      /Unsupported Pen signature; encrypted\/binary files are not decoded/.test(
+        window.figmaPaste.lastError,
+      ),
+    );
     assert.equal(await p.evaluate(() => window.design.getDocument().name), "Fixture design");
+    const syntheticPen = {
+      version: "2.8",
+      children: [
+        {
+          type: "frame",
+          id: "synthetic",
+          width: 200,
+          height: 100,
+          children: [
+            { type: "text", id: "label", content: "Synthetic Pen", width: 150, height: 30 },
+          ],
+        },
+      ],
+    };
+    await drop("Synthetic.pen", Buffer.from(JSON.stringify(syntheticPen)).toString("base64"));
+    await p.waitForFunction(() => window.design.getDocument().name === "Synthetic");
+    assert.equal(
+      await p.evaluate(() =>
+        window.design.getDocument().pages[0].nodes.some((n) => n.text === "Synthetic Pen"),
+      ),
+      true,
+    );
 
     // Dialog: account settings persist the client ID and port (no secret, nothing sealed yet).
     await p.evaluate(() => document.getElementById("figma-import").click());

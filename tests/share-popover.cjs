@@ -16,7 +16,12 @@ const shots = process.env.VERYNIZE_SCREENSHOTS || "";
 const PASSWORD = "a long enough password";
 
 async function launch(dir, label, server) {
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_CLOUD_SERVER: server };
+  const env = {
+    ...process.env,
+    VERYNIZE_SKIP_ONBOARDING: "1",
+    VERYNIZE_LAUNCH_EDITOR: "1",
+    VERYNIZE_CLOUD_SERVER: server,
+  };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await _electron.launch({
     env,
@@ -317,7 +322,7 @@ const focusWindow = (app) =>
         .waitFor();
       // The previous copy's toast may still be showing, so wait for the clipboard itself.
       await A.app.evaluate(async ({ clipboard }, expected) => {
-        for (let i = 0; i < 100 && clipboard.readText() !== expected; i++)
+        for (let i = 0; i < 100 && (await clipboard.readText()) !== expected; i++)
           await new Promise((resolve) => setTimeout(resolve, 50));
       }, link);
       assert.equal(await A.app.evaluate(({ clipboard }) => clipboard.readText()), link);

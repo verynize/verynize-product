@@ -1,0 +1,234 @@
+# manual groups not run: runner-orphan, web-nitro, cloud-vercel, package (name them with --group)
+# running 75 test(s)
+build integrations ... ok (0.1s)
+build ui ... ok (2.0s)
+build worker ... ok (4.2s)
+[ 1/75] PASS       0.1s  tests/node-index.cjs
+[ 2/75] PASS       0.1s  tests/views-store.cjs
+[ 3/75] PASS       0.9s  tests/commit-state.cjs
+[ 4/75] PASS      35.6s  tests/canvas-layers-dnd.cjs
+[ 5/75] PASS      39.4s  tests/inspector-paints.cjs
+[ 6/75] PASS      32.4s  tests/inspector-parity.cjs
+[ 7/75] PASS      21.7s  tests/document-validation-safety.cjs
+[ 8/75] FAIL      34.3s  tests/settings.cjs
+    | design preferences via preload IPC
+    | locator.click: Timeout 30000ms exceeded.
+    | Call log:
+    |   - waiting for locator('[data-mode-option="auto"]')
+    |     - locator resolved to <div tabindex="-1" role="menuitemradio" aria-checked="false" data-state="unchecked" data-mode-option="auto" data-orientation="vertical" data-radix-collection-item="" data-slot="dropdown-menu-radio-item" class="relative flex cursor-default items-center gap-2 h-7 rounded-md py-0 pr-2 pl-8 text-xs outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-']…>…</div>
+    |   - attempting click action
+    |     2 × waiting for element to be visible, enabled and stable
+    |       - element is not stable
+    |     - retrying click action
+    |     - waiting 20ms
+    |     - waiting for element to be visible, enabled and stable
+    |     - element is not stable
+    |   2 × retrying click action
+    |       - waiting 100ms
+    |       - waiting for element to be visible, enabled and stable
+    |       - element is visible, enabled and stable
+    |       - scrolling into view if needed
+    |       - done scrolling
+    |       - <li class="" tabindex="0" data-index="1" data-styled="true" data-front="false" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="false" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events
+    |   5 × retrying click action
+    |       - waiting 500ms
+    |       - waiting for element to be visible, enabled and stable
+    |       - element is visible, enabled and stable
+    |       - scrolling into view if needed
+    |       - done scrolling
+    |       - <li class="" tabindex="0" data-index="1" data-styled="true" data-front="false" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="false" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events
+    |   52 × retrying click action
+    |        - waiting 500ms
+    |        - waiting for element to be visible, enabled and stable
+    |        - element is visible, enabled and stable
+    |        - scrolling into view if needed
+    |        - done scrolling
+    |        - <li class="" tabindex="0" data-index="0" data-front="true" data-styled="true" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="true" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events
+    |   - retrying click action
+    |     - waiting 500ms
+    | 
+    |     at /data/workspace/vfix-perf/tests/settings.cjs:281:53 {
+    |   log: [
+    |     `  - waiting for locator('[data-mode-option="auto"]')`,
+    |     `    - locator resolved to <div tabindex="-1" role="menuitemradio" aria-checked="false" data-state="unchecked" data-mode-option="auto" data-orientation="vertical" data-radix-collection-item="" data-slot="dropdown-menu-radio-item" class="relative flex cursor-default items-center gap-2 h-7 rounded-md py-0 pr-2 pl-8 text-xs outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-']…>…</div>`,
+    |     '  - attempting click action',
+    |     '    2 × waiting for element to be visible, enabled and stable',
+    |     '      - element is not stable',
+    |     '    - retrying click action',
+    |     '    - waiting 20ms',
+    |     '    - waiting for element to be visible, enabled and stable',
+    |     '    - element is not stable',
+    |     '  2 × retrying click action',
+    |     '      - waiting 100ms',
+    |     '      - waiting for element to be visible, enabled and stable',
+    |     '      - element is visible, enabled and stable',
+    |     '      - scrolling into view if needed',
+    |     '      - done scrolling',
+    |     '      - <li class="" tabindex="0" data-index="1" data-styled="true" data-front="false" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="false" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events',
+    |     '  5 × retrying click action',
+    |     '      - waiting 500ms',
+    |     '      - waiting for element to be visible, enabled and stable',
+    |     '      - element is visible, enabled and stable',
+    |     '      - scrolling into view if needed',
+    |     '      - done scrolling',
+    |     '      - <li class="" tabindex="0" data-index="1" data-styled="true" data-front="false" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="false" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events',
+    |     '  52 × retrying click action',
+    |     '       - waiting 500ms',
+    |     '       - waiting for element to be visible, enabled and stable',
+    |     '       - element is visible, enabled and stable',
+    |     '       - scrolling into view if needed',
+    |     '       - done scrolling',
+    |     '       - <li class="" tabindex="0" data-index="0" data-front="true" data-styled="true" data-mounted="true" data-swiped="false" data-visible="true" data-sonner-toast="" data-promise="false" data-removed="false" data-swiping="false" data-expanded="true" data-swipe-out="false" data-x-position="right" data-dismissible="true" data-y-position="bottom">…</li> from <div data-bd="" id="bd-settings-root" data-island="settings">…</div> subtree intercepts pointer events',
+    |     '  - retrying click action',
+    |     '    - waiting 500ms'
+    |   ],
+    |   name: 'TimeoutError'
+    | }
+[ 9/75] PASS      13.3s  tests/inspector-effects.cjs
+[10/75] PASS      15.8s  tests/storage-limits-ux.mjs
+[11/75] PASS       8.4s  tests/share-popover.cjs
+[12/75] PASS      12.5s  tests/canvas-interactions.cjs
+[13/75] PASS       8.2s  tests/canvas-compositing.cjs
+[14/75] PASS       6.5s  tests/canvas-help-shortcuts.cjs
+[15/75] PASS       6.4s  tests/inspector-border-mask-binding.cjs
+[16/75] PASS       6.9s  tests/inspector-variable-folders.cjs
+[17/75] PASS       7.0s  tests/inspector-variable-library.cjs
+[18/75] PASS       6.9s  tests/inspector-variable-binding.cjs
+[19/75] PASS       5.6s  tests/canvas-advanced.cjs
+[20/75] PASS       5.7s  tests/use-as-mask.cjs
+[21/75] PASS       4.6s  tests/panel-resize.cjs
+[22/75] PASS       5.1s  tests/document-lifecycle.cjs
+[23/75] PASS       6.8s  tests/shell-routes.cjs
+[24/75] PASS       5.0s  tests/canvas-context-menu.cjs
+[25/75] PASS       4.6s  tests/inspector-shader-library.cjs
+[26/75] PASS       2.4s  tests/canvas-precision.cjs
+[27/75] PASS       3.7s  tests/canvas-spacing.cjs
+[28/75] PASS       2.7s  tests/canvas-clipboard.cjs
+[29/75] PASS       3.0s  tests/canvas-transform.cjs
+[30/75] PASS       4.3s  tests/canvas-page.cjs
+[31/75] PASS       4.4s  tests/canvas.cjs
+[32/75] PASS       3.3s  tests/inspector-position.cjs
+[33/75] PASS       3.1s  tests/inspector-type-bind.cjs
+[34/75] PASS       4.5s  tests/shell-router.cjs
+[35/75] PASS       4.2s  tests/views-templates.cjs
+[36/75] PASS       3.8s  tests/settings-route.cjs
+[37/75] PASS       3.1s  tests/canvas-shaders.cjs
+[38/75] PASS       1.5s  tests/canvas-resize.cjs
+[39/75] PASS       5.3s  tests/html-import-dialog.cjs
+[40/75] PASS       3.0s  tests/canvas-selection-marks.cjs
+[41/75] PASS       3.5s  tests/wonder-shell.cjs
+[42/75] PASS       3.1s  tests/inspector-typography.cjs
+[43/75] PASS       2.6s  tests/render-export.cjs
+[44/75] PASS       3.1s  tests/file-thumbnail.cjs
+[45/75] PASS       2.9s  tests/inspector-selection-colors.cjs
+[46/75] PASS       2.7s  tests/ui-ready.cjs
+[47/75] PASS       2.7s  tests/canvas-wonder-marks.cjs
+[48/75] PASS       1.9s  tests/web-platform.cjs
+[49/75] PASS       3.7s  tests/canvas-image-drop.cjs
+[50/75] PASS       1.9s  tests/canvas-roundtrip.cjs
+[51/75] PASS       2.0s  tests/canvas-constraints.cjs
+[52/75] PASS       1.9s  tests/canvas-text-caret.cjs
+[53/75] PASS       1.8s  tests/canvas-bound-resize.cjs
+[54/75] PASS       1.9s  tests/inspector-bound-fields.cjs
+[55/75] PASS       1.5s  tests/canvas-codec.cjs
+[56/75] PASS       1.6s  tests/cloud-async.cjs
+[57/75] PASS       3.1s  tests/renderer-commit-performance.cjs
+[58/75] PASS       2.6s  tests/canvas-tiles.cjs
+[59/75] PASS       7.6s  tests/canvas-incremental-render.cjs
+[60/75] PASS       1.7s  tests/canvas-loose-culling.cjs
+[61/75] PASS       6.5s  tests/canvas-drag-scale.cjs
+[62/75] PASS       2.9s  tests/components.cjs
+[63/75] PASS       4.4s  tests/components-ui.cjs
+[64/75] PASS       8.4s  tests/canvas-vectors.cjs
+[65/75] PASS       2.4s  tests/canvas-find-layers.cjs
+[66/75] PASS       1.8s  tests/canvas-find-background.cjs
+[67/75] PASS       2.5s  tests/canvas-frame-labels.cjs
+[68/75] PASS       2.2s  tests/canvas-world-bounds.cjs
+[69/75] PASS       4.2s  tests/home-first-opening.cjs
+[70/75] PASS       1.2s  tests/switch-cache.cjs
+[71/75] PASS      33.2s  tests/switch-loading-visuals.cjs
+[72/75] PASS       3.7s  tests/file-tabs.cjs
+[73/75] PASS       3.7s  tests/settings-image-generation.cjs
+[74/75] PASS      15.2s  tests/library-implicit-files.cjs
+[75/75] PASS       1.5s  tests/canvas-css-invalidation.cjs
+
+status        time   lane     test
+pass          3.1s   electron tests/renderer-commit-performance.cjs
+pass          0.9s   node     tests/commit-state.cjs
+pass          2.6s   electron tests/canvas-tiles.cjs
+pass          4.4s   electron tests/canvas.cjs
+pass          5.6s   electron tests/canvas-advanced.cjs
+pass          1.9s   electron tests/canvas-roundtrip.cjs
+pass          3.1s   electron tests/canvas-shaders.cjs
+pass          4.6s   electron tests/inspector-shader-library.cjs
+pass          6.4s   electron tests/inspector-border-mask-binding.cjs
+pass          2.4s   electron tests/canvas-precision.cjs
+pass          1.5s   electron tests/canvas-resize.cjs
+pass          3.0s   electron tests/canvas-transform.cjs
+pass         12.5s   electron tests/canvas-interactions.cjs
+pass          7.6s   electron tests/canvas-incremental-render.cjs
+pass          1.7s   electron tests/canvas-loose-culling.cjs
+pass          6.5s   electron tests/canvas-drag-scale.cjs
+pass          2.7s   electron tests/canvas-clipboard.cjs
+pass          2.9s   electron tests/components.cjs
+pass          4.4s   electron tests/components-ui.cjs
+pass          3.7s   electron tests/canvas-image-drop.cjs
+pass          8.4s   electron tests/canvas-vectors.cjs
+pass          5.0s   electron tests/canvas-context-menu.cjs
+pass          3.1s   electron tests/file-thumbnail.cjs
+pass          5.7s   electron tests/use-as-mask.cjs
+pass          3.7s   electron tests/canvas-spacing.cjs
+pass          2.0s   electron tests/canvas-constraints.cjs
+pass          3.3s   electron tests/inspector-position.cjs
+pass          8.2s   electron tests/canvas-compositing.cjs
+pass          2.6s   electron tests/render-export.cjs
+pass          1.5s   electron tests/canvas-codec.cjs
+pass          5.3s   electron tests/html-import-dialog.cjs
+pass         35.6s   electron tests/canvas-layers-dnd.cjs
+pass          2.4s   electron tests/canvas-find-layers.cjs
+pass          1.8s   electron tests/canvas-find-background.cjs
+pass          6.5s   electron tests/canvas-help-shortcuts.cjs
+pass          2.7s   electron tests/canvas-wonder-marks.cjs
+pass          3.0s   electron tests/canvas-selection-marks.cjs
+pass          2.5s   electron tests/canvas-frame-labels.cjs
+pass          0.1s   node     tests/node-index.cjs
+pass          1.9s   electron tests/canvas-text-caret.cjs
+pass          2.2s   electron tests/canvas-world-bounds.cjs
+pass          4.3s   electron tests/canvas-page.cjs
+pass         32.4s   electron tests/inspector-parity.cjs
+pass          7.0s   electron tests/inspector-variable-library.cjs
+pass          6.9s   electron tests/inspector-variable-binding.cjs
+pass          1.9s   electron tests/inspector-bound-fields.cjs
+pass          3.1s   electron tests/inspector-type-bind.cjs
+pass          6.9s   electron tests/inspector-variable-folders.cjs
+pass          1.8s   electron tests/canvas-bound-resize.cjs
+pass         13.3s   electron tests/inspector-effects.cjs
+pass         39.4s   electron tests/inspector-paints.cjs
+pass          2.9s   electron tests/inspector-selection-colors.cjs
+pass          3.1s   electron tests/inspector-typography.cjs
+pass          4.2s   electron tests/home-first-opening.cjs
+pass          1.2s   electron tests/switch-cache.cjs
+pass         33.2s   electron tests/switch-loading-visuals.cjs
+pass          3.5s   electron tests/wonder-shell.cjs
+pass          3.7s   electron tests/file-tabs.cjs
+fail         34.3s   electron tests/settings.cjs
+pass          3.7s   electron tests/settings-image-generation.cjs
+pass          4.2s   electron tests/views-templates.cjs
+pass          0.1s   node     tests/views-store.cjs
+pass          5.1s   electron tests/document-lifecycle.cjs
+pass         21.7s   electron tests/document-validation-safety.cjs
+pass         15.2s   electron tests/library-implicit-files.cjs
+pass          1.6s   electron tests/cloud-async.cjs
+pass          4.5s   electron tests/shell-router.cjs
+pass          3.8s   electron tests/settings-route.cjs
+pass          6.8s   electron tests/shell-routes.cjs
+pass          1.5s   electron tests/canvas-css-invalidation.cjs
+pass          2.7s   electron tests/ui-ready.cjs
+pass          4.6s   electron tests/panel-resize.cjs
+pass          1.9s   electron tests/web-platform.cjs
+pass         15.8s   electron tests/storage-limits-ux.mjs
+pass          8.4s   electron tests/share-popover.cjs
+
+74 passed, 1 failed, 0 skipped in 499.6s
+  fail: tests/settings.cjs
+reports in /data/test-results/verynize/perf-20261109T001832Z

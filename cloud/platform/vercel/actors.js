@@ -87,6 +87,7 @@ class Turn {
     this.coordinator = coordinator;
     this.actor = actor;
     this.upgrade = upgrade;
+    this.fence = lease.fence;
     this.entries = new Map();
     for (const [id, value] of lease.sockets) {
       const split = value.indexOf("|");
@@ -407,6 +408,19 @@ export class Coordinator {
     const ctx = {
       id: { name: actor.name, toString: () => actor.name },
       storage: {
+        sync: async () => {
+          const changes = actor.cache.collect();
+          if (changes) {
+            const seq = await this.store.commit(
+              actor.key,
+              actor.turn.fence,
+              actor.cache.seq,
+              changes,
+            );
+            actor.cache.committed(seq, changes.schema);
+          }
+        },
+        transactionSync: (fn) => actor.cache.storage.transactionSync(fn),
         get sql() {
           return actor.cache.storage;
         },

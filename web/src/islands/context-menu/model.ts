@@ -21,6 +21,7 @@
 import { toast } from "sonner";
 import { toggleBodyClass } from "../chrome/hooks";
 import { design, activePage, type LayerNode } from "@/lib/bridge";
+import { componentInfo, type ComponentInfo } from "@/lib/components";
 import {
   detachShapeMask,
   maskGroup,
@@ -217,6 +218,19 @@ export function layerMenu(surface: "canvas" | "label" | "row", under: string[] =
     commandItem(have, "layer.visibility", every("hidden") ? "Show" : "Hide", "⌘⇧H"),
     commandItem(have, "layer.lock", every("locked") ? "Unlock" : "Lock", "⌘⇧L"),
   ];
+  if (artboards && !multi) {
+    // Version history panel (web/src/islands/history, docs/version-history.md).
+    const artboard = selected[0].id;
+    flags.push({
+      type: "item",
+      command: "menu.versionHistory",
+      label: "Version history",
+      run: () =>
+        window.dispatchEvent(
+          new CustomEvent("bd:open-version-history", { detail: { artboardId: artboard } }),
+        ),
+    });
+  }
   if (artboards) {
     const hidden = every("labelHidden");
     flags.push({
@@ -248,6 +262,12 @@ export function layerMenu(surface: "canvas" | "label" | "row", under: string[] =
       },
     );
   }
+
+  // Components (design/component-audit/README.md "UI"; Figma 12-instance-actions). Create component sits in Layout
+  // next to Frame selection; mains, instances, their layers and frames inside a main get their own group.
+  const info = multi ? null : componentInfo(selected[0].id);
+  const components = multi ? [] : componentEntries(have, selected[0], info, nodes);
+  const canCreate = multi || !info?.instanceId;
 
   return join([
     [
@@ -288,18 +308,80 @@ export function layerMenu(surface: "canvas" | "label" | "row", under: string[] =
         label: "Layout",
         entries: [
           commandItem(have, "transform.frame", "Frame selection", "⌘G"),
+          ...(canCreate ? [commandItem(have, "component.create", "Create component", "⌥⌘K")] : []),
           commandItem(have, "transform.autoLayout", "Add auto layout", "⇧A"),
         ],
       },
       ...masking,
     ],
+    components,
     [
       {
         type: "item",
         command: "menu.setThumbnail",
         label: "Set as file thumbnail",
+        disabled: selected.length !== 1 || selected[0].type !== "frame",
         run: () => setFileThumbnail(selected[0].id),
       },
+      ...(doc.thumbnailNodeId
+        ? [
+            {
+              type: "item" as const,
+              command: "menu.restoreThumbnail",
+              label: "Restore default thumbnail",
+              run: () => setFileThumbnail(""),
+            },
+          ]
+        : []),
     ],
   ]);
+}
+
+/** Component commands for one selected layer that is a main, an instance, a layer inside one or a frame inside a
+ * main; empty for any other layer. */
+function componentEntries(
+  have: Set<string>,
+  node: LayerNode,
+  info: ComponentInfo | null,
+  nodes: LayerNode[],
+): Entry[] {
+  const role = info?.role ?? null;
+  const out: Entry[] = [];
+  if (role === "main" || role === "instance")
+    out.push(
+      commandItem(have, "component.instance", "Create instance", undefined, {
+        disabled: info?.missingMain,
+      }),
+    );
+  if (info?.instanceId) {
+    out.push(
+      commandItem(have, "component.goToMain", "Go to main component", undefined, {
+        disabled: info.missingMain,
+      }),
+      commandItem(have, "component.reset", "Reset overrides", undefined, {
+        disabled: !info.overrideCount,
+      }),
+    );
+    if (role === "instance")
+      out.push(commandItem(have, "component.detach", "Detach instance", "⌥⌘B"));
+  }
+  if (role === "slot" && !info?.instanceId)
+    out.push(commandItem(have, "component.removeSlot", "Remove slot"));
+  if (!role && node.type === "frame" && insideMain(node, nodes))
+    out.push(commandItem(have, "component.convertToSlot", "Convert to slot"));
+  return out;
+}
+
+function insideMain(node: LayerNode, nodes: LayerNode[]) {
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const seen = new Set<string>();
+  for (
+    let p = byId.get(node.parentId ?? "");
+    p && !seen.has(p.id);
+    p = byId.get(p.parentId ?? "")
+  ) {
+    seen.add(p.id);
+    if (p.component === true) return true;
+  }
+  return false;
 }

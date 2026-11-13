@@ -16,21 +16,55 @@
     "Hint You have 2 unsaved changes"
   ],
   "constraints": ["Single screen 1280x832", "Light theme", "English copy"],
-  "assetsAllowed": { "icons": true, "photos": false, "generatedImages": false, "avatars": true, "customFonts": true },
+  "assetsAllowed": {
+    "icons": true,
+    "photos": false,
+    "generatedImages": false,
+    "avatars": true,
+    "customFonts": true
+  },
   "inputs": [],
   "budget": { "maxMinutes": 15, "followUpTurns": 0 },
   "checklist": [
-    { "id": "c01", "text": "Both navigation levels are present and Settings / Notifications are visibly active." },
-    { "id": "c02", "text": "Exactly four email toggles; Invoice paid and Invoice overdue are on, Weekly summary and Product updates are off, and on/off states are unambiguous." },
-    { "id": "c03", "text": "Each toggle row has a label and a one-line description, and the toggle controls align on one vertical edge." },
-    { "id": "c04", "text": "The digest select shows \"Daily at 9:00 AM\" and looks like a select (chevron or similar)." },
-    { "id": "c05", "text": "The quiet hours radio group has three options with \"8 PM - 7 AM\" selected." },
-    { "id": "c06", "text": "\"Save changes\" is the only primary-styled button; Cancel is secondary." },
+    {
+      "id": "c01",
+      "text": "Both navigation levels are present and Settings / Notifications are visibly active."
+    },
+    {
+      "id": "c02",
+      "text": "Exactly four email toggles; Invoice paid and Invoice overdue are on, Weekly summary and Product updates are off, and on/off states are unambiguous."
+    },
+    {
+      "id": "c03",
+      "text": "Each toggle row has a label and a one-line description, and the toggle controls align on one vertical edge."
+    },
+    {
+      "id": "c04",
+      "text": "The digest select shows \"Daily at 9:00 AM\" and looks like a select (chevron or similar)."
+    },
+    {
+      "id": "c05",
+      "text": "The quiet hours radio group has three options with \"8 PM - 7 AM\" selected."
+    },
+    {
+      "id": "c06",
+      "text": "\"Save changes\" is the only primary-styled button; Cancel is secondary."
+    },
     { "id": "c07", "text": "The unsaved-changes hint is present near the action buttons." },
-    { "id": "c08", "text": "Groups are separated by consistent spacing or dividers, with group headings." },
-    { "id": "c09", "text": "Labels, descriptions and controls use a consistent type scale (no more than ~4 distinct text sizes in the panel)." },
+    {
+      "id": "c08",
+      "text": "Groups are separated by consistent spacing or dividers, with group headings."
+    },
+    {
+      "id": "c09",
+      "text": "Labels, descriptions and controls use a consistent type scale (no more than ~4 distinct text sizes in the panel)."
+    },
     { "id": "c10", "text": "No text is clipped, overlapping, or overflowing.", "critical": true },
-    { "id": "c11", "text": "Description text is readable (>= 12px, sufficient contrast).", "critical": true },
+    {
+      "id": "c11",
+      "text": "Description text is readable (>= 12px, sufficient contrast).",
+      "critical": true
+    },
     { "id": "c12", "text": "No placeholder text remains.", "critical": true }
   ]
 }

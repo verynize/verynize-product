@@ -1,2 +1,98 @@
-const {_electron}=require('@playwright/test');const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path'),http=require('node:http');
-(async()=>{let foreignHits=0,authorizedAsset=false;const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==','base64');const foreign=http.createServer((req,res)=>{foreignHits++;res.setHeader('content-type','image/png');res.end(png)});await new Promise(r=>foreign.listen(0,'127.0.0.1',r));const source=http.createServer((req,res)=>{if(req.url==='/asset.png'){authorizedAsset ||= !!req.headers.authorization;res.setHeader('content-type','image/png');res.end(png);return;}res.setHeader('content-type','text/html');res.end(`<html><head><title>Capture fixture</title></head><body style="margin:0"><section style="position:absolute;left:40px;top:30px;width:300px;height:200px;border:3px solid rgb(12,34,56);box-shadow:0 5px 9px rgb(0 0 0 / 0.3);background:rgb(200,210,220)"><p style="font-size:24px;letter-spacing:2px">Captured content</p><img width="40" height="30" src="/asset.png"><img width="20" height="20" src="http://127.0.0.1:${foreign.address().port}/foreign.png"></section><script>window.example=true</script></body></html>`)});await new Promise(r=>source.listen(0,'127.0.0.1',r));const dir=await fs.mkdtemp(path.join(os.tmpdir(),'capture-fixture-')),env={...process.env};delete env.ELECTRON_RUN_AS_NODE;env.VERYNIZE_SKIP_ONBOARDING='1';const app=await _electron.launch({env,args:['.',`--user-data-dir=${dir}`],timeout:20000});try{const page=await app.firstWindow({timeout:20000});await page.waitForFunction(()=>!!window.desktop);const result=await page.evaluate(url=>window.desktop.previewApp({url,capture:true,width:800,height:600,region:{x:20,y:10,width:400,height:300}}),`http://127.0.0.1:${source.address().port}`);assert.ok(result.document);const nodes=result.document.pages[0].nodes;assert.equal(nodes[0].w,400);assert.equal(nodes[0].clipContent,true);assert.ok(nodes.some(n=>n.src?.startsWith('data:image/png;base64,')));assert.ok(nodes.some(n=>n.strokeWidth===3));assert.ok(nodes.some(n=>n.shadow?.includes('5px')));assert.ok(nodes.some(n=>n.letterSpacing===2));assert.ok(nodes.some(n=>n.text==='Captured content'));assert.equal(foreignHits,0);assert.equal(authorizedAsset,false);assert.ok(result.warnings.some(v=>/origin/.test(v)));assert.doesNotMatch(result.html,/<script>window.example/);await page.evaluate(html=>window.design.importHTML(html),result.html);assert.ok(await page.locator('#canvas img').count());const invalid=await page.evaluate(async url=>{try{await window.desktop.previewApp({url,capture:true,width:800,height:600,region:{x:700,y:0,width:200,height:100}})}catch(e){return e.message}},`http://127.0.0.1:${source.address().port}`);assert.match(invalid,/region/);console.log('PASS local capture hierarchy, region clipping, embedded bitmap, border/shadow/type styles, script exclusion and foreign-resource blocking');}finally{await app.close();await new Promise(r=>source.close(r));await new Promise(r=>foreign.close(r));await fs.rm(dir,{recursive:true,force:true})}})().catch(e=>{console.error(e);process.exitCode=1});
+const { _electron } = require("@playwright/test");
+const assert = require("node:assert/strict"),
+  fs = require("node:fs/promises"),
+  os = require("node:os"),
+  path = require("node:path"),
+  http = require("node:http");
+(async () => {
+  let foreignHits = 0,
+    authorizedAsset = false;
+  const png = Buffer.from(
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==",
+    "base64",
+  );
+  const foreign = http.createServer((req, res) => {
+    foreignHits++;
+    res.setHeader("content-type", "image/png");
+    res.end(png);
+  });
+  await new Promise((r) => foreign.listen(0, "127.0.0.1", r));
+  const source = http.createServer((req, res) => {
+    if (req.url === "/asset.png") {
+      authorizedAsset ||= !!req.headers.authorization;
+      res.setHeader("content-type", "image/png");
+      res.end(png);
+      return;
+    }
+    res.setHeader("content-type", "text/html");
+    res.end(
+      `<html><head><title>Capture fixture</title></head><body style="margin:0"><section style="position:absolute;left:40px;top:30px;width:300px;height:200px;border:3px solid rgb(12,34,56);box-shadow:0 5px 9px rgb(0 0 0 / 0.3);background:rgb(200,210,220)"><p style="font-size:24px;letter-spacing:2px">Captured content</p><img width="40" height="30" src="/asset.png"><img width="20" height="20" src="http://127.0.0.1:${foreign.address().port}/foreign.png"></section><script>window.example=true</script></body></html>`,
+    );
+  });
+  await new Promise((r) => source.listen(0, "127.0.0.1", r));
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "capture-fixture-")),
+    env = { ...process.env };
+  delete env.ELECTRON_RUN_AS_NODE;
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
+  const app = await _electron.launch({
+    env,
+    args: [".", `--user-data-dir=${dir}`],
+    timeout: 20000,
+  });
+  try {
+    const page = await app.firstWindow({ timeout: 20000 });
+    await page.waitForFunction(() => !!window.desktop);
+    const result = await page.evaluate(
+      (url) =>
+        window.desktop.previewApp({
+          url,
+          capture: true,
+          width: 800,
+          height: 600,
+          region: { x: 20, y: 10, width: 400, height: 300 },
+        }),
+      `http://127.0.0.1:${source.address().port}`,
+    );
+    assert.ok(result.document);
+    const nodes = result.document.pages[0].nodes;
+    assert.equal(nodes[0].w, 400);
+    assert.equal(nodes[0].clipContent, true);
+    assert.ok(nodes.some((n) => n.src?.startsWith("data:image/png;base64,")));
+    assert.ok(nodes.some((n) => n.strokeWidth === 3));
+    assert.ok(nodes.some((n) => n.shadow?.includes("5px")));
+    assert.ok(nodes.some((n) => n.letterSpacing === 2));
+    assert.ok(nodes.some((n) => n.text === "Captured content"));
+    assert.equal(foreignHits, 0);
+    assert.equal(authorizedAsset, false);
+    assert.ok(result.warnings.some((v) => /origin/.test(v)));
+    assert.doesNotMatch(result.html, /<script>window.example/);
+    await page.evaluate((html) => window.design.importHTML(html), result.html);
+    assert.ok(await page.locator("#canvas img").count());
+    const invalid = await page.evaluate(async (url) => {
+      try {
+        await window.desktop.previewApp({
+          url,
+          capture: true,
+          width: 800,
+          height: 600,
+          region: { x: 700, y: 0, width: 200, height: 100 },
+        });
+      } catch (e) {
+        return e.message;
+      }
+    }, `http://127.0.0.1:${source.address().port}`);
+    assert.match(invalid, /region/);
+    console.log(
+      "PASS local capture hierarchy, region clipping, embedded bitmap, border/shadow/type styles, script exclusion and foreign-resource blocking",
+    );
+  } finally {
+    await app.close();
+    await new Promise((r) => source.close(r));
+    await new Promise((r) => foreign.close(r));
+    await fs.rm(dir, { recursive: true, force: true });
+  }
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

@@ -10,21 +10,22 @@ import fs from "node:fs";
 import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { createWebServer } from "../web-start/node/server.mjs";
-import { launchBrowser, signedInContext } from "./helpers/web-app.mjs";
+import { launchBrowser, openStarterFile, signedInContext } from "./helpers/web-app.mjs";
 import { checkWebRouter } from "./helpers/web-router.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const dist = fileURLToPath(new URL("../dist/web-node", import.meta.url));
 if (!fs.existsSync(new URL("../web/dist/ui.js", import.meta.url)))
   execFileSync(process.execPath, ["scripts/build-ui.cjs"], { cwd: root, stdio: "pipe" });
-execFileSync(
-  process.execPath,
-  ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
-  {
-    cwd: root,
-    stdio: "pipe",
-  },
-);
+if (!process.env.TEST_WEB_NODE_BUILT)
+  execFileSync(
+    process.execPath,
+    ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
+    {
+      cwd: root,
+      stdio: "pipe",
+    },
+  );
 
 // The signed-in account (the web app needs one) and the account reads the editor makes, answered
 // like the real backend with an empty workspace.
@@ -144,18 +145,75 @@ try {
   assert.equal(new URL(anonymous.url()).pathname, "/code");
   await anonymous.close();
   // Signed in.
-  const context = await signedInContext(browser, origin, {
-    session: `${"a".repeat(32)}.${"b".repeat(32)}`,
-    account: ACCOUNT,
-  });
+  const context = await signedInContext(
+    browser,
+    origin,
+    {
+      session: `${"a".repeat(32)}.${"b".repeat(32)}`,
+      account: ACCOUNT,
+    },
+    { aiSetupDone: false },
+  );
   const page = await context.newPage();
   page.on("pageerror", (error) => errors.push(error.message));
+  const reads = [];
+  page.on("request", (request) => {
+    if (request.method() === "GET") reads.push(new URL(request.url()).pathname);
+  });
+  const count = (path) => reads.filter((read) => read === path).length;
   await page.goto(origin + "/editor");
   await page.waitForFunction(() => document.documentElement.dataset.legacyEditor === "ready");
   await page.waitForFunction(() => document.documentElement.dataset.uiReady === "true", null, {
     timeout: 20000,
   });
-  assert.equal(await page.evaluate(() => window.shellRouter.state.location.pathname), "/editor");
+  // No file of its own: a fresh profile lands on Files until the user opens or makes one.
+  await page.waitForFunction(() => location.pathname === "/" && !window.fileLibrary.currentId);
+  await page.waitForFunction(() =>
+    window.__bdQueryCache().some(({ key, data }) => key[3] === "rooms" && data),
+  );
+  await page.waitForTimeout(300);
+  assert.equal(count("/api/me"), 1, "auth and onboarding share one /api/me at boot");
+  assert.equal(count("/api/me/rooms"), 1, "Home loads rooms once");
+  assert.equal(count("/api/orgs/org-1/rooms"), 0, "no redundant organization rooms request");
+  assert.equal(count("/api/auth/organization/list"), 1, "one organization list at boot");
+  await openStarterFile(page, { detached: true });
+  await page.evaluate(() => window.fileLibrary.showHome());
+  await page.waitForFunction(() => location.pathname === "/");
+  await page.waitForTimeout(300);
+  // The detached-file helper reloads the entire shell. Warm Home in that new shell,
+  // then opening the existing file and returning must use the same query cache.
+  const roomsAfterCreate = count("/api/me/rooms");
+  const organizationsAfterCreate = count("/api/auth/organization/list");
+  await page.evaluate(() => window.fileLibrary.open(window.fileLibrary.list()[0].id));
+  await page.waitForFunction(() => location.pathname.startsWith("/editor/"));
+  await page.evaluate(() => window.fileLibrary.showHome());
+  await page.waitForFunction(() => location.pathname === "/");
+  await page.waitForTimeout(300);
+  assert.equal(
+    count("/api/me/rooms"),
+    roomsAfterCreate,
+    "quick editor → Home return uses fresh rooms",
+  );
+  assert.equal(
+    count("/api/auth/organization/list"),
+    organizationsAfterCreate,
+    "Home remount uses fresh organizations",
+  );
+  const refreshed = page.waitForResponse(
+    (response) => new URL(response.url()).pathname === "/api/me/rooms",
+  );
+  await page.evaluate(() => window.dispatchEvent(new Event("cloud-files-changed")));
+  await refreshed;
+  assert.equal(
+    count("/api/me/rooms"),
+    roomsAfterCreate + 1,
+    "local mutations invalidate fresh rooms immediately",
+  );
+  await page.evaluate(() => window.fileLibrary.open(window.fileLibrary.list()[0].id));
+  assert.equal(
+    await page.evaluate(() => window.shellRouter.state.location.pathname),
+    await page.evaluate(() => "/editor/" + encodeURIComponent(window.fileLibrary.currentId)),
+  );
   await page.waitForSelector("#canvas .layer");
   const before = await page.locator("#canvas .layer").count();
   await page.locator(".app-menu-trigger:visible").first().click();

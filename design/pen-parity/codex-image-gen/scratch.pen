@@ -1,0 +1,21 @@
+{
+  "version": "2.22",
+  "children": [
+    {
+      "type": "frame",
+      "id": "P1wzP5",
+      "x": 0,
+      "y": 0,
+      "name": "Blue Teapot",
+      "width": 256,
+      "height": 256,
+      "fill": {
+        "type": "image",
+        "enabled": true,
+        "url": "generated.png",
+        "mode": "cover"
+      }
+    }
+  ],
+  "fileToken": "2f190675-595a-4406-9e3b-95b50cebf5da"
+}

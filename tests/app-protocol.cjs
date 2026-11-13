@@ -77,6 +77,15 @@ async function unitChecks() {
     path.resolve("web/index.html"),
     "extensionless paths are client-side routes",
   );
+  // A cloud file's route holds an encoded colon (/editor/room%3A<id>): reloading it must load the app.
+  const roomRoute = "app://verynize/editor/room%3A0b7e4b5e-4f7a-4c55-9a43-7a2d1c3e9f10";
+  assert.equal((await appProtocol.resolveRequest(roomRoute)).file, path.resolve("web/index.html"));
+  assert.equal((await appProtocol.serve(new Request(roomRoute))).status, 200);
+  assert.equal(
+    await status("app://verynize/assets/C%3Afont.woff2"),
+    403,
+    "never a colon in a file",
+  );
   // A symlink inside web/ that points outside it is refused.
   const link = path.resolve("web/zz-app-protocol-test-link.js");
   await fs.symlink(path.resolve("desktop/main.cjs"), link);
@@ -167,13 +176,16 @@ async function appChecks(profile) {
   const app = await launch(profile);
   try {
     const page = await editor(app);
-    assert.equal(page.url(), ENTRY);
+    await page.waitForFunction(() => window.shellRouter?.state.status === "idle");
+    assert.equal(page.url(), "app://verynize/");
     assert.equal(await page.evaluate(() => location.origin), "app://verynize");
     assert.equal(await page.evaluate(() => isSecureContext), true);
+    assert.equal(await page.evaluate(() => document.body.classList.contains("files-view")), true);
     assert.ok(await ipcWorks(page));
     // Client-side routes: path, query and hash do not matter to IPC.
+    // (The router replaces a bare /editor with the active file's URL.)
     await page.evaluate(() => history.pushState({}, "", "/editor"));
-    assert.equal(await page.evaluate(() => location.pathname), "/editor");
+    assert.match(await page.evaluate(() => location.pathname), /^\/editor(\/[^/]+)?$/);
     assert.ok(await ipcWorks(page), "IPC after pushState");
     await page.evaluate(() => history.pushState({}, "", "/settings?tab=agents#advanced"));
     assert.ok(await ipcWorks(page), "IPC with query and hash");
@@ -181,9 +193,22 @@ async function appChecks(profile) {
     await page.evaluate(() => history.pushState({}, "", "/editor"));
     await Promise.all([page.waitForEvent("load"), page.evaluate(() => location.reload())]);
     await page.waitForFunction(() => !!window.desktop);
-    assert.equal(page.url(), "app://verynize/editor");
+    // Bare /editor is replaced with the active file's canonical URL (/editor/<fileId>).
+    await page.waitForFunction(
+      () => location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary?.currentId),
+    );
+    assert.match(page.url(), /^app:\/\/verynize\/editor\/[^/?#]+$/);
     assert.ok(await ipcWorks(page), "IPC after reloading app://verynize/editor");
     assert.ok((await stylesLoaded(page)) >= 10, "stylesheets load from a route URL");
+    // Reloading a cloud file's route (Cmd+R or location.reload()) loads the app, not "Forbidden".
+    const room = "/editor/room%3A0b7e4b5e-4f7a-4c55-9a43-7a2d1c3e9f10";
+    await page.evaluate((route) => history.pushState({}, "", route), room);
+    await Promise.all([page.waitForEvent("load"), page.evaluate(() => location.reload())]);
+    await page.waitForFunction(() => !!window.desktop && document.readyState === "complete");
+    assert.notEqual(await page.evaluate(() => document.body?.innerText.trim()), "Forbidden");
+    assert.ok(await page.evaluate(() => !!window.design), "the editor scripts ran");
+    assert.ok(await ipcWorks(page), "IPC after reloading a cloud file's route");
+    assert.ok((await stylesLoaded(page)) >= 10, "the app loads, not an error page");
     // A nested route loads its root-absolute assets too.
     await Promise.all([
       page.waitForEvent("load"),
@@ -328,7 +353,12 @@ async function migrationChecks(profile) {
   });
   try {
     const page = await editor(again);
-    assert.equal(page.url(), ENTRY, "editor opens without waiting for the downgrade probe");
+    // Plain launches open Home even when a migrated profile has an active file.
+    assert.match(
+      page.url(),
+      /^app:\/\/verynize\/$/,
+      "editor opens without waiting for the downgrade probe",
+    );
     let probe;
     for (let i = 0; i < 400 && !probe; i++) {
       probe = await fs

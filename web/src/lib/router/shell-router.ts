@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { useLayoutEffect } from "react";
 import {
   createBrowserHistory,
@@ -16,14 +17,14 @@ import "@/lib/bridge";
 
 // Shell routes (docs/spikes/tanstack-router.md). The URL is the single source of truth for the top-level shell:
 //   /                    Files home      body.files-view
-//   /editor              editor          (no view class)
+//   /editor/<fileId>      editor (stable library id; /editor replaces to the active file)
 //   /code                Code workspace  body.code-mode
 //   /settings[/section]  settings overlay (body.settings-open) over the view named in history state
 // Legacy entry points (fileLibrary.showHome/showEditor, appSettings.open/close/select, agentWorkspace.setCodeMode)
 // are requests: they call request() (via window.shellRequest, web/shell-request.js), which writes history and applies
 // the resulting shell. Router-driven changes (navigate(), Back/Forward, reload, typed URLs) are applied by the route
 // components. Both apply through applyShell(), which calls the legacy appliers (applyHome/applyEditor,
-// applyOpen/applyClose, applyCodeMode) and nothing else.
+// applyOpen/applyClose, applyCodeMode). File locations open through fileLibrary.open and the switch coordinator.
 // Cloud fragments (#room=<id>&token=<capability>, #public=<id>) are never routes and never move into
 // the query string: every shell navigation keeps them unless clearRoomHash() drops them.
 //
@@ -38,7 +39,7 @@ import "@/lib/bridge";
 //   settings history (the view underneath, closing via history.back()), canonical settings URLs and the cloud
 //   fragment rules are the same.
 
-export type ViewPath = "/" | "/editor" | "/code";
+export type ViewPath = "/" | "/editor" | `/editor/${string}` | "/code";
 type Shell = { view: ViewPath; settings: SectionId | null };
 type EntryState = { settingsUnder?: ViewPath; settingsPushed?: boolean; __TSR_key?: string };
 export type ShellRequest = { view: ViewPath } | { settings: string | null };
@@ -46,7 +47,8 @@ export type ShellRequest = { view: ViewPath } | { settings: string | null };
 const DEFAULT_SECTION = DEFAULT_SETTINGS_SECTION;
 const isSection = isSettingsSection;
 const VIEWS: readonly string[] = ["/", "/editor", "/code"];
-const isView = (value: unknown): value is ViewPath => VIEWS.includes(value as string);
+const isView = (value: unknown): value is ViewPath =>
+  typeof value === "string" && (VIEWS.includes(value) || /^\/editor\/[^/]+$/.test(value));
 const isSettingsPath = (path: string) => path === "/settings" || path.startsWith("/settings/");
 
 const host = shellHost();
@@ -56,7 +58,27 @@ export { hosted };
 /* ---------- Legacy appliers (DOM + body classes only; they never touch history) ---------- */
 
 type LegacyShell = {
-  fileLibrary?: { applyHome?(): void; applyEditor?(): void };
+  switchCoordinator?: {
+    getState(): {
+      token: number;
+      kind: string;
+      phase: string;
+      room?: string | null;
+      to: { fileKey: string | null };
+    } | null;
+    cancel(token: number): void;
+  };
+  fileLibrary?: {
+    applyHome?(): void;
+    applyEditor?(): void;
+    currentId: string | null;
+    ready?(): Promise<void>;
+    isReady?(): boolean;
+    summaries(): { id: string }[];
+    cloudOf(id: string): { roomId: string } | null;
+    subscribe(fn: () => void): () => void;
+    open(id: string, options?: { isCurrent(): boolean }): Promise<unknown>;
+  };
   appSettings?: {
     applyOpen?(section: string): void;
     applyClose?(): void;
@@ -71,7 +93,11 @@ const body = () => document.body.classList;
 function shown(): Shell {
   const section = legacy().appSettings?.getState().section;
   return {
-    view: body().contains("code-mode") ? "/code" : body().contains("files-view") ? "/" : "/editor",
+    view: body().contains("code-mode")
+      ? "/code"
+      : body().contains("files-view")
+        ? "/"
+        : editorPath(),
     settings: body().contains("settings-open")
       ? isSection(section)
         ? section
@@ -79,6 +105,10 @@ function shown(): Shell {
       : null,
   };
 }
+const editorPath = (): ViewPath => {
+  const id = legacy().fileLibrary?.currentId;
+  return id ? `/editor/${encodeURIComponent(id)}` : "/";
+};
 const same = (a: Shell, b: Shell) => a.view === b.view && a.settings === b.settings;
 
 function applyShell(next: Shell) {
@@ -144,10 +174,20 @@ if (!host && !fileProtocol && location.pathname === "/index.html") {
 }
 // The entry's own state, before createBrowserHistory gives a state-less entry a fresh key.
 const rawStartState = (host ? host.initialState : window.history.state) as EntryState | null;
+// Before the file library has loaded (IndexedDB, asynchronously) the shown editor has no file id yet: a file launch
+// starts on the bare editor, which restoreFile settles to the file's URL (or Files) once the library is ready.
+function fileStartView(): ViewPath {
+  const { view } = shown();
+  return view === "/" &&
+    !body().contains("files-view") &&
+    legacy().fileLibrary?.isReady?.() === false
+    ? "/editor"
+    : view;
+}
 const history: RouterHistory = host
   ? host.router.history
   : fileProtocol
-    ? createMemoryHistory({ initialEntries: [shown().view] })
+    ? createMemoryHistory({ initialEntries: [fileStartView()] })
     : createBrowserHistory();
 // Memory history never owns the address bar, so the real fragment is already untouched there.
 const dropFragment = fileProtocol
@@ -168,6 +208,9 @@ export function clearRoomHash(roomId?: string) {
 /* ---------- History ---------- */
 
 const entryState = () => history.location.state as EntryState;
+// The entry the page was loaded on: its key and the path it was loaded at. Set at startup (below), and moved to the
+// replacement when a bare /editor launch is replaced with the active file's URL.
+const launch: { key?: string; path?: string } = {};
 const settingsStateOf = ({ settingsUnder, settingsPushed }: EntryState): EntryState => ({
   ...(settingsUnder ? { settingsUnder } : {}),
   ...(settingsPushed ? { settingsPushed } : {}),
@@ -274,7 +317,8 @@ history.subscribe(({ location }) => {
 });
 
 function resolve(from: Shell, target: ShellRequest): Shell {
-  if ("view" in target) return { view: target.view, settings: null };
+  if ("view" in target)
+    return { view: target.view === "/editor" ? editorPath() : target.view, settings: null };
   if (target.settings === null) return { view: from.view, settings: null };
   return {
     view: from.view,
@@ -291,12 +335,23 @@ function resolve(from: Shell, target: ShellRequest): Shell {
  *   {settings: null}  close settings
  */
 export function request(target: ShellRequest, { replace = false }: { replace?: boolean } = {}) {
+  if (
+    openingFile &&
+    openingFile.location === fileLocation() &&
+    legacy().fileLibrary?.currentId === openingFile.id &&
+    "view" in target &&
+    target.view.startsWith("/editor")
+  )
+    return true;
   const from = logical();
   const next = resolve(from, target);
+  // Settings requests keep the view underneath, and a bare "/editor" (show the editor) names no other file, so
+  // neither cancels a file load in progress.
+  if ("view" in target && target.view !== "/editor") cancelDepartedFile(next.view);
   applyShell(next);
   if (same(from, next)) return true;
   if (closing) closing.desired = next;
-  else transition(from, next, replace);
+  else transition(from, next, replace || isRoomAlias(from.view, next.view));
   return true;
 }
 
@@ -305,9 +360,7 @@ export function request(target: ShellRequest, { replace = false }: { replace?: b
  * history state: not a reload or Back/Forward).
  */
 export const isLaunchEntry = (path: ViewPath) =>
-  !rawStartState?.__TSR_key &&
-  entryState().__TSR_key === launchKey &&
-  history.location.pathname === path;
+  !rawStartState?.__TSR_key && entryState().__TSR_key === launch.key && launch.path === path;
 
 /* ---------- Route components: URL → shell ---------- */
 
@@ -326,7 +379,11 @@ history.subscribe(({ location, action }) => {
 export type ShellArea = ViewPath | "/settings";
 type RenderedLocation = { pathname: string; state: unknown };
 const ownsPath = (area: ShellArea, path: string) =>
-  area === "/settings" ? isSettingsPath(path) : path === area;
+  area === "/settings"
+    ? isSettingsPath(path)
+    : area === "/editor"
+      ? path === "/editor" || path.startsWith("/editor/")
+      : path === area;
 
 /**
  * Applies a location rendered by the route of `area` (this module's route components standalone, Start's route
@@ -338,8 +395,132 @@ export function applyLocation(area: ShellArea, location: RenderedLocation) {
   const key = (location.state as EntryState).__TSR_key;
   if (closing || key !== entryState().__TSR_key || !ownsPath(area, location.pathname)) return false;
   if (area === "/settings") applySettingsLocation(location);
-  else applyShell({ view: area, settings: null });
+  else {
+    const view = location.pathname as ViewPath;
+    // Only a location reached after the switch began departs from it (Back/Forward, a navigation); the entry the
+    // switch started on renders late and must not cancel it.
+    if (key !== switchBeganAt) cancelDepartedFile(view);
+    applyShell({ view, settings: null });
+    restoreFile(view);
+  }
   return true;
+}
+
+// Route opens retain their history entry, including settingsUnder. A later location invalidates
+// a pending open; the library/coordinator checks isCurrent before committing the document.
+const fileLocation = () => history.location.pathname + "|" + (entryState().settingsUnder ?? "");
+let openingFile: { location: string; id: string } | null = null;
+const idOf = (view: string) => {
+  if (!view.startsWith("/editor/")) return "";
+  try {
+    return decodeURIComponent(view.slice(8));
+  } catch {
+    return "";
+  }
+};
+/** `from` names a cloud room by its id and `to` is that room's library file: the same file under its canonical URL. */
+function isRoomAlias(from: ViewPath, to: ViewPath) {
+  const room = idOf(from);
+  const id = idOf(to);
+  return !!room && !!id && room !== id && legacy().fileLibrary?.cloudOf(id)?.roomId === room;
+}
+/** The file switch in progress (begin/ready), if any. */
+function switching() {
+  const state = legacy().switchCoordinator?.getState();
+  return state?.kind === "file" && ["begin", "ready"].includes(state.phase) ? state : null;
+}
+/** Whether `id` (a library file id or a room id) is where the switch in progress is going. */
+function isSwitchTarget(state: NonNullable<ReturnType<typeof switching>>, id: string) {
+  if (!id) return false;
+  if (state.to.fileKey === id) return true;
+  if (!state.room) return false;
+  return state.room === id || legacy().fileLibrary?.cloudOf(id)?.roomId === state.room;
+}
+// The history entry current when the latest switch began.
+let switchBeganAt: string | undefined;
+window.addEventListener("switch-loading-change", (event) => {
+  if ((event as CustomEvent<{ phase?: string }>).detail?.phase === "begin")
+    switchBeganAt = entryState().__TSR_key;
+});
+function cancelDepartedFile(view: ViewPath) {
+  const coordinator = legacy().switchCoordinator;
+  const state = coordinator?.getState();
+  if (state?.kind !== "file" || (!state.to.fileKey && !state.room)) return;
+  if (!isSwitchTarget(state, idOf(view))) coordinator?.cancel(state.token);
+}
+
+function restoreFile(view: ViewPath) {
+  if (!view.startsWith("/editor")) return;
+  const lib = legacy().fileLibrary;
+  if (!lib) return;
+  if (lib.isReady?.() === false) {
+    void lib.ready?.().then(() => {
+      if (logical().view === view) restoreFile(view);
+    });
+    return;
+  }
+  if (view === "/editor") {
+    const path = editorPath();
+    if (isSettingsPath(history.location.pathname))
+      commit(history.location.pathname, "replace", {
+        ...settingsStateOf(entryState()),
+        settingsUnder: path,
+      });
+    else {
+      // Keep the launch entry identity under its canonical file URL.
+      const wasLaunch = isLaunchEntry("/editor");
+      commit(path, "replace");
+      if (wasLaunch) launch.key = entryState().__TSR_key;
+    }
+    return;
+  }
+  let id = "";
+  try {
+    id = decodeURIComponent(view.slice(8));
+  } catch {}
+  const files = lib.summaries();
+  const file =
+    files.find((file) => file.id === id) ??
+    files.find((file) => lib.cloudOf(file.id)?.roomId === id);
+  const fail = (message: string) => {
+    commit("/", "replace");
+    applyShell({ view: "/", settings: null });
+    toast.error(message);
+  };
+  if (!file) {
+    // A room opened from Files or a link shows its URL before its library file exists.
+    const inProgress = switching();
+    if (inProgress && isSwitchTarget(inProgress, id)) return;
+    fail("This file is unavailable. Choose a file from Files.");
+    return;
+  }
+  const canonical: ViewPath = `/editor/${encodeURIComponent(file.id)}`;
+  if (canonical !== view) {
+    if (isSettingsPath(history.location.pathname))
+      commit(history.location.pathname, "replace", {
+        ...settingsStateOf(entryState()),
+        settingsUnder: canonical,
+      });
+    else commit(canonical, "replace");
+    return;
+  }
+  // Home clicks and room links already started this load before the destination route rendered.
+  const inProgress = switching();
+  if (inProgress && isSwitchTarget(inProgress, file.id)) return;
+  if (file.id === lib.currentId) return;
+  const location = fileLocation();
+  if (openingFile?.id === file.id && openingFile.location === location) return;
+  const pending = { location, id: file.id };
+  openingFile = pending;
+  const isCurrent = () => fileLocation() === location && openingFile === pending;
+  void lib
+    .open(file.id, { isCurrent })
+    .catch((error: unknown) => {
+      if (isCurrent()) fail(error instanceof Error ? error.message : "Unable to open this file.");
+    })
+    .finally(() => {
+      if (openingFile === pending) openingFile = null;
+    });
 }
 
 /** Applies the current history entry (hosted: Start's routes rendered it before this bundle ran). */
@@ -370,17 +551,22 @@ function applySettingsLocation(location: RenderedLocation) {
   // A reloaded or Back/Forward-reached settings entry restores the view it was opened over. Without state: a push
   // from a view entry opens over that view; a typed/shared URL over the shown view (the editor, the legacy startup
   // view, on a fresh load).
+  // Preserve the pending editor view while IndexedDB hydrates, just as a bare /editor launch does.
+  // An absent currentId before hydration does not mean this settings entry was opened over Files.
   let record: EntryState | null = null;
   if (!isView(state.settingsUnder))
     record =
       lastAction === "PUSH" && isView(fromPath)
         ? { settingsUnder: fromPath, settingsPushed: true }
-        : { settingsUnder: shown().view };
+        : { settingsUnder: fileStartView() };
   const view = record?.settingsUnder ?? state.settingsUnder ?? "/editor";
   applyShell({ view, settings: wanted });
   // Canonical URL (/settings and unknown sections become /settings/<section>) and recorded state, both in place.
-  if (record || location.pathname !== `/settings/${wanted}`)
+  if (record || location.pathname !== `/settings/${wanted}`) {
     commit(`/settings/${wanted}`, "replace", { ...settingsStateOf(state), ...record });
+    return;
+  }
+  restoreFile(view);
 }
 
 // The standalone route tree. Hosted, Start's file routes (web-start/src/routes/_editor/) have the same paths and
@@ -393,6 +579,7 @@ function createShellRouter() {
     routeTree: root.addChildren([
       route("/", "/"),
       route("/editor", "/editor"),
+      route("/editor/$fileId", "/editor"),
       route("/code", "/code"),
       route("/settings", "/settings"),
       route("/settings/$section", "/settings"),
@@ -408,7 +595,8 @@ export type ShellRouter = ReturnType<typeof createShellRouter>;
 
 /* ---------- Startup ---------- */
 
-const launchKey = entryState().__TSR_key;
+launch.key = entryState().__TSR_key;
+launch.path = history.location.pathname;
 
 // A reload while settings was closing (history.back() not landed yet) comes back closed, on the view underneath.
 // Chromium can drop the entry's state when a reload cancels the traversal, so a state-less entry on the same path
@@ -465,3 +653,24 @@ declare global {
 }
 window.shellRouter = shellRouter;
 window.shellNavigation = { navigate, request, clearRoomHash, applyLocation };
+
+// Library removals (including account/cloud refreshes) must not leave an orphan editor URL.
+legacy().fileLibrary?.subscribe(() => {
+  queueMicrotask(() => {
+    if (isSettingsPath(history.location.pathname)) return;
+    const view = logical().view;
+    if (!view.startsWith("/editor/") || openingFile) return;
+    let id: string;
+    try {
+      id = decodeURIComponent(view.slice(8));
+    } catch {
+      return;
+    }
+    if (
+      !legacy()
+        .fileLibrary?.summaries()
+        .some((file) => file.id === id)
+    )
+      restoreFile(view);
+  });
+});

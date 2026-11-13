@@ -37,6 +37,7 @@ Tools: `get_design_context`, `get_artboards`, `get_element_tree`, `get_element_c
 - **Token names.** Tokens map onto the existing hex color variables. A name such as `color/text/primary` becomes `var(--color-text-primary)`.
 
 Document files end in `.verynize.json` and share the editor's version 2 schema: `{version:2,name,pages:[{id,name,nodes}],tokens:{}}`. Nodes reference parent frames using `parentId`. Validation and file safety:
+
 - Hierarchy cycles, duplicate IDs, invalid geometry and missing parents are rejected.
 - Deleting a frame deletes its descendants.
 - Lock files serialize writers. Writes go to a temporary file and are then renamed into place.
@@ -59,13 +60,18 @@ The token changes each launch. To avoid copying it each time, configure the stdi
   "mcpServers": {
     "verynize": {
       "command": "node",
-      "args": ["/absolute/path/to/verynize/integrations/mcp-server.mjs", "--root", "/absolute/path/to/designs"]
+      "args": [
+        "/absolute/path/to/verynize/integrations/mcp-server.mjs",
+        "--root",
+        "/absolute/path/to/designs"
+      ]
     }
   }
 }
 ```
 
 Flags:
+
 - `--no-bridge` forces file mode.
 - `--bridge-file FILE` (or `$VERYNIZE_MCP_FILE`) points at a different bridge file.
 - `VERYNIZE_DISABLE_MCP=1` stops the app from starting the bridge.

@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { platform } from "@/lib/platform";
 import { queryClient } from "@/lib/query/client";
+import { textOf } from "@/lib/utils";
 import {
   accountScope,
   queryKeys,
@@ -105,7 +106,7 @@ const metadataOf = (org: Pick<Organization, "metadata">): Record<string, unknown
   if (org.metadata && typeof org.metadata === "object")
     return org.metadata as Record<string, unknown>;
   try {
-    return JSON.parse(String(org.metadata || "null")) || {};
+    return JSON.parse(textOf(org.metadata || "null")) || {};
   } catch {
     return {};
   }
@@ -143,6 +144,8 @@ const byPersonalThenName = (a: Organization, b: Organization) =>
 export const organizationsQuery = (scope: AccountScope) =>
   queryOptions({
     queryKey: queryKeys.organizations(scope),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
     queryFn: async () =>
       (await scopedRequest<Organization[]>(scope, "/api/auth/organization/list")).sort(
         byPersonalThenName,
@@ -177,11 +180,15 @@ export function reloadOrganizations(): Promise<void> {
   if (!scope) return Promise.resolve();
   // refetchType "all": also refresh the list when no island shows it right now, so a reader that
   // mounts next (e.g. after switching to a just-created workspace) finds it current.
-  return queryClient.invalidateQueries({
-    queryKey: queryKeys.organizations(scope),
-    exact: true,
-    refetchType: "all",
-  });
+  return Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.organizations(scope),
+      exact: true,
+      refetchType: "all",
+    }),
+    // Joining/leaving a workspace or changing its member roles also changes room access.
+    queryClient.invalidateQueries({ queryKey: queryKeys.rooms(scope) }),
+  ]).then(() => {});
 }
 const NO_ORGANIZATIONS: Organization[] = [];
 /** The organizations of the signed-in email account, personal first; refreshes on changes. */
@@ -200,7 +207,9 @@ export const organizationsChanged = () => reloadOrganizations();
 export function openSignIn() {
   if (platform.kind === "desktop") window.dispatchEvent(new Event("bd:open-onboarding"));
   else {
-    (window as unknown as { cloudWorkspace?: { openDialog?(): void } }).cloudWorkspace?.openDialog?.();
+    (
+      window as unknown as { cloudWorkspace?: { openDialog?(): void } }
+    ).cloudWorkspace?.openDialog?.();
     const section = document.getElementById("cloud-account-section") as HTMLDetailsElement | null;
     if (section) section.open = true;
   }

@@ -1,0 +1,530 @@
+{
+  "window_ms": 10681,
+  "writes_blocked": 0,
+  "events": [
+    {
+      "t_ms": 30,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 31,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 1088,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 1089,
+      "event": "focus",
+      "hidden": false
+    },
+    {
+      "t_ms": 2153,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 2153,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 3228,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 3228,
+      "event": "focus",
+      "hidden": false
+    },
+    {
+      "t_ms": 4291,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 4292,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 5358,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 5359,
+      "event": "focus",
+      "hidden": false
+    },
+    {
+      "t_ms": 6413,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 6413,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 7477,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 7477,
+      "event": "focus",
+      "hidden": false
+    },
+    {
+      "t_ms": 8543,
+      "event": "blur",
+      "hidden": false
+    },
+    {
+      "t_ms": 8543,
+      "event": "visibilitychange",
+      "hidden": true
+    },
+    {
+      "t_ms": 9612,
+      "event": "visibilitychange",
+      "hidden": false
+    },
+    {
+      "t_ms": 9612,
+      "event": "focus",
+      "hidden": false
+    }
+  ],
+  "requests": [
+    {
+      "t_ms": 1088,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 151,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 1089,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 151,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 1089,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 360,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 3228,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 593,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 3228,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 129,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 3228,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 258,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 5358,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 109,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 5359,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 479,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 5359,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 779,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 7477,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 131,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 7477,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 124,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 7477,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 200,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 9612,
+      "method": "GET",
+      "path": "/api/orgs/<org>/rooms",
+      "status": 200,
+      "dur_ms": 156,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 9612,
+      "method": "GET",
+      "path": "/api/me/rooms",
+      "status": 200,
+      "dur_ms": 125,
+      "hidden": false,
+      "hasFocus": false,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    },
+    {
+      "t_ms": 9613,
+      "method": "GET",
+      "path": "/api/me/state",
+      "status": 200,
+      "dur_ms": 212,
+      "hidden": false,
+      "hasFocus": true,
+      "headers": {
+        "cache-control": "no-store",
+        "etag": null,
+        "last-modified": null,
+        "content-encoding": "zstd",
+        "content-type": "application/json",
+        "vary": null
+      }
+    }
+  ],
+  "resource_timing": [
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 150,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 1089
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 152,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 1089
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 561,
+      "transfer": 556154,
+      "enc": 555854,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 1089
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 594,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 3228
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 128,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 3228
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 453,
+      "transfer": 556152,
+      "enc": 555852,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 3229
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 109,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 5358
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 479,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 5359
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 968,
+      "transfer": 556086,
+      "enc": 555786,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 5359
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 130,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 7477
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 123,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 7477
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 373,
+      "transfer": 556154,
+      "enc": 555854,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 7477
+    },
+    {
+      "path": "/api/orgs/<org>/rooms",
+      "dur": 156,
+      "transfer": 1002,
+      "enc": 702,
+      "dec": 1846,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 9612
+    },
+    {
+      "path": "/api/me/rooms",
+      "dur": 125,
+      "transfer": 1038,
+      "enc": 738,
+      "dec": 3016,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 9612
+    },
+    {
+      "path": "/api/me/state",
+      "dur": 392,
+      "transfer": 556154,
+      "enc": 555854,
+      "dec": 4084341,
+      "status": 200,
+      "init": "fetch",
+      "proto": "h2",
+      "t_ms": 9613
+    }
+  ]
+}

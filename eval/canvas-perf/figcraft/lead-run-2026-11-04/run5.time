@@ -1,0 +1,22 @@
+measuring 1000 layers…
+measuring 10000 layers…
+measuring 50000 layers…
+measuring 100000 layers…
+        8.49 real        12.62 user         1.22 sys
+          1192247296  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              191219  page reclaims
+                  15  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                   1  voluntary context switches
+               80194  involuntary context switches
+        107597752110  instructions retired
+         39626388303  cycles elapsed
+          1392969456  peak memory footprint

@@ -1,0 +1,2210 @@
+{
+  "gesturer": "web",
+  "remote": "desktop",
+  "room": "AUDIT collab test (delete me)",
+  "ids": {
+    "A": "aba8ea10-5f73-4595-b6da-cc056e35f247",
+    "B": "24577de7-e37d-4e14-bfe5-d5fc18739e80",
+    "R": "5fac1410-9fed-4853-998b-9c1920b8d5af",
+    "T": "6395abfb-4a3e-42d4-89cc-53302d695e1d"
+  },
+  "startedAt": "2026-11-08T23:14:43.536Z",
+  "trials": [
+    {
+      "scenario": "drag",
+      "withRemote": false,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "hold": {
+        "heldMs": 0
+      },
+      "remoteEdit": null,
+      "upAtMs": 1614,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1614,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 1986,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1614,
+      "moveSamples": [
+        {
+          "t": 15,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 98,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 181,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 265,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 348,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 431,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 515,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 599,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 681,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 765,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 848,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 931,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1015,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1098,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1183,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1266,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1348,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1433,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1516,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 613,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Saved shared revision 137",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "remoteClientAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "serverAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "moved": false,
+      "matchesExpected": false,
+      "preUp": {
+        "layer": [481, 240],
+        "dragging": false
+      },
+      "hold": {
+        "heldMs": 2017,
+        "seenBeforeRelease": true
+      },
+      "remoteEdit": {
+        "color": "#c0392b",
+        "atMsAfterDown": 465,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 3633,
+      "allSetDocuments": [
+        {
+          "atMs": 3083,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 3047,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 3083,
+          "ms": 1,
+          "B": "#c0392b"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3633,
+      "moveSamples": [
+        {
+          "t": 18,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 101,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 185,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 268,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 351,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 435,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 518,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 601,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 684,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 768,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 852,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 935,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1018,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1102,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1185,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1268,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1351,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1435,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1518,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1601,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1685,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1768,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1851,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1935,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2018,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2101,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2185,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2267,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2351,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2435,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2518,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2601,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2685,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2768,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2851,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2935,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3018,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3119,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3201,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3285,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3368,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3451,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3535,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        }
+      ],
+      "remoteClientSetDocuments": [],
+      "status": "Synced revision 139",
+      "shot": "screens/gesture-drag-web-after.png"
+    },
+    {
+      "scenario": "drag",
+      "withRemote": false,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "remoteClientAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "serverAfter": {
+        "x": -1990,
+        "y": -1333
+      },
+      "moved": true,
+      "matchesExpected": true,
+      "preUp": {
+        "layer": [291, 107],
+        "dragging": true
+      },
+      "hold": {
+        "heldMs": 0
+      },
+      "remoteEdit": null,
+      "upAtMs": 1599,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1596,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 369
+        },
+        {
+          "dir": "recv",
+          "atMs": 1888,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 438
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1599,
+      "moveSamples": [
+        {
+          "t": 2,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 85,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 168,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 252,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 334,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 418,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 502,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 585,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 668,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 752,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 835,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 918,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1002,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1085,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1168,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1252,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1334,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1418,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1502,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        }
+      ],
+      "remoteClientSetDocuments": [
+        {
+          "afterUpMs": 767,
+          "A": {
+            "x": -1990,
+            "y": -1333
+          }
+        }
+      ],
+      "status": "Saved shared revision 140",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "remoteClientAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "serverAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "moved": false,
+      "matchesExpected": false,
+      "preUp": {
+        "layer": [480, 240],
+        "dragging": false
+      },
+      "hold": {
+        "heldMs": 2330,
+        "seenBeforeRelease": true
+      },
+      "remoteEdit": {
+        "color": "#27ae60",
+        "atMsAfterDown": 468,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 3964,
+      "allSetDocuments": [
+        {
+          "atMs": 3318,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 3280,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 3318,
+          "ms": 1,
+          "B": "#27ae60"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3964,
+      "moveSamples": [
+        {
+          "t": 16,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 99,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 183,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 266,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 349,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 433,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 516,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 600,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 683,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 766,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 850,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 933,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1016,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1100,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1182,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1266,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1349,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1433,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1516,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1616,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1699,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1783,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1866,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1949,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2033,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2116,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2199,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2283,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2366,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2450,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2533,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2616,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2699,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2783,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2866,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2949,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3036,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3116,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3199,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3282,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3366,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3449,
+          "layer": [480, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3532,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3616,
+          "layer": [480, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3699,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3782,
+          "layer": [480, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3865,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        }
+      ],
+      "remoteClientSetDocuments": [],
+      "status": "Synced revision 142",
+      "shot": null
+    },
+    {
+      "scenario": "drag",
+      "withRemote": true,
+      "before": {
+        "x": -1800,
+        "y": -1200,
+        "w": 120,
+        "h": 80,
+        "color": "#97c3b1",
+        "text": ""
+      },
+      "expected": {
+        "x": -1990,
+        "y": -1333
+      },
+      "gesturerAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "remoteClientAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "serverAfter": {
+        "x": -1800,
+        "y": -1200
+      },
+      "moved": false,
+      "matchesExpected": false,
+      "preUp": {
+        "layer": [481, 240],
+        "dragging": false
+      },
+      "hold": {
+        "heldMs": 1857,
+        "seenBeforeRelease": true
+      },
+      "remoteEdit": {
+        "color": "#2980b9",
+        "atMsAfterDown": 559,
+        "seenOnGesturer": true
+      },
+      "upAtMs": 3747,
+      "allSetDocuments": [
+        {
+          "atMs": 3217,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 3180,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 3217,
+          "ms": 1,
+          "B": "#2980b9"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3747,
+      "moveSamples": [
+        {
+          "t": 19,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 102,
+          "layer": [471, 233, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 185,
+          "layer": [461, 226, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 268,
+          "layer": [451, 219, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 352,
+          "layer": [441, 212, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 435,
+          "layer": [431, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 518,
+          "layer": [421, 200, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 601,
+          "layer": [411, 191, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 702,
+          "layer": [401, 184, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 851,
+          "layer": [391, 177, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 968,
+          "layer": [381, 170, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1051,
+          "layer": [371, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1152,
+          "layer": [361, 160, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1235,
+          "layer": [351, 149, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1318,
+          "layer": [341, 142, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1402,
+          "layer": [331, 135, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1485,
+          "layer": [321, 128, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1568,
+          "layer": [311, 121, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1651,
+          "layer": [301, 114, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1885,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 1968,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2051,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2135,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2218,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2301,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2384,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2485,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2568,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2651,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2735,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2817,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2902,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 2985,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3068,
+          "layer": [291, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3152,
+          "layer": [292, 107, 120, 80],
+          "dragging": true
+        },
+        {
+          "t": 3235,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3318,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3401,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3485,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3568,
+          "layer": [481, 240, 120, 80],
+          "dragging": false
+        },
+        {
+          "t": 3652,
+          "layer": [482, 240, 120, 80],
+          "dragging": false
+        }
+      ],
+      "remoteClientSetDocuments": [],
+      "status": "Synced revision 143",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": false,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": null,
+      "hold": {
+        "heldMs": 0
+      },
+      "upAtMs": 1591,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1588,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 1949,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1591,
+      "moveSamples": [
+        {
+          "t": 49,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 132,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 216,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 298,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 381,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 465,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 549,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 632,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 715,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 799,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 882,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 965,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1049,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1132,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1216,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1299,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1382,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1466,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1549,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Saved shared revision 144",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "serverAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "resized": false,
+      "matchesExpected": false,
+      "remoteEdit": {
+        "color": "#8e44ad",
+        "atMsAfterDown": 474
+      },
+      "hold": {
+        "heldMs": 2040,
+        "seenBeforeRelease": true
+      },
+      "upAtMs": 3669,
+      "allSetDocuments": [
+        {
+          "atMs": 3143,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 3105,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 3143,
+          "ms": 1,
+          "B": "#8e44ad"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3669,
+      "moveSamples": [
+        {
+          "t": 19,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 102,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 185,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 269,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 352,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 435,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 519,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 602,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 685,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 769,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 852,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 935,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1019,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1102,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1185,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1269,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1352,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1435,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1519,
+          "layer": [481, 440, 228, 152]
+        },
+        {
+          "t": 1652,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1761,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 1852,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1935,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2019,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2102,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2185,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2269,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2352,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2435,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2519,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2602,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2685,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2769,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2852,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2935,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 3019,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 3102,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 3185,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3269,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3352,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3435,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3519,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3601,
+          "layer": [481, 440, 120, 80]
+        }
+      ],
+      "status": "Synced revision 146",
+      "shot": "screens/gesture-resize-web-after.png"
+    },
+    {
+      "scenario": "resize",
+      "withRemote": false,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 234,
+        "h": 156,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "serverAfter": {
+        "w": 234,
+        "h": 156
+      },
+      "resized": true,
+      "matchesExpected": true,
+      "remoteEdit": null,
+      "hold": {
+        "heldMs": 0
+      },
+      "upAtMs": 1614,
+      "allSetDocuments": [],
+      "gesturerWsFrames": [
+        {
+          "dir": "sent",
+          "atMs": 1605,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 365
+        },
+        {
+          "dir": "recv",
+          "atMs": 2004,
+          "type": "ops",
+          "ops": 2,
+          "bytes": 434
+        }
+      ],
+      "setDocumentDuringGesture": [],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 1614,
+      "moveSamples": [
+        {
+          "t": 19,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 118,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 201,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 286,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 369,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 452,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 534,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 619,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 701,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 786,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 867,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 951,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1036,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1118,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1202,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1286,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1369,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1451,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1536,
+          "layer": [481, 440, 228, 152]
+        }
+      ],
+      "status": "Saved shared revision 147",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "serverAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "resized": false,
+      "matchesExpected": false,
+      "remoteEdit": {
+        "color": "#d35400",
+        "atMsAfterDown": 470
+      },
+      "hold": {
+        "heldMs": 1866,
+        "seenBeforeRelease": true
+      },
+      "upAtMs": 3473,
+      "allSetDocuments": [
+        {
+          "atMs": 2907,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 2867,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 2907,
+          "ms": 1,
+          "B": "#d35400"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3473,
+      "moveSamples": [
+        {
+          "t": 20,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 119,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 203,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 287,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 370,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 453,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 536,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 620,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 704,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 786,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 870,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 952,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1036,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1120,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1202,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1287,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1370,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1453,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1536,
+          "layer": [481, 440, 228, 152]
+        },
+        {
+          "t": 1620,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1703,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 1787,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1869,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 1953,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2036,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2153,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2235,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2320,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2403,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2487,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2570,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2653,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2737,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2819,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2903,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2987,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3069,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3153,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3237,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3320,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3403,
+          "layer": [481, 440, 120, 80]
+        }
+      ],
+      "status": "Synced revision 149",
+      "shot": null
+    },
+    {
+      "scenario": "resize",
+      "withRemote": true,
+      "before": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "expected": {
+        "w": 234,
+        "h": 156
+      },
+      "gesturerAfter": {
+        "w": 120,
+        "h": 80,
+        "x": -1800,
+        "y": -1000
+      },
+      "remoteClientAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "serverAfter": {
+        "w": 120,
+        "h": 80
+      },
+      "resized": false,
+      "matchesExpected": false,
+      "remoteEdit": {
+        "color": "#16a085",
+        "atMsAfterDown": 579
+      },
+      "hold": {
+        "heldMs": 2175,
+        "seenBeforeRelease": true
+      },
+      "upAtMs": 3874,
+      "allSetDocuments": [
+        {
+          "atMs": 3360,
+          "ms": 1
+        }
+      ],
+      "gesturerWsFrames": [
+        {
+          "dir": "recv",
+          "atMs": 3319,
+          "type": "ops",
+          "ops": 1,
+          "bytes": 278
+        }
+      ],
+      "setDocumentDuringGesture": [
+        {
+          "atMs": 3360,
+          "ms": 1,
+          "B": "#16a085"
+        }
+      ],
+      "setDocumentAfterRelease": [],
+      "gestureMs": 3874,
+      "moveSamples": [
+        {
+          "t": 27,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 111,
+          "layer": [481, 440, 126, 84]
+        },
+        {
+          "t": 193,
+          "layer": [481, 440, 132, 88]
+        },
+        {
+          "t": 278,
+          "layer": [481, 440, 138, 92]
+        },
+        {
+          "t": 361,
+          "layer": [481, 440, 144, 96]
+        },
+        {
+          "t": 444,
+          "layer": [481, 440, 150, 100]
+        },
+        {
+          "t": 527,
+          "layer": [481, 440, 156, 104]
+        },
+        {
+          "t": 610,
+          "layer": [481, 440, 162, 108]
+        },
+        {
+          "t": 694,
+          "layer": [481, 440, 168, 112]
+        },
+        {
+          "t": 778,
+          "layer": [481, 440, 174, 116]
+        },
+        {
+          "t": 860,
+          "layer": [481, 440, 180, 120]
+        },
+        {
+          "t": 944,
+          "layer": [481, 440, 186, 124]
+        },
+        {
+          "t": 1028,
+          "layer": [481, 440, 192, 128]
+        },
+        {
+          "t": 1111,
+          "layer": [481, 440, 198, 132]
+        },
+        {
+          "t": 1194,
+          "layer": [481, 440, 204, 136]
+        },
+        {
+          "t": 1278,
+          "layer": [481, 440, 210, 140]
+        },
+        {
+          "t": 1361,
+          "layer": [481, 440, 216, 144]
+        },
+        {
+          "t": 1444,
+          "layer": [481, 440, 222, 148]
+        },
+        {
+          "t": 1527,
+          "layer": [481, 440, 228, 152]
+        },
+        {
+          "t": 1728,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1810,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 1894,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 1978,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2060,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2144,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2226,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2310,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2394,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2478,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2559,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2644,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2727,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2811,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 2894,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 2978,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 3061,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 3142,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 3227,
+          "layer": [481, 440, 234, 156]
+        },
+        {
+          "t": 3311,
+          "layer": [481, 440, 235, 156]
+        },
+        {
+          "t": 3393,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3478,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3561,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3644,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3728,
+          "layer": [481, 440, 120, 80]
+        },
+        {
+          "t": 3811,
+          "layer": [481, 440, 120, 80]
+        }
+      ],
+      "status": "Synced revision 150",
+      "shot": null
+    }
+  ],
+  "finishedAt": "2026-11-08T23:16:29.967Z"
+}

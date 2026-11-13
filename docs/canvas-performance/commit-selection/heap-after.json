@@ -1,0 +1,39 @@
+[
+  {
+    "tiles": false,
+    "motion": [
+      {
+        "handlerP95": 11.599999999627471,
+        "rafP95": 17.300000000000182,
+        "over25Pct": 1.7543859649122806
+      },
+      {
+        "handlerP95": 10.700000001117587,
+        "rafP95": 17.699999999999818,
+        "over25Pct": 0
+      },
+      {
+        "handlerP95": 11.299999998882413,
+        "rafP95": 17.699999999999818,
+        "over25Pct": 0.8333333333333334
+      }
+    ],
+    "selection": {
+      "syncMs": 145.90000000037253,
+      "fenceMs": 305.80000000074506,
+      "longestTaskMs": 230
+    },
+    "selection5k": {
+      "syncMs": 53.09999999962747,
+      "fenceMs": 123.59999999962747,
+      "longestTaskMs": 85
+    },
+    "heapBeforeMiB": 40.22023010253906,
+    "heapAfter170MiB": 31.069671630859375,
+    "history": {
+      "entries": 100,
+      "bytes": 7501,
+      "documentBytes": 3112779
+    }
+  }
+]

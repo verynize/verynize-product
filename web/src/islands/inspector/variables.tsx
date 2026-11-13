@@ -507,9 +507,9 @@ export function VariablesSection({ open, onToggle }: { open: boolean; onToggle: 
     <section
       id="insp-variables"
       className={cn(
-        "flex min-h-0 flex-col border-b border-divider",
+        "flex flex-col border-b border-divider",
         // Panel accordion (inspector.tsx): an open section fills the space, collapsed ones keep their header height.
-        open ? "flex-1" : "shrink-0",
+        open ? "min-h-24 flex-1" : "min-h-9 shrink-0",
       )}
     >
       <PanelSectionHeader
@@ -614,7 +614,7 @@ export function VariablesSection({ open, onToggle }: { open: boolean; onToggle: 
           </>
         }
       />
-      <div hidden={!open} className="min-h-0 flex-1 overflow-y-auto pb-2">
+      <div hidden={!open} data-scroll className="min-h-0 flex-1 overflow-y-auto pb-2">
         <datalist id="bd-variable-fonts">
           {FONTS.map((f) => (
             <option key={f} value={f} />

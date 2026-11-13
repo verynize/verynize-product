@@ -33,8 +33,9 @@
         message: `This file would be ${(bytes / 1048576).toFixed(1)} MB, over the 20 MB limit for files saved on this device. Remove large images or split it into several files.`,
       });
   }
-  // Existing oversized documents must still permit edits that do not add image bytes.
-  function preflightChange(doc, before) {
+  // Existing oversized documents must still permit edits that do not add image bytes. `before`/`after` are what
+  // changed (the whole document by default, or only the edited nodes): `doc` is checked when `after` adds images.
+  function preflightChange(doc, before, after = doc) {
     const sources = (value) => {
       const counts = new Map();
       JSON.stringify(value, (_key, item) => {
@@ -45,7 +46,7 @@
       return counts;
     };
     const old = sources(before);
-    for (const [src, count] of sources(doc))
+    for (const [src, count] of sources(after))
       if (count > (old.get(src) || 0)) {
         preflight(doc);
         break;

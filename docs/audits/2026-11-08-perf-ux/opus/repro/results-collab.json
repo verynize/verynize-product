@@ -1,0 +1,216 @@
+{
+  "divergePost": {
+    "before": {
+      "b": 3,
+      "server": {
+        "revision": 0,
+        "nodes": 3
+      }
+    },
+    "afterPost": {
+      "b": 4903,
+      "server": {
+        "revision": 1,
+        "nodes": 4903
+      },
+      "status": "Connected · revision 0"
+    },
+    "afterReload": {
+      "b": 4903,
+      "server": {
+        "revision": 1,
+        "nodes": 4903
+      },
+      "status": "Connected · revision 1"
+    }
+  },
+  "gap": {
+    "missed": {
+      "b": 3,
+      "server": {
+        "revision": 1,
+        "nodes": 503
+      },
+      "status": "Connected · revision 0"
+    },
+    "later": {
+      "b": 3,
+      "server": {
+        "revision": 2,
+        "nodes": 503
+      },
+      "status": "Synced revision 2"
+    },
+    "reload": {
+      "b": 3,
+      "server": {
+        "revision": 2,
+        "nodes": 503
+      },
+      "status": "Connected · revision 2"
+    }
+  },
+  "dupack": {
+    "sent": {
+      "b": 503,
+      "server": {
+        "revision": 1,
+        "nodes": 503
+      },
+      "status": "Connected · revision 0"
+    },
+    "after": {
+      "flushed": "ok",
+      "b": 3,
+      "server": {
+        "revision": 1,
+        "nodes": 503
+      },
+      "status": "Saved shared revision 1"
+    },
+    "reload": {
+      "b": 3,
+      "server": {
+        "revision": 1,
+        "nodes": 503
+      },
+      "status": "Connected · revision 1"
+    }
+  },
+  "poison": {
+    "held": {
+      "server": {
+        "revision": 0,
+        "nodes": 3
+      },
+      "status": "This batch interrupted room processing. Edits are retained on this device; retry a smaller import."
+    },
+    "smallEditReachedServer": false,
+    "serverA_x": 100,
+    "status": "This batch interrupted room processing. Edits are retained on this device; retry a smaller import.",
+    "statuses": [
+      "Live connection interrupted. Reconnecting in 1s…",
+      "Connected · revision 0",
+      "This batch interrupted room processing. Edits are retained on this device; retry a smaller import.",
+      "Live connection interrupted. Reconnecting in 1s…",
+      "Connected · revision 0",
+      "This batch interrupted room processing. Edits are retained on this device; retry a smaller import."
+    ],
+    "limitDialog": null
+  },
+  "gestures": [
+    {
+      "drag": {
+        "withRemote": false,
+        "before": [100, 100],
+        "after": [300, 200],
+        "server": [300, 200],
+        "moved": true,
+        "bColor": "#97c3b1",
+        "status": "Saved shared revision 1",
+        "sOps": 1,
+        "room": "<room>",
+        "roomId": "<room>"
+      }
+    },
+    {
+      "drag": {
+        "withRemote": true,
+        "before": [300, 200],
+        "after": [300, 200],
+        "server": [300, 200],
+        "moved": false,
+        "bColor": "#111111",
+        "status": "Synced revision 2",
+        "sOps": 2,
+        "room": "<room>",
+        "roomId": "<room>"
+      }
+    },
+    {
+      "drag": {
+        "withRemote": false,
+        "before": [300, 200],
+        "after": [500, 300],
+        "server": [500, 300],
+        "moved": true,
+        "bColor": "#111111",
+        "status": "Saved shared revision 3",
+        "sOps": 3,
+        "room": "<room>",
+        "roomId": "<room>"
+      }
+    },
+    {
+      "drag": {
+        "withRemote": true,
+        "before": [500, 300],
+        "after": [500, 300],
+        "server": [500, 300],
+        "moved": false,
+        "bColor": "#222222",
+        "status": "Synced revision 4",
+        "sOps": 4,
+        "room": "<room>",
+        "roomId": "<room>"
+      }
+    },
+    {
+      "resize": {
+        "withRemote": false,
+        "before": [100, 80],
+        "after": [200, 160],
+        "resized": true
+      }
+    },
+    {
+      "resize": {
+        "withRemote": true,
+        "before": [200, 160],
+        "after": [200, 160],
+        "resized": false
+      }
+    },
+    {
+      "text": {
+        "withRemote": false,
+        "stillEditingAfterRemote": true,
+        "text": " one two",
+        "server": " one two"
+      }
+    },
+    {
+      "text": {
+        "withRemote": true,
+        "stillEditingAfterRemote": true,
+        "text": " two one",
+        "server": " two one"
+      }
+    }
+  ],
+  "timing": {
+    "edits": {
+      "count": 91,
+      "ms": 1509.5
+    },
+    "arrivals": [
+      {
+        "ms": 1544,
+        "ops": 91,
+        "bytes": 8835
+      }
+    ],
+    "sends": [
+      {
+        "n": 91,
+        "bytes": 8768,
+        "at": 34613
+      }
+    ],
+    "singleEditLatencyMs": [null, 53, 61, 54, 54, 57, 56, 56, 82, 58, 63, 56, 56, 58, 52]
+  },
+  "access": {
+    "GET /api/rooms/:id": 1,
+    "GET /api/rooms/:id/access": 2
+  }
+}

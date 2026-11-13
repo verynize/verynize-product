@@ -1,0 +1,8 @@
+{
+  "name": "verynize-canvas-perf-prototypes",
+  "private": true,
+  "description": "Standalone renderer prototypes for eval/canvas-perf. Not part of the app bundle.",
+  "dependencies": {
+    "pixi.js": "8.22.0"
+  }
+}

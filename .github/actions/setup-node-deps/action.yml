@@ -1,0 +1,70 @@
+name: Set up Node dependencies
+description: Restore the npm download cache, install locked dependencies and retain install timings.
+inputs:
+  node-version:
+    description: Node version used by the job.
+    required: false
+    default: "24"
+  diagnostics-name:
+    description: Unique artifact name for this job (include the matrix index in matrix jobs).
+    required: true
+outputs:
+  cache-hit:
+    description: Whether the npm cache exactly matched this lockfile.
+    value: ${{ steps.cache.outputs.cache-hit }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: ${{ inputs.node-version }}
+    - name: Locate npm download cache
+      id: cache-dir
+      shell: bash
+      run: echo "path=$(npm config get cache)" >> "$GITHUB_OUTPUT"
+    - name: Restore npm download cache
+      id: cache
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: ${{ steps.cache-dir.outputs.path }}
+        key: npm-downloads-v1-${{ runner.os }}-${{ runner.arch }}-node-${{ inputs.node-version }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          node-cache-${{ runner.os }}-${{ runner.arch }}-npm-${{ hashFiles('package-lock.json') }}
+          npm-downloads-v1-${{ runner.os }}-${{ runner.arch }}-node-${{ inputs.node-version }}-
+    - name: Install locked dependencies
+      id: install
+      shell: bash
+      env:
+        NPM_CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+      run: |
+        set -euo pipefail
+        logs_dir=$(mktemp -d "$RUNNER_TEMP/npm-install.XXXXXX")
+        echo "logs-dir=$logs_dir" >> "$GITHUB_OUTPUT"
+        started=$SECONDS
+        node_version=$(node --version)
+        npm_version=$(npm --version)
+        echo "Node $node_version; npm $npm_version; exact npm cache hit: ${NPM_CACHE_HIT:-false}"
+        # Keep lifecycle scripts and native dependency installation enabled. npm verifies cached
+        # tarball integrity against the lockfile; missing tarballs still download normally.
+        if npm ci --prefer-offline --no-audit --no-fund --timing --loglevel=http --logs-dir "$logs_dir"; then
+          result=0
+        else
+          result=$?
+        fi
+        {
+          echo "### npm install"
+          echo
+          echo "Node $node_version; npm $npm_version."
+          echo "Exact npm cache hit: ${NPM_CACHE_HIT:-false} (a non-exact restore may still reuse tarballs)."
+          echo "Duration: $((SECONDS - started))s; exit code: $result."
+          echo "Timing JSON is retained separately; debug logs are not uploaded."
+        } >> "$GITHUB_STEP_SUMMARY"
+        exit "$result"
+    - name: Upload npm install timings
+      if: always() && steps.install.outputs.logs-dir != ''
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ inputs.diagnostics-name }}
+        path: ${{ steps.install.outputs.logs-dir }}/*-timing.json
+        if-no-files-found: ignore
+        retention-days: 7

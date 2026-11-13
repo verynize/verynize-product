@@ -1,5 +1,362 @@
-#project-toggle{position:fixed;bottom:12px;left:12px;z-index:20;background:#26262c;color:#dedee7;border:1px solid #45454d;padding:9px 13px;border-radius:8px}#project-name{flex:1;color:#a5a5b4;font-size:12px}.project-agent{display:flex;flex-direction:column;gap:8px}.project-agent h3{margin:0}.project-agent p{font-size:11px;line-height:1.5;color:#9b9ba9;margin:0}#project-prompt{min-height:95px;resize:vertical}.project-agent label{font-size:11px;display:flex;gap:6px;align-items:center}#project-context{width:auto}#project-output{flex:1;min-height:100px;background:#101014;padding:10px;border-radius:7px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}#project-status{white-space:pre-wrap;max-height:50px;overflow:auto;font-size:12px;color:#bfb2e8} 
+#project-toggle {
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 20;
+  background: #26262c;
+  color: #dedee7;
+  border: 1px solid #45454d;
+  padding: 9px 13px;
+  border-radius: 8px;
+}
+#project-name {
+  flex: 1;
+  color: #a5a5b4;
+  font-size: 12px;
+}
+.project-agent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.project-agent h3 {
+  margin: 0;
+}
+.project-agent p {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #9b9ba9;
+  margin: 0;
+}
+#project-prompt {
+  min-height: 95px;
+  resize: vertical;
+}
+.project-agent label {
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+#project-context {
+  width: auto;
+}
+#project-output {
+  flex: 1;
+  min-height: 100px;
+  background: #101014;
+  padding: 10px;
+  border-radius: 7px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+}
+#project-status {
+  white-space: pre-wrap;
+  max-height: 50px;
+  overflow: auto;
+  font-size: 12px;
+  color: #bfb2e8;
+}
 
 /* Wonder reference: quiet chat surface, transcript above a compact composer. */
-#agent-chat-dock{display:none;position:fixed;left:0;top:42px;bottom:0;width:360px;z-index:45;padding:0;background:#191919;border-right:1px solid #2c2c2c;color:#d4d4d4;overflow:hidden}.agent-chat-open #agent-chat-dock{display:flex;flex-direction:column}.agent-chat-open>main{margin-left:360px;width:calc(100% - 360px)}.chat-dock-bar{height:44px;display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid #292929}.chat-dock-bar strong{font-weight:500;flex:1;font-size:12px}.chat-dock-bar button{padding:5px 8px;font-size:11px;background:transparent;border:0;color:#999}.chat-heading{display:flex;align-items:center;gap:8px}.chat-heading strong{flex:1;font-size:12px;font-weight:500;color:#adadad}.chat-heading button{font-size:14px;padding:3px 7px!important;background:transparent!important}.project-agent{gap:7px}.project-agent #chat-history{font-size:11px;margin:0;background:#212121;border:1px solid #303030}.project-agent #chat-messages{order:2;flex:1;min-height:100px;overflow:auto;padding:5px 0 16px;scrollbar-width:thin;scrollbar-color:#444 transparent}.project-agent .chat-heading{order:0}.project-agent #chat-history{order:1}.project-agent #chat-queue{order:3;color:#a985c6;font-size:11px}.project-agent #project-prompt{order:4;font:13px/1.6 system-ui;background:#252525;border:1px solid #333;border-radius:12px;min-height:95px}.project-agent #chat-attachments{order:5;display:flex;flex-wrap:wrap;gap:4px}.project-agent .chat-attachment-actions{order:6;display:flex;gap:5px}.project-agent #project-agent{order:7}.project-agent #agent-model{order:8;font-size:11px;min-height:29px;margin:0;padding:5px 8px}.project-agent .agent-options{order:9;display:flex;gap:6px}.agent-options select{min-width:0;font-size:10px;margin:0;padding:5px}.project-agent #project-agent-status{order:10}.project-agent>label{order:11;margin:0}.project-agent>div:has(#project-run){order:12;display:flex;gap:5px;flex-wrap:wrap}.project-agent .project-note{order:13;font-size:10px!important}.project-agent .agent-log{order:14;margin:0;padding:0;border:0;font-size:10px;color:#777}.agent-log summary{font-size:10px;color:#777}.agent-log #project-output{height:120px;min-height:0;margin:4px 0 0}.chat-message{padding:13px 1px 15px;margin:0 0 10px;overflow-wrap:anywhere;font-size:13px;line-height:1.7}.chat-message.user{background:#292929;border:1px solid #303030;border-radius:12px;padding:12px}.chat-message small{display:block;font-size:10px;color:#888;margin-bottom:7px}.chat-message-content{white-space:pre-wrap}.chat-message>button{font-size:9px!important;padding:2px 5px!important;margin-top:10px;opacity:0;color:#999!important;background:transparent!important;border:0!important}.chat-message:hover>button,.chat-message>button:focus-visible{opacity:1}#chat-attachments button,.chat-attachment-actions button{font-size:10px;padding:4px 6px!important;border-radius:5px!important;background:#292929!important}.project-agent #project-run{background:#8946ad!important;border:1px solid #a252c7!important;color:white!important}.project-agent #project-cancel{background:transparent!important}.project-agent #project-review,.project-agent #project-apply-design{font-size:10px!important}#agent-chat-dock>.project-agent{flex:1;min-height:0;padding:12px 15px;overflow:hidden}#agent-chat-dock select,#agent-chat-dock input{color:#b8b8b8;background:#252525;border:1px solid #353535;border-radius:6px}#agent-chat-dock button{color:#bbb;background:#262626;border:1px solid #353535;border-radius:6px;padding:6px 9px;font-size:11px}#agent-chat-dock textarea{box-sizing:border-box;width:100%;color:#ddd;padding:12px;resize:vertical}#agent-chat-dock #project-agent{font-size:11px;padding:5px;margin:0}#agent-chat-dock #project-context{display:inline;width:auto}#agent-chat-dock .project-note{display:none}@media(max-width:1100px){#agent-chat-dock{width:320px}.agent-chat-open>main{margin-left:320px;width:calc(100% - 320px)}}
-.project-agent .agent-config{order:7;margin:0;padding:0;border:0}.agent-config summary{color:#b9a7c8;font-size:11px;padding:5px 0;cursor:pointer}.agent-config[open]{padding:10px;background:#222;border:1px solid #353535;border-radius:8px}.project-agent .agent-config #project-agent,.project-agent .agent-config #agent-model{margin:6px 0}.project-agent .agent-config #project-agent-status{margin:7px 0 0}.project-agent>label:has(#project-context){display:none}.project-agent #project-prompt{min-height:105px;max-height:220px}.project-agent #chat-messages{padding-top:14px}
+#agent-chat-dock {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 42px;
+  bottom: 0;
+  width: 360px;
+  z-index: 45;
+  padding: 0;
+  background: #191919;
+  border-right: 1px solid #2c2c2c;
+  color: #d4d4d4;
+  overflow: hidden;
+}
+.agent-chat-open #agent-chat-dock {
+  display: flex;
+  flex-direction: column;
+}
+.agent-chat-open > main {
+  margin-left: 360px;
+  width: calc(100% - 360px);
+}
+.chat-dock-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #292929;
+}
+.chat-dock-bar strong {
+  font-weight: 500;
+  flex: 1;
+  font-size: 12px;
+}
+.chat-dock-bar button {
+  padding: 5px 8px;
+  font-size: 11px;
+  background: transparent;
+  border: 0;
+  color: #999;
+}
+.chat-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chat-heading strong {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: #adadad;
+}
+.chat-heading button {
+  font-size: 14px;
+  padding: 3px 7px !important;
+  background: transparent !important;
+}
+.project-agent {
+  gap: 7px;
+}
+.project-agent #chat-history {
+  font-size: 11px;
+  margin: 0;
+  background: #212121;
+  border: 1px solid #303030;
+}
+.project-agent #chat-messages {
+  order: 2;
+  flex: 1;
+  min-height: 100px;
+  overflow: auto;
+  padding: 5px 0 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #444 transparent;
+}
+.project-agent .chat-heading {
+  order: 0;
+}
+.project-agent #chat-history {
+  order: 1;
+}
+.project-agent #chat-queue {
+  order: 3;
+  color: #a985c6;
+  font-size: 11px;
+}
+.project-agent #project-prompt {
+  order: 4;
+  font: 13px/1.6 system-ui;
+  background: #252525;
+  border: 1px solid #333;
+  border-radius: 12px;
+  min-height: 95px;
+}
+.project-agent #chat-attachments {
+  order: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.project-agent .chat-attachment-actions {
+  order: 6;
+  display: flex;
+  gap: 5px;
+}
+.project-agent #project-agent {
+  order: 7;
+}
+.project-agent #agent-model {
+  order: 8;
+  font-size: 11px;
+  min-height: 29px;
+  margin: 0;
+  padding: 5px 8px;
+}
+.project-agent .agent-options {
+  order: 9;
+  display: flex;
+  gap: 6px;
+}
+.agent-options select {
+  min-width: 0;
+  font-size: 10px;
+  margin: 0;
+  padding: 5px;
+}
+.project-agent #project-agent-status {
+  order: 10;
+}
+.project-agent > label {
+  order: 11;
+  margin: 0;
+}
+.project-agent > div:has(#project-run) {
+  order: 12;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.project-agent .project-note {
+  order: 13;
+  font-size: 10px !important;
+}
+.project-agent .agent-log {
+  order: 14;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 10px;
+  color: #777;
+}
+.agent-log summary {
+  font-size: 10px;
+  color: #777;
+}
+.agent-log #project-output {
+  height: 120px;
+  min-height: 0;
+  margin: 4px 0 0;
+}
+.chat-message {
+  padding: 13px 1px 15px;
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.chat-message.user {
+  background: #292929;
+  border: 1px solid #303030;
+  border-radius: 12px;
+  padding: 12px;
+}
+.chat-message small {
+  display: block;
+  font-size: 10px;
+  color: #888;
+  margin-bottom: 7px;
+}
+.chat-message-content {
+  white-space: pre-wrap;
+}
+.chat-message > button {
+  font-size: 9px !important;
+  padding: 2px 5px !important;
+  margin-top: 10px;
+  opacity: 0;
+  color: #999 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+.chat-message:hover > button,
+.chat-message > button:focus-visible {
+  opacity: 1;
+}
+#chat-attachments button,
+.chat-attachment-actions button {
+  font-size: 10px;
+  padding: 4px 6px !important;
+  border-radius: 5px !important;
+  background: #292929 !important;
+}
+.project-agent #project-run {
+  background: #8946ad !important;
+  border: 1px solid #a252c7 !important;
+  color: white !important;
+}
+.project-agent #project-cancel {
+  background: transparent !important;
+}
+.project-agent #project-review,
+.project-agent #project-apply-design {
+  font-size: 10px !important;
+}
+#agent-chat-dock > .project-agent {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 15px;
+  overflow: hidden;
+}
+#agent-chat-dock select,
+#agent-chat-dock input {
+  color: #b8b8b8;
+  background: #252525;
+  border: 1px solid #353535;
+  border-radius: 6px;
+}
+#agent-chat-dock button {
+  color: #bbb;
+  background: #262626;
+  border: 1px solid #353535;
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+#agent-chat-dock textarea {
+  box-sizing: border-box;
+  width: 100%;
+  color: #ddd;
+  padding: 12px;
+  resize: vertical;
+}
+#agent-chat-dock #project-agent {
+  font-size: 11px;
+  padding: 5px;
+  margin: 0;
+}
+#agent-chat-dock #project-context {
+  display: inline;
+  width: auto;
+}
+#agent-chat-dock .project-note {
+  display: none;
+}
+@media (max-width: 1100px) {
+  #agent-chat-dock {
+    width: 320px;
+  }
+  .agent-chat-open > main {
+    margin-left: 320px;
+    width: calc(100% - 320px);
+  }
+}
+.project-agent .agent-config {
+  order: 7;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.agent-config summary {
+  color: #b9a7c8;
+  font-size: 11px;
+  padding: 5px 0;
+  cursor: pointer;
+}
+.agent-config[open] {
+  padding: 10px;
+  background: #222;
+  border: 1px solid #353535;
+  border-radius: 8px;
+}
+.project-agent .agent-config #project-agent,
+.project-agent .agent-config #agent-model {
+  margin: 6px 0;
+}
+.project-agent .agent-config #project-agent-status {
+  margin: 7px 0 0;
+}
+.project-agent > label:has(#project-context) {
+  display: none;
+}
+.project-agent #project-prompt {
+  min-height: 105px;
+  max-height: 220px;
+}
+.project-agent #chat-messages {
+  padding-top: 14px;
+}

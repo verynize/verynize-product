@@ -1,0 +1,169 @@
+{
+  "audit": {
+    "start": 253640,
+    "longTasks": [],
+    "events": [],
+    "lcp": [
+      {
+        "start": 2800,
+        "size": 8787
+      }
+    ],
+    "ws": [
+      {
+        "type": "send",
+        "time": 319034.30000000005,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319116.80000000005,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319215.90000000014,
+        "bytes": 181
+      },
+      {
+        "type": "send",
+        "time": 319298.6000000001,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319381.1000000001,
+        "bytes": 181
+      },
+      {
+        "type": "send",
+        "time": 319465,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319550.69999999995,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319647.5,
+        "bytes": 181
+      },
+      {
+        "type": "send",
+        "time": 319731.69999999995,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 319832.40000000014,
+        "bytes": 182
+      },
+      {
+        "type": "send",
+        "time": 319915.19999999995,
+        "bytes": 181
+      },
+      {
+        "type": "send",
+        "time": 320014.90000000014,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320114.80000000005,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320198.30000000005,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320284.90000000014,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320381.1000000001,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320464.40000000014,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 320595,
+        "bytes": 368
+      },
+      {
+        "type": "send",
+        "time": 320691.40000000014,
+        "bytes": 217
+      },
+      {
+        "type": "send",
+        "time": 326986.90000000014,
+        "bytes": 206
+      },
+      {
+        "type": "send",
+        "time": 330984.19999999995,
+        "bytes": 217
+      },
+      {
+        "type": "send",
+        "time": 349304.6000000001,
+        "bytes": 847
+      },
+      {
+        "type": "send",
+        "time": 349383.19999999995,
+        "bytes": 180
+      },
+      {
+        "type": "send",
+        "time": 349911.5,
+        "bytes": 139
+      },
+      {
+        "type": "send",
+        "time": 352574,
+        "bytes": 180
+      }
+    ],
+    "frames": [],
+    "click": 253640.1000000001,
+    "nodes": 4,
+    "observedReadyAt": 258703.30000000005,
+    "domNodes": 2801,
+    "edits": [
+      {
+        "name": "property-opacity",
+        "duration": 3.0999999998603016,
+        "result": true,
+        "nodes": 3
+      },
+      {
+        "name": "property-opacity-profiled",
+        "duration": 2.6000000000931323,
+        "result": true,
+        "nodes": 3
+      }
+    ],
+    "beforeMove": {
+      "x": 1600,
+      "y": 181.95
+    },
+    "afterMove": {
+      "x": 2033.5,
+      "y": 367
+    },
+    "selected": 1,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36"
+  }
+}

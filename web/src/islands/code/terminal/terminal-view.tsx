@@ -4,7 +4,12 @@ import { useEffect, useRef } from "react";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { WebLinksAddon } from "@xterm/addon-web-links";
-import { terminalBridge, writeChunks, type TerminalDataEvent, type TerminalSession } from "./bridge";
+import {
+  terminalBridge,
+  writeChunks,
+  type TerminalDataEvent,
+  type TerminalSession,
+} from "./bridge";
 import type { TerminalAppearance } from "./theme";
 
 type Props = {
@@ -74,7 +79,13 @@ export function TerminalView({ cwd, active, focusToken, appearance, onSession, o
 
     // ⌘K clears the screen and scrollback (Terminal.app); copy/paste go through the Edit menu's copy/paste events.
     term.attachCustomKeyEventHandler((event) => {
-      if (event.type === "keydown" && event.metaKey && !event.ctrlKey && !event.altKey && event.key.toLowerCase() === "k") {
+      if (
+        event.type === "keydown" &&
+        event.metaKey &&
+        !event.ctrlKey &&
+        !event.altKey &&
+        event.key.toLowerCase() === "k"
+      ) {
         event.preventDefault();
         event.stopPropagation();
         term.clear();
@@ -114,7 +125,8 @@ export function TerminalView({ cwd, active, focusToken, appearance, onSession, o
     });
     const input = term.onData((data) => {
       if (!id) return;
-      for (const chunk of writeChunks(data)) bridge.terminalWrite({ id, data: chunk }).catch(() => {});
+      for (const chunk of writeChunks(data))
+        bridge.terminalWrite({ id, data: chunk }).catch(() => {});
     });
     const resize = term.onResize(({ cols, rows }) => {
       if (id) bridge.terminalResize({ id, cols, rows }).catch(() => {});
@@ -135,7 +147,10 @@ export function TerminalView({ cwd, active, focusToken, appearance, onSession, o
       },
       (error: unknown) => {
         if (disposed) return;
-        const message = error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, "") : String(error);
+        const message =
+          error instanceof Error
+            ? error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, "")
+            : String(error);
         term.writeln(`\x1b[31m${message}\x1b[0m`);
       },
     );
@@ -173,5 +188,11 @@ export function TerminalView({ cwd, active, focusToken, appearance, onSession, o
     if (active && focusToken > 0) termRef.current?.focus();
   }, [active, focusToken]);
 
-  return <div ref={hostRef} data-slot="terminal-view" className="size-full overflow-hidden px-2 pt-1.5" />;
+  return (
+    <div
+      ref={hostRef}
+      data-slot="terminal-view"
+      className="size-full overflow-hidden px-2 pt-1.5"
+    />
+  );
 }

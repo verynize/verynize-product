@@ -104,7 +104,10 @@ function Switcher({ state }: { state: ChatState }) {
             )}
             <span className="truncate">{title}</span>
             {elsewhere > 0 && (
-              <span title={`${elsewhere} other ${elsewhere === 1 ? "chat is" : "chats are"} running`} className="flex">
+              <span
+                title={`${elsewhere} other ${elsewhere === 1 ? "chat is" : "chats are"} running`}
+                className="flex"
+              >
                 <RunningDot />
               </span>
             )}
@@ -132,32 +135,32 @@ function Switcher({ state }: { state: ChatState }) {
         {/* Repositories and worktrees are desktop-only (the `git` capability); the web chat has its chats only. */}
         {can("git") && (
           <>
-        <ChatMenuSeparator />
-        <ChatMenuLabel>Repositories</ChatMenuLabel>
-        {attached && (
-          <ChatMenuSub>
-            <ChatMenuSubTrigger>
-              <FolderIcon />
-              <span className="min-w-0 truncate">{state.projectName}</span>
-            </ChatMenuSubTrigger>
-            <ChatMenuSubContent className="w-60">
-              <ChatList state={state} createLabel="New chat" />
-            </ChatMenuSubContent>
-          </ChatMenuSub>
-        )}
-        {attached && <ChatMenuSeparator />}
-        <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("new")}>
-          <PlusIcon />
-          Create new repository
-        </ChatMenuItem>
-        <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("clone")}>
-          <GitForkIcon />
-          Start from GitHub
-        </ChatMenuItem>
-        <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("local")}>
-          <LaptopIcon />
-          Start from local folder
-        </ChatMenuItem>
+            <ChatMenuSeparator />
+            <ChatMenuLabel>Repositories</ChatMenuLabel>
+            {attached && (
+              <ChatMenuSub>
+                <ChatMenuSubTrigger>
+                  <FolderIcon />
+                  <span className="min-w-0 truncate">{state.projectName}</span>
+                </ChatMenuSubTrigger>
+                <ChatMenuSubContent className="w-60">
+                  <ChatList state={state} createLabel="New chat" />
+                </ChatMenuSubContent>
+              </ChatMenuSub>
+            )}
+            {attached && <ChatMenuSeparator />}
+            <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("new")}>
+              <PlusIcon />
+              Create new repository
+            </ChatMenuItem>
+            <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("clone")}>
+              <GitForkIcon />
+              Start from GitHub
+            </ChatMenuItem>
+            <ChatMenuItem onSelect={() => void window.codeWorkspace?.addRepository("local")}>
+              <LaptopIcon />
+              Start from local folder
+            </ChatMenuItem>
           </>
         )}
       </ChatMenuContent>
@@ -181,7 +184,10 @@ export function DockHeader({ state }: { state: ChatState }) {
       >
         {!sidebarOpen && can("projects") && (
           <ChatTip label="Show sidebar" side="bottom">
-            <ChatIconButton aria-label="Show sidebar" onClick={() => document.body.classList.add("chat-sidebar-open")}>
+            <ChatIconButton
+              aria-label="Show sidebar"
+              onClick={() => document.body.classList.add("chat-sidebar-open")}
+            >
               <PanelLeftIcon className="size-4" />
             </ChatIconButton>
           </ChatTip>

@@ -34,7 +34,7 @@ export function documentFromMeta(meta = {}, fallbackName = "Imported") {
     version: 2,
     name: typeof meta.name === "string" && meta.name.trim() ? meta.name : fallbackName,
     activePage: page.id,
-    tokens: { ...(meta.tokens || {}) },
+    tokens: { ...meta.tokens },
     pages: [page],
   };
   if (meta.variables && typeof meta.variables === "object") doc.variables = clone(meta.variables);
@@ -106,13 +106,25 @@ export function mergeVariables(document, { tokens = {}, variables = {}, aliases 
 }
 
 /** Add the artboards of codec JSX (documentToJsx / tailwindCode / create_artboard JSX) to a page. */
-export function importJsxInto(document, pageId, code, { viewport = null } = {}) {
+export function importJsxInto(
+  document,
+  pageId,
+  code,
+  { viewport = null, name, placement = "preserve", split = "pages" } = {},
+) {
   const doc = structuredClone(document);
   mergeVariables(doc, readSourceHeader(code) || {});
-  const result = createArtboards(doc, pageId, jsxBody(code), { viewport });
+  const result = createArtboards(doc, pageId, jsxBody(code), {
+    viewport,
+    name,
+    placement,
+    importNames: true,
+    split,
+  });
   return {
     document: validateDocument(result.document),
     roots: result.roots,
+    pages: result.pages,
     page: result.page,
     warnings: result.warnings,
   };
@@ -146,10 +158,24 @@ export async function prepareHtmlImport(html, current, pageId, options = {}) {
         variables: imported.variables,
         aliases: imported.aliases,
       });
-      const out = createArtboards(doc, pageId, result.jsx, { viewport: options.viewport || null });
+      const out = createArtboards(doc, pageId, result.jsx, {
+        viewport: options.viewport || null,
+        name: options.name,
+        placement: options.placement || "auto",
+        split: options.split || "pages",
+      });
+      for (const root of out.roots) {
+        if (/^Imported page(?: \d+)?$/.test(root.name) && !options.name) {
+          let n = 1;
+          while (out.page.nodes.some((node) => node !== root && node.name === `Imported page ${n}`))
+            n++;
+          root.name = `Imported page ${n}`;
+        }
+      }
       return {
         document: validateDocument(out.document),
         roots: out.roots,
+        pages: out.pages,
         page: out.page,
         warnings: out.warnings,
       };

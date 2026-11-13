@@ -20,14 +20,16 @@ const LOGO = svg(
   await fs.mkdir(out);
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${path.join(dir, "profile")}`],
     timeout: 20000,
   });
   try {
-    const page = await app.firstWindow({ timeout: 20000 }); await moveOffCursor(app);
+    const page = await app.firstWindow({ timeout: 20000 });
+    await moveOffCursor(app);
     await page.waitForSelector("#canvas .layer");
     const errors = [];
     page.on("pageerror", (e) => errors.push(e.message));
@@ -86,11 +88,14 @@ const LOGO = svg(
     // The Export section starts closed for every newly selected layer.
     // Like Wonder (ref 50), the "Exported …" toast sits over the bottom of the inspector, where the Export section
     // ends up; wait for the previous export's toast to leave before clicking under it.
+    const toastsGone = async () => {
+      // Sonner pauses its timers while the pointer is over a toast.
+      await page.mouse.move(400, 300);
+      await page.waitForSelector("[data-sonner-toast]", { state: "detached", timeout: 15000 });
+    };
     const openExport = async () => {
       if (!(await page.locator("#artwork-scale").isVisible())) {
-        // Sonner pauses its timers while the pointer is over a toast.
-        await page.mouse.move(400, 300);
-        await page.waitForSelector("[data-sonner-toast]", { state: "detached", timeout: 15000 });
+        await toastsGone();
         await page.locator("#export-section .insp-add").click();
       }
     };
@@ -110,14 +115,14 @@ const LOGO = svg(
       for (;;) {
         const status = (await page.locator("#artwork-status").textContent()) || "";
         if (
-          /^Exported/.test(status) &&
+          status.startsWith("Exported") &&
           (await fs.stat(target).then(
             () => true,
             () => false,
           ))
         )
           break;
-        if (status && !/^Exported/.test(status)) throw new Error("Export failed: " + status);
+        if (status && !status.startsWith("Exported")) throw new Error("Export failed: " + status);
         if (Date.now() > deadline) throw new Error("Export timed out");
         await page.waitForTimeout(100);
       }
@@ -251,11 +256,27 @@ const LOGO = svg(
         const panel = document.querySelector("#properties");
         const left = panel.getBoundingClientRect().left + panel.clientLeft;
         const r = e.getBoundingClientRect();
-        return { x: r.left - left, right: r.right - left, cx: (r.left + r.right) / 2 - left, y: r.top, h: r.height };
+        return {
+          x: r.left - left,
+          right: r.right - left,
+          cx: (r.left + r.right) / 2 - left,
+          y: r.top,
+          h: r.height,
+        };
       });
     const visibleOpacity = (loc) => loc.evaluate((e) => getComputedStyle(e).opacity);
     await setup([
-      { id: "card", name: "Card", type: "frame", x: 20, y: 20, w: 100, h: 80, color: "transparent", layout: "free" },
+      {
+        id: "card",
+        name: "Card",
+        type: "frame",
+        x: 20,
+        y: 20,
+        w: 100,
+        h: 80,
+        color: "transparent",
+        layout: "free",
+      },
     ]);
     assert.equal(await fill.locator("[data-paint]").count(), 0);
     assert.equal((await box(fill)).h, 32, "an empty fill is the 32 px header only");
@@ -272,7 +293,10 @@ const LOGO = svg(
       { type: "solid", color: "#00000033" },
       { type: "solid", color: "#ffffff" },
     ]);
-    assert.equal(await fill.getByRole("textbox", { name: "Fill hex colour" }).inputValue(), "000000");
+    assert.equal(
+      await fill.getByRole("textbox", { name: "Fill hex colour" }).inputValue(),
+      "000000",
+    );
     assert.equal(await fill.getByRole("textbox", { name: "Fill opacity" }).inputValue(), "20");
     const row0 = fill.locator("[data-paint='0']"),
       row1 = fill.locator("[data-paint='1']");
@@ -281,7 +305,11 @@ const LOGO = svg(
     assert.equal((await box(row0.locator("[data-paint-visibility]"))).cx, 224, "eye centre 224");
     assert.equal((await box(row0.locator("[data-paint-remove]"))).cx, 256, "− centre 256");
     assert.equal((await box(row1)).y - (await box(row0)).y, 33, "33 px row pitch");
-    assert.equal((await box(fill)).h, 32 + 5 + 24 + 9 + 24 + 12, "two rows: 5 px under the header, 12 above the divider");
+    assert.equal(
+      (await box(fill)).h,
+      32 + 5 + 24 + 9 + 24 + 12,
+      "two rows: 5 px under the header, 12 above the divider",
+    );
     // Hover drag grip in the left gutter; dragging the lower paint onto the upper one reorders the stack.
     const grip = row1.locator("[data-paint-grip]");
     await page.mouse.move(5, 5);
@@ -302,7 +330,10 @@ const LOGO = svg(
     );
     // Hidden paint: Wonder's closed-eye glyph.
     await fill.locator('[data-paint-visibility="1"]').click();
-    assert.equal(await fill.locator('[data-paint-visibility="1"] svg.lucide-eye-closed').count(), 1);
+    assert.equal(
+      await fill.locator('[data-paint-visibility="1"] svg.lucide-eye-closed').count(),
+      1,
+    );
     // --- H6: the wavy square is the "Shader mode" toggle (wonder/H6-tooltip-confirmed, H6-open-confirmed) ---
     const shaderMode = fill.locator("[data-shader-mode]");
     const paintsBefore = (await node("card")).fills;
@@ -322,39 +353,71 @@ const LOGO = svg(
     // Pressed look: the purple toggle tint behind a light purple glyph (Wonder #372441 / #ce86f8).
     assert.notEqual(
       await shaderMode.evaluate((e) => getComputedStyle(e).backgroundColor),
-      await fill.getByRole("button", { name: "Add paint" }).evaluate((e) => getComputedStyle(e).backgroundColor),
+      await fill
+        .getByRole("button", { name: "Add paint" })
+        .evaluate((e) => getComputedStyle(e).backgroundColor),
     );
     // Preset dropdown + settings button + the preset's colours replace the paint rows.
     assert.equal(await fill.locator("[data-paint]").count(), 0, "paint rows replaced");
     assert.equal(await fill.locator("#shader-fill-preset").innerText(), "Tidal Swirl 1");
     assert.equal(await fill.locator("[data-shader-color-row]").count(), 4);
     const presetBox = await box(fill.locator("#shader-fill-preset"));
-    assert.deepEqual([presetBox.x, presetBox.right, presetBox.h], [12, 232, 24], "dropdown x 12–232");
-    assert.equal((await box(fill.locator("#shader-options-open"))).cx, 256, "settings button under +");
+    assert.deepEqual(
+      [presetBox.x, presetBox.right, presetBox.h],
+      [12, 232, 24],
+      "dropdown x 12–232",
+    );
+    assert.equal(
+      (await box(fill.locator("#shader-options-open"))).cx,
+      256,
+      "settings button under +",
+    );
     assert.equal((await box(fill.getByRole("button", { name: "Add paint" }))).cx, 256, "+ stays");
     // The canvas paints the fill with a shader surface under the layer's content.
     const surface = page.locator('#canvas [data-id="card"] > canvas.shader-surface');
     await surface.waitFor({ state: "attached" });
-    assert.equal(await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-fill"), "true");
-    assert.equal(await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-preset"), "tidal-swirl-1");
+    assert.equal(
+      await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-fill"),
+      "true",
+    );
+    assert.equal(
+      await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-preset"),
+      "tidal-swirl-1",
+    );
     assert.equal(await surface.evaluate((e) => getComputedStyle(e).zIndex), "-1");
     // Choosing a preset changes the fill, not the layer type.
     await fill.locator("#shader-fill-preset").click();
     await page.locator('#shader-gallery [data-shader-option="ripple-pool-2"]').click();
     modeCard = await node("card");
-    assert.deepEqual([modeCard.type, modeCard.shaderPreset, modeCard.shaderFill], ["frame", "ripple-pool-2", true]);
+    assert.deepEqual(
+      [modeCard.type, modeCard.shaderPreset, modeCard.shaderFill],
+      ["frame", "ripple-pool-2", true],
+    );
     assert.equal(await fill.locator("#shader-fill-preset").innerText(), "Ripple Pool 2");
     await fill.locator("#shader-options-open").click();
     await page.locator("#shader-options").waitFor();
-    await page.locator("#shader-options").getByRole("button", { name: "Close shader settings" }).click();
+    await page
+      .locator("#shader-options")
+      .getByRole("button", { name: "Close shader settings" })
+      .click();
     // Persisted: the mode, preset and pressed state survive a reload.
     await page.reload();
     await page.waitForSelector("#canvas .layer");
     await page.evaluate(() => window.design.setSelection(["card"]));
     modeCard = await node("card");
-    assert.deepEqual([modeCard.shaderFill, modeCard.shaderPreset], [true, "ripple-pool-2"], "saved with the document");
-    assert.equal(await shaderMode.getAttribute("aria-pressed"), "true", "still pressed after reload");
-    await page.locator('#canvas [data-id="card"] > canvas.shader-surface').waitFor({ state: "attached" });
+    assert.deepEqual(
+      [modeCard.shaderFill, modeCard.shaderPreset],
+      [true, "ripple-pool-2"],
+      "saved with the document",
+    );
+    assert.equal(
+      await shaderMode.getAttribute("aria-pressed"),
+      "true",
+      "still pressed after reload",
+    );
+    await page
+      .locator('#canvas [data-id="card"] > canvas.shader-surface')
+      .waitFor({ state: "attached" });
     // Off: the paint rows come back unchanged, the surface goes, the chosen preset is kept for next time.
     await shaderMode.click();
     modeCard = await node("card");
@@ -364,7 +427,10 @@ const LOGO = svg(
     assert.equal(await shaderMode.getAttribute("aria-pressed"), "false");
     assert.equal(await fill.locator("[data-paint]").count(), 2, "paint rows back");
     assert.equal(await page.locator('#canvas [data-id="card"] > canvas.shader-surface').count(), 0);
-    assert.equal(await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-fill"), null);
+    assert.equal(
+      await page.locator('#canvas [data-id="card"]').getAttribute("data-shader-fill"),
+      null,
+    );
     // + in Shader mode adds a paint and goes back to the paint rows (one step).
     await shaderMode.click();
     await fill.getByRole("button", { name: "Add paint" }).click();
@@ -374,30 +440,71 @@ const LOGO = svg(
     // Older documents: an `animated` gradient still renders and stays editable; Shader mode replaces it.
     await page.evaluate(() => window.design.updateNodes(["card"], { animated: "aurora" }));
     assert.ok(
-      (await page.locator('#canvas [data-id="card"]').evaluate((e) => e.style.animation)).includes("design-gradient"),
+      (await page.locator('#canvas [data-id="card"]').evaluate((e) => e.style.animation)).includes(
+        "design-gradient",
+      ),
     );
     assert.equal(await fill.locator("[name=animated]").inputValue(), "aurora");
     await shaderMode.click();
     assert.equal((await node("card")).animated, "", "Shader mode replaces the animated gradient");
     assert.equal(await fill.locator("[name=animated]").count(), 0);
     // Text: Text Fill has no shader mode (disabled); the Background Fill behind the glyphs does.
-    await setup([{ id: "label", name: "Label", type: "text", text: "Hi", x: 20, y: 20, w: 100, h: 40, color: "#ffffff" }]);
-    assert.equal(await fill.locator("[data-shader-mode]").isDisabled(), true, "Text Fill: no shader mode");
+    await setup([
+      {
+        id: "label",
+        name: "Label",
+        type: "text",
+        text: "Hi",
+        x: 20,
+        y: 20,
+        w: 100,
+        h: 40,
+        color: "#ffffff",
+      },
+    ]);
+    assert.equal(
+      await fill.locator("[data-shader-mode]").isDisabled(),
+      true,
+      "Text Fill: no shader mode",
+    );
     const textBackground = page.locator("#text-background-fill-section");
     await textBackground.locator("[data-shader-mode]").click();
     assert.equal((await node("label")).shaderFill, true);
     assert.equal(await textBackground.locator("[data-shader-color-row]").count(), 4);
-    await page.locator('#canvas [data-id="label"] > canvas.shader-surface').waitFor({ state: "attached" });
-    assert.equal(await page.locator('#canvas [data-id="label"]').innerText(), "Hi", "glyphs stay above the shader");
-    console.log("PASS shader mode: tooltip, pressed toggle, preset + colours replace paints, canvas surface, reload, off, legacy animated");
+    await page
+      .locator('#canvas [data-id="label"] > canvas.shader-surface')
+      .waitFor({ state: "attached" });
+    assert.equal(
+      await page.locator('#canvas [data-id="label"]').innerText(),
+      "Hi",
+      "glyphs stay above the shader",
+    );
+    console.log(
+      "PASS shader mode: tooltip, pressed toggle, preset + colours replace paints, canvas surface, reload, off, legacy animated",
+    );
 
     // P0 bug 1: a solid with a separate paint opacity shows the product, and edits fold it into the colour alpha.
     await setup([
       {
-        id: "card", name: "Card", type: "frame", x: 20, y: 20, w: 100, h: 80, color: "#ff0000", layout: "free",
+        id: "card",
+        name: "Card",
+        type: "frame",
+        x: 20,
+        y: 20,
+        w: 100,
+        h: 80,
+        color: "#ff0000",
+        layout: "free",
         fills: [
           { type: "solid", color: "#ff0000", opacity: 50 },
-          { type: "linear", angle: 90, stops: [{ position: 0, color: "#0000ff" }, { position: 100, color: "#00ff00" }] },
+          {
+            type: "linear",
+            angle: 90,
+            stops: [
+              { position: 0, color: "#0000ff" },
+              { position: 100, color: "#00ff00" },
+            ],
+          },
         ],
       },
     ]);
@@ -405,8 +512,16 @@ const LOGO = svg(
     assert.equal(await opacity0.inputValue(), "50", "opacity 50 does not read 100 %");
     await opacity0.fill("40");
     await opacity0.press("Enter");
-    assert.deepEqual((await node("card")).fills[0], { type: "solid", color: "#ff000066" }, "40 % is the paint's alpha, not 40 % of 50 %");
-    assert.equal(await fill.locator("[data-paint='1'] input").count(), 0, "gradient row: no % field");
+    assert.deepEqual(
+      (await node("card")).fills[0],
+      { type: "solid", color: "#ff000066" },
+      "40 % is the paint's alpha, not 40 % of 50 %",
+    );
+    assert.equal(
+      await fill.locator("[data-paint='1'] input").count(),
+      0,
+      "gradient row: no % field",
+    );
     // Swatch of a translucent colour: Wonder's split swatch (opaque left, checker right).
     assert.match(
       await row0.locator("button[name=color] span").getAttribute("style"),
@@ -415,7 +530,18 @@ const LOGO = svg(
 
     // B3 / P0 bugs 2 and 5: bound paint. No % at any alpha, hover-only unlink, picker plane renders, alpha edits the variable.
     await setup([
-      { id: "card", name: "Card", type: "frame", x: 20, y: 20, w: 100, h: 80, color: "#172033", token: "brand", layout: "free" },
+      {
+        id: "card",
+        name: "Card",
+        type: "frame",
+        x: 20,
+        y: 20,
+        w: 100,
+        h: 80,
+        color: "#172033",
+        token: "brand",
+        layout: "free",
+      },
     ]);
     assert.equal(await row0.getByRole("textbox").count(), 0, "bound fill shows no hex or %");
     const unlink = row0.getByRole("button", { name: "Detach variable" });
@@ -431,19 +557,28 @@ const LOGO = svg(
       .locator("#color-dialog #color-field")
       .evaluate((e) => getComputedStyle(e).backgroundImage);
     assert.match(plane, /linear-gradient/, "picker plane renders for a bound paint");
-    assert.match(await page.locator("#color-dialog [data-bound-edit]").innerText(), /Editing variable brand/);
+    assert.match(
+      await page.locator("#color-dialog [data-bound-edit]").innerText(),
+      /Editing variable brand/,
+    );
     const alpha = page.getByRole("textbox", { name: "Opacity percent" });
     await alpha.fill("50");
     await alpha.press("Enter");
     card = await node("card");
-    assert.deepEqual([card.token, card.fills], ["brand", undefined], "alpha edit keeps the binding");
+    assert.deepEqual(
+      [card.token, card.fills],
+      ["brand", undefined],
+      "alpha edit keeps the binding",
+    );
     assert.equal(
       await page.evaluate(() => window.design.getDocument().tokens.brand),
       "#17203380",
       "translucency lives in the variable",
     );
     assert.equal(
-      await page.locator("#canvas [data-id=card]").evaluate((e) => getComputedStyle(e).backgroundColor),
+      await page
+        .locator("#canvas [data-id=card]")
+        .evaluate((e) => getComputedStyle(e).backgroundColor),
       "rgba(23, 32, 51, 0.5)",
     );
     assert.equal(await row0.locator("[data-paint-token=brand]").count(), 1, "chip stays");
@@ -622,13 +757,11 @@ const LOGO = svg(
       },
     ]);
     assert.equal(await fill.locator("h3").textContent(), "Text Fill");
-    const textStyle = await page
-      .locator("#canvas [data-id=title]")
-      .evaluate((e) => ({
-        clip: getComputedStyle(e).backgroundClip,
-        color: getComputedStyle(e).color,
-        image: e.style.backgroundImage,
-      }));
+    const textStyle = await page.locator("#canvas [data-id=title]").evaluate((e) => ({
+      clip: getComputedStyle(e).backgroundClip,
+      color: getComputedStyle(e).color,
+      image: e.style.backgroundImage,
+    }));
     assert.deepEqual(textStyle, {
       clip: "text",
       color: "rgba(0, 0, 0, 0)",
@@ -656,12 +789,26 @@ const LOGO = svg(
     );
     await bg.getByRole("button", { name: "Add background paint" }).click();
     let title = await node("title");
-    assert.deepEqual(title.backgroundFills, [{ type: "solid", color: "#ffffff" }], "Add defaults to white");
+    assert.deepEqual(
+      title.backgroundFills,
+      [{ type: "solid", color: "#ffffff" }],
+      "Add defaults to white",
+    );
     assert.equal(title.color, "#111111", "the text colour is untouched");
     assert.equal(title.fills.length, 1, "the Text Fill stack is untouched");
-    assert.equal(await bg.locator("[data-paint-stack]").getAttribute("data-paint-target"), "backgroundFills");
-    assert.equal(await fill.locator("[data-paint-stack]").getAttribute("data-paint-target"), "fills");
-    assert.equal(await page.locator("[name=color]").count(), 1, "only the Text Fill row owns [name=color]");
+    assert.equal(
+      await bg.locator("[data-paint-stack]").getAttribute("data-paint-target"),
+      "backgroundFills",
+    );
+    assert.equal(
+      await fill.locator("[data-paint-stack]").getAttribute("data-paint-target"),
+      "fills",
+    );
+    assert.equal(
+      await page.locator("[name=color]").count(),
+      1,
+      "only the Text Fill row owns [name=color]",
+    );
     const bgHex = bg.getByRole("textbox", { name: "Background fill hex colour" });
     await bgHex.fill("ff0000");
     await bgHex.press("Enter");
@@ -686,21 +833,45 @@ const LOGO = svg(
     await bg.locator("[data-paint-remove='0']").click();
     await bg.locator("[data-paint-remove='0']").click();
     title = await node("title");
-    assert.equal(title.backgroundFills, undefined, "an empty stack writes backgroundFills: undefined");
     assert.equal(
-      await page.evaluate(() => "backgroundFills" in JSON.parse(JSON.stringify(window.design.getDocument())).pages[0].nodes[0]),
+      title.backgroundFills,
+      undefined,
+      "an empty stack writes backgroundFills: undefined",
+    );
+    assert.equal(
+      await page.evaluate(
+        () =>
+          "backgroundFills" in
+          JSON.parse(JSON.stringify(window.design.getDocument())).pages[0].nodes[0],
+      ),
       false,
       "and leaves nothing in the saved document",
     );
     assert.equal(title.color, "#111111");
     assert.equal(await bg.locator("[data-paint]").count(), 0);
     await page.evaluate(() => window.design.runCommand("edit.undo"));
-    assert.deepEqual((await node("title")).backgroundFills, [{ type: "solid", color: "#ff0000" }], "undo restores it");
+    assert.deepEqual(
+      (await node("title")).backgroundFills,
+      [{ type: "solid", color: "#ff0000" }],
+      "undo restores it",
+    );
     await setup([
-      { id: "box", name: "Box", type: "frame", x: 20, y: 20, w: 100, h: 80, color: "#ffffff", layout: "free" },
+      {
+        id: "box",
+        name: "Box",
+        type: "frame",
+        x: 20,
+        y: 20,
+        w: 100,
+        h: 80,
+        color: "#ffffff",
+        layout: "free",
+      },
     ]);
     assert.equal(await bg.count(), 0, "only text layers have a Background Fill under the fill");
-    console.log("PASS text Background Fill: own stack in backgroundFills, white default, no collapse, empty removes");
+    console.log(
+      "PASS text Background Fill: own stack in backgroundFills, white default, no collapse, empty removes",
+    );
 
     // --- Multicolour SVG Colors, SVG-only export format, recoloured raster and vector output --------------------
     await setup([
@@ -800,18 +971,32 @@ const LOGO = svg(
       await menu.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
       return {
         menu,
-        items: await menu.locator("[data-export-option]").evaluateAll((els) =>
-          els.map((e) => e.innerText.trim() + (e.querySelector("svg") ? " ✓" : "")),
-        ),
+        items: await menu
+          .locator("[data-export-option]")
+          .evaluateAll((els) =>
+            els.map((e) => e.innerText.trim() + (e.querySelector("svg") ? " ✓" : "")),
+          ),
         separators: await menu.locator('[role="separator"]').count(),
         width: (await menu.boundingBox()).width,
-        rows: await menu.locator("[data-export-option]").evaluateAll((els) => [
-          ...new Set(els.map((e) => e.getBoundingClientRect().height)),
-        ]),
+        rows: await menu
+          .locator("[data-export-option]")
+          .evaluateAll((els) => [...new Set(els.map((e) => e.getBoundingClientRect().height))]),
       };
     };
     let menu = await exportMenu("artwork-scale");
-    assert.deepEqual(menu.items, ["0.5x", "1x", "2x ✓", "3x", "4x", "720p", "1080p", "1440p", "2160p", "512w", "512h"]);
+    assert.deepEqual(menu.items, [
+      "0.5x",
+      "1x",
+      "2x ✓",
+      "3x",
+      "4x",
+      "720p",
+      "1080p",
+      "1440p",
+      "2160p",
+      "512w",
+      "512h",
+    ]);
     assert.deepEqual([menu.separators, menu.width, menu.rows], [2, 152, [24]]);
     await menu.menu.locator('[data-export-option="1080p"]').click();
     await menu.menu.waitFor({ state: "detached" });
@@ -832,7 +1017,7 @@ const LOGO = svg(
       ["2160p", [2700, 2160], "Card@2160p.png"],
       ["0.5", [50, 40], "Card@0.5x.png"],
     ]) {
-      await saveAs(`card-${preset}.png`);
+      await saveAs(`card-${String(preset)}.png`);
       await page.locator("#artwork-scale").selectOption(preset);
       const bytes = await exportNow();
       assert.deepEqual(pngSize(bytes), { width: size[0], height: size[1] }, preset);
@@ -842,10 +1027,12 @@ const LOGO = svg(
         [size[0] - 2, Math.floor(size[1] / 2)],
         [Math.floor(size[0] / 2), size[1] - 2],
       ]);
-      near(corner.px[0], [255, 0, 0, 255], `${preset}: artwork fills the output`);
-      near(corner.px[1], [255, 0, 0, 255], `${preset}: artwork fills the output height`);
+      near(corner.px[0], [255, 0, 0, 255], `${String(preset)}: artwork fills the output`);
+      near(corner.px[1], [255, 0, 0, 255], `${String(preset)}: artwork fills the output height`);
     }
     // The suffix lives in the Export options popover (the name field is full width, as in Wonder A7).
+    // The last export's toast sits over this button.
+    await toastsGone();
     await page.getByRole("button", { name: "Export options" }).click();
     const suffix = page.getByRole("textbox", { name: "Export file suffix" });
     await suffix.fill("-hero");

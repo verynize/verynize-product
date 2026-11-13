@@ -1,0 +1,111 @@
+{
+  "gesturer": "desktop",
+  "remote": "web",
+  "room": "AUDIT collab test (delete me)",
+  "ids": {
+    "A": "aba8ea10-5f73-4595-b6da-cc056e35f247",
+    "B": "24577de7-e37d-4e14-bfe5-d5fc18739e80",
+    "R": "5fac1410-9fed-4853-998b-9c1920b8d5af",
+    "T": "6395abfb-4a3e-42d4-89cc-53302d695e1d"
+  },
+  "startedAt": "2026-11-08T23:17:24.615Z",
+  "trials": [],
+  "latency": {
+    "single": [
+      {
+        "visibleMs": 2590,
+        "applyMs": 2,
+        "firstSendAfterEditMs": 2212
+      },
+      {
+        "visibleMs": 2653,
+        "applyMs": 4,
+        "firstSendAfterEditMs": 2327
+      },
+      {
+        "visibleMs": 2425,
+        "applyMs": 3,
+        "firstSendAfterEditMs": 2070
+      },
+      {
+        "visibleMs": 2521,
+        "applyMs": 2,
+        "firstSendAfterEditMs": 2210
+      },
+      {
+        "visibleMs": 2350,
+        "applyMs": 2,
+        "firstSendAfterEditMs": 2031
+      }
+    ],
+    "burst": [
+      {
+        "edits": 1,
+        "durationMs": 1996,
+        "sendsDuringBurst": 0,
+        "sends": [
+          {
+            "afterStartMs": 2384,
+            "ops": 1,
+            "bytes": 201
+          }
+        ],
+        "remoteAppliesDuringBurst": 0,
+        "remoteApplies": [
+          {
+            "afterStartMs": 2687,
+            "x": -1499,
+            "ms": 2
+          }
+        ],
+        "firstVisibleAfterFirstEditMs": 1560,
+        "finalVisibleAfterLastEditMs": 1560
+      },
+      {
+        "edits": 1,
+        "durationMs": 1714,
+        "sendsDuringBurst": 0,
+        "sends": [
+          {
+            "afterStartMs": 2263,
+            "ops": 1,
+            "bytes": 201
+          }
+        ],
+        "remoteAppliesDuringBurst": 0,
+        "remoteApplies": [
+          {
+            "afterStartMs": 2645,
+            "x": -1499,
+            "ms": 2
+          }
+        ],
+        "firstVisibleAfterFirstEditMs": 1521,
+        "finalVisibleAfterLastEditMs": 1521
+      },
+      {
+        "edits": 1,
+        "durationMs": 1910,
+        "sendsDuringBurst": 0,
+        "sends": [
+          {
+            "afterStartMs": 2283,
+            "ops": 1,
+            "bytes": 201
+          }
+        ],
+        "remoteAppliesDuringBurst": 0,
+        "remoteApplies": [
+          {
+            "afterStartMs": 2636,
+            "x": -1499,
+            "ms": 2
+          }
+        ],
+        "firstVisibleAfterFirstEditMs": 1492,
+        "finalVisibleAfterLastEditMs": 1492
+      }
+    ]
+  },
+  "finishedAt": "2026-11-08T23:18:16.018Z"
+}

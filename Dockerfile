@@ -13,7 +13,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && npm cache clean --force
 COPY cloud ./cloud
-COPY integrations ./integrations
+# From the build stage: integrations/generated/ is emitted from integrations/src by build:ui.
+COPY --from=build /app/integrations ./integrations
 COPY server ./server
 COPY --from=build /app/web ./web
 RUN rm -rf web/src && mkdir -p /data && chown node:node /data

@@ -7,7 +7,9 @@ export function useIconKinds() {
     const select = legacySelect("icon-kind");
     return {
       value: select?.value ?? "star",
-      options: select ? [...select.options].map((o) => [o.value, o.textContent ?? o.value] as const) : [["star", "Star"] as const],
+      options: select
+        ? [...select.options].map((o) => [o.value, o.textContent ?? o.value] as const)
+        : [["star", "Star"] as const],
     };
   };
   const [state, setState] = useState(read);

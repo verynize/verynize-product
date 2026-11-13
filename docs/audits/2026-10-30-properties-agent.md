@@ -28,12 +28,12 @@ Sebelum perbaikan, `bindVariable` pada `vars.ts` hanya menulis scalar dan nama b
 
 Reproduksi headless menggunakan fungsi produksi `syncVariables` dan `nodeStyle` menghasilkan:
 
-| Properti | Scalar setelah sync | Nilai CSS sebelum perbaikan bind |
-|---|---|---|
-| radius | 24 | `4px 8px 12px 16px` |
-| strokeWidth | 24 | `1px 2px 3px 4px` |
-| padding | 24 | `5px 5px 5px 5px` |
-| gap | 24 | column `7px`, row `9px` |
+| Properti    | Scalar setelah sync | Nilai CSS sebelum perbaikan bind |
+| ----------- | ------------------- | -------------------------------- |
+| radius      | 24                  | `4px 8px 12px 16px`              |
+| strokeWidth | 24                  | `1px 2px 3px 4px`                |
+| padding     | 24                  | `5px 5px 5px 5px`                |
+| gap         | 24                  | column `7px`, row `9px`          |
 
 Perbaikan pada `vars.ts:224`: pemasangan binding scalar membersihkan override yang bertentangan melalui helper `scalarOverrides` di `model.ts`. Gap mengikuti kontrak kontrol `layout.tsx:430`: main axis flex, atau column gap untuk grid. Override cross axis tetap dipertahankan. Detach hanya melepas binding dan mempertahankan hasil yang sudah dirender.
 
@@ -67,23 +67,23 @@ Test lama hanya memeriksa dua pixel dan `body background:blue`, sehingga backgro
 
 ## Matriks cakupan
 
-| Area | Bukti Wonder | Verynize saat audit | Status/pengujian yang diperlukan |
-|---|---|---|---|
-| Page background | Screenshot awal sesi user, referensi 42 | Warna dan alpha halaman | Ada; variable halaman belum didukung |
-| Position, constraints, z-index | Referensi 43 | Kontrol tersedia | Flow/absolute perlu observasi Wonder lanjutan |
-| Free/flex/grid/block layout | Spesifikasi §3 | Layout, axis, wrapping, alignment, gap | Ada; binding gap diperbaiki untuk override |
-| W/H modes, min/max | Spesifikasi §3 | Sebagian mode dan min/max | Audit UI modes lengkap di luar perbaikan ini |
-| Padding/margin per axis/side | Spesifikasi §3 | Per-axis/per-side tersedia | Binding padding uniform diperbaiki |
-| Opacity, clip | Referensi 43 | Number binding dan clip frame | Ada, test inspector lama |
-| Radius | Referensi 43 + capture aktif 29 | Scalar binding dan empat editor corner | Implementasi dan regression CSS/undo lulus |
-| Font family/weight/size | Referensi 42 dan spesifikasi | Typed binding tersedia | Test inspector lama; batas font-size tidak seragam |
-| Fill dan color variable | Referensi 43 | Fill utama, alpha, gradient CSS | Detach diperbaiki; paint stack belum |
-| Border | Referensi 43 dan spesifikasi | Uniform width bindable + per-side width, warna literal | Editor per-side selesai; color binding belum |
-| Outline/Filters | Referensi 43 | Tidak dirender PropertiesBody | Gap eksplisit |
-| Shadow/Mask | Referensi 43 | Field CSS | Structured editor dan variable subproperti belum |
-| Export | Referensi 43, spesifikasi §3 | PNG/JPEG/WebP/SVG/PDF/HTML; urutan zoom native diperbaiki | Regression raster 0.5/1/2/4× lulus, termasuk pixel cakupan |
-| Variable types | Referensi 42 | Colors + Dimensions + Numbers + Font family + Font weight | Kelima jenis tersedia |
-| Icons | Screenshot awal sesi user | Panel terpisah | Audit agent `audit_variables_icons` |
+| Area                           | Bukti Wonder                            | Verynize saat audit                                       | Status/pengujian yang diperlukan                           |
+| ------------------------------ | --------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| Page background                | Screenshot awal sesi user, referensi 42 | Warna dan alpha halaman                                   | Ada; variable halaman belum didukung                       |
+| Position, constraints, z-index | Referensi 43                            | Kontrol tersedia                                          | Flow/absolute perlu observasi Wonder lanjutan              |
+| Free/flex/grid/block layout    | Spesifikasi §3                          | Layout, axis, wrapping, alignment, gap                    | Ada; binding gap diperbaiki untuk override                 |
+| W/H modes, min/max             | Spesifikasi §3                          | Sebagian mode dan min/max                                 | Audit UI modes lengkap di luar perbaikan ini               |
+| Padding/margin per axis/side   | Spesifikasi §3                          | Per-axis/per-side tersedia                                | Binding padding uniform diperbaiki                         |
+| Opacity, clip                  | Referensi 43                            | Number binding dan clip frame                             | Ada, test inspector lama                                   |
+| Radius                         | Referensi 43 + capture aktif 29         | Scalar binding dan empat editor corner                    | Implementasi dan regression CSS/undo lulus                 |
+| Font family/weight/size        | Referensi 42 dan spesifikasi            | Typed binding tersedia                                    | Test inspector lama; batas font-size tidak seragam         |
+| Fill dan color variable        | Referensi 43                            | Fill utama, alpha, gradient CSS                           | Detach diperbaiki; paint stack belum                       |
+| Border                         | Referensi 43 dan spesifikasi            | Uniform width bindable + per-side width, warna literal    | Editor per-side selesai; color binding belum               |
+| Outline/Filters                | Referensi 43                            | Tidak dirender PropertiesBody                             | Gap eksplisit                                              |
+| Shadow/Mask                    | Referensi 43                            | Field CSS                                                 | Structured editor dan variable subproperti belum           |
+| Export                         | Referensi 43, spesifikasi §3            | PNG/JPEG/WebP/SVG/PDF/HTML; urutan zoom native diperbaiki | Regression raster 0.5/1/2/4× lulus, termasuk pixel cakupan |
+| Variable types                 | Referensi 42                            | Colors + Dimensions + Numbers + Font family + Font weight | Kelima jenis tersedia                                      |
+| Icons                          | Screenshot awal sesi user               | Panel terpisah                                            | Audit agent `audit_variables_icons`                        |
 
 ## Validasi
 

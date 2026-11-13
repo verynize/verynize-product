@@ -6,7 +6,7 @@ const newDesign = `# Skill: new-design
 
 Use for anything new from a prompt: a page, screen, flow, dashboard, a single component, a set of separate items (logo options, empty states, one artboard each), or variations of an existing design.
 
-Supporting skills: load **new-design-references** when the user wants examples, inspiration or a competitive scan; **new-design-arrange** whenever you place more than one artboard; **generate-assets** when the design needs imagery beyond a stock photo; **design-library** when you create or reuse tokens.
+Supporting skills: load **new-design-references** when the user wants examples, inspiration or a competitive scan; **new-design-arrange** whenever you place more than one artboard; **generate-assets** when the design needs imagery beyond a stock photo; **design-library** when you create or reuse tokens; **components** when parts repeat across screens (an app shell around every page, a card or row used many times).
 
 ## 1. Pick the source of the look
 In this order: (1) the user's brief, references or named style; (2) a repository behind the product, whose tokens, fonts and components win (follow code-to-design for how to read them); (3) the language already on the canvas: when existing artboards share palette, type and radii, a new screen joins them, so read two of them with get_element_code; (4) only with a free hand, choose a style (get_design_guidelines with \`brief\` suggests candidates).
@@ -53,7 +53,7 @@ const editDesign = `# Skill: edit-design
 
 Use to change an existing design beyond a one-property tweak, to fix a problem the user reports, or to give feedback on a design. A quick text, color, spacing or icon change needs no skill: apply it directly. Several side-by-side alternatives belong to new-design (Variations).
 
-Supporting skills: **new-design-references** when real references would sharpen feedback; **design-library** when the change touches tokens; **design-review** after a large change.
+Supporting skills: **new-design-references** when real references would sharpen feedback; **design-library** when the change touches tokens; **components** when the layer you change belongs to a main component or an instance; **design-review** after a large change.
 
 ## 1. Diagnose before touching
 - take_screenshot of the area and read its current code with get_element_code (get_element_tree or find_elements to locate ids). The user may have edited since your last read, so read again before the first edit of the turn.
@@ -61,6 +61,7 @@ Supporting skills: **new-design-references** when real references would sharpen 
 - Name the existing direction: fonts, palette, radius, spacing rhythm, tokens. Preserve it unless asked for a new one. If the design follows a named style, or the user picks a new one, call get_design_guidelines with \`style\` so edits stay inside it.
 
 ## 2. Change the minimum
+- For small copy/class changes, read get_element_code and read_document, then use replace_in_element with the current revision and an exact old string occurring once. Preserve data-node-id attributes.
 - Edit the smallest element that solves it, in place: \`edit\` directives merge classes, \`replace\` only for a real restructure. Never insert a new version beside the old one.
 - Keep ids stable. Do not rebuild a section to change a word.
 - Reuse existing tokens and sibling classes; do not invent colors or sizes. A token change restyles every element bound to it, other artboards included, so change the token itself only when the user wants it everywhere, and ask first when other designs use it.
@@ -116,7 +117,7 @@ const codeToDesign = `# Skill: code-to-design
 
 Use when the user gives code (a repo path, a component, pasted JSX or HTML) and wants it on the canvas, or wants a canvas copy refreshed after the code changed. The result reproduces what the code renders today.
 
-Supporting skills: **code-to-design-library** when the job is a whole component library ("bring in our buttons, inputs and cards"); **design-library-icons** for the repo's own icons; **design-library** for token mechanics. The code is the style here; call get_design_guidelines with \`style\` only for an uplift the user asks for.
+Supporting skills: **code-to-design-library** when the job is a whole component library ("bring in our buttons, inputs and cards"); **design-library-icons** for the repo's own icons; **design-library** for token mechanics; **components** when the code reuses one component across screens (a layout shell, list rows, cards). The code is the style here; call get_design_guidelines with \`style\` only for an uplift the user asks for.
 
 ## 1. Read the source of truth
 - Read the checkout with your own file tools, skipping build output and \`node_modules\`. If there is no checkout, ask where the code is.
@@ -126,6 +127,7 @@ Supporting skills: **code-to-design-library** when the job is a whole component 
 ## 2. Bring in tokens first
 - Read get_design_tokens. Reuse a token that matches by value and role. Create the missing ones with create_design_tokens using the repo's names and exact values (\`rem\` converted at the repo's root size).
 - Where the repo layers semantic names over a raw palette, keep both: create the raw token, then the semantic one, then point it at the raw token with update_design_tokens \`aliasOf\`. Never flatten an alias to its value.
+- Import HTML/JSX with optional \`name\` and \`placement\`: \`auto\` places roots beside existing artboards; \`preserve\` keeps source coordinates. Inline SVG becomes a sanitized image; arbitrary border, radius, outline and embedded URL backgrounds are supported. For local HTTP images, use HTML import with explicit \`allowRemote: true\`. Read returned warnings for missing assets.
 - Static HTML or exported pages can come in through import_html, which turns :root custom properties into tokens. A running app the user asks to capture can come in through capture_preview_to_canvas.
 
 ## 3. Translate, do not re-imagine
@@ -189,7 +191,7 @@ Supporting skills: **new-design-arrange** when assets become separate artboards 
 ## 1. Choose the source by the slot
 - **Photography** (hero, product context, people, atmosphere): search_images with an art-directed query: subject, viewpoint, light, mood, and where the quiet area for text sits. Pick one result that fits; place it with \`<img src="…" alt="…" className="w-full h-[480px] object-cover" />\`. Credit the author where the design shows credits. Do not use more photos than the layout needs.
 - **Living texture or abstract hero** (product launch, AI or audio themes, ambient bands): a shader node, \`<Shader preset="aurora" />\`. Presets include aurora, mesh, waves, noise, ribbon and swirl; pass palette colors as \`data-shader-colors\` (a JSON object keyed by center, edge, ripple and background) and lower \`speed\` and \`intensity\` so it stays calm behind text.
-- **Logo marks, illustrations, patterns**: an SVG as \`<img src="data:image/svg+xml;base64,…" />\`, written by hand from simple geometry. Keep it flat: a few paths, one stroke weight or none, colors from the palette. Recolor a single-color SVG by binding its SVG color with bind_variables.
+- **Logo marks, illustrations, patterns**: inline \`<svg viewBox="0 0 24 24" className="size-12"><path d="…" fill="#…" /></svg>\`, written by hand from simple geometry. It becomes an editable vector layer (one per paint, grouped in a frame when there are several), read back as \`<svg data-vector …>\` whose fill, stroke, strokeWidth (layer pixels), strokeLinecap/Linejoin and strokeDasharray you can edit in place. Keep it flat: a few paths, one stroke weight or none, colors from the palette. Gradients, filters, masks, clip paths and text inside an SVG keep it an image (the warning says so); draw those parts with frames and fills instead.
 - **Gradients and shapes**: \`bg-linear-to-br from-… via-… to-…\` in the palette's own hues, or overlapping \`<div />\` shapes with radius, borders and low-opacity fills cut from the accent and surface colors.
 - **Typographic art**: a huge cropped word or number in the display face often beats a weak picture.
 
@@ -333,7 +335,7 @@ Use together with code-to-design when the user wants a repository's component li
 ## Build order
 1. Tokens (design-library) and repo icons (design-library-icons).
 2. Primitives that import no other repo component, written from their source.
-3. Each composite after everything it imports. A part used many times is built once and copied with duplicate_elements, then each copy's text and classes are adjusted with update_elements. A slot whose children differ per copy stays a labelled empty frame such as "Card Body Slot".
+3. Each composite after everything it imports. A part used many times is built once, made a main component with create_component, and placed with create_instance; each instance's text and classes are adjusted with update_elements (those edits stay on that instance). A region whose children differ per use (\`children\`, a render prop) becomes a slot with set_slot.
 
 ## Organize
 - One top-level artboard labelled "<Repo> Design Guide", a wide \`flex flex-col\` frame holding one "<Component> — Guide Section" frame per component, each with its variant and state nodes at natural size, no preview frame around them.
@@ -344,30 +346,162 @@ Use together with code-to-design when the user wants a repository's component li
 Counts (tokens, icons, components, variants, pages), what you left out and why, and parts with no source that you built new.
 `;
 
+const components = `# Skill: components
+
+Use when a part repeats: an app shell (header, sidebar, content) around every screen of a product, a nav bar, a card, a list row, a button style used across artboards. A main component is the one definition; each instance is a full, linked copy that follows the main and keeps its own edits.
+
+## When to make one
+- Make a component when the same part appears on two or more screens or three or more times on one, and should change together. One-off sections stay plain layers.
+- Build the part once and finish it (real copy, tokens, spacing) before making it a component; edits to the main reach every instance, so a rough main spreads roughness.
+- Keep mains together on their own artboard or page ("Components"), labelled by role ("App Shell", "Pricing Card"), so they are easy to find and never mistaken for screens.
+
+## Tools
+- create_component {ids}: one frame becomes the main; several sibling layers are wrapped in a frame first.
+- set_slot {id, name}: a frame inside the main becomes a slot, a content region every instance fills on its own (page content, a card body, a modal's form). Name slots by what goes in them ("Content", "Actions").
+- create_instance {component, parent?, x?, y?, label?}: places an instance and returns its id and its slot ids. Without parent it becomes its own artboard.
+- list_components lists mains with their slots and instances; with id it tells what a layer is (main, instance, inherited layer, slot, local layer) and which keys it overrides.
+- reset_overrides {ids, all?} returns layers (or whole instances) to the main's values; on a slot it brings back the default content. detach_instance turns an instance into plain layers when it must stop following the main.
+
+## How edits behave
+- Edit the main (update_elements on its ids) to change every instance. Keys you change inside an instance become overrides and stay on that instance only; reset_overrides undoes them.
+- Content added inside an instance belongs in a slot: insert into the slot id from create_instance (\`{/* insert as last child of SLOT_ID */}\`). The slot then shows that instance's own content. Layers added outside a slot stay local to that instance, and the update_elements report says so in its notes; prefer a slot.
+- Deleting an inherited layer in an instance hides it there; delete it in the main to remove it everywhere.
+- Duplicating a main with duplicate_elements gives an instance; duplicating an instance keeps its overrides and slot content.
+- In JSX, \`data-component="true"\` marks a main, \`data-instance-of="<main id or name>"\` an instance and \`data-slot="Name"\` a slot. A new element written as \`<div data-instance-of="App Shell"><div data-slot="Content">…</div></div>\` is an instance whose Content slot holds what you wrote; other children of an instance element are ignored. A main cannot contain an instance of itself.
+
+## App shell pattern
+1. Build the shell once as an artboard: header (product name, nav), sidebar (sections), and a content frame with the page padding; flex layout, tokens, no fixed heights.
+2. create_component on the shell, then set_slot on the content frame with name "Content" (leave a short default such as a heading there).
+3. One instance per screen: create_instance with x/y laid out by new-design-arrange and a label per screen ("Dashboard", "Settings").
+4. Fill each instance's Content slot with that screen's content; change the active nav item per screen with an edit in the instance (an override).
+5. Shell changes go to the main and reach every screen; screenshot one instance after a main edit to check it still fits.
+`;
+
 const entries = [
-  { name: 'new-design', kind: 'primary', summary: 'Design something new from a prompt, a set of separate items, or up to 4 variations: brief → style → labelled skeleton → section-by-section with screenshots → review → finish.', supporting: ['new-design-references', 'new-design-arrange', 'generate-assets', 'design-library'], body: newDesign },
-  { name: 'edit-design', kind: 'primary', summary: 'Change, fix or give feedback on an existing design: diagnose from screenshot and code, change the minimum, preserve the direction, re-verify.', supporting: ['new-design-references', 'design-library', 'design-review'], body: editDesign },
-  { name: 'design-to-code', kind: 'primary', summary: 'Build a canvas design in the user\'s repository, reusing its components, tokens and icons, then check it with the repo\'s own tools.', supporting: ['design-to-code-pull-request', 'design-library-icons'], body: designToCode },
-  { name: 'code-to-design', kind: 'primary', summary: 'Reproduce a screen or component from the user\'s code on the canvas, tokens first, faithfully, then verify against the source.', supporting: ['code-to-design-library', 'design-library-icons', 'design-library'], body: codeToDesign },
-  { name: 'design-library', kind: 'primary', summary: 'Create, alias, bind, rename or extract design tokens, choose the icon set, and build a style guide or component sheet.', supporting: ['design-library-icons', 'code-to-design-library'], body: designLibrary },
-  { name: 'generate-assets', kind: 'primary', summary: 'Source imagery and artwork without an image model: stock photos, shader fills, hand-written SVG vectors, gradients and shapes.', supporting: ['new-design-arrange'], body: generateAssets },
-  { name: 'design-review', kind: 'supporting', summary: 'Ten-point critique with 1–5 concrete fixes citing element ids; re-screenshot; max 3 repair iterations. Required before finish_artboard.', body: designReview },
-  { name: 'new-design-references', kind: 'supporting', summary: 'Gather and cite references: examples, competitive analysis, unconventional directions, reference-backed critique.', body: newDesignReferences },
-  { name: 'new-design-arrange', kind: 'supporting', summary: 'Place several artboards with data-component-x/y: flows in rows, variants in columns, 100px gaps, no overlaps.', body: newDesignArrange },
-  { name: 'design-library-icons', kind: 'supporting', summary: 'Bring a repository\'s own icons onto the canvas: find rendered glyphs, map published sets to get_icons, embed repo SVGs unchanged.', body: designLibraryIcons },
-  { name: 'design-to-code-pull-request', kind: 'supporting', summary: 'Commit design work and open a pull request only when asked, following the repo\'s conventions.', body: designToCodePullRequest },
-  { name: 'code-to-design-library', kind: 'supporting', summary: 'Import a repo\'s component library: inventory, build in import order, organize a design guide of reusable components.', body: codeToDesignLibrary },
+  {
+    name: "new-design",
+    kind: "primary",
+    summary:
+      "Design something new from a prompt, a set of separate items, or up to 4 variations: brief → style → labelled skeleton → section-by-section with screenshots → review → finish.",
+    supporting: [
+      "new-design-references",
+      "new-design-arrange",
+      "generate-assets",
+      "design-library",
+      "components",
+    ],
+    body: newDesign,
+  },
+  {
+    name: "edit-design",
+    kind: "primary",
+    summary:
+      "Change, fix or give feedback on an existing design: diagnose from screenshot and code, change the minimum, preserve the direction, re-verify.",
+    supporting: ["new-design-references", "design-library", "components", "design-review"],
+    body: editDesign,
+  },
+  {
+    name: "design-to-code",
+    kind: "primary",
+    summary:
+      "Build a canvas design in the user's repository, reusing its components, tokens and icons, then check it with the repo's own tools.",
+    supporting: ["design-to-code-pull-request", "design-library-icons"],
+    body: designToCode,
+  },
+  {
+    name: "code-to-design",
+    kind: "primary",
+    summary:
+      "Reproduce a screen or component from the user's code on the canvas, tokens first, faithfully, then verify against the source.",
+    supporting: ["code-to-design-library", "design-library-icons", "design-library", "components"],
+    body: codeToDesign,
+  },
+  {
+    name: "design-library",
+    kind: "primary",
+    summary:
+      "Create, alias, bind, rename or extract design tokens, choose the icon set, and build a style guide or component sheet.",
+    supporting: ["design-library-icons", "code-to-design-library"],
+    body: designLibrary,
+  },
+  {
+    name: "generate-assets",
+    kind: "primary",
+    summary:
+      "Source imagery and artwork without an image model: stock photos, shader fills, hand-written SVG vectors, gradients and shapes.",
+    supporting: ["new-design-arrange"],
+    body: generateAssets,
+  },
+  {
+    name: "design-review",
+    kind: "supporting",
+    summary:
+      "Ten-point critique with 1–5 concrete fixes citing element ids; re-screenshot; max 3 repair iterations. Required before finish_artboard.",
+    body: designReview,
+  },
+  {
+    name: "new-design-references",
+    kind: "supporting",
+    summary:
+      "Gather and cite references: examples, competitive analysis, unconventional directions, reference-backed critique.",
+    body: newDesignReferences,
+  },
+  {
+    name: "new-design-arrange",
+    kind: "supporting",
+    summary:
+      "Place several artboards with data-component-x/y: flows in rows, variants in columns, 100px gaps, no overlaps.",
+    body: newDesignArrange,
+  },
+  {
+    name: "design-library-icons",
+    kind: "supporting",
+    summary:
+      "Bring a repository's own icons onto the canvas: find rendered glyphs, map published sets to get_icons, embed repo SVGs unchanged.",
+    body: designLibraryIcons,
+  },
+  {
+    name: "design-to-code-pull-request",
+    kind: "supporting",
+    summary:
+      "Commit design work and open a pull request only when asked, following the repo's conventions.",
+    body: designToCodePullRequest,
+  },
+  {
+    name: "components",
+    kind: "supporting",
+    summary:
+      "Reusable parts: main components, linked instances with their own overrides, slots for per-instance content, and the app shell pattern (one shell main, one instance per screen).",
+    body: components,
+  },
+  {
+    name: "code-to-design-library",
+    kind: "supporting",
+    summary:
+      "Import a repo's component library: inventory, build in import order, organize a design guide of reusable components.",
+    body: codeToDesignLibrary,
+  },
 ];
 
 /** Old skill names that still resolve: alias → current skill. */
 export const skillAliases = {
-  variations: { target: 'new-design', note: 'Variations are part of new-design now; follow its "Variations" section.' },
-  'design-system': { target: 'design-library', note: 'design-system is now design-library; its style guide and component sheet steps are in section 5.' },
+  variations: {
+    target: "new-design",
+    note: 'Variations are part of new-design now; follow its "Variations" section.',
+  },
+  "design-system": {
+    target: "design-library",
+    note: "design-system is now design-library; its style guide and component sheet steps are in section 5.",
+  },
 };
 
-export const skills = Object.fromEntries(entries.map(e => [e.name, e]));
+export const skills = Object.fromEntries(entries.map((e) => [e.name, e]));
 
-const normalize = name => String(name || '').toLowerCase().trim().replace(/[\s_]+/g, '-');
+const normalize = (name) =>
+  String(name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, "-");
 
 /** Resolve a skill name or alias to the canonical skill name, or null. */
 export function resolveSkillName(name) {
@@ -382,32 +516,49 @@ export function resolveSkillName(name) {
  * @returns {{ name: string, kind: 'primary'|'supporting'|'alias', summary: string, supporting?: string[], aliasOf?: string }[]}
  */
 export function listSkills({ aliases = true } = {}) {
-  const out = entries.map(({ name, kind, summary, supporting }) => ({ name, kind, summary, ...(supporting ? { supporting } : {}) }));
-  if (aliases) for (const [name, { target }] of Object.entries(skillAliases)) out.push({ name, kind: 'alias', aliasOf: target, summary: `Old name for ${target}; resolves to it.` });
+  const out = entries.map(({ name, kind, summary, supporting }) => ({
+    name,
+    kind,
+    summary,
+    ...(supporting ? { supporting } : {}),
+  }));
+  if (aliases)
+    for (const [name, { target }] of Object.entries(skillAliases))
+      out.push({
+        name,
+        kind: "alias",
+        aliasOf: target,
+        summary: `Old name for ${target}; resolves to it.`,
+      });
   return out;
 }
 
 export function getSkill(name) {
   const key = normalize(name);
   const target = resolveSkillName(key);
-  if (!target) throw new Error(`Unknown skill "${name}". Available: ${entries.map(e => e.name).join(', ')}`);
+  if (!target)
+    throw new Error(`Unknown skill "${name}". Available: ${entries.map((e) => e.name).join(", ")}`);
   const body = skills[target].body;
   return key === target ? body : `> ${skillAliases[key].note}\n\n${body}`;
 }
 
 /** Markdown for a get_skills call without a name. */
 export function skillCatalog() {
-  const primary = entries.filter(e => e.kind === 'primary');
-  const supporting = entries.filter(e => e.kind === 'supporting');
+  const primary = entries.filter((e) => e.kind === "primary");
+  const supporting = entries.filter((e) => e.kind === "supporting");
   return `## Skills
 
 Load the one skill that matches the job with get_skills {skill} before starting it, and follow it step by step. A quick text, color, spacing or icon tweak needs no skill.
 
 ### Primary (one per job)
-${primary.map(e => `- **${e.name}**: ${e.summary}${e.supporting.length ? ` Supporting: ${e.supporting.join(', ')}.` : ''}`).join('\n')}
+${primary.map((e) => `- **${e.name}**: ${e.summary}${e.supporting.length ? ` Supporting: ${e.supporting.join(", ")}.` : ""}`).join("\n")}
 
 ### Supporting (a primary skill says when to load them)
-${supporting.map(e => `- **${e.name}**: ${e.summary}`).join('\n')}
+${supporting.map((e) => `- **${e.name}**: ${e.summary}`).join("\n")}
 
-Once a style is chosen or named, call get_design_guidelines {style}. Always run design-review before finish_artboard. Old names still work: ${Object.entries(skillAliases).map(([a, { target }]) => `${a} → ${target}`).join(', ')}.`;
+Once a style is chosen or named, call get_design_guidelines {style}. Always run design-review before finish_artboard. Old names still work: ${Object.entries(
+    skillAliases,
+  )
+    .map(([a, { target }]) => `${a} → ${target}`)
+    .join(", ")}.`;
 }

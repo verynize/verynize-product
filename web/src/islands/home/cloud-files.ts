@@ -1,7 +1,7 @@
-// Cloud files in the Files home: rooms of the active workspace (`/api/orgs/:id/rooms`) plus rooms
-// shared with the account directly (`/api/me/rooms`), merged with this device's cloud-backed
+// Cloud files in the Files home: filter `/api/me/rooms` to the active workspace and direct shares,
+// merged with this device's cloud-backed
 // library records so each room appears once. Opening a listed room joins it through
-// `window.cloudWorkspace.openRoom`, which creates the library record on first open.
+// the library, which selects the destination route before fetching its document.
 import "@/lib/account-store";
 import { useMemo } from "react";
 import { queryOptions, useQuery } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ import {
   type AccountScope,
 } from "@/lib/query/keys";
 import type { DesignDocument } from "@/lib/bridge";
-import type { CloudRoom, LibraryFile } from "./library";
+import { library, type CloudRoom, type LibraryFile } from "./library";
 
 type RoomRow = {
   id: string;
@@ -25,57 +25,35 @@ type RoomRow = {
   organizationId?: string | null;
   organizationName?: string | null;
 };
-type CloudWorkspaceApi = {
-  openRoom(info: { server: string; id: string }): Promise<void>;
-};
 
-const RANK: Record<string, number> = { viewer: 1, commenter: 2, editor: 3, owner: 4 };
-const higher = (a = "", b = "") => ((RANK[a] ?? 0) >= (RANK[b] ?? 0) ? a : b);
-
-type RoomLists = { workspace: { role: string; rooms: RoomRow[] }; mine: { rooms: RoomRow[] } };
-/** Rooms of a workspace (none when `organizationId` is null) and rooms shared with the account. */
-export const cloudRoomsQuery = (scope: AccountScope, organizationId: string | null) =>
+type RoomLists = { rooms: RoomRow[] };
+/** One account-wide list; workspace switches filter the same fresh response locally. */
+export const cloudRoomsQuery = (scope: AccountScope) =>
   queryOptions({
-    queryKey: queryKeys.rooms(scope, organizationId),
-    queryFn: async (): Promise<RoomLists> => {
-      const [workspace, mine] = await Promise.all([
-        organizationId
-          ? scopedRequest<RoomLists["workspace"]>(scope, `/api/orgs/${organizationId}/rooms`)
-          : { role: "", rooms: [] as RoomRow[] },
-        scopedRequest<RoomLists["mine"]>(scope, "/api/me/rooms"),
-      ]);
-      return { workspace, mine };
-    },
+    queryKey: queryKeys.rooms(scope),
+    queryFn: () => scopedRequest<RoomLists>(scope, "/api/me/rooms"),
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
   });
 
 function mergeRooms(
-  { workspace, mine }: RoomLists,
+  { rooms }: RoomLists,
   server: string,
+  organizationId: string | null,
   organizationName: string | null,
 ): CloudRoom[] {
-  const byId = new Map<string, CloudRoom>();
-  const roleIn = new Map(mine.rooms.map((room) => [room.id, room.role ?? ""]));
-  for (const room of workspace.rooms)
-    byId.set(room.id, {
+  // The server includes organization-only memberships and chooses the higher direct/org role.
+  // Direct shares without a workspace remain visible in every workspace, as before.
+  return rooms
+    .filter((room) => !room.organizationId || room.organizationId === organizationId)
+    .map((room) => ({
       id: room.id,
       server,
       title: room.title || "Untitled",
-      role: higher(workspace.role, roleIn.get(room.id)),
+      role: room.role ?? "viewer",
       updatedAt: room.updatedAt ?? 0,
-      organizationName: organizationName ?? "Workspace",
-    });
-  // Direct shares: rooms outside any of your organizations.
-  for (const room of mine.rooms)
-    if (!room.organizationId && !byId.has(room.id))
-      byId.set(room.id, {
-        id: room.id,
-        server,
-        title: room.title || "Untitled",
-        role: room.role ?? "viewer",
-        updatedAt: room.updatedAt ?? 0,
-        organizationName: null,
-      });
-  return [...byId.values()];
+      organizationName: room.organizationId ? (organizationName ?? "Workspace") : null,
+    }));
 }
 
 const NO_ROOMS: CloudRoom[] = [];
@@ -87,17 +65,21 @@ export function useCloudRooms(active: boolean) {
   const organizationName = organizations.find((org) => org.id === organization)?.name ?? null;
   const enabled = active && !!scope;
   const query = useQuery({
-    ...cloudRoomsQuery(scope ?? SIGNED_OUT, organization),
+    ...cloudRoomsQuery(scope ?? SIGNED_OUT),
     enabled,
-    refetchInterval: 3000,
-    refetchOnWindowFocus: true,
+    // Local mutations invalidate immediately. Poll while Home is open for cross-device changes;
+    // mount/focus refetch only when the shared list is stale.
+    refetchInterval: 60_000,
   });
   const { data, error } = query;
   const server = scope?.server ?? "";
   // Like before: no rooms while signed out, hidden, or after a failed load.
   const rooms = useMemo(
-    () => (enabled && data && !error ? mergeRooms(data, server, organizationName) : NO_ROOMS),
-    [enabled, data, error, server, organizationName],
+    () =>
+      enabled && data && !error
+        ? mergeRooms(data, server, organization, organizationName)
+        : NO_ROOMS,
+    [enabled, data, error, server, organization, organizationName],
   );
   return { rooms, error: enabled && error ? error.message : "" };
 }
@@ -147,10 +129,13 @@ export function openEntry(file: LibraryFile, open: (id: string) => unknown) {
     return void Promise.resolve(open(file.id)).catch((e: unknown) =>
       toast(e instanceof Error ? e.message : String(e)),
     );
-  const workspace = (window as unknown as { cloudWorkspace?: CloudWorkspaceApi }).cloudWorkspace;
-  void workspace
-    ?.openRoom({ server: file.room!.server, id: file.room!.id })
-    .catch((e: unknown) => toast(e instanceof Error ? e.message : String(e)));
+  void library()
+    .openRoomFile(file.room!)
+    .catch((e: unknown) => {
+      // A failed open from Files announces itself (chrome/SwitchLoading.tsx); only earlier errors are shown here.
+      if (!(e as { notified?: boolean } | null)?.notified)
+        toast(e instanceof Error ? e.message : String(e));
+    });
 }
 
 export const ROLE_LABEL: Record<string, string> = {

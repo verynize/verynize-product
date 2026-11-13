@@ -12,7 +12,7 @@ const path = require("node:path");
 
 (async () => {
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "panel-resize-"));
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   const app = await electron.launch({
     env,

@@ -4,9 +4,21 @@
 import { useSyncExternalStore } from "react";
 import { platform } from "@/lib/platform";
 
-export type McpStatus = "connected" | "starting" | "failed" | "needs-auth" | "disabled" | "not-started";
+export type McpStatus =
+  | "connected"
+  | "starting"
+  | "failed"
+  | "needs-auth"
+  | "disabled"
+  | "not-started";
 export type McpServer = { name: string; status: McpStatus; error?: string; builtIn?: boolean };
-export type McpSnapshot = { agent: string; live: boolean; servers: McpServer[]; error?: string; at: number };
+export type McpSnapshot = {
+  agent: string;
+  live: boolean;
+  servers: McpServer[];
+  error?: string;
+  at: number;
+};
 export type ContextBreakdown = {
   totalTokens: number;
   maxTokens?: number;
@@ -24,7 +36,13 @@ export type AccountUsage = {
   limits: AccountLimit[];
   updatedAt?: number;
 };
-export type LayerUsage = { thisWeek: number; lastWeek: number; total: number; weekStart: number; resetsAt: number };
+export type LayerUsage = {
+  thisWeek: number;
+  lastWeek: number;
+  total: number;
+  weekStart: number;
+  resetsAt: number;
+};
 
 export const desktopApi = () => platform.desktop;
 
@@ -34,7 +52,14 @@ const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((fn) => fn());
 let attached = false;
 
-const STATUSES: McpStatus[] = ["connected", "starting", "failed", "needs-auth", "disabled", "not-started"];
+const STATUSES: McpStatus[] = [
+  "connected",
+  "starting",
+  "failed",
+  "needs-auth",
+  "disabled",
+  "not-started",
+];
 function cleanServers(value: unknown): McpServer[] {
   if (!Array.isArray(value)) return [];
   return value
@@ -46,7 +71,10 @@ function cleanServers(value: unknown): McpServer[] {
       ...(s.builtIn || s.name === "verynize" ? { builtIn: true } : {}),
     }));
 }
-const ordered = (servers: McpServer[]) => [...servers.filter((s) => s.builtIn), ...servers.filter((s) => !s.builtIn)];
+const ordered = (servers: McpServer[]) => [
+  ...servers.filter((s) => s.builtIn),
+  ...servers.filter((s) => !s.builtIn),
+];
 
 function attach() {
   if (attached) return;
@@ -65,7 +93,12 @@ function attach() {
       for (const s of servers) byName.set(s.name, s);
       next = [...byName.values()];
     }
-    mcp.set(event.chatId, { agent: (typeof event.agent === "string" && event.agent) || previous?.agent || "", live: true, servers: ordered(next), at: Date.now() });
+    mcp.set(event.chatId, {
+      agent: (typeof event.agent === "string" && event.agent) || previous?.agent || "",
+      live: true,
+      servers: ordered(next),
+      at: Date.now(),
+    });
     notify();
   });
 }
@@ -82,7 +115,10 @@ export function useMcpStatus(chatId: string | null | undefined): McpSnapshot | u
 }
 
 /** Ask the desktop for the chat's MCP servers (the live run, else the configured list) and store the answer. */
-export async function refreshMcpStatus(chatId: string | null | undefined, agent: string): Promise<void> {
+export async function refreshMcpStatus(
+  chatId: string | null | undefined,
+  agent: string,
+): Promise<void> {
   const ask = desktopApi()?.agentLiveStatus?.mcp;
   if (!ask) return;
   const result = await ask({ agent, chatId: chatId ?? null });
@@ -90,7 +126,13 @@ export async function refreshMcpStatus(chatId: string | null | undefined, agent:
   const previous = mcp.get(key);
   // A configured list never replaces what a run reported for the same agent.
   if (!result.live && previous?.live && previous.agent === result.agent) return;
-  mcp.set(key, { agent: result.agent, live: !!result.live, servers: ordered(cleanServers(result.servers)), ...(result.error ? { error: result.error } : {}), at: Date.now() });
+  mcp.set(key, {
+    agent: result.agent,
+    live: !!result.live,
+    servers: ordered(cleanServers(result.servers)),
+    ...(result.error ? { error: result.error } : {}),
+    at: Date.now(),
+  });
   notify();
 }
 
@@ -108,12 +150,18 @@ const subscribeUsage = (fn: () => void) => {
   return () => usageListeners.delete(fn);
 };
 
-export function useAccountUsage(agent: string): { account?: AccountUsage; layers: LayerUsage | null } {
+export function useAccountUsage(agent: string): {
+  account?: AccountUsage;
+  layers: LayerUsage | null;
+} {
   useSyncExternalStore(subscribeUsage, () => usageVersion.value);
   return { account: accounts.get(agent), layers };
 }
 
-export async function refreshAccountUsage(agent: "claude" | "codex", refresh = false): Promise<void> {
+export async function refreshAccountUsage(
+  agent: "claude" | "codex",
+  refresh = false,
+): Promise<void> {
   const api = desktopApi()?.agentUsage;
   if (!api) return;
   const [account, layerUsage] = await Promise.all([
@@ -125,7 +173,9 @@ export async function refreshAccountUsage(agent: "claude" | "codex", refresh = f
   bump();
 }
 
-export async function readContext(chatId: string | null | undefined): Promise<ContextBreakdown | null> {
+export async function readContext(
+  chatId: string | null | undefined,
+): Promise<ContextBreakdown | null> {
   const ask = desktopApi()?.agentLiveStatus?.context;
   if (!ask || !chatId) return null;
   return ask({ chatId }).catch(() => null);

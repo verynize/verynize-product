@@ -1,0 +1,9 @@
+{
+  "title": "Foreign controls and contents retain text",
+  "covers": ["display-contents", "input", "textarea", "select", "relative-image"],
+  "expect": [
+    { "node": "Controls", "prop": "type", "eq": "frame" },
+    { "node": "Area", "prop": "type", "eq": "frame" },
+    { "node": "Missing", "prop": "type", "eq": "image" }
+  ]
+}

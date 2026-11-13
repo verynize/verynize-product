@@ -1,5 +1,5 @@
 // Properties sections (design/wonder 22, 25, 43, 45–46, 55–56).
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   AlignHorizontalDistributeCenter,
   AlignVerticalDistributeCenter,
@@ -58,6 +58,7 @@ import {
   PreviewTemplateSection,
 } from "./preview-frame";
 import { ScaleSection } from "./scale";
+import { ComponentSection } from "./component";
 import { FillTools, PaintStack, hasPaintRows } from "./paints";
 import { parseColor, toHex } from "./color";
 import { fmt, hexLabel, pageNodes, parseHex, patchNodes, setField, type Node } from "./model";
@@ -79,6 +80,7 @@ import { ShadowSection } from "./shadows";
 import { FilterSection } from "./filters";
 import { MaskSection } from "./masks";
 import { BorderSection } from "./border-colors";
+import { VectorStrokeSection } from "./vector-stroke";
 import {
   ShaderFill,
   ShaderParameters,
@@ -261,12 +263,12 @@ function PositionSection({ doc, node, selection }: Props) {
   const set = (key: string) => (value: string) => setField(selection, node, key, value);
   const many = selection.length > 1;
   const nodes = pageNodes(doc);
-  const parent = node.parentId ? nodes.find((n) => n.id === node.parentId) : undefined;
-  const selected = nodes.filter((n) => selection.includes(n.id));
+  const byId = new Map(nodes.map((item) => [item.id, item]));
+  const wanted = new Set(selection);
+  const parent = node.parentId ? byId.get(node.parentId) : undefined;
+  const selected = nodes.filter((n) => wanted.has(n.id));
   // Children of flow frames can be taken out of the flow; children of free frames are always positioned.
-  const flowChildren = selected.filter(
-    (n) => !!n.parentId && isFlowFrame(nodes.find((m) => m.id === n.parentId)),
-  );
+  const flowChildren = selected.filter((n) => !!n.parentId && isFlowFrame(byId.get(n.parentId)));
   const absolute = flowChildren.length > 0 && flowChildren.every((n) => n.position === "absolute");
   const inFlow = !!parent && isFlowFrame(parent) && node.position !== "absolute";
   // One layer: align it to its parent unless the flow places it (Wonder dims the tools for top-level layers and
@@ -281,7 +283,9 @@ function PositionSection({ doc, node, selection }: Props) {
   // ⌘⇧⌥F runs the expand tool (Wonder's shortcut) while the canvas, not a field, has the keyboard.
   // Captured on window so ⌘⇧F (global search) does not also see it.
   const fit = useRef<(() => void) | null>(null);
-  fit.current = fitEnabled ? () => fitToContent(doc, node) : null;
+  useLayoutEffect(() => {
+    fit.current = fitEnabled ? () => fitToContent(doc, node) : null;
+  });
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.code !== "KeyF" || !event.shiftKey || !event.altKey || event.repeat) return;
@@ -332,8 +336,8 @@ function PositionSection({ doc, node, selection }: Props) {
       tools={tools}
     >
       <div className="grid grid-cols-3 gap-2">
-        {ALIGN_GROUPS.map((group, i) => (
-          <ToolGroup key={i} disabled={!alignEnabled}>
+        {ALIGN_GROUPS.map((group) => (
+          <ToolGroup key={group[0]?.id} disabled={!alignEnabled}>
             {group.map((b) => (
               <ToolButton
                 key={b.id}
@@ -430,7 +434,7 @@ function PositionSection({ doc, node, selection }: Props) {
           name="zIndex"
           label="Stack order"
           numeric
-          className="col-span-2 has-disabled:bg-field-disabled"
+          className={cn("col-span-2", inFlow && !many && "bg-field-disabled")}
           inputClassName="placeholder:text-foreground disabled:placeholder:text-field-disabled-foreground"
           disabled={inFlow && !many}
           value={node.zIndex ? fmt(node.zIndex) : ""}
@@ -805,7 +809,9 @@ function FillSection({
             ? "Text Fill"
             : node?.type === "shader"
               ? "Shader Fill"
-              : "Background Fill"}
+              : node?.type === "vector"
+                ? "Fill"
+                : "Background Fill"}
         </h3>
         {node ? <FillTools doc={doc} node={node} selection={selection} /> : null}
       </div>
@@ -819,7 +825,7 @@ function FillSection({
         <ShaderSettings node={node} selection={selection} />
         {node ? <ShaderParameters doc={doc} node={node} selection={selection} /> : null}
         {/* Shader mode (H6): preset dropdown + colours in place of the paint rows (Text Fill has no shader mode). */}
-        {node && node.type !== "text" ? (
+        {node && node.type !== "text" && node.type !== "vector" ? (
           <ShaderFill doc={doc} node={node} selection={selection} />
         ) : null}
         {node ? (
@@ -1045,7 +1051,7 @@ function LayerCommands() {
 }
 
 /* ---------- Panel body ---------- */
-export function PropertiesBody({
+function DetailedPropertiesBody({
   doc,
   node,
   selection,
@@ -1076,6 +1082,7 @@ export function PropertiesBody({
       ) : null}
       <div className={scaling ? "hidden" : "contents"}>
         {node && preview ? <PreviewTemplateSection node={node} /> : null}
+        {node && !many && !preview ? <ComponentSection doc={doc} node={node} /> : null}
         {node ? <PositionSection doc={doc} node={node} selection={selection} /> : null}
         {node && preview ? (
           <PreviewLayoutSection doc={doc} node={node} selection={selection} />
@@ -1106,7 +1113,12 @@ export function PropertiesBody({
         {node?.type === "text" && !fillsMixed ? (
           <TextBackgroundFillSection doc={doc} node={node} selection={selection} />
         ) : null}
-        {plain ? <BorderSection doc={doc} node={plain} selection={selection} /> : null}
+        {/* A vector's stroke follows its path (cap, join, dash) instead of the box border. */}
+        {plain?.type === "vector" ? (
+          <VectorStrokeSection doc={doc} node={plain} selection={selection} />
+        ) : plain ? (
+          <BorderSection doc={doc} node={plain} selection={selection} />
+        ) : null}
         {plain ? <OutlineSection doc={doc} node={plain} selection={selection} /> : null}
         {node && shadowsMixed ? (
           <MixedSection
@@ -1143,6 +1155,34 @@ export function PropertiesBody({
         {!node && !framePresets ? <PageSection doc={doc} /> : null}
       </div>
       <LayerCommands />
+    </>
+  );
+}
+
+// Large selections show the count immediately; detailed editors are opened on demand.
+export function PropertiesBody(props: {
+  doc: DesignDocument;
+  node: Node | undefined;
+  selection: string[];
+}) {
+  const [expandedSelection, setExpandedSelection] = useState<string | null>(null);
+  const key = props.selection.join(",");
+  if (props.selection.length <= 200 || expandedSelection === key)
+    return <DetailedPropertiesBody {...props} />;
+  return (
+    <>
+      <Section title={`${props.selection.length} nodes selected`}>
+        <button
+          type="button"
+          className="rounded-md bg-input px-3 py-2 text-xs text-foreground"
+          onClick={() => setExpandedSelection(key)}
+        >
+          Inspect selection
+        </button>
+      </Section>
+      <div className="hidden">
+        <FillSection doc={props.doc} node={undefined} selection={[]} />
+      </div>
     </>
   );
 }

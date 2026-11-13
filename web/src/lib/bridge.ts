@@ -1,11 +1,11 @@
 // Bridge between React islands and the legacy vanilla renderer (web/*.js).
 // Legacy modules expose their APIs on `window`; their DOM controls keep the original handlers.
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useEffectEvent, useState, useSyncExternalStore } from "react";
 
 /* ---------- Legacy window APIs (subset used by islands) ---------- */
 export type LayerNode = {
   id: string;
-  type: "rectangle" | "text" | "frame" | "image" | "shader" | string;
+  type: "rectangle" | "text" | "frame" | "image" | "shader" | (string & {});
   parentId: string | null;
   name: string;
   x: number;
@@ -29,6 +29,8 @@ export type DesignDocument = {
 };
 export type DesignApi = {
   getDocument(): DesignDocument;
+  /** Shared deeply frozen commit snapshot; copy before mutation. */
+  getSnapshot(): DesignDocument;
   setDocument(doc: DesignDocument): void;
   subscribe(fn: (doc: DesignDocument) => void): () => void;
   getSelection(): string[];
@@ -45,10 +47,30 @@ export type DesignApi = {
   updatePage(patch: Partial<Omit<DesignPage, "id" | "nodes">>, id?: string): boolean;
   /** Set (or with an empty id clear) the file's thumbnail layer, `document.thumbnailNodeId` (validated, one undo step). */
   setThumbnail(id: string): boolean;
+  /** Detached render markup of a frame (or, with no id, the whole first page) for the file cover. */
+  thumbnailMarkup(
+    id?: string | null,
+    doc?: DesignDocument,
+  ): { width: number; height: number; pageId: string; nodeId: string | null; html: string };
   setActivePage(id: string): void;
   canUndo(): boolean;
+  /** Undo history writes made by edits since launch (loading a document is not counted). */
+  editCount(): number;
   canRedo(): boolean;
   getCamera(): { x: number; y: number; zoom: number };
+  /** Camera and active page of the canvas view. */
+  getView?: () => {
+    zoom: number;
+    scrollLeft: number;
+    scrollTop: number;
+    page: string;
+    x: number;
+    y: number;
+  };
+  screenToWorld?: (x: number, y: number) => { x: number; y: number };
+  exportHTML?: () => string;
+  /** Editor defaults on every page now (a shared room's copy is prepared whole). */
+  prepareAllPages?: () => void;
   setCamera(x: number, y: number, zoom: number): void;
   zoomToFit(): void;
   setTool(tool: string): void;
@@ -56,18 +78,44 @@ export type DesignApi = {
   commands(): { id: string; label?: string }[];
   runCommand(id: string, arg?: unknown): boolean;
   /** Constraints of a positioned layer ({h, v}: start/end/stretch/center/scale), or null when it has none. */
-  getConstraints?(id: string): { h: string; v: string } | null;
+  getConstraints?: (id: string) => { h: string; v: string } | null;
   /** Change constraints without moving the layers (one undo step). */
-  setConstraints?(ids: string[], constraints: { h?: string; v?: string }): boolean;
+  setConstraints?: (ids: string[], constraints: { h?: string; v?: string }) => boolean;
+  [key: string]: unknown;
+};
+
+/** The shared room a library file is linked to (`fileLibrary.cloudOf`). */
+export type FileCloud = {
+  server: string;
+  roomId: string;
+  token?: string;
+  detached?: boolean;
   [key: string]: unknown;
 };
 
 declare global {
   interface Window {
+    /** Start host: lazily initialize the editor before a file operation. Absent on desktop. */
+    verynizeEditorBoot?: () => Promise<void>;
     design: DesignApi;
     verynize: DesignApi;
     agentWorkspace?: Record<string, (...args: never[]) => unknown>;
-    fileLibrary?: Record<string, unknown> & { list(): unknown[]; currentId: string | null };
+    fileLibrary?: Record<string, unknown> & {
+      list(): unknown[];
+      currentId: string | null;
+      findCloud?(server: string, roomId: string): string | null;
+      cloudOf?(id: string): FileCloud | null;
+      setCloud?(id: string, cloud: FileCloud | null, initializeMetadata?: boolean): void;
+      open?(id: string, options?: { cloud?: FileCloud; [key: string]: unknown }): unknown;
+      createFromDocument?(
+        document: DesignDocument,
+        options?: { cloud?: FileCloud; [key: string]: unknown },
+      ): Promise<string>;
+      ready?(): Promise<unknown>;
+      flush?(): Promise<unknown>;
+      showHome?(): void;
+      applyEditor?(): void;
+    };
     appSettings?: { open(section?: string): void; close?(): void };
     appPreferences?: { get(): Record<string, unknown> };
     askText?: (title: string, value?: string) => Promise<string | null>;
@@ -84,7 +132,7 @@ let attached = false;
 function attach() {
   if (attached || !window.design) return;
   attached = true;
-  snapshot = window.design.getDocument();
+  snapshot = window.design.getSnapshot();
   selectionSnapshot = window.design.getSelection();
   window.design.subscribe((doc) => {
     snapshot = doc;
@@ -132,10 +180,13 @@ export function useBodyClass(name: string): boolean {
 
 /** Subscribe to a window event (e.g. "app-preferences-changed"). */
 export function useWindowEvent(name: string, fn: (event: Event) => void) {
+  // Always calls the latest `fn` without re-adding the listener when an inline handler changes identity.
+  const onEvent = useEffectEvent(fn);
   useEffect(() => {
-    window.addEventListener(name, fn);
-    return () => window.removeEventListener(name, fn);
-  }, [name, fn]);
+    const listener = (event: Event) => onEvent(event);
+    window.addEventListener(name, listener);
+    return () => window.removeEventListener(name, listener);
+  }, [name]);
 }
 
 /* ---------- Legacy controls ---------- */
@@ -240,8 +291,8 @@ function checkUiReady() {
 
 /** mountIsland() calls this before it renders: the island holds back the UI-ready signal until it commits. */
 export function registerIsland(name: string) {
-  if (uiReady) return;
   mounting.add(name);
+  if (uiReady) return;
   if (uiReadyStarted) return;
   uiReadyStarted = true;
   // Never sets the signal itself; it only names what is stuck so a missing claim is diagnosable.

@@ -1,13 +1,25 @@
 // Narrow subscriptions to the legacy design store. The store notifies after *every* legacy render
 // (including each pointer move while dragging on the canvas); the sidebar only re-renders when the
 // slice it shows actually changes.
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { activePage, design, type DesignDocument, type LayerNode } from "@/lib/bridge";
+import { layerRole, type LayerRole } from "@/lib/components";
 
 /** Subscribe to a JSON-serialisable slice of the document; re-renders only when the slice changes. */
 export function useDesignSlice<T>(select: (doc: DesignDocument) => T): T {
   const selectRef = useRef(select);
-  selectRef.current = select;
+  // The store notifies after commit, so the selector only needs to be current once this render commits.
+  useLayoutEffect(() => {
+    selectRef.current = select;
+  });
   const keyRef = useRef<string | null>(null);
   const subscribe = useCallback((notify: () => void) => {
     const api = design();
@@ -21,7 +33,8 @@ export function useDesignSlice<T>(select: (doc: DesignDocument) => T): T {
     });
   }, []);
   const key = useSyncExternalStore(subscribe, () => {
-    if (keyRef.current === null) keyRef.current = JSON.stringify(selectRef.current(design().getDocument()));
+    if (keyRef.current === null)
+      keyRef.current = JSON.stringify(selectRef.current(design().getDocument()));
     return keyRef.current;
   });
   return useMemo(() => JSON.parse(key) as T, [key]);
@@ -39,12 +52,17 @@ export function useDocSummary(): DocSummary {
 }
 
 /** Only the fields the layer tree renders. */
-export type TreeNode = Pick<LayerNode, "id" | "name" | "type" | "parentId" | "hidden" | "locked"> & {
+export type TreeNode = Pick<
+  LayerNode,
+  "id" | "name" | "type" | "parentId" | "hidden" | "locked"
+> & {
   layout?: string;
   direction?: string;
   ellipse?: boolean;
   /** A live preview frame (preview audit PF7): drawn with a browser-window icon. */
   preview?: true;
+  /** Main component, instance root, slot or inherited instance layer (design/component-audit "Layers panel"). */
+  role?: Exclude<LayerRole, null>;
 };
 
 export function useTreeNodes(): TreeNode[] {
@@ -60,6 +78,7 @@ export function useTreeNodes(): TreeNode[] {
       direction: typeof n.direction === "string" ? n.direction : undefined,
       ellipse: n.ellipse === true || undefined,
       preview: n.preview ? (true as const) : undefined,
+      role: layerRole(n) ?? undefined,
     })),
   );
 }
@@ -83,7 +102,9 @@ export function useLayerPreview(): LayerPreview {
 export function applyLayerPreview(nodes: TreeNode[], preview: LayerPreview): TreeNode[] {
   if (!preview) return nodes;
   const ids = new Set(preview.ids);
-  const moved = nodes.filter((n) => ids.has(n.id)).map((n) => ({ ...n, parentId: preview.parentId }));
+  const moved = nodes
+    .filter((n) => ids.has(n.id))
+    .map((n) => ({ ...n, parentId: preview.parentId }));
   if (!moved.length) return nodes;
   const rest = nodes.filter((n) => !ids.has(n.id));
   const siblings = rest.filter((n) => (n.parentId || null) === preview.parentId);

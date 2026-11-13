@@ -501,7 +501,7 @@ function Row({
 }
 
 const rowBox =
-  "group/paint flex h-6 min-w-0 flex-1 items-center gap-1 rounded-md bg-input pr-2 pl-1 text-xs shadow-field has-focus-visible:ring-1 has-focus-visible:ring-ring";
+  "group/paint flex h-6 min-w-0 flex-1 items-center gap-1 rounded-md bg-input pr-2 pl-1 text-xs shadow-field focus-within:ring-1 focus-within:ring-ring";
 // Wonder A1: the number ends 4 px before the "%" (x 181 / 185.5), the % ends at 194.
 const percentField =
   "h-5 w-12 shrink-0 gap-0.5 bg-transparent px-0 shadow-none focus-within:ring-0";

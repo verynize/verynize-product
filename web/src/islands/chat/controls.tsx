@@ -61,7 +61,8 @@ export function ChatActionButton({ className, hook, variant = "default", ...prop
         hook,
         "gap-1 px-2.5 text-sm",
         variant === "outline" && "text-foreground-2",
-        variant === "ghost" && "px-1.5 text-muted-foreground hover:text-foreground-2 focus-visible:bg-muted",
+        variant === "ghost" &&
+          "px-1.5 text-muted-foreground hover:text-foreground-2 focus-visible:bg-muted",
         className,
       )}
       {...props}
@@ -97,7 +98,11 @@ export function ChatPillButton({ className, hook, ...props }: Omit<ButtonProps, 
   return (
     <Button
       variant="outline"
-      className={cn(hook, "rounded-lg border-card-border bg-card px-2.5 text-sm text-foreground-2", className)}
+      className={cn(
+        hook,
+        "rounded-lg border-card-border bg-card px-2.5 text-sm text-foreground-2",
+        className,
+      )}
       {...props}
     />
   );
@@ -119,7 +124,12 @@ export function ChatSuggestionButton({ className, hook, ...props }: Omit<ButtonP
 }
 
 /** Answer option of a question card (radio / checkbox role set by the caller), highlighted when `selected`. */
-export function ChatOptionButton({ className, hook, selected, ...props }: Omit<ButtonProps, "variant"> & { selected: boolean }) {
+export function ChatOptionButton({
+  className,
+  hook,
+  selected,
+  ...props
+}: Omit<ButtonProps, "variant"> & { selected: boolean }) {
   return (
     <Button
       variant="outline"
@@ -137,7 +147,12 @@ export function ChatOptionButton({ className, hook, selected, ...props }: Omit<B
 }
 
 /** Text row that selects or edits something: `text` 13px (queued message), `file` 12px (changed-file list). */
-export function ChatRowButton({ className, hook, density = "text", ...props }: Omit<ButtonProps, "variant"> & { density?: "text" | "file" }) {
+export function ChatRowButton({
+  className,
+  hook,
+  density = "text",
+  ...props
+}: Omit<ButtonProps, "variant"> & { density?: "text" | "file" }) {
   return (
     <Button
       variant="ghost"

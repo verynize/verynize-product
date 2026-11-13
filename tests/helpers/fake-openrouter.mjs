@@ -11,6 +11,7 @@
 //                                          may be a function of the request body, and `id` fixes
 //                                          the tool call id (the same id twice scripts a repeat)
 //   {delay: ms}                            wait before the next step
+//   {wait: Promise<void>}                  wait for the test to observe the preceding deltas
 //   {hang: true}                           keep the stream open until the client goes away
 // Every request is recorded (`requests`), so tests can assert what the backend sent (for writes:
 // the tool message the model got back, e.g. a denial). `userText(body)` and `toolMessages(body)`
@@ -169,6 +170,7 @@ export async function startFakeOpenRouter(scenarios) {
     for (const step of steps) {
       if (closed) return;
       if (step.delay) await sleep(step.delay);
+      else if (step.wait) await step.wait;
       else if (step.hang) {
         while (!closed) await sleep(50);
         return;

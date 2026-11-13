@@ -7,7 +7,12 @@ import { attachSettings } from "./settings/api";
 import { startPreferenceRuntime } from "./settings/preference-runtime";
 import { SettingsScreen } from "./settings/SettingsScreen";
 import { GlobalSearchDialog } from "./settings/projects";
-import { DialogEnhancer, ExportToasts } from "./settings/dialogs";
+import { DialogEnhancer } from "./settings/dialogs";
+import { TextPrompt } from "./settings/text-prompt";
+import { PreviewImportDialog } from "./settings/preview-import";
+import { FigmaDialog } from "./settings/figma-dialog";
+import { TemplatesDialog } from "./settings/templates-dialog";
+import { ViewsDialog } from "./settings/views-dialog";
 import "./settings/settings.css";
 
 function Island() {
@@ -16,8 +21,12 @@ function Island() {
       {/* On the web, Start's settings route renders the screen (settings/route-area.tsx). */}
       {!hosted && <SettingsScreen />}
       <GlobalSearchDialog />
+      <TextPrompt />
+      <PreviewImportDialog />
+      <FigmaDialog />
+      <TemplatesDialog />
+      <ViewsDialog />
       <DialogEnhancer />
-      <ExportToasts />
       <Toaster position="bottom-right" offset={16} visibleToasts={3} />
     </>
   );

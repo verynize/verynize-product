@@ -6,13 +6,16 @@
 //   its first web sign-in: finishing or skipping is stored on the server (`PATCH /api/me {aiSetup: true}`, read back
 //   as `aiSetupAt` from `GET /api/me`), with a per-account localStorage copy for when that request fails.
 // `bd:open-onboarding` reopens it (Sign in entries on the desktop, Settings › Agents › AI setup on the web).
+// Desktop, once setup is done: the one-time crash-report question (onboarding/telemetry-prompt.tsx).
 import { useEffect, useState, type ReactNode } from "react";
 import { mountIsland, ensureContainer } from "@/lib/mount";
+import { getWebMe } from "@/lib/web-session";
 import { webAgentScope } from "@/lib/agent-transport";
 import { cloudAccount, useCloudAccount } from "@/lib/cloud-account";
 import { AccountStep } from "./onboarding/account-step";
 import { AgentsStep } from "./onboarding/agents-step";
 import { AiStep, ReadyStep } from "./onboarding/ai-step";
+import { TelemetryPrompt } from "./onboarding/telemetry-prompt";
 import "./onboarding/onboarding.css";
 import { can, platform } from "@/lib/platform";
 
@@ -60,11 +63,13 @@ function Frame({
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-6 pb-chrome">
         {children}
       </div>
-      <div className="flex justify-center gap-1.5 pb-6" role="list" aria-label="Setup steps">
+      <ul
+        className="m-0 flex list-none justify-center gap-1.5 px-0 pt-0 pb-6"
+        aria-label="Setup steps"
+      >
         {steps.map((id) => (
-          <span
+          <li
             key={id}
-            role="listitem"
             aria-current={id === step ? "step" : undefined}
             className={
               id === step
@@ -73,7 +78,7 @@ function Frame({
             }
           />
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
@@ -95,6 +100,8 @@ function DesktopOnboarding() {
     return () => window.removeEventListener("bd:open-onboarding", reopen);
   }, []);
 
+  // After setup (or for a profile set up earlier): the one-time crash-report question.
+  if (step === "done") return <TelemetryPrompt />;
   if (step !== "account" && step !== "agents") return null;
   const finish = () => {
     try {
@@ -132,7 +139,7 @@ function WebOnboarding() {
     const api = cloudAccount();
     if (!accountId || !api || doneLocally(accountId)) return;
     let live = true;
-    api.request<{ aiSetupAt?: number | null }>("/api/me").then(
+    getWebMe().then(
       (me) => {
         if (live && me.aiSetupAt == null) setStep((current) => current ?? "ai");
       },

@@ -15,7 +15,8 @@ import { useChatState } from "./chat/store";
 import { Transcript } from "./chat/transcript";
 import "./chat/chat.css";
 
-const agentSection = () => document.querySelector<HTMLElement>("#desktop-panel .project-agent, .project-agent");
+const agentSection = () =>
+  document.querySelector<HTMLElement>("#desktop-panel .project-agent, .project-agent");
 
 function headerContainer(): HTMLElement | null {
   const dock = document.getElementById("agent-chat-dock");
@@ -42,7 +43,11 @@ function Island() {
   // ⌘L / Ctrl+L focuses the composer while the chat dock is open.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "l" && document.body.classList.contains("agent-chat-open")) {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "l" &&
+        document.body.classList.contains("agent-chat-open")
+      ) {
         event.preventDefault();
         document.getElementById("project-prompt")?.focus();
       }

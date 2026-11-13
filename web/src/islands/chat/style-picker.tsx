@@ -6,14 +6,23 @@
 // hidden zero-height anchor. Nothing renders when the desktop build has no style catalog.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { platform } from "@/lib/platform";
-import { ChatMenu, ChatMenuContent, ChatMenuLabel, ChatMenuOptionItem, ChatMenuRadioGroup, ChatMenuSeparator, ChatMenuTrigger } from "./menu";
+import {
+  ChatMenu,
+  ChatMenuContent,
+  ChatMenuLabel,
+  ChatMenuOptionItem,
+  ChatMenuRadioGroup,
+  ChatMenuSeparator,
+  ChatMenuTrigger,
+} from "./menu";
 
 export type DesignStyle = { id: string; name: string; summary?: string };
 
 const STORAGE_KEY = "verynize.chat.design-style";
 export const OPEN_STYLE_PICKER_EVENT = "bd:open-style-picker";
 
-const styleDesktop = (): { designStylesList?(): Promise<DesignStyle[]> } | null => platform.desktop;
+const styleDesktop = (): { designStylesList?: () => Promise<DesignStyle[]> } | null =>
+  platform.desktop;
 /** Whether this desktop build offers the style catalog. */
 export const hasStyleCatalog = () => typeof styleDesktop()?.designStylesList === "function";
 
@@ -65,7 +74,9 @@ function loadStyles(): Promise<DesignStyle[]> {
   if (!list) return Promise.resolve([]);
   catalog ??= list()
     .then((items) => {
-      const styles = (Array.isArray(items) ? items : []).filter((s) => s && typeof s.id === "string" && s.id);
+      const styles = (Array.isArray(items) ? items : []).filter(
+        (s) => s && typeof s.id === "string" && s.id,
+      );
       known = new Set(styles.map((s) => s.id));
       return styles;
     })
@@ -80,7 +91,7 @@ function useStyles(): DesignStyle[] {
   const [styles, setStyles] = useState<DesignStyle[]>([]);
   useEffect(() => {
     let live = true;
-    loadStyles().then((value) => live && setStyles(value));
+    void loadStyles().then((value) => live && setStyles(value));
     return () => {
       live = false;
     };
@@ -106,7 +117,9 @@ export function StylePicker() {
   useEffect(() => {
     if (!open) return;
     const frame = requestAnimationFrame(() =>
-      contentRef.current?.querySelector<HTMLElement>("[role=menuitemradio][aria-checked=true]")?.focus(),
+      contentRef.current
+        ?.querySelector<HTMLElement>("[role=menuitemradio][aria-checked=true]")
+        ?.focus(),
     );
     return () => cancelAnimationFrame(frame);
   }, [open]);
@@ -116,7 +129,11 @@ export function StylePicker() {
   return (
     <ChatMenu open={open} onOpenChange={setOpen} modal={false}>
       <ChatMenuTrigger asChild>
-        <span aria-hidden="true" tabIndex={-1} className="pointer-events-none absolute inset-x-0 top-0 h-0" />
+        <span
+          aria-hidden="true"
+          tabIndex={-1}
+          className="pointer-events-none absolute inset-x-0 top-0 h-0"
+        />
       </ChatMenuTrigger>
       <ChatMenuContent
         ref={contentRef}
@@ -136,15 +153,26 @@ export function StylePicker() {
           <ChatMenuOptionItem value={AUTO} data-style-id={AUTO}>
             <span className="flex min-w-0 flex-col">
               <span className="text-foreground">Auto</span>
-              <span className="text-xs leading-4 text-muted-foreground">Let the agent choose a direction from the brief.</span>
+              <span className="text-xs leading-4 text-muted-foreground">
+                Let the agent choose a direction from the brief.
+              </span>
             </span>
           </ChatMenuOptionItem>
           <ChatMenuSeparator />
           {styles.map((style) => (
-            <ChatMenuOptionItem key={style.id} value={style.id} data-style-id={style.id} textValue={style.name}>
+            <ChatMenuOptionItem
+              key={style.id}
+              value={style.id}
+              data-style-id={style.id}
+              textValue={style.name}
+            >
               <span className="flex min-w-0 flex-col">
                 <span className="truncate text-foreground">{style.name}</span>
-                {style.summary && <span className="line-clamp-2 text-xs leading-4 text-muted-foreground">{style.summary}</span>}
+                {style.summary && (
+                  <span className="line-clamp-2 text-xs leading-4 text-muted-foreground">
+                    {style.summary}
+                  </span>
+                )}
               </span>
             </ChatMenuOptionItem>
           ))}

@@ -1,0 +1,6218 @@
+{
+  "results": {
+    "electron/A/13000": {
+      "browser": "electron",
+      "strategy": "A",
+      "n": 13000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 155.40000000037253,
+        "initMs": 84.59999999962747,
+        "firstSettleMs": 3.400000000372529,
+        "pan": {
+          "p50": 68.59999999999991,
+          "p95": 74.80000000000018,
+          "over16": 1,
+          "over25": 1,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 118.5,
+          "p95": 134.60000000000036,
+          "over16": 1,
+          "over25": 1,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "overviewSettleMs": 144.09999999962747,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 105.89999999999964,
+          "p95": 122.89999999999964,
+          "over16": 1,
+          "over25": 1,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "editP50": 8.399999999441206,
+        "editP95": 30.299999999813735,
+        "drag": {
+          "p50": 3.8000000000029104,
+          "p95": 5.400000000001455,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "jsHeapMB": 7.339153289794922,
+        "gpuProcMB": 175,
+        "rendererProcMB": 437,
+        "gpuEstimateMB": null,
+        "domNodes": 13145,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "A",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 12.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 87.40000000037253,
+          "ttffMs": 160.80000000074506,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 4,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 68.90000000000009,
+            "p95": 72.70000000000073,
+            "max": 86.39999999999986,
+            "over16": 1,
+            "over25": 1,
+            "mean": 67.715,
+            "scriptP50": 35.799999999813735,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 118.60000000000036,
+            "p95": 134.60000000000036,
+            "max": 142.20000000000073,
+            "over16": 1,
+            "over25": 1,
+            "mean": 119.22666666666667,
+            "scriptP50": 40.60000000055879,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 144.09999999962747,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 105.89999999999964,
+            "p95": 121.60000000000218,
+            "max": 126.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 106.17750000000001,
+            "scriptP50": 41,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7.3999999994412065,
+            "p95": 8.200000000186265,
+            "max": 8.200000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 3.7000000000007276,
+            "p95": 5.400000000001455,
+            "max": 5.899999999997817,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.9599999999999453,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.2627716064453125,
+          "stats": {
+            "domNodes": 13145
+          },
+          "domNodes": 13145,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 139,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 175,
+              "peakMb": 179
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 422,
+              "peakMb": 615
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.93, 3.29, 3.85],
+            "freeMemMB": 410
+          },
+          "machineAfter": {
+            "loadavg": [2.89, 3.26, 3.83],
+            "freeMemMB": 250
+          },
+          "wallMs": 19781,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 84.59999999962747,
+          "ttffMs": 155.40000000037253,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 3,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 68.70000000000027,
+            "p95": 74.80000000000018,
+            "max": 88.79999999999995,
+            "over16": 1,
+            "over25": 1,
+            "mean": 67.95833333333333,
+            "scriptP50": 35.59999999962747,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 118.5,
+            "p95": 136.20000000000073,
+            "max": 146.89999999999964,
+            "over16": 1,
+            "over25": 1,
+            "mean": 119.465,
+            "scriptP50": 40.799999999813735,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 153.1000000005588,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 105.10000000000218,
+            "p95": 124,
+            "max": 128.10000000000036,
+            "over16": 1,
+            "over25": 1,
+            "mean": 105.30500000000002,
+            "scriptP50": 40.799999999813735,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8,
+            "p95": 27.800000000745058,
+            "max": 27.800000000745058
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 4.200000000000728,
+            "p95": 6.399999999997817,
+            "max": 8.900000000001455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.455000000000018,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.339347839355469,
+          "stats": {
+            "domNodes": 13145
+          },
+          "domNodes": 13145,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 129,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 175,
+              "peakMb": 176
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 479,
+              "peakMb": 636
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.66, 3.21, 3.81],
+            "freeMemMB": 841
+          },
+          "machineAfter": {
+            "loadavg": [2.52, 3.15, 3.78],
+            "freeMemMB": 208
+          },
+          "wallMs": 19569,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.699999999254942,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 85.69999999925494,
+          "ttffMs": 155.79999999981374,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 3.2999999998137355,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 68.59999999999991,
+            "p95": 74.69999999999982,
+            "max": 91.60000000000014,
+            "over16": 1,
+            "over25": 1,
+            "mean": 67.61833333333333,
+            "scriptP50": 35.799999999813735,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 118.60000000000036,
+            "p95": 133.5,
+            "max": 152,
+            "over16": 1,
+            "over25": 1,
+            "mean": 119.82166666666669,
+            "scriptP50": 40.700000000186265,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 144.19999999925494,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 106.29999999999927,
+            "p95": 122.69999999999709,
+            "max": 125.30000000000109,
+            "over16": 1,
+            "over25": 1,
+            "mean": 105.76999999999998,
+            "scriptP50": 40.5,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.5,
+            "p95": 31.200000000186265,
+            "max": 31.200000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 3.8000000000029104,
+            "p95": 5.200000000000728,
+            "max": 5.899999999997817,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.0050000000000185,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.339153289794922,
+          "stats": {
+            "domNodes": 13145
+          },
+          "domNodes": 13145,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 136,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 168,
+              "peakMb": 169
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 437,
+              "peakMb": 620
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.52, 3.15, 3.78],
+            "freeMemMB": 982
+          },
+          "machineAfter": {
+            "loadavg": [2.64, 3.14, 3.76],
+            "freeMemMB": 228
+          },
+          "wallMs": 19618,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.799999999813735,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 83.69999999925494,
+          "ttffMs": 153.29999999981374,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 3.400000000372529,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 68.30000000000018,
+            "p95": 78.69999999999982,
+            "max": 88.09999999999991,
+            "over16": 1,
+            "over25": 1,
+            "mean": 67.36,
+            "scriptP50": 35.30000000074506,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 117.30000000000018,
+            "p95": 133.5,
+            "max": 144.1999999999989,
+            "over16": 1,
+            "over25": 1,
+            "mean": 119.06500000000001,
+            "scriptP50": 40.39999999944121,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 138.79999999981374,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 106.89999999999964,
+            "p95": 122.89999999999964,
+            "max": 128,
+            "over16": 1,
+            "over25": 1,
+            "mean": 107.06250000000004,
+            "scriptP50": 40.59999999962747,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.599999999627471,
+            "p95": 30.59999999962747,
+            "max": 30.59999999962747
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 4.599999999998545,
+            "p95": 6.799999999999272,
+            "max": 7.200000000000728,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.845000000000073,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.340141296386719,
+          "stats": {
+            "domNodes": 13145
+          },
+          "domNodes": 13145,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 129,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 174,
+              "peakMb": 175
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 467,
+              "peakMb": 620
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.64, 3.14, 3.76],
+            "freeMemMB": 945
+          },
+          "machineAfter": {
+            "loadavg": [2.53, 3.08, 3.72],
+            "freeMemMB": 201
+          },
+          "wallMs": 19609,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.799999999813735,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 83.3999999994412,
+          "ttffMs": 153.59999999962747,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 3.599999999627471,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 67.59999999999991,
+            "p95": 75,
+            "max": 87.39999999999964,
+            "over16": 1,
+            "over25": 1,
+            "mean": 67.57,
+            "scriptP50": 35.799999999813735,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 117.80000000000109,
+            "p95": 134.89999999999964,
+            "max": 150.79999999999927,
+            "over16": 1,
+            "over25": 1,
+            "mean": 119.125,
+            "scriptP50": 41,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 144,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 105.10000000000218,
+            "p95": 124.90000000000146,
+            "max": 126,
+            "over16": 1,
+            "over25": 1,
+            "mean": 106.93000000000002,
+            "scriptP50": 41.39999999944121,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.399999999441206,
+            "p95": 30.299999999813735,
+            "max": 30.299999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 3.7000000000007276,
+            "p95": 5.099999999998545,
+            "max": 5.899999999997817,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.9149999999999636,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.308040618896484,
+          "stats": {
+            "domNodes": 13145
+          },
+          "domNodes": 13145,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 129,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 176,
+              "peakMb": 178
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 435,
+              "peakMb": 628
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.53, 3.08, 3.72],
+            "freeMemMB": 946
+          },
+          "machineAfter": {
+            "loadavg": [2.65, 3.07, 3.7],
+            "freeMemMB": 244
+          },
+          "wallMs": 19578,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/A2/13000": {
+      "browser": "electron",
+      "strategy": "A2",
+      "n": 13000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 161.3999999994412,
+        "initMs": 90.6000000005588,
+        "firstSettleMs": 10,
+        "pan": {
+          "p50": 1.3999999999999773,
+          "p95": 4.800000000000068,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 13.5,
+          "p95": 28.100000000000136,
+          "over16": 0.3,
+          "over25": 0.1,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "overviewSettleMs": 55.5,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 3.1000000000001364,
+          "p95": 10.700000000000045,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "editP50": 123.20000000018626,
+        "editP95": 150.59999999962747,
+        "drag": {
+          "p50": 123.80000000000018,
+          "p95": 146.39999999999964,
+          "over16": 1,
+          "over25": 1,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "jsHeapMB": 7.492593765258789,
+        "gpuProcMB": 157,
+        "rendererProcMB": 355,
+        "gpuEstimateMB": null,
+        "domNodes": 13147,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "A2",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 92.70000000018626,
+          "ttffMs": 164.6000000005588,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 9.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 4.800000000000068,
+            "max": 7.2999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.6649999999999996,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 13.399999999999977,
+            "p95": 28.100000000000136,
+            "max": 44.19999999999982,
+            "over16": 0.3,
+            "over25": 0.08333333333333333,
+            "mean": 15.618333333333334,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 56.89999999944121,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.1000000000001364,
+            "p95": 10.599999999999909,
+            "max": 11,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.847499999999997,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 120.79999999981374,
+            "p95": 141.3999999994412,
+            "max": 141.3999999994412
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 122.5,
+            "p95": 146.39999999999964,
+            "max": 160.09999999999945,
+            "over16": 1,
+            "over25": 1,
+            "mean": 124.87750000000001,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.312528610229492,
+          "stats": {
+            "domNodes": 13147
+          },
+          "domNodes": 13147,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 128,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 168,
+              "peakMb": 201
+            },
+            {
+              "type": "Utility",
+              "mb": 42,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 355,
+              "peakMb": 659
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.65, 3.07, 3.7],
+            "freeMemMB": 979
+          },
+          "machineAfter": {
+            "loadavg": [2.93, 3.12, 3.71],
+            "freeMemMB": 383
+          },
+          "wallMs": 10200,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.899999999441206,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 87,
+          "ttffMs": 157.79999999981374,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 10.5,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3000000000000682,
+            "p95": 4.7999999999999545,
+            "max": 7.7999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.6616666666666675,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 13.5,
+            "p95": 30,
+            "max": 43.799999999999955,
+            "over16": 0.31666666666666665,
+            "over25": 0.1,
+            "mean": 15.308333333333332,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 55.5,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.1000000000001364,
+            "p95": 10.700000000000045,
+            "max": 10.900000000000091,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.894999999999999,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 131.90000000037253,
+            "p95": 150.3999999994412,
+            "max": 150.3999999994412
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 124.10000000000036,
+            "p95": 145,
+            "max": 147.30000000000018,
+            "over16": 1,
+            "over25": 1,
+            "mean": 126.49499999999998,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.492593765258789,
+          "stats": {
+            "domNodes": 13147
+          },
+          "domNodes": 13147,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 128,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 133,
+              "peakMb": 212
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 364,
+              "peakMb": 657
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.93, 3.12, 3.71],
+            "freeMemMB": 999
+          },
+          "machineAfter": {
+            "loadavg": [2.79, 3.08, 3.69],
+            "freeMemMB": 566
+          },
+          "wallMs": 10286,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.700000000186265,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 90.29999999981374,
+          "ttffMs": 161.3999999994412,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 2.2999999998137355,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 5.2999999999999545,
+            "max": 7.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.7350000000000003,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 13.700000000000045,
+            "p95": 29.09999999999991,
+            "max": 46.700000000000045,
+            "over16": 0.2833333333333333,
+            "over25": 0.1,
+            "mean": 15.651666666666666,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 53.200000000186265,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.2000000000000455,
+            "p95": 10.800000000000182,
+            "max": 11.300000000000182,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.990000000000004,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 123.20000000018626,
+            "p95": 152.90000000037253,
+            "max": 152.90000000037253
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 126.19999999999982,
+            "p95": 156.10000000000036,
+            "max": 163.19999999999982,
+            "over16": 1,
+            "over25": 1,
+            "mean": 129.085,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.532293319702148,
+          "stats": {
+            "domNodes": 13147
+          },
+          "domNodes": 13147,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 119,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 86,
+              "peakMb": 208
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 285,
+              "peakMb": 666
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.79, 3.08, 3.69],
+            "freeMemMB": 1141
+          },
+          "machineAfter": {
+            "loadavg": [2.45, 2.99, 3.65],
+            "freeMemMB": 454
+          },
+          "wallMs": 10398,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 91.20000000018626,
+          "ttffMs": 162.8999999994412,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 11.5,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.2999999999999545,
+            "p95": 4.699999999999932,
+            "max": 7.399999999999977,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.6683333333333337,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 13.100000000000136,
+            "p95": 26.799999999999955,
+            "max": 40.5,
+            "over16": 0.3,
+            "over25": 0.11666666666666667,
+            "mean": 15.528333333333334,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 52.30000000074506,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.2000000000000455,
+            "p95": 10.700000000000273,
+            "max": 11,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.962500000000006,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 125.3999999994412,
+            "p95": 153,
+            "max": 153
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 123.80000000000018,
+            "p95": 144.29999999999927,
+            "max": 164.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 126.66999999999999,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 7.534608840942383,
+          "stats": {
+            "domNodes": 13147
+          },
+          "domNodes": 13147,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 133,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 168,
+              "peakMb": 203
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 343,
+              "peakMb": 671
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.45, 2.99, 3.65],
+            "freeMemMB": 772
+          },
+          "machineAfter": {
+            "loadavg": [2.37, 2.96, 3.63],
+            "freeMemMB": 418
+          },
+          "wallMs": 10321,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.100000000558794,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 90.6000000005588,
+          "ttffMs": 161.20000000018626,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 10,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 4.899999999999977,
+            "max": 8.200000000000045,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.7133333333333325,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 13.600000000000023,
+            "p95": 28,
+            "max": 37.799999999999955,
+            "over16": 0.3,
+            "over25": 0.1,
+            "mean": 15.214999999999998,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 56.90000000037253,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.1000000000001364,
+            "p95": 10.600000000000136,
+            "max": 11,
+            "over16": 0,
+            "over25": 0,
+            "mean": 4.8850000000000025,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 120.70000000018626,
+            "p95": 150.59999999962747,
+            "max": 150.59999999962747
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 123,
+            "p95": 161.5,
+            "max": 163.40000000000055,
+            "over16": 1,
+            "over25": 1,
+            "mean": 127.71750000000002,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 6.925695419311523,
+          "stats": {
+            "domNodes": 13147
+          },
+          "domNodes": 13147,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 129,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 157,
+              "peakMb": 223
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 365,
+              "peakMb": 660
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.37, 2.96, 3.63],
+            "freeMemMB": 1024
+          },
+          "machineAfter": {
+            "loadavg": [2.31, 2.93, 3.61],
+            "freeMemMB": 352
+          },
+          "wallMs": 10350,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/B/13000": {
+      "browser": "electron",
+      "strategy": "B",
+      "n": 13000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 38.19999999925494,
+        "initMs": 18.5,
+        "firstSettleMs": 30.200000000186265,
+        "pan": {
+          "p50": 0.5,
+          "p95": 2.3999999999999773,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 6.5,
+          "p95": 24.700000000000045,
+          "over16": 0.15,
+          "over25": 0.05,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "overviewSettleMs": 106.5,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 1.1000000000001364,
+          "p95": 1.5,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "editP50": 7.2999999998137355,
+        "editP95": 11.099999999627471,
+        "drag": {
+          "p50": 1.400000000000091,
+          "p95": 2.2999999999999545,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "jsHeapMB": 12.203600883483887,
+        "gpuProcMB": 140,
+        "rendererProcMB": 378,
+        "gpuEstimateMB": 21.825439453125,
+        "domNodes": 3046,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "B",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.399999999441206,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 18.40000000037253,
+          "ttffMs": 37.90000000037253,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 30.200000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 2.1000000000000227,
+            "max": 3.3999999999999773,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.65,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.5,
+            "p95": 25.300000000000068,
+            "max": 78.90000000000009,
+            "over16": 0.2,
+            "over25": 0.06666666666666667,
+            "mean": 9.641666666666667,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 118.20000000018626,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 1.1000000000001364,
+            "p95": 1.5,
+            "max": 1.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.2025000000000035,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.800000000745058,
+            "p95": 11.799999999813735,
+            "max": 11.799999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.5,
+            "p95": 2.2999999999999545,
+            "max": 2.7000000000000455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.5925000000000011,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 12.198939323425293,
+          "stats": {
+            "domNodes": 3046,
+            "mountedBoards": 30,
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 22885632
+          },
+          "domNodes": 3046,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 112,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 122,
+              "peakMb": 124
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 357,
+              "peakMb": 383
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.31, 2.93, 3.61],
+            "freeMemMB": 942
+          },
+          "machineAfter": {
+            "loadavg": [2.31, 2.93, 3.61],
+            "freeMemMB": 101
+          },
+          "wallMs": 2845,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.699999999254942,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 17.5,
+          "ttffMs": 36.200000000186265,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 23.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 2.599999999999909,
+            "max": 3.6000000000000227,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.7583333333333333,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.7999999999999545,
+            "p95": 24.700000000000045,
+            "max": 81.59999999999991,
+            "over16": 0.16666666666666666,
+            "over25": 0.03333333333333333,
+            "mean": 9.393333333333336,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 101.29999999981374,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 1.2000000000000455,
+            "p95": 1.7000000000000455,
+            "max": 1.7999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.2849999999999966,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7.2999999998137355,
+            "p95": 10.5,
+            "max": 10.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.400000000000091,
+            "p95": 2.5,
+            "max": 2.599999999999909,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.5974999999999966,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 12.203600883483887,
+          "stats": {
+            "domNodes": 3046,
+            "mountedBoards": 30,
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 22885632
+          },
+          "domNodes": 3046,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 151,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 126,
+              "peakMb": 137
+            },
+            {
+              "type": "Utility",
+              "mb": 45,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 378,
+              "peakMb": 432
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.31, 2.93, 3.61],
+            "freeMemMB": 1118
+          },
+          "machineAfter": {
+            "loadavg": [2.36, 2.93, 3.61],
+            "freeMemMB": 226
+          },
+          "wallMs": 2850,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 20.300000000745058,
+          "ttffMs": 40.60000000055879,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 24.90000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 2.3999999999999773,
+            "max": 3.2000000000000455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.7533333333333341,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.2999999999999545,
+            "p95": 24.200000000000045,
+            "max": 81.29999999999995,
+            "over16": 0.15,
+            "over25": 0.05,
+            "mean": 9.098333333333333,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 92.70000000018626,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 1.1000000000001364,
+            "p95": 1.5,
+            "max": 1.7000000000000455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.1950000000000045,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.300000000745058,
+            "p95": 21.299999999813735,
+            "max": 21.299999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.2000000000000455,
+            "p95": 1.400000000000091,
+            "max": 1.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.1899999999999977,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 12.197543144226074,
+          "stats": {
+            "domNodes": 3046,
+            "mountedBoards": 30,
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 22885632
+          },
+          "domNodes": 3046,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 142,
+              "peakMb": 142
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 398,
+              "peakMb": 445
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.36, 2.93, 3.61],
+            "freeMemMB": 1387
+          },
+          "machineAfter": {
+            "loadavg": [2.36, 2.93, 3.61],
+            "freeMemMB": 213
+          },
+          "wallMs": 2702,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 20.600000000558794,
+          "ttffMs": 40.60000000055879,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 31.200000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.40000000000009095,
+            "p95": 2.5,
+            "max": 3.3999999999999773,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6649999999999996,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.400000000000091,
+            "p95": 24.199999999999932,
+            "max": 81.40000000000009,
+            "over16": 0.13333333333333333,
+            "over25": 0.03333333333333333,
+            "mean": 9.05,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 106.5,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 1.099999999999909,
+            "p95": 1.5,
+            "max": 1.599999999999909,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.1799999999999955,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.099999999627471,
+            "p95": 11.099999999627471,
+            "max": 11.099999999627471
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.400000000000091,
+            "p95": 2.199999999999818,
+            "max": 2.2999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.525,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 12.231911659240723,
+          "stats": {
+            "domNodes": 3046,
+            "mountedBoards": 30,
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 22885632
+          },
+          "domNodes": 3046,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 144,
+              "peakMb": 144
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 376,
+              "peakMb": 408
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.26, 2.9, 3.59],
+            "freeMemMB": 1320
+          },
+          "machineAfter": {
+            "loadavg": [2.26, 2.9, 3.59],
+            "freeMemMB": 122
+          },
+          "wallMs": 2765,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 18.5,
+          "ttffMs": 38.19999999925494,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 31.5,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 2.3999999999999773,
+            "max": 3.2999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6899999999999996,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.5,
+            "p95": 24.700000000000045,
+            "max": 80.00000000000011,
+            "over16": 0.13333333333333333,
+            "over25": 0.05,
+            "mean": 9.078333333333331,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 108.40000000037253,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 1.1000000000001364,
+            "p95": 1.5,
+            "max": 1.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.1850000000000023,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8,
+            "p95": 9.300000000745058,
+            "max": 9.300000000745058
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.400000000000091,
+            "p95": 2.2999999999999545,
+            "max": 2.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.575,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 12.225872993469238,
+          "stats": {
+            "domNodes": 3046,
+            "mountedBoards": 30,
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 22885632
+          },
+          "domNodes": 3046,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 140,
+              "peakMb": 140
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 379,
+              "peakMb": 416
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.26, 2.9, 3.59],
+            "freeMemMB": 1328
+          },
+          "machineAfter": {
+            "loadavg": [2.07, 2.85, 3.57],
+            "freeMemMB": 111
+          },
+          "wallMs": 2751,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/C/13000": {
+      "browser": "electron",
+      "strategy": "C",
+      "n": 13000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 45.200000000186265,
+        "initMs": 44.40000000037253,
+        "firstSettleMs": 18.5,
+        "pan": {
+          "p50": 0.20000000000004547,
+          "p95": 0.6000000000000227,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 0.6000000000000227,
+          "p95": 10,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": 0.08534802388969055,
+          "truncated": false
+        },
+        "overviewSettleMs": 72.59999999962747,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 0.20000000000004547,
+          "p95": 0.3000000000000682,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "editP50": 4.800000000745058,
+        "editP95": 20.09999999962747,
+        "drag": {
+          "p50": 0.20000000000004547,
+          "p95": 0.2999999999999545,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "jsHeapMB": 11.843185424804688,
+        "gpuProcMB": 242,
+        "rendererProcMB": 268,
+        "gpuEstimateMB": 238.4130859375,
+        "domNodes": 15,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "C",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.699999999254942,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 36.299999999813735,
+          "ttffMs": 36.799999999813735,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 0.5,
+            "max": 4.600000000000023,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.35166666666666707,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 10,
+            "max": 10.899999999999977,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.729999999999999,
+            "scriptP50": 0.2999999998137355,
+            "incompleteFrac": 0.09618075597242262,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 76.1000000005588,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.5,
+            "max": 0.7000000000000455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.24000000000000057,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.800000000745058,
+            "p95": 20.200000000186265,
+            "max": 20.200000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.2999999999999545,
+            "p95": 0.3000000000001819,
+            "max": 0.40000000000009095,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.24250000000000113,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 11.840001106262207,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 455,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 242,
+              "peakMb": 242
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 279,
+              "peakMb": 295
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.07, 2.85, 3.57],
+            "freeMemMB": 1312
+          },
+          "machineAfter": {
+            "loadavg": [2.07, 2.85, 3.57],
+            "freeMemMB": 164
+          },
+          "wallMs": 2196,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 45.69999999925494,
+          "ttffMs": 46.5,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.59999999962747,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 0.599999999999909,
+            "max": 3.2999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.32999999999999924,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 0.6000000000000227,
+            "p95": 9.800000000000068,
+            "max": 11.300000000000068,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.828333333333334,
+            "scriptP50": 0.2999999998137355,
+            "incompleteFrac": 0.08998752405002404,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 72.59999999962747,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.39999999999997726,
+            "max": 0.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.20749999999999885,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 5.099999999627471,
+            "p95": 18.299999999813735,
+            "max": 18.299999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.2999999999999545,
+            "max": 0.40000000000009095,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.20249999999999774,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 11.829652786254883,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 452,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 231,
+              "peakMb": 231
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 272,
+              "peakMb": 287
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.07, 2.85, 3.57],
+            "freeMemMB": 1170
+          },
+          "machineAfter": {
+            "loadavg": [2.15, 2.85, 3.57],
+            "freeMemMB": 118
+          },
+          "wallMs": 2220,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 44.40000000037253,
+          "ttffMs": 45.200000000186265,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.5,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 0.6000000000000227,
+            "max": 3.300000000000068,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.3316666666666663,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 0.5,
+            "p95": 10.100000000000023,
+            "max": 11.200000000000045,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.6416666666666666,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0.08534802388969055,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 95.30000000074506,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.1999999999999318,
+            "p95": 0.2999999999999545,
+            "max": 0.39999999999997726,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.17750000000000057,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.5,
+            "p95": 20.09999999962747,
+            "max": 20.09999999962747
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.2999999999999545,
+            "max": 0.2999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.20500000000000113,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 11.84381103515625,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 460,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 225,
+              "peakMb": 225
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 268,
+              "peakMb": 305
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.15, 2.85, 3.57],
+            "freeMemMB": 1139
+          },
+          "machineAfter": {
+            "loadavg": [2.15, 2.85, 3.57],
+            "freeMemMB": 268
+          },
+          "wallMs": 2193,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.599999999627471,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 40.5,
+          "ttffMs": 41.299999999813735,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 17.90000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 0.6000000000000227,
+            "max": 3.300000000000068,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.3216666666666678,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 0.8999999999999773,
+            "p95": 10.199999999999932,
+            "max": 10.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.7866666666666675,
+            "scriptP50": 0.2999999998137355,
+            "incompleteFrac": 0.08441588504088506,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 70.80000000074506,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.1999999999999318,
+            "p95": 0.3000000000000682,
+            "max": 0.40000000000009095,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.19749999999999943,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.400000000372529,
+            "p95": 19.899999999441206,
+            "max": 19.899999999441206
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.3000000000001819,
+            "max": 0.40000000000009095,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.22749999999999773,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 11.845358848571777,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 460,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 242,
+              "peakMb": 242
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 266,
+              "peakMb": 289
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.15, 2.85, 3.57],
+            "freeMemMB": 1268
+          },
+          "machineAfter": {
+            "loadavg": [2.14, 2.84, 3.56],
+            "freeMemMB": 85
+          },
+          "wallMs": 2191,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.599999999627471,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 47.19999999925494,
+          "ttffMs": 48,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 17.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 0.6999999999999318,
+            "max": 3.3999999999999773,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.33500000000000035,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 1.1999999999999318,
+            "p95": 9.899999999999977,
+            "max": 11,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.85,
+            "scriptP50": 0.30000000074505806,
+            "incompleteFrac": 0.0839385922719256,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 72,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.2999999999999545,
+            "max": 0.39999999999997726,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.18999999999999773,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.800000000745058,
+            "p95": 20.100000000558794,
+            "max": 20.100000000558794
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.2999999999999545,
+            "max": 0.3000000000001819,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.2375,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 11.843185424804688,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 455,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 243,
+              "peakMb": 243
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 266,
+              "peakMb": 289
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.14, 2.84, 3.56],
+            "freeMemMB": 987
+          },
+          "machineAfter": {
+            "loadavg": [2.14, 2.84, 3.56],
+            "freeMemMB": 164
+          },
+          "wallMs": 2222,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/Dgpu/13000": {
+      "browser": "electron",
+      "strategy": "Dgpu",
+      "n": 13000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 233.3999999994412,
+        "initMs": 230,
+        "firstSettleMs": 16.40000000037253,
+        "pan": {
+          "p50": 2.8999999999999773,
+          "p95": 3.7000000000000455,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 6.2999999999999545,
+          "p95": 53.799999999999955,
+          "over16": 0.2833333333333333,
+          "over25": 0.21666666666666667,
+          "frames": 60,
+          "incompleteFrac": 0.08563401875901877,
+          "truncated": false
+        },
+        "overviewSettleMs": 262.70000000018626,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 0.3000000000001819,
+          "p95": 0.599999999999909,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "editP50": 7.1000000005587935,
+        "editP95": 31.700000000186265,
+        "drag": {
+          "p50": 1.5,
+          "p95": 2,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "jsHeapMB": 240.46528434753418,
+        "gpuProcMB": 182,
+        "rendererProcMB": 563,
+        "gpuEstimateMB": 93.7794189453125,
+        "domNodes": 15,
+        "renderer": "webgpu"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "Dgpu",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.600000000558794,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 281.30000000074506,
+          "ttffMs": 285.6000000005588,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 14.600000000558794,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 2.8999999999999773,
+            "p95": 3.6000000000000227,
+            "max": 14.700000000000045,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.973333333333333,
+            "scriptP50": 2.3999999994412065,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 5.900000000000091,
+            "p95": 53.59999999999991,
+            "max": 68.79999999999995,
+            "over16": 0.2833333333333333,
+            "over25": 0.23333333333333334,
+            "mean": 15.556666666666668,
+            "scriptP50": 6.1000000005587935,
+            "incompleteFrac": 0.08909992784992785,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 293.5,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.29999999999972715,
+            "p95": 0.6999999999998181,
+            "max": 0.900000000000091,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.3224999999999909,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.3999999994412065,
+            "p95": 23.5,
+            "max": 23.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.900000000000091,
+            "p95": 3.599999999999909,
+            "max": 8.200000000000273,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.1225000000000023,
+            "scriptP50": 1.3999999994412065,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 240.46528434753418,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 98334848
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 129,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 172,
+              "peakMb": 224
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 553,
+              "peakMb": 561
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.14, 2.84, 3.56],
+            "freeMemMB": 1175
+          },
+          "machineAfter": {
+            "loadavg": [2.29, 2.86, 3.56],
+            "freeMemMB": 117
+          },
+          "wallMs": 3653,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.300000000745058,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 203.09999999962747,
+          "ttffMs": 206.59999999962747,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 16.300000000745058,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 3,
+            "p95": 3.7999999999999545,
+            "max": 15,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.081666666666666,
+            "scriptP50": 2.5,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.5,
+            "p95": 52,
+            "max": 74.69999999999982,
+            "over16": 0.2833333333333333,
+            "over25": 0.21666666666666667,
+            "mean": 15.535,
+            "scriptP50": 6.099999999627471,
+            "incompleteFrac": 0.08563401875901877,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 263,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.3000000000001819,
+            "p95": 0.5,
+            "max": 0.6000000000003638,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.35,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.199999999254942,
+            "p95": 35.39999999944121,
+            "max": 35.39999999944121
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.699999999999818,
+            "p95": 2.400000000000091,
+            "max": 7.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.8175000000000068,
+            "scriptP50": 1.2999999998137355,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 240.2922763824463,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 98334848
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 128,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 182,
+              "peakMb": 229
+            },
+            {
+              "type": "Utility",
+              "mb": 41,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 572,
+              "peakMb": 582
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.29, 2.86, 3.56],
+            "freeMemMB": 1221
+          },
+          "machineAfter": {
+            "loadavg": [2.34, 2.86, 3.56],
+            "freeMemMB": 149
+          },
+          "wallMs": 3690,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.599999999627471,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 230.29999999981374,
+          "ttffMs": 233.40000000037253,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 16.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 2.7999999999999545,
+            "p95": 3.7000000000000455,
+            "max": 16.200000000000045,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.9883333333333346,
+            "scriptP50": 2.300000000745058,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.2999999999999545,
+            "p95": 54.399999999999864,
+            "max": 70.29999999999995,
+            "over16": 0.26666666666666666,
+            "over25": 0.2,
+            "mean": 15.338333333333333,
+            "scriptP50": 6.400000000372529,
+            "incompleteFrac": 0.08495851370851369,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 262.70000000018626,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.40000000000009095,
+            "p95": 2.600000000000364,
+            "max": 10.699999999999818,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.8324999999999931,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7.1000000005587935,
+            "p95": 29.800000000745058,
+            "max": 29.800000000745058
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.5,
+            "p95": 1.900000000000091,
+            "max": 2,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.447499999999991,
+            "scriptP50": 1.1000000005587935,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 247.26990699768066,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 98334848
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 127,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 178,
+              "peakMb": 244
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 555,
+              "peakMb": 599
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.34, 2.86, 3.56],
+            "freeMemMB": 1381
+          },
+          "machineAfter": {
+            "loadavg": [2.34, 2.86, 3.56],
+            "freeMemMB": 153
+          },
+          "wallMs": 3586,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 11.400000000372529,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 230,
+          "ttffMs": 233.3999999994412,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 16.40000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 2.800000000000068,
+            "p95": 3.6000000000000227,
+            "max": 15,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.9616666666666673,
+            "scriptP50": 2.400000000372529,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 5.900000000000091,
+            "p95": 55.09999999999991,
+            "max": 86.70000000000005,
+            "over16": 0.2833333333333333,
+            "over25": 0.21666666666666667,
+            "mean": 15.556666666666668,
+            "scriptP50": 5.7999999998137355,
+            "incompleteFrac": 0.08592442279942282,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 256.70000000018626,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.3000000000001819,
+            "p95": 0.40000000000009095,
+            "max": 0.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.3099999999999909,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7.7000000001862645,
+            "p95": 31.700000000186265,
+            "max": 31.700000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.5,
+            "p95": 2,
+            "max": 2.400000000000091,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.4774999999999978,
+            "scriptP50": 1.199999999254942,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 240.76896476745605,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 98334848
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 155,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 189,
+              "peakMb": 243
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 565,
+              "peakMb": 604
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.34, 2.86, 3.56],
+            "freeMemMB": 1467
+          },
+          "machineAfter": {
+            "loadavg": [2.31, 2.84, 3.55],
+            "freeMemMB": 113
+          },
+          "wallMs": 3608,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 13000,
+          "boards": 130,
+          "genMs": 10.900000000372529,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.05923363095238095,
+          "initMs": 202.79999999981374,
+          "ttffMs": 206.09999999962747,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 16.40000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 3,
+            "p95": 4,
+            "max": 14.800000000000068,
+            "over16": 0,
+            "over25": 0,
+            "mean": 3.1383333333333328,
+            "scriptP50": 2.5,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 6.900000000000091,
+            "p95": 53.799999999999955,
+            "max": 68.79999999999995,
+            "over16": 0.31666666666666665,
+            "over25": 0.21666666666666667,
+            "mean": 15.558333333333334,
+            "scriptP50": 6.7000000001862645,
+            "incompleteFrac": 0.08455447330447331,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 258.79999999981374,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.3999999999996362,
+            "p95": 0.599999999999909,
+            "max": 0.599999999999909,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.3850000000000023,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7.099999999627471,
+            "p95": 41.39999999944121,
+            "max": 41.39999999944121
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.300000000000182,
+            "p95": 1.7999999999997272,
+            "max": 1.800000000000182,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.3525000000000091,
+            "scriptP50": 1,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 240.3014087677002,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 130,
+            "thumbs": 129,
+            "gpuEstimateBytes": 98334848
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 130,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 183,
+              "peakMb": 240
+            },
+            {
+              "type": "Utility",
+              "mb": 40,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 563,
+              "peakMb": 611
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.31, 2.84, 3.55],
+            "freeMemMB": 1453
+          },
+          "machineAfter": {
+            "loadavg": [2.37, 2.85, 3.54],
+            "freeMemMB": 183
+          },
+          "wallMs": 3544,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/A/100000": {
+      "browser": "electron",
+      "strategy": "A",
+      "n": 100000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 902.2000000001863,
+        "initMs": 394.29999999981374,
+        "firstSettleMs": 14.299999999813735,
+        "pan": {
+          "p50": 527.5,
+          "p95": 576.9000000000005,
+          "over16": 1,
+          "over25": 1,
+          "frames": 24,
+          "incompleteFrac": null,
+          "truncated": true
+        },
+        "zoom": {
+          "p50": 925,
+          "p95": 1026.9000000000015,
+          "over16": 1,
+          "over25": 1,
+          "frames": 12,
+          "incompleteFrac": null,
+          "truncated": true
+        },
+        "overviewSettleMs": 1459.300000000745,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 1323.8999999999942,
+          "p95": 1991.300000000003,
+          "over16": 1,
+          "over25": 1,
+          "frames": 6,
+          "incompleteFrac": null,
+          "truncated": true
+        },
+        "editP50": 35.200000000186265,
+        "editP95": 70.80000000074506,
+        "drag": {
+          "p50": 16.099999999998545,
+          "p95": 16.69999999999709,
+          "over16": 0.05,
+          "over25": 0.025,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "jsHeapMB": 29.748433113098145,
+        "gpuProcMB": 242,
+        "rendererProcMB": 892,
+        "gpuEstimateMB": null,
+        "domNodes": 101015,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "A",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.79999999981374,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 394.90000000037253,
+          "ttffMs": 919.2000000001863,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 13,
+            "complete": true
+          },
+          "pan": {
+            "frames": 22,
+            "p50": 554.3000000000002,
+            "p95": 645.3000000000011,
+            "max": 668.1000000000004,
+            "over16": 1,
+            "over25": 1,
+            "mean": 559.6500000000001,
+            "scriptP50": 284.90000000037253,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "zoom": {
+            "frames": 11,
+            "p50": 1034.7999999999993,
+            "p95": 1220.5,
+            "max": 1220.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1031.7818181818182,
+            "scriptP50": 340.3999999994412,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "overviewSettle": {
+            "ms": 1501.5,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 6,
+            "p50": 1365.5999999999985,
+            "p95": 1836.0999999999985,
+            "max": 1836.0999999999985,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1406.4000000000003,
+            "scriptP50": 420.59999999962747,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "edit": {
+            "p50": 36.30000000074506,
+            "p95": 207.09999999962747,
+            "max": 207.09999999962747
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 16.099999999998545,
+            "p95": 16.400000000001455,
+            "max": 16.599999999998545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 16.082500000000074,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 29.748433113098145,
+          "stats": {
+            "domNodes": 101015
+          },
+          "domNodes": 101015,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 70,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 242,
+              "peakMb": 613
+            },
+            {
+              "type": "Utility",
+              "mb": 28,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 865,
+              "peakMb": 1906
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.37, 2.85, 3.54],
+            "freeMemMB": 1514
+          },
+          "machineAfter": {
+            "loadavg": [3.06, 2.92, 3.52],
+            "freeMemMB": 936
+          },
+          "wallMs": 54714,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.20000000018626,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 394.69999999925494,
+          "ttffMs": 903.8999999994412,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 14.599999999627471,
+            "complete": true
+          },
+          "pan": {
+            "frames": 23,
+            "p50": 536,
+            "p95": 573.6999999999998,
+            "max": 578.6000000000004,
+            "over16": 1,
+            "over25": 1,
+            "mean": 535.7,
+            "scriptP50": 280.90000000037253,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "zoom": {
+            "frames": 12,
+            "p50": 908.8000000000029,
+            "p95": 978.6999999999971,
+            "max": 1120.300000000003,
+            "over16": 1,
+            "over25": 1,
+            "mean": 930.4583333333334,
+            "scriptP50": 332.3999999994412,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "overviewSettle": {
+            "ms": 1818,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 6,
+            "p50": 1406.0999999999985,
+            "p95": 2025.6000000000058,
+            "max": 2025.6000000000058,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1496.3000000000004,
+            "scriptP50": 428.90000000037253,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "edit": {
+            "p50": 34.5,
+            "p95": 39.39999999944121,
+            "max": 39.39999999944121
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 16.69999999999709,
+            "p95": 17.799999999995634,
+            "max": 52.39999999999418,
+            "over16": 0.475,
+            "over25": 0.025,
+            "mean": 17.317499999999928,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 29.597859382629395,
+          "stats": {
+            "domNodes": 101015
+          },
+          "domNodes": 101015,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 54,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 185,
+              "peakMb": 604
+            },
+            {
+              "type": "Utility",
+              "mb": 17,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 892,
+              "peakMb": 2211
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [3.06, 2.92, 3.52],
+            "freeMemMB": 2353
+          },
+          "machineAfter": {
+            "loadavg": [4.52, 3.32, 3.63],
+            "freeMemMB": 969
+          },
+          "wallMs": 56393,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.90000000037253,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 387.79999999981374,
+          "ttffMs": 894.2999999998137,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 14.299999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 24,
+            "p50": 525.8999999999996,
+            "p95": 596.2999999999993,
+            "max": 649.6000000000004,
+            "over16": 1,
+            "over25": 1,
+            "mean": 537.1999999999999,
+            "scriptP50": 278.70000000018626,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "zoom": {
+            "frames": 11,
+            "p50": 958.5999999999985,
+            "p95": 1144.8999999999978,
+            "max": 1144.8999999999978,
+            "over16": 1,
+            "over25": 1,
+            "mean": 980.2909090909095,
+            "scriptP50": 335.70000000018626,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "overviewSettle": {
+            "ms": 1459.300000000745,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 6,
+            "p50": 1323.8999999999942,
+            "p95": 1991.300000000003,
+            "max": 1991.300000000003,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1417.3499999999997,
+            "scriptP50": 398.29999999981374,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "edit": {
+            "p50": 35.200000000186265,
+            "p95": 151.30000000074506,
+            "max": 151.30000000074506
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 16,
+            "p95": 16.69999999999709,
+            "max": 17.5,
+            "over16": 0.05,
+            "over25": 0,
+            "mean": 16.1,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 29.010315895080566,
+          "stats": {
+            "domNodes": 101015
+          },
+          "domNodes": 101015,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 63,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 293,
+              "peakMb": 622
+            },
+            {
+              "type": "Utility",
+              "mb": 24,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 872,
+              "peakMb": 2201
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [4.52, 3.32, 3.63],
+            "freeMemMB": 2182
+          },
+          "machineAfter": {
+            "loadavg": [6.26, 3.89, 3.82],
+            "freeMemMB": 736
+          },
+          "wallMs": 55242,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 71.79999999981374,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 381.5,
+          "ttffMs": 895.5,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 17.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 24,
+            "p50": 525.6000000000004,
+            "p95": 552.3000000000011,
+            "max": 587.1999999999998,
+            "over16": 1,
+            "over25": 1,
+            "mean": 522.5416666666666,
+            "scriptP50": 275.90000000037253,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "zoom": {
+            "frames": 13,
+            "p50": 864.2000000000007,
+            "p95": 987,
+            "max": 1044.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 888.646153846154,
+            "scriptP50": 320.09999999962747,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "overviewSettle": {
+            "ms": 1445.5,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 6,
+            "p50": 1280.1000000000058,
+            "p95": 2106,
+            "max": 2106,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1413.8833333333325,
+            "scriptP50": 395.20000000018626,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "edit": {
+            "p50": 35.10000000055879,
+            "p95": 67.90000000037253,
+            "max": 67.90000000037253
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 16.39999999999418,
+            "p95": 18.400000000001455,
+            "max": 51.5,
+            "over16": 0.325,
+            "over25": 0.025,
+            "mean": 17.084999999999855,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 30.042031288146973,
+          "stats": {
+            "domNodes": 101015
+          },
+          "domNodes": 101015,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 64,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 253,
+              "peakMb": 620
+            },
+            {
+              "type": "Utility",
+              "mb": 25,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1001,
+              "peakMb": 2211
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [6.26, 3.89, 3.82],
+            "freeMemMB": 2369
+          },
+          "machineAfter": {
+            "loadavg": [4.39, 3.76, 3.77],
+            "freeMemMB": 679
+          },
+          "wallMs": 55693,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 69.5,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 394.29999999981374,
+          "ttffMs": 902.2000000001863,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 12.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 24,
+            "p50": 527.5,
+            "p95": 576.9000000000005,
+            "max": 579.2999999999993,
+            "over16": 1,
+            "over25": 1,
+            "mean": 529.5666666666667,
+            "scriptP50": 279.8999999994412,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "zoom": {
+            "frames": 12,
+            "p50": 925,
+            "p95": 1026.9000000000015,
+            "max": 1106.9000000000015,
+            "over16": 1,
+            "over25": 1,
+            "mean": 947.066666666667,
+            "scriptP50": 329.3999999994412,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "overviewSettle": {
+            "ms": 1438.8999999994412,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 6,
+            "p50": 1229.9000000000015,
+            "p95": 1781.5,
+            "max": 1781.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1327.9166666666667,
+            "scriptP50": 380.79999999981374,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "edit": {
+            "p50": 35.5,
+            "p95": 70.80000000074506,
+            "max": 70.80000000074506
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 15.900000000001455,
+            "p95": 16.599999999998545,
+            "max": 51.5,
+            "over16": 0.05,
+            "over25": 0.025,
+            "mean": 16.55,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 29.923501014709473,
+          "stats": {
+            "domNodes": 101015
+          },
+          "domNodes": 101015,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 111,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 232,
+              "peakMb": 656
+            },
+            {
+              "type": "Utility",
+              "mb": 34,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 997,
+              "peakMb": 2248
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [4.39, 3.76, 3.77],
+            "freeMemMB": 2240
+          },
+          "machineAfter": {
+            "loadavg": [3.59, 3.63, 3.72],
+            "freeMemMB": 866
+          },
+          "wallMs": 55010,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/A2/100000": {
+      "browser": "electron",
+      "strategy": "A2",
+      "n": 100000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 958.7999999998137,
+        "initMs": 446.09999999962747,
+        "firstSettleMs": 47.40000000037253,
+        "pan": {
+          "p50": 4.099999999999909,
+          "p95": 22.09999999999991,
+          "over16": 0.08333333333333333,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 75.89999999999964,
+          "p95": 335.09999999999945,
+          "over16": 1,
+          "over25": 1,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "overviewSettleMs": 688.4000000003725,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 91.5,
+          "p95": 115.10000000000036,
+          "over16": 1,
+          "over25": 0.975,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "editP50": 1589.199999999255,
+        "editP95": 2179.7000000001863,
+        "drag": {
+          "p50": 1785.699999999997,
+          "p95": 2282.600000000006,
+          "over16": 1,
+          "over25": 1,
+          "frames": 4,
+          "incompleteFrac": null,
+          "truncated": true
+        },
+        "jsHeapMB": 29.27017879486084,
+        "gpuProcMB": 71,
+        "rendererProcMB": 851,
+        "gpuEstimateMB": null,
+        "domNodes": 101017,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "A2",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 64.69999999925494,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 444.3999999994412,
+          "ttffMs": 965.7999999998137,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 51.10000000055879,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 4.599999999999909,
+            "p95": 22.700000000000045,
+            "max": 24.300000000000182,
+            "over16": 0.08333333333333333,
+            "over25": 0,
+            "mean": 6.2233333333333345,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 79.19999999999891,
+            "p95": 368.60000000000036,
+            "max": 632.2999999999993,
+            "over16": 1,
+            "over25": 1,
+            "mean": 126.93166666666666,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 729.1000000005588,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 81.59999999999854,
+            "p95": 117.29999999999927,
+            "max": 119.89999999999964,
+            "over16": 1,
+            "over25": 0.975,
+            "mean": 73.38249999999998,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 1596.2999999998137,
+            "p95": 2132.100000000559,
+            "max": 2132.100000000559
+          },
+          "drag": {
+            "frames": 4,
+            "p50": 1785.699999999997,
+            "p95": 2206.800000000003,
+            "max": 2206.800000000003,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1837.125,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "jsHeapMB": 29.27017879486084,
+          "stats": {
+            "domNodes": 101017
+          },
+          "domNodes": 101017,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 69,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 56,
+              "peakMb": 520
+            },
+            {
+              "type": "Utility",
+              "mb": 23,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 842,
+              "peakMb": 2424
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [3.59, 3.63, 3.72],
+            "freeMemMB": 2353
+          },
+          "machineAfter": {
+            "loadavg": [4.13, 3.94, 3.84],
+            "freeMemMB": 1478
+          },
+          "wallMs": 51179,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 66,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 444.59999999962747,
+          "ttffMs": 958.7999999998137,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 46.19999999925494,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 4.099999999999909,
+            "p95": 22.200000000000045,
+            "max": 23.40000000000009,
+            "over16": 0.08333333333333333,
+            "over25": 0,
+            "mean": 5.743333333333331,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 75.89999999999964,
+            "p95": 338.6999999999998,
+            "max": 734.3999999999996,
+            "over16": 1,
+            "over25": 1,
+            "mean": 122.95833333333334,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 688.4000000003725,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 97.20000000000073,
+            "p95": 113.5,
+            "max": 129.5,
+            "over16": 1,
+            "over25": 0.975,
+            "mean": 70.68249999999998,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 1574.0999999996275,
+            "p95": 2259.9000000003725,
+            "max": 2259.9000000003725
+          },
+          "drag": {
+            "frames": 4,
+            "p50": 1841.199999999997,
+            "p95": 2344.199999999997,
+            "max": 2344.199999999997,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1885.7749999999996,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "jsHeapMB": 28.74703025817871,
+          "stats": {
+            "domNodes": 101017
+          },
+          "domNodes": 101017,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 80,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 71,
+              "peakMb": 647
+            },
+            {
+              "type": "Utility",
+              "mb": 29,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 876,
+              "peakMb": 2512
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [4.13, 3.94, 3.84],
+            "freeMemMB": 2222
+          },
+          "machineAfter": {
+            "loadavg": [3.33, 3.78, 3.78],
+            "freeMemMB": 1665
+          },
+          "wallMs": 50972,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.20000000018626,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 447.09999999962747,
+          "ttffMs": 955.9000000003725,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 47.40000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 4,
+            "p95": 22,
+            "max": 23.90000000000009,
+            "over16": 0.08333333333333333,
+            "over25": 0,
+            "mean": 5.716666666666667,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 76.60000000000036,
+            "p95": 305.40000000000055,
+            "max": 733.2999999999993,
+            "over16": 1,
+            "over25": 1,
+            "mean": 122.17666666666666,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 649.6000000005588,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 91.70000000000073,
+            "p95": 115.19999999999891,
+            "max": 125.39999999999964,
+            "over16": 1,
+            "over25": 0.925,
+            "mean": 71.1,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 1624.7000000001863,
+            "p95": 2179.7000000001863,
+            "max": 2179.7000000001863
+          },
+          "drag": {
+            "frames": 3,
+            "p50": 1720,
+            "p95": 2282.600000000006,
+            "max": 2282.600000000006,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1881.8000000000004,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "jsHeapMB": 28.816264152526855,
+          "stats": {
+            "domNodes": 101017
+          },
+          "domNodes": 101017,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 66,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 62,
+              "peakMb": 640
+            },
+            {
+              "type": "Utility",
+              "mb": 24,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 764,
+              "peakMb": 2276
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [3.33, 3.78, 3.78],
+            "freeMemMB": 2538
+          },
+          "machineAfter": {
+            "loadavg": [2.46, 3.48, 3.67],
+            "freeMemMB": 1509
+          },
+          "wallMs": 49420,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 64.80000000074506,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 449.40000000037253,
+          "ttffMs": 973.4000000003725,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 48.299999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 4.2000000000000455,
+            "p95": 22.09999999999991,
+            "max": 23.40000000000009,
+            "over16": 0.08333333333333333,
+            "over25": 0,
+            "mean": 5.838333333333333,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 74.40000000000146,
+            "p95": 335.09999999999945,
+            "max": 755.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 122.61833333333333,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 644.2000000001863,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 80.5,
+            "p95": 115.10000000000036,
+            "max": 127.80000000000109,
+            "over16": 1,
+            "over25": 0.85,
+            "mean": 69.03249999999998,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 1589.199999999255,
+            "p95": 2213.5,
+            "max": 2213.5
+          },
+          "drag": {
+            "frames": 3,
+            "p50": 1800.7000000000044,
+            "p95": 2309.2999999999956,
+            "max": 2309.2999999999956,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1948.5333333333328,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "jsHeapMB": 29.365260124206543,
+          "stats": {
+            "domNodes": 101017
+          },
+          "domNodes": 101017,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 107,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 73,
+              "peakMb": 678
+            },
+            {
+              "type": "Utility",
+              "mb": 35,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 895,
+              "peakMb": 2583
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.46, 3.48, 3.67],
+            "freeMemMB": 2102
+          },
+          "machineAfter": {
+            "loadavg": [2.96, 3.46, 3.65],
+            "freeMemMB": 1725
+          },
+          "wallMs": 48915,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "A2",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 446.09999999962747,
+          "ttffMs": 956.6999999992549,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 46.30000000074506,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 4.099999999999909,
+            "p95": 21.899999999999864,
+            "max": 23.09999999999991,
+            "over16": 0.08333333333333333,
+            "over25": 0,
+            "mean": 5.7399999999999975,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 72.89999999999964,
+            "p95": 316.6999999999998,
+            "max": 825.6000000000004,
+            "over16": 1,
+            "over25": 1,
+            "mean": 120.61999999999999,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 701,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 91.5,
+            "p95": 112.70000000000073,
+            "max": 128.39999999999964,
+            "over16": 1,
+            "over25": 0.975,
+            "mean": 69.17249999999999,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 1532.4000000003725,
+            "p95": 2048,
+            "max": 2048
+          },
+          "drag": {
+            "frames": 4,
+            "p50": 1769.199999999997,
+            "p95": 2146.5,
+            "max": 2146.5,
+            "over16": 1,
+            "over25": 1,
+            "mean": 1828.2749999999996,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": true
+          },
+          "jsHeapMB": 29.278474807739258,
+          "stats": {
+            "domNodes": 101017
+          },
+          "domNodes": 101017,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 116,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 80,
+              "peakMb": 648
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 851,
+              "peakMb": 2610
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.96, 3.46, 3.65],
+            "freeMemMB": 2623
+          },
+          "machineAfter": {
+            "loadavg": [2.41, 3.25, 3.56],
+            "freeMemMB": 1669
+          },
+          "wallMs": 49450,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/B/100000": {
+      "browser": "electron",
+      "strategy": "B",
+      "n": 100000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 58.09999999962747,
+        "initMs": 32.59999999962747,
+        "firstSettleMs": 39.700000000186265,
+        "pan": {
+          "p50": 1.3999999999999773,
+          "p95": 5.600000000000023,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 30.90000000000009,
+          "p95": 62.40000000000009,
+          "over16": 0.7333333333333333,
+          "over25": 0.65,
+          "frames": 60,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "overviewSettleMs": 1874.8999999994412,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 33.79999999999927,
+          "p95": 51.79999999999927,
+          "over16": 1,
+          "over25": 0.975,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "editP50": 6.400000000372529,
+        "editP95": 13.900000000372529,
+        "drag": {
+          "p50": 1.3999999999996362,
+          "p95": 2.199999999999818,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": null,
+          "truncated": false
+        },
+        "jsHeapMB": 62.85510730743408,
+        "gpuProcMB": 146,
+        "rendererProcMB": 1366,
+        "gpuEstimateMB": 169.020263671875,
+        "domNodes": 6076,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "B",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.1000000005588,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 33,
+          "ttffMs": 58.80000000074506,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 38.5,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3000000000000682,
+            "p95": 5.600000000000023,
+            "max": 9.700000000000045,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.9683333333333337,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 30.600000000000023,
+            "p95": 63.799999999999955,
+            "max": 168.9000000000001,
+            "over16": 0.7333333333333333,
+            "over25": 0.65,
+            "mean": 33.965,
+            "scriptP50": 6.2999999998137355,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 1845.4000000003725,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 33.79999999999927,
+            "p95": 51.79999999999927,
+            "max": 52.80000000000018,
+            "over16": 1,
+            "over25": 1,
+            "mean": 35.45,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.3999999994412065,
+            "p95": 14.200000000186265,
+            "max": 14.200000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.300000000000182,
+            "p95": 2,
+            "max": 2.100000000000364,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.3474999999999908,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 62.82027244567871,
+          "stats": {
+            "domNodes": 6076,
+            "mountedBoards": 60,
+            "builtBoards": 266,
+            "thumbs": 999,
+            "gpuEstimateBytes": 177230592
+          },
+          "domNodes": 6076,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 162,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 154,
+              "peakMb": 182
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1397,
+              "peakMb": 1462
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.41, 3.25, 3.56],
+            "freeMemMB": 2548
+          },
+          "machineAfter": {
+            "loadavg": [2.46, 3.25, 3.56],
+            "freeMemMB": 132
+          },
+          "wallMs": 7879,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 66,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 13,
+          "ttffMs": 28.09999999962747,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 39.19999999925494,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 5.399999999999977,
+            "max": 8.799999999999955,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.9566666666666663,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 30.90000000000009,
+            "p95": 61.899999999999864,
+            "max": 162.5,
+            "over16": 0.75,
+            "over25": 0.6333333333333333,
+            "mean": 33.501666666666665,
+            "scriptP50": 6.400000000372529,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 1868.9000000003725,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 35.600000000000364,
+            "p95": 51.900000000000546,
+            "max": 68.39999999999964,
+            "over16": 1,
+            "over25": 0.95,
+            "mean": 37.50750000000001,
+            "scriptP50": 0.19999999925494194,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.7000000001862645,
+            "p95": 13.900000000372529,
+            "max": 13.900000000372529
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.3999999999996362,
+            "p95": 2.300000000000182,
+            "max": 2.699999999999818,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.4725000000000137,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 62.87977409362793,
+          "stats": {
+            "domNodes": 6076,
+            "mountedBoards": 60,
+            "builtBoards": 258,
+            "thumbs": 999,
+            "gpuEstimateBytes": 177230592
+          },
+          "domNodes": 6076,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 162,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 146,
+              "peakMb": 181
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1366,
+              "peakMb": 1436
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.46, 3.25, 3.56],
+            "freeMemMB": 2098
+          },
+          "machineAfter": {
+            "loadavg": [2.78, 3.29, 3.57],
+            "freeMemMB": 116
+          },
+          "wallMs": 7886,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.90000000037253,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 33,
+          "ttffMs": 58.60000000055879,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 41.80000000074506,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 5.199999999999932,
+            "max": 9.399999999999977,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.9533333333333323,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 30.5,
+            "p95": 62.40000000000009,
+            "max": 166.5,
+            "over16": 0.7333333333333333,
+            "over25": 0.65,
+            "mean": 33.575,
+            "scriptP50": 6.3999999994412065,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 2065.7000000001863,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 33,
+            "p95": 35.19999999999982,
+            "max": 39,
+            "over16": 1,
+            "over25": 1,
+            "mean": 32.8375,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.8999999994412065,
+            "p95": 11.5,
+            "max": 11.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.300000000000182,
+            "p95": 2,
+            "max": 2.2000000000007276,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.3350000000000137,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 62.85510730743408,
+          "stats": {
+            "domNodes": 6076,
+            "mountedBoards": 60,
+            "builtBoards": 261,
+            "thumbs": 999,
+            "gpuEstimateBytes": 177230592
+          },
+          "domNodes": 6076,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 155,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 148,
+              "peakMb": 178
+            },
+            {
+              "type": "Utility",
+              "mb": 46,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1287,
+              "peakMb": 1317
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.78, 3.29, 3.57],
+            "freeMemMB": 2142
+          },
+          "machineAfter": {
+            "loadavg": [2.63, 3.25, 3.56],
+            "freeMemMB": 74
+          },
+          "wallMs": 7939,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.29999999981374,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 15.399999999441206,
+          "ttffMs": 31,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 39.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3999999999999773,
+            "p95": 5.600000000000023,
+            "max": 9,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.9650000000000014,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 31.700000000000273,
+            "p95": 62,
+            "max": 163.69999999999982,
+            "over16": 0.75,
+            "over25": 0.65,
+            "mean": 33.57833333333333,
+            "scriptP50": 6.3999999994412065,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 1894.7999999998137,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 33.900000000000546,
+            "p95": 52,
+            "max": 53.099999999999454,
+            "over16": 1,
+            "over25": 0.975,
+            "mean": 36.120000000000005,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.400000000372529,
+            "p95": 13.900000000372529,
+            "max": 13.900000000372529
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.3999999999996362,
+            "p95": 2.199999999999818,
+            "max": 2.699999999999818,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.4299999999999955,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 62.84952354431152,
+          "stats": {
+            "domNodes": 6076,
+            "mountedBoards": 60,
+            "builtBoards": 257,
+            "thumbs": 999,
+            "gpuEstimateBytes": 177230592
+          },
+          "domNodes": 6076,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 143,
+              "peakMb": 176
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1356,
+              "peakMb": 1422
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.63, 3.25, 3.56],
+            "freeMemMB": 2061
+          },
+          "machineAfter": {
+            "loadavg": [2.69, 3.24, 3.55],
+            "freeMemMB": 126
+          },
+          "wallMs": 7887,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "B",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.19999999925494,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 32.59999999962747,
+          "ttffMs": 58.09999999962747,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 43.59999999962747,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 1.3000000000000682,
+            "p95": 5.899999999999977,
+            "max": 8.600000000000023,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.9333333333333333,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 31.300000000000068,
+            "p95": 62.50000000000023,
+            "max": 185.19999999999982,
+            "over16": 0.7333333333333333,
+            "over25": 0.6166666666666667,
+            "mean": 33.54,
+            "scriptP50": 6.3999999994412065,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 1874.8999999994412,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 33.30000000000018,
+            "p95": 35.100000000000364,
+            "max": 52.69999999999982,
+            "over16": 1,
+            "over25": 0.975,
+            "mean": 33.084999999999994,
+            "scriptP50": 0.20000000018626451,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 6.199999999254942,
+            "p95": 21.5,
+            "max": 21.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 1.3999999999996362,
+            "p95": 2.4000000000005457,
+            "max": 2.5,
+            "over16": 0,
+            "over25": 0,
+            "mean": 1.4575000000000045,
+            "scriptP50": 0,
+            "incompleteFrac": null,
+            "truncated": false
+          },
+          "jsHeapMB": 62.88665962219238,
+          "stats": {
+            "domNodes": 6076,
+            "mountedBoards": 60,
+            "builtBoards": 263,
+            "thumbs": 999,
+            "gpuEstimateBytes": 177230592
+          },
+          "domNodes": 6076,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 162,
+              "peakMb": 162
+            },
+            {
+              "type": "GPU",
+              "mb": 144,
+              "peakMb": 178
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1392,
+              "peakMb": 1457
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.69, 3.24, 3.55],
+            "freeMemMB": 2086
+          },
+          "machineAfter": {
+            "loadavg": [2.74, 3.24, 3.54],
+            "freeMemMB": 83
+          },
+          "wallMs": 7885,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/C/100000": {
+      "browser": "electron",
+      "strategy": "C",
+      "n": 100000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 57.59999999962747,
+        "initMs": 56.89999999944121,
+        "firstSettleMs": 18.40000000037253,
+        "pan": {
+          "p50": 0.20000000000004547,
+          "p95": 3,
+          "over16": 0,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 8.899999999999977,
+          "p95": 13.799999999999955,
+          "over16": 0.016666666666666666,
+          "over25": 0,
+          "frames": 60,
+          "incompleteFrac": 0.3813209475709475,
+          "truncated": false
+        },
+        "overviewSettleMs": 849.8999999994412,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 0.20000000000004547,
+          "p95": 0.40000000000009095,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "editP50": 4.099999999627471,
+        "editP95": 19.699999999254942,
+        "drag": {
+          "p50": 0.5,
+          "p95": 0.6999999999998181,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "jsHeapMB": 61.43347644805908,
+        "gpuProcMB": 261,
+        "rendererProcMB": 619,
+        "gpuEstimateMB": 238.4130859375,
+        "domNodes": 15,
+        "renderer": "dom/canvas2d"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "C",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.6000000005588,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 57.69999999925494,
+          "ttffMs": 58.299999999813735,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 3,
+            "max": 6.099999999999909,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6683333333333337,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 8.899999999999977,
+            "p95": 13.199999999999932,
+            "max": 17.90000000000009,
+            "over16": 0.016666666666666666,
+            "over25": 0,
+            "mean": 7.030000000000001,
+            "scriptP50": 8.5,
+            "incompleteFrac": 0.3892118606701939,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 849.8999999994412,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.40000000000009095,
+            "max": 0.7999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.225,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.2999999998137355,
+            "p95": 19.299999999813735,
+            "max": 19.299999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.599999999999909,
+            "p95": 0.6999999999998181,
+            "max": 0.7000000000002728,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.5399999999999977,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 61.47489356994629,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 454,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 267,
+              "peakMb": 267
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 619,
+              "peakMb": 670
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.74, 3.24, 3.54],
+            "freeMemMB": 2013
+          },
+          "machineAfter": {
+            "loadavg": [2.74, 3.24, 3.54],
+            "freeMemMB": 426
+          },
+          "wallMs": 3289,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.29999999981374,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 49.09999999962747,
+          "ttffMs": 49.799999999813735,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 3.2999999999999545,
+            "max": 5.900000000000091,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6899999999999996,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 8.799999999999955,
+            "p95": 13.399999999999977,
+            "max": 17.899999999999977,
+            "over16": 0.016666666666666666,
+            "over25": 0,
+            "mean": 7.004999999999999,
+            "scriptP50": 8.400000000372529,
+            "incompleteFrac": 0.3853394059644058,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 866.4000000003725,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.3999999999998636,
+            "max": 0.6000000000001364,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.19249999999999545,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4,
+            "p95": 19.699999999254942,
+            "max": 19.699999999254942
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.5,
+            "p95": 0.6999999999998181,
+            "max": 0.7000000000002728,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.5275000000000091,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 61.43347644805908,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 458,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 261,
+              "peakMb": 261
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 586,
+              "peakMb": 633
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.74, 3.24, 3.54],
+            "freeMemMB": 1752
+          },
+          "machineAfter": {
+            "loadavg": [2.76, 3.23, 3.54],
+            "freeMemMB": 414
+          },
+          "wallMs": 3277,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 56.89999999944121,
+          "ttffMs": 57.59999999962747,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 18.40000000037253,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 2.800000000000068,
+            "max": 5.599999999999909,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6616666666666655,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 9.199999999999932,
+            "p95": 14.100000000000023,
+            "max": 91.79999999999995,
+            "over16": 0.03333333333333333,
+            "over25": 0.016666666666666666,
+            "mean": 8.566666666666666,
+            "scriptP50": 8.699999999254942,
+            "incompleteFrac": 0.37759990780824104,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 738.7999999998137,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.40000000000009095,
+            "max": 11.899999999999864,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.5024999999999977,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 4.099999999627471,
+            "p95": 20.700000000186265,
+            "max": 20.700000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.5,
+            "p95": 0.6999999999998181,
+            "max": 0.7000000000002728,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.5175000000000068,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 61.40885543823242,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 459,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 271,
+              "peakMb": 271
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 621,
+              "peakMb": 671
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.76, 3.23, 3.54],
+            "freeMemMB": 1694
+          },
+          "machineAfter": {
+            "loadavg": [2.62, 3.19, 3.52],
+            "freeMemMB": 385
+          },
+          "wallMs": 3269,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 66.70000000018626,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 55.700000000186265,
+          "ttffMs": 56.40000000037253,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 17.700000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 3,
+            "max": 5.7999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.6699999999999988,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 8.800000000000068,
+            "p95": 14,
+            "max": 17.200000000000045,
+            "over16": 0.016666666666666666,
+            "over25": 0,
+            "mean": 7.063333333333334,
+            "scriptP50": 8.5,
+            "incompleteFrac": 0.3813209475709475,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 847.6999999992549,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.40000000000009095,
+            "max": 14.300000000000182,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.5525000000000034,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 5,
+            "p95": 19.09999999962747,
+            "max": 19.09999999962747
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.599999999999909,
+            "p95": 1,
+            "max": 1.199999999999818,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.627500000000009,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 61.47017860412598,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 457,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 161,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 255,
+              "peakMb": 256
+            },
+            {
+              "type": "Utility",
+              "mb": 48,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 619,
+              "peakMb": 675
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.62, 3.19, 3.52],
+            "freeMemMB": 1715
+          },
+          "machineAfter": {
+            "loadavg": [2.62, 3.19, 3.52],
+            "freeMemMB": 141
+          },
+          "wallMs": 3287,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "C",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.70000000018626,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 57.5,
+          "ttffMs": 58.299999999813735,
+          "renderer": "dom/canvas2d",
+          "firstSettle": {
+            "ms": 16.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 0.20000000000004547,
+            "p95": 3.6000000000000227,
+            "max": 5.699999999999932,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.7133333333333326,
+            "scriptP50": 0.09999999962747097,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 9.099999999999909,
+            "p95": 13.799999999999955,
+            "max": 18,
+            "over16": 0.016666666666666666,
+            "over25": 0,
+            "mean": 7.015,
+            "scriptP50": 8.599999999627471,
+            "incompleteFrac": 0.37516253807920463,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 877.7000000001863,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 0.20000000000004547,
+            "p95": 0.5,
+            "max": 0.7999999999999545,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.2550000000000011,
+            "scriptP50": 0.10000000055879354,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 3.800000000745058,
+            "p95": 20.90000000037253,
+            "max": 20.90000000037253
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 0.20000000000027285,
+            "p95": 0.599999999999909,
+            "max": 10.400000000000091,
+            "over16": 0,
+            "over25": 0,
+            "mean": 0.4975000000000023,
+            "scriptP50": 0,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 61.40761470794678,
+          "stats": {
+            "tiles": 220,
+            "tilesPainted": 459,
+            "gpuEstimateBytes": 249994240
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 149,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 230,
+              "peakMb": 255
+            },
+            {
+              "type": "Utility",
+              "mb": 47,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 573,
+              "peakMb": 669
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.62, 3.19, 3.52],
+            "freeMemMB": 1474
+          },
+          "machineAfter": {
+            "loadavg": [2.49, 3.16, 3.51],
+            "freeMemMB": 227
+          },
+          "wallMs": 3335,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    },
+    "electron/Dgpu/100000": {
+      "browser": "electron",
+      "strategy": "Dgpu",
+      "n": 100000,
+      "summary": {
+        "runs": 5,
+        "ttffMs": 268.79999999981374,
+        "initMs": 264.79999999981374,
+        "firstSettleMs": 15.599999999627471,
+        "pan": {
+          "p50": 5.599999999999909,
+          "p95": 24.5,
+          "over16": 0.06666666666666667,
+          "over25": 0.05,
+          "frames": 60,
+          "incompleteFrac": 0.003968253968253968,
+          "truncated": false
+        },
+        "zoom": {
+          "p50": 37.90000000000009,
+          "p95": 71.59999999999991,
+          "over16": 0.75,
+          "over25": 0.6333333333333333,
+          "frames": 60,
+          "incompleteFrac": 0.39712659507838033,
+          "truncated": false
+        },
+        "overviewSettleMs": 13510.400000000373,
+        "overviewComplete": true,
+        "overviewPan": {
+          "p50": 3.7000000000007276,
+          "p95": 21.19999999999709,
+          "over16": 0.075,
+          "over25": 0.025,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "editP50": 8.400000000372529,
+        "editP95": 19.299999999813735,
+        "drag": {
+          "p50": 2.8000000000029104,
+          "p95": 3.399999999997817,
+          "over16": 0,
+          "over25": 0,
+          "frames": 40,
+          "incompleteFrac": 0,
+          "truncated": false
+        },
+        "jsHeapMB": 1118.9288387298584,
+        "gpuProcMB": 191,
+        "rendererProcMB": 1771,
+        "gpuEstimateMB": 240.4307861328125,
+        "domNodes": 15,
+        "renderer": "webgpu"
+      },
+      "errors": [],
+      "raw": [
+        {
+          "strategy": "Dgpu",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 70.8999999994412,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 368.90000000037253,
+          "ttffMs": 374.6000000005588,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 15.099999999627471,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 5.400000000000091,
+            "p95": 24.5,
+            "max": 50.5,
+            "over16": 0.06666666666666667,
+            "over25": 0.05,
+            "mean": 8.591666666666667,
+            "scriptP50": 5.2000000001862645,
+            "incompleteFrac": 0.003968253968253968,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 37.69999999999982,
+            "p95": 71.59999999999991,
+            "max": 72.40000000000009,
+            "over16": 0.75,
+            "over25": 0.65,
+            "mean": 36.943333333333335,
+            "scriptP50": 38.40000000037253,
+            "incompleteFrac": 0.39712659507838033,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 13414.700000000186,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.6999999999970896,
+            "p95": 21.19999999999709,
+            "max": 39.10000000000218,
+            "over16": 0.075,
+            "over25": 0.025,
+            "mean": 5.8,
+            "scriptP50": 3.300000000745058,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.600000000558794,
+            "p95": 19.700000000186265,
+            "max": 19.700000000186265
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 2.7999999999992724,
+            "p95": 3.399999999997817,
+            "max": 3.7000000000007276,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.8125,
+            "scriptP50": 2.400000000372529,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 1119.2231578826904,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 320,
+            "thumbs": 999,
+            "gpuEstimateBytes": 252109952
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 116,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 209,
+              "peakMb": 229
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1818,
+              "peakMb": 1818
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [2.49, 3.16, 3.51],
+            "freeMemMB": 1457
+          },
+          "machineAfter": {
+            "loadavg": [3.08, 3.24, 3.53],
+            "freeMemMB": 95
+          },
+          "wallMs": 19308,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 68.8999999994412,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 248.5,
+          "ttffMs": 252.69999999925494,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 15.800000000745058,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 5.899999999999977,
+            "p95": 17.799999999999955,
+            "max": 48.90000000000009,
+            "over16": 0.1,
+            "over25": 0.03333333333333333,
+            "mean": 8.793333333333333,
+            "scriptP50": 5.5,
+            "incompleteFrac": 0.0042658730158730155,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 37.90000000000009,
+            "p95": 73.69999999999982,
+            "max": 89.5,
+            "over16": 0.7833333333333333,
+            "over25": 0.6333333333333333,
+            "mean": 37.35666666666667,
+            "scriptP50": 41.5,
+            "incompleteFrac": 0.40122817030561037,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 13510.400000000373,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.7999999999992724,
+            "p95": 21.5,
+            "max": 38,
+            "over16": 0.075,
+            "over25": 0.025,
+            "mean": 5.827499999999963,
+            "scriptP50": 3.5,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 7,
+            "p95": 17.5,
+            "max": 17.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 2.7000000000007276,
+            "p95": 3.3000000000029104,
+            "max": 3.400000000001455,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.7225000000000366,
+            "scriptP50": 2.400000000372529,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 1119.0232105255127,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 320,
+            "thumbs": 999,
+            "gpuEstimateBytes": 252109952
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 118,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 191,
+              "peakMb": 227
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1771,
+              "peakMb": 1774
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [3.08, 3.24, 3.53],
+            "freeMemMB": 2653
+          },
+          "machineAfter": {
+            "loadavg": [3.07, 3.23, 3.52],
+            "freeMemMB": 89
+          },
+          "wallMs": 19329,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 65.09999999962747,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 264.79999999981374,
+          "ttffMs": 268.79999999981374,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 15.799999999813735,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 5.7000000000000455,
+            "p95": 15.599999999999909,
+            "max": 48.700000000000045,
+            "over16": 0.05,
+            "over25": 0.05,
+            "mean": 8.419999999999998,
+            "scriptP50": 5.2999999998137355,
+            "incompleteFrac": 0.0035714285714285713,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 38.20000000000027,
+            "p95": 71.09999999999991,
+            "max": 89.59999999999991,
+            "over16": 0.75,
+            "over25": 0.6333333333333333,
+            "mean": 36.663333333333334,
+            "scriptP50": 40.299999999813735,
+            "incompleteFrac": 0.4009837388111788,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 13531.799999999814,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.7000000000007276,
+            "p95": 20.30000000000291,
+            "max": 39.30000000000291,
+            "over16": 0.075,
+            "over25": 0.025,
+            "mean": 5.667500000000018,
+            "scriptP50": 3.3999999994412065,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.799999999813735,
+            "p95": 19.5,
+            "max": 19.5
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 2.8000000000029104,
+            "p95": 3.3000000000029104,
+            "max": 18,
+            "over16": 0.025,
+            "over25": 0,
+            "mean": 3.1699999999999817,
+            "scriptP50": 2.5,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 1118.9288387298584,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 320,
+            "thumbs": 999,
+            "gpuEstimateBytes": 252109952
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 116,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 180,
+              "peakMb": 227
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1768,
+              "peakMb": 1768
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [3.07, 3.23, 3.52],
+            "freeMemMB": 2485
+          },
+          "machineAfter": {
+            "loadavg": [4.16, 3.46, 3.59],
+            "freeMemMB": 82
+          },
+          "wallMs": 19331,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 64.8999999994412,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 262,
+          "ttffMs": 266,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 15.200000000186265,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 5.599999999999909,
+            "p95": 27.700000000000045,
+            "max": 50.90000000000009,
+            "over16": 0.06666666666666667,
+            "over25": 0.06666666666666667,
+            "mean": 8.675,
+            "scriptP50": 5.2999999998137355,
+            "incompleteFrac": 0.003968253968253968,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 40.19999999999982,
+            "p95": 73.90000000000009,
+            "max": 89,
+            "over16": 0.7833333333333333,
+            "over25": 0.6166666666666667,
+            "mean": 38.276666666666664,
+            "scriptP50": 40,
+            "incompleteFrac": 0.39602615435444566,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 13622,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.7000000000007276,
+            "p95": 21.799999999999272,
+            "max": 57.599999999998545,
+            "over16": 0.075,
+            "over25": 0.05,
+            "mean": 6.385000000000036,
+            "scriptP50": 3.3999999994412065,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8.400000000372529,
+            "p95": 18.899999999441206,
+            "max": 18.899999999441206
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 2.900000000001455,
+            "p95": 3.600000000002183,
+            "max": 17,
+            "over16": 0.025,
+            "over25": 0,
+            "mean": 3.3100000000000365,
+            "scriptP50": 2.599999999627471,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 1118.468069076538,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 320,
+            "thumbs": 999,
+            "gpuEstimateBytes": 252109952
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 116,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 178,
+              "peakMb": 220
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1751,
+              "peakMb": 1751
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [4.16, 3.46, 3.59],
+            "freeMemMB": 2372
+          },
+          "machineAfter": {
+            "loadavg": [4.22, 3.51, 3.61],
+            "freeMemMB": 98
+          },
+          "wallMs": 19583,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        },
+        {
+          "strategy": "Dgpu",
+          "n": 100000,
+          "boards": 1000,
+          "genMs": 66.19999999925494,
+          "dpr": 2,
+          "viewport": [1440, 838],
+          "zFit": 0.020994198312236284,
+          "initMs": 272.79999999981374,
+          "ttffMs": 277.1000000005588,
+          "renderer": "webgpu",
+          "firstSettle": {
+            "ms": 15.599999999627471,
+            "complete": true
+          },
+          "pan": {
+            "frames": 60,
+            "p50": 5,
+            "p95": 28.09999999999991,
+            "max": 52.09999999999991,
+            "over16": 0.08333333333333333,
+            "over25": 0.06666666666666667,
+            "mean": 8.353333333333333,
+            "scriptP50": 4.7999999998137355,
+            "incompleteFrac": 0.003968253968253968,
+            "truncated": false
+          },
+          "zoom": {
+            "frames": 60,
+            "p50": 37.5,
+            "p95": 70.19999999999982,
+            "max": 85.90000000000009,
+            "over16": 0.7,
+            "over25": 0.65,
+            "mean": 35.83833333333333,
+            "scriptP50": 39.09999999962747,
+            "incompleteFrac": 0.3938978725145159,
+            "truncated": false
+          },
+          "overviewSettle": {
+            "ms": 11878.900000000373,
+            "complete": true
+          },
+          "overviewPan": {
+            "frames": 40,
+            "p50": 3.600000000000364,
+            "p95": 20.100000000000364,
+            "max": 39.20000000000073,
+            "over16": 0.075,
+            "over25": 0.025,
+            "mean": 5.742500000000018,
+            "scriptP50": 3.2999999998137355,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "edit": {
+            "p50": 8,
+            "p95": 19.299999999813735,
+            "max": 19.299999999813735
+          },
+          "drag": {
+            "frames": 40,
+            "p50": 2.899999999997817,
+            "p95": 3.600000000002183,
+            "max": 3.6999999999970896,
+            "over16": 0,
+            "over25": 0,
+            "mean": 2.8675000000000184,
+            "scriptP50": 2.5,
+            "incompleteFrac": 0,
+            "truncated": false
+          },
+          "jsHeapMB": 1116.0374965667725,
+          "stats": {
+            "renderer": "webgpu",
+            "builtBoards": 320,
+            "thumbs": 999,
+            "gpuEstimateBytes": 252109952
+          },
+          "domNodes": 15,
+          "procs": [
+            {
+              "type": "Browser",
+              "mb": 117,
+              "peakMb": 161
+            },
+            {
+              "type": "GPU",
+              "mb": 201,
+              "peakMb": 224
+            },
+            {
+              "type": "Utility",
+              "mb": 39,
+              "peakMb": 49
+            },
+            {
+              "type": "Tab",
+              "mb": 1795,
+              "peakMb": 1795
+            }
+          ],
+          "machineBefore": {
+            "loadavg": [4.22, 3.51, 3.61],
+            "freeMemMB": 2371
+          },
+          "machineAfter": {
+            "loadavg": [4.34, 3.57, 3.62],
+            "freeMemMB": 71
+          },
+          "wallMs": 17630,
+          "version": "42.11.18 / Chromium 148.0.7778.280"
+        }
+      ]
+    }
+  },
+  "fidelity": {},
+  "machines": [
+    {
+      "at": "2026-11-03T23:02:31.876Z",
+      "browser": "electron",
+      "cpu": "Apple M1",
+      "cores": 8,
+      "totalMemGB": 8,
+      "platform": "darwin 27.2.0",
+      "loadavg": [2.93, 3.29, 3.85],
+      "freeMemMB": 410,
+      "args": [
+        "--sizes",
+        "13000,100000",
+        "--runs",
+        "5",
+        "--strategies",
+        "A,A2,B,C,Dgpu",
+        "--out",
+        "eval/canvas-perf/results/prototypes-2026-11-04-sequential.json"
+      ]
+    }
+  ],
+  "method": "Median of runs. Frame time = delta between consecutive rAF timestamps with vsync and frame-rate limit disabled. ttff = strategy init + two rAFs. edit = edit call until the second rAF after it. Memory: JS heap after gc; GPU process working set from Electron app.getAppMetrics()."
+}

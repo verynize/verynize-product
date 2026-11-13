@@ -228,8 +228,8 @@
         limit: limits.PAGE_LIMIT_BYTES,
         message:
           state === "over"
-            ? `Page “${page.name}” is ${mb(page.bytes, limits.PAGE_LIMIT_BYTES)}, over the ${mb(limits.PAGE_LIMIT_BYTES)} page limit. Split it into several pages.`
-            : `Page “${page.name}” is ${mb(page.bytes)} of the ${mb(limits.PAGE_LIMIT_BYTES)} page limit. Consider splitting it into several pages.`,
+            ? `Page “${page.name}” is ${mb(page.bytes, limits.PAGE_LIMIT_BYTES)}, over the ${mb(limits.PAGE_LIMIT_BYTES)} page limit. Move content to another file.`
+            : `Page “${page.name}” is ${mb(page.bytes)} of the ${mb(limits.PAGE_LIMIT_BYTES)} page limit. Pages share the file budget.`,
       });
     }
     for (const item of report.inline.tooLarge)
@@ -325,13 +325,17 @@
     window.dispatchEvent(new CustomEvent("storage-limit-error", { detail }));
     return detail;
   }
-  // Server answers that mean "too large" (room size limits, inline binaries, asset caps).
+  // Server answers that mean "too large" (room size limits, inline binaries, asset caps). Room
+  // receipts carry a `code` (web/room-sync.js); an error with a `code` is decided by it alone, and
+  // the text is matched only for errors without one (desktop bridge messages, older servers).
+  const SIZE_CODES = new Set(["storage_limit", "too_large"]);
   const SIZE_ERROR =
     /exceeds|too large|larger than|over the .* limit|inline .*data|limit for shared/i;
-  const isSizeError = (error) =>
-    error?.code === "storage_limit" ||
-    error?.status === 413 ||
-    SIZE_ERROR.test(String(error?.message || error || ""));
+  const isSizeError = (error) => {
+    if (error?.status === 413) return true;
+    if (error && typeof error === "object" && "code" in error) return SIZE_CODES.has(error.code);
+    return SIZE_ERROR.test(String(error?.message || error || ""));
+  };
   /**
    * Throws (and reports) the first blocking problem of `doc` before it is shared or synced.
    * Returns the report when nothing blocks.

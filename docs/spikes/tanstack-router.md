@@ -137,10 +137,9 @@ view exclusive with the editor and the Files home (`code.css` hides `main` and
 `mode` query would follow every later navigation. Choosing Files (or ⌘K) in code
 mode therefore leaves code mode for the home; before, the home opened hidden
 behind the code workspace. `setCodeMode(false)` outside code mode is still a
-no-op. Code mode is still persisted (`verynize-code-mode`): on desktop, when the
-window opens on its launch entry (`/editor`, a fresh load without history
-state), the code island replaces that entry with `/code`. Anywhere else the URL
-wins (reload, Back/Forward, typed or shared URLs, the web).
+no-op. Code mode is no longer restored at launch: a plain desktop launch opens
+the Files home (`/`), a cold-start design link opens `/editor`, and the URL
+always wins (reload, Back/Forward, typed or shared URLs, the web).
 
 Not routed (layout state inside a view): `code-sidebar-collapsed`,
 `left-collapsed`/`right-collapsed`, `agent-chat-open`, `chat-sidebar-open`, the
@@ -328,3 +327,8 @@ PASS typography: Wonder layout, line height Auto, vertical alignment, Type setti
 
 Thus the final canvas and UX suite runs pass. The initial toast timeout and the
 repository-wide formatting failure remain explicitly recorded above.
+
+Editor files use `/editor/<fileId>` with stable library IDs. Tab switches push history; bare
+`/editor` and known cloud-room ID aliases replace to the local file URL. Unknown or unavailable
+files return to Files with a non-blocking notice. Settings history retains the full file path;
+cloud capabilities remain exclusively in the existing fragments.

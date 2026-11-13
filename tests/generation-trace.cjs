@@ -14,7 +14,7 @@ const path = require("node:path");
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "trace-fidelity-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],

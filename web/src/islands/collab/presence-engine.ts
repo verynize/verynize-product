@@ -70,6 +70,7 @@ type Workspace = {
   sendPresence?(): void;
   presence?(): RoomState;
   request?<T>(path: string, options?: RequestInit): Promise<T>;
+  roomAccess?(id: string): Promise<{ visibility?: string } | null>;
   shareLink?(): string;
 };
 type Account = {
@@ -273,9 +274,13 @@ function loadVisibility() {
   visibility = null;
   const id = room.roomId;
   if (!id) return;
-  workspace()
-    ?.request?.<{ visibility?: string }>(`/api/rooms/${id}/access`)
-    .then((access) => {
+  const ws = workspace();
+  // Shared with the share service's request for the room just opened (web/cloud-share.js).
+  const request = ws?.roomAccess
+    ? ws.roomAccess(id)
+    : ws?.request?.<{ visibility?: string }>(`/api/rooms/${id}/access`);
+  request
+    ?.then((access) => {
       if (room.roomId !== id) return;
       visibility = access?.visibility ?? null;
       publish();
@@ -478,11 +483,11 @@ function follow(id: string | null) {
 export const presence = {
   sync,
   message,
-  snapshot(): PresenceSnapshot {
+  snapshot: (): PresenceSnapshot => {
     if (!current) publish(true);
     return current ?? snapshotOf();
   },
-  subscribe(listener: () => void) {
+  subscribe: (listener: () => void) => {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },

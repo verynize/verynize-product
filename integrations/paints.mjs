@@ -122,7 +122,7 @@ export function applyPaintAttrs(node, attrs, previous = null) {
   }
   if (
     node.svgPaints &&
-    (node.type !== "image" || !/^data:image\/svg\+xml;base64,/.test(node.src || ""))
+    (node.type !== "image" || !String(node.src || "").startsWith("data:image/svg+xml;base64,"))
   )
     delete node.svgPaints;
 }

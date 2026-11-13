@@ -33,6 +33,7 @@ Use the visible setup/run/port review flow, explicit startup/error/paused/runnin
 ## Live reference (2026-10-31)
 
 Wonder's preview was later driven live against a sandbox repository (`/tmp/preview-sandbox`).
+
 - Steps, exact strings, measurements and per-id verdicts are in `design/wonder/preview-audit/wonder/notes.md`; read its "Do not use" list before relying on a screenshot.
 - The live pass refines this page:
   - In Auto access the agent saves the run profile directly, as a "Preview setup / Saved by auto mode" transcript card, and does not start the server.

@@ -117,14 +117,15 @@ async function vercel() {
 }
 
 async function node() {
-  execFileSync(
-    process.execPath,
-    ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
-    {
-      cwd: root,
-      stdio: "pipe",
-    },
-  );
+  if (!process.env.TEST_WEB_NODE_BUILT)
+    execFileSync(
+      process.execPath,
+      ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
+      {
+        cwd: root,
+        stdio: "pipe",
+      },
+    );
   const { createWebServer } = await import("../web-start/node/server.mjs");
   const options = await cloudOptionsForNode(path.join(temp, "node"));
   const backend = new NodeCloud(options);

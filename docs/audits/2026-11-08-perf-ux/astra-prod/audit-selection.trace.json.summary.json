@@ -1,0 +1,145 @@
+{
+  "trace": "audit-selection.trace.json.gz",
+  "mainThreads": [[2857, 16408]],
+  "longTasks": {
+    "count": 11,
+    "maxMs": 791.102,
+    "totalMs": 5325.883
+  },
+  "eventTotalsMs": {
+    "RunTask": 10510.545000002021,
+    "v8.callFunction": 2726.6490000001686,
+    "FunctionCall": 1699.0739999999378,
+    "RunMicrotasks": 1011.3679999999995,
+    "v8::Debugger::AsyncTaskRun": 951.6469999999986,
+    "TimerFire": 823.9609999999998,
+    "WidgetBaseInputHandler::OnHandleInputEvent": 785.577,
+    "WebFrameWidgetImpl::HandleInputEvent": 785.395,
+    "EventDispatch": 769.6719999999991,
+    "UpdateLayoutTree": 405.293,
+    "V8.StackGuard": 203.7479999999995,
+    "V8.HandleInterrupts": 203.4329999999994,
+    "PageAnimator::serviceScriptedAnimations": 195.7650000000003,
+    "EvaluateScript": 193.819,
+    "V8.InvokeApiInterruptCallbacks": 192.068,
+    "CpuProfiler::StartProfiling": 191.584,
+    "Commit": 157.40299999999988,
+    "V8.GCIncrementalMarking": 130.24900000000042,
+    "V8.GC_MC_INCREMENTAL": 128.9400000000006,
+    "FireAnimationFrame": 78.82000000000016
+  },
+  "bottomUpSampleSelfMs": {
+    "set dynamicId @ ": 466.66099999999597,
+    "(garbage collector) @ ": 211.69899999999961,
+    "(anonymous) @ legacy-ui-CXHsJAu3.js": 155.27099999999987,
+    "measureHostInstance @ installHook.js": 153.00199999999955,
+    "render @ app.js": 94.22600000000001,
+    "get scrollWidth @ ": 87.40600000000002,
+    "requestAnimationFrame @ ": 55.322000000000976,
+    "getDocument @ app.js": 52.391,
+    "setAttribute @ ": 47.432000000000016,
+    "getBoundingClientRect @ ": 38.891000000000005,
+    "walk @ storage-limits.js": 38.32100000000004,
+    "(anonymous) @ account-step-DjTwgSPb.js": 37.442000000000014,
+    "setProperty @ ": 37.141999999999996,
+    "Ll @ index-Dpo3UJ4v.js": 30.888,
+    "op @ index-Dpo3UJ4v.js": 30.024999999999995,
+    "a @ legacy-ui-CXHsJAu3.js": 28.097999999999995,
+    "Ar @ account-step-DjTwgSPb.js": 27.59700000000001,
+    "o @ legacy-ui-CXHsJAu3.js": 26.932000000000002,
+    "elementFromPoint @ ": 24.198000000000008,
+    "start @ canvas-render.js": 22.468999999999998,
+    "za @ account-step-DjTwgSPb.js": 18.39100000000001,
+    "rs @ index-Dpo3UJ4v.js": 16.381,
+    "removeAttribute @ ": 16.09,
+    "updateFiberRecursively @ installHook.js": 15.818000000000001,
+    "gl @ index-Dpo3UJ4v.js": 15.084000000000014
+  },
+  "frameEventCounts": {
+    "BeginFrame": 2013,
+    "DrawFrame": 34,
+    "DroppedFrame": 154
+  },
+  "marks": [
+    {
+      "name": "select-all-api-start",
+      "ph": "I",
+      "ts": 1214895836
+    },
+    {
+      "name": "select-all-api-end",
+      "ph": "I",
+      "ts": 1215013092
+    },
+    {
+      "name": "select-1000-api-start",
+      "ph": "I",
+      "ts": 1219895827
+    },
+    {
+      "name": "select-1000-api-end",
+      "ph": "I",
+      "ts": 1219951634
+    },
+    {
+      "name": "select-one-api-start",
+      "ph": "I",
+      "ts": 1222895805
+    },
+    {
+      "name": "select-one-api-end",
+      "ph": "I",
+      "ts": 1222985432
+    },
+    {
+      "name": "pan-api-start",
+      "ph": "I",
+      "ts": 1224895798
+    },
+    {
+      "name": "pan-api-end",
+      "ph": "I",
+      "ts": 1224897015
+    },
+    {
+      "name": "select-all-api",
+      "ph": "b",
+      "ts": 1214895836
+    },
+    {
+      "name": "select-all-api",
+      "ph": "e",
+      "ts": 1215013092
+    },
+    {
+      "name": "select-1000-api",
+      "ph": "b",
+      "ts": 1219895827
+    },
+    {
+      "name": "select-1000-api",
+      "ph": "e",
+      "ts": 1219951634
+    },
+    {
+      "name": "select-one-api",
+      "ph": "b",
+      "ts": 1222895805
+    },
+    {
+      "name": "select-one-api",
+      "ph": "e",
+      "ts": 1222985432
+    },
+    {
+      "name": "pan-api",
+      "ph": "b",
+      "ts": 1224895798
+    },
+    {
+      "name": "pan-api",
+      "ph": "e",
+      "ts": 1224897015
+    }
+  ]
+}

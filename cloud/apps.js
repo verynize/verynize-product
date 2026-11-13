@@ -61,6 +61,8 @@ export function cleanPath(value) {
   } catch {
     return null;
   }
+  // Backslashes and control characters are exactly what this rejects.
+  // oxlint-disable-next-line no-control-regex
   if (/[\\\u0000-\u001f]/.test(path) || path.startsWith("/")) return null;
   const parts = path.split("/");
   if (parts.some((part) => part === "" || part === "." || part === "..")) return null;

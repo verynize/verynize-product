@@ -233,10 +233,21 @@ try {
   );
   await openLink(b, link);
   await expectInvitation(b, "Editor");
+  // Opening the room asks for its access once: the share service and presence share the answer.
+  const accessReads = [];
+  const countAccess = (request) => {
+    if (request.method() === "GET" && request.url().endsWith(`/api/rooms/${room.id}/access`))
+      accessReads.push(request.url());
+  };
+  b.on("request", countAccess);
   await b.locator("#room-invitation-join").click();
   await inRoom(b);
   await invitation(b).waitFor({ state: "detached" });
   await b.waitForFunction(() => window.cloudWorkspace.role() === "editor");
+  await b.waitForFunction(() => window.cloudWorkspace.state().visibility === "private");
+  await b.waitForTimeout(1500);
+  b.off("request", countAccess);
+  assert.equal(accessReads.length, 1, "one /access request per room open");
   assert.equal(await b.evaluate(() => document.body.classList.contains("cloud-read-only")), false);
   assert.equal(await b.locator("#view-only-pill").count(), 0);
   assert.equal(await b.evaluate(() => window.design.getDocument().name), "Sunbird");

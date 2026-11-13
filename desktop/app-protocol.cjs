@@ -15,8 +15,8 @@ const { pathToFileURL } = require("node:url");
 const SCHEME = "app";
 const HOST = "verynize";
 const ORIGIN = `${SCHEME}://${HOST}`;
-// Legacy startup opens the editor; "/" is the files home route (web/src/lib/router/shell-router.ts).
-const ENTRY_URL = `${ORIGIN}/editor`;
+// Plain launches open Files; explicit editor URLs are still handled by the shell router.
+const ENTRY_URL = `${ORIGIN}/`;
 const WEB_ROOT = path.resolve(__dirname, "../web");
 const INDEX = path.join(WEB_ROOT, "index.html");
 
@@ -59,7 +59,17 @@ const MIME = {
 };
 
 function registerSchemes(protocol) {
-  protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: PRIVILEGES }]);
+  protocol.registerSchemesAsPrivileged([
+    { scheme: SCHEME, privileges: PRIVILEGES },
+    {
+      scheme: "asset",
+      privileges: { secure: true, supportFetchAPI: true, corsEnabled: true, bypassCSP: false },
+    },
+    {
+      scheme: "verynize-render",
+      privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true },
+    },
+  ]);
 }
 
 /** True for app://verynize/... (no credentials, no port). Node's URL reports origin "null" for
@@ -98,7 +108,9 @@ const within = (root, file) => {
 let realRoot = null;
 
 /** Maps a request URL to a file in web/: {status:200,file} or {status:4xx}. Never follows a symlink
- *  out of web/. Extensionless paths are client-side routes and get index.html. */
+ *  out of web/. Extensionless paths are client-side routes and get index.html, whatever their segments
+ *  hold besides separators and dot segments: a cloud file's route is /editor/room%3A<id>, and refusing
+ *  its colon showed "Forbidden" on every reload of a shared file. */
 async function resolveRequest(value) {
   let url;
   try {
@@ -119,14 +131,15 @@ async function resolveRequest(value) {
     } catch {
       return { status: 400 };
     }
-    if (segment === "." || segment === ".." || /[\\/\0]/.test(segment) || segment.includes(":"))
-      return { status: 403 };
+    if (segment === "." || segment === ".." || /[\\/\0]/.test(segment)) return { status: 403 };
     if (segment.startsWith(".")) return { status: 404 }; // no dotfiles
     segments.push(segment);
   }
   const last = segments[segments.length - 1] || "";
   if (!segments.length || !path.extname(last))
     return { status: 200, file: INDEX, fallback: segments.length > 0 };
+  // A file path never holds a colon (Windows drive letters, NTFS streams).
+  if (segments.some((segment) => segment.includes(":"))) return { status: 403 };
   const file = path.resolve(WEB_ROOT, ...segments);
   if (!within(WEB_ROOT, file)) return { status: 403 };
   let real;

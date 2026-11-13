@@ -21,7 +21,7 @@ const mf = new Miniflare(await cloudOptions(path.join(dir, "state")));
 let app;
 try {
   const server = (await mf.ready).origin;
-  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1" };
+  const env = { ...process.env, VERYNIZE_SKIP_ONBOARDING: "1", VERYNIZE_LAUNCH_EDITOR: "1" };
   delete env.ELECTRON_RUN_AS_NODE;
   app = await electron.launch({ env, args: [".", `--user-data-dir=${path.join(dir, "profile")}`] });
   const page = await app.firstWindow();
@@ -43,6 +43,7 @@ try {
         nodes: Array.from({ length: Math.ceil(size / 500000) }, (_, i) => ({
           id: `t-${p}-${i}`,
           type: "text",
+          hidden: true,
           name: `Copy ${i + 1}`,
           x: 40,
           y: 40 + i * 60,
@@ -85,32 +86,35 @@ try {
   await shot("size-ok-share-panel.png");
   await page.locator("#cloud-close").click();
 
-  // 2. A page at 80 % of the 2 MB page limit: warning in the panel (naming the page) and a toast.
+  // 2. A page at 80 % of the 20 MB page limit: warning in the panel (naming the page) and a toast.
   await mark();
-  await load([1.75 * MiB, 50000]);
+  await load([17.5 * MiB, 50000]);
   measured = await report();
   assert.deepEqual(
     measured.problems.map((p) => [p.level, p.scope, p.pageId]),
-    [["warn", "page", "page-1"]],
+    [
+      ["warn", "document", undefined],
+      ["warn", "page", "page-1"],
+    ],
   );
-  const toast = page.locator("[data-sonner-toast]", { hasText: "Page “Landing” is" });
+  const toast = page.locator("[data-sonner-toast]", { hasText: "This file is" });
   await toast.waitFor({ timeout: 10000 });
-  assert.match(await toast.textContent(), /of the 2 MB page limit/);
+  assert.match(await toast.textContent(), /of the 20 MB limit/);
   await openSharedDesign(page);
   await page.waitForFunction(
     () => document.getElementById("storage-meter")?.dataset.level === "warn",
   );
   const warning = page.locator('#storage-meter [data-storage-problem="warn"][data-scope="page"]');
-  assert.match(await warning.textContent(), /Page “Landing” is 1\.\d MB of the 2 MB page limit/);
+  assert.match(await warning.textContent(), /Page “Landing” is 18 MB of the 20 MB page limit/);
   assert.match(await meter.textContent(), /Largest page: Landing/);
-  assert.match(await meter.textContent(), /Split large pages/);
+  assert.match(await meter.textContent(), /Move content to another file/);
   await shot("size-warning-share-panel.png");
   await page.locator("#cloud-close").click();
   await shot("size-warning-toast.png");
 
   // 3. Over the page limit: creating a room is blocked before any request reaches the server.
   await mark();
-  await load([2.3 * MiB, 50000]);
+  await load([20.3 * MiB, 50000]);
   measured = await report();
   assert.equal(measured.problems[0].level, "over");
   const requests = [];
@@ -124,11 +128,8 @@ try {
   await page.locator("#cloud-create").click();
   const blocked = page.locator("#storage-limit-error");
   await blocked.waitFor();
-  assert.match(
-    await blocked.textContent(),
-    /Page “Landing” is 2\.\d+ MB, over the 2 MB page limit\. Split it/,
-  );
-  assert.match(await page.locator("#cloud-status").textContent(), /over the 2 MB page limit/);
+  assert.match(await blocked.textContent(), /This file is 20\.\d+ MB, over the 20 MB limit/);
+  assert.match(await page.locator("#cloud-status").textContent(), /over the 20 MB limit/);
   assert.deepEqual(requests, [], "nothing was sent");
   assert.equal(await page.evaluate(() => window.cloudWorkspace.isConnected()), false);
   await shot("size-over-blocked-share.png");
@@ -138,7 +139,7 @@ try {
   // 4. Syncing: the room accepts the file, then refuses an edit that makes it too large for the
   // server; the refusal is the blocking size dialog (the Share panel is closed).
   await mark();
-  await load([1.1 * MiB]);
+  await load([19.3 * MiB]);
   await report();
   await openSharedDesign(page);
   await page.locator("#cloud-create").click();
@@ -151,6 +152,7 @@ try {
   await page.evaluate(() =>
     window.design.addNode("text", {
       name: "Pasted article",
+      hidden: true,
       x: 600,
       y: 40,
       w: 400,
@@ -162,12 +164,54 @@ try {
   await dialog.waitFor({ timeout: 20000 });
   assert.match(await dialog.textContent(), /File is too large to sync/);
   // The room refuses per page (cloud/room-store.js) and names the page.
-  assert.match(await dialog.textContent(), /Page "Landing" exceeds the 2 MB page limit/);
+  assert.match(await dialog.textContent(), /Page "Landing" exceeds the 20 MB page limit/);
   assert.match(await dialog.textContent(), /Your changes are kept on this device/);
-  await page.waitForTimeout(400); // the dialog's fade-in
+  await page.waitForTimeout(900); // allow the size report and toast effect to settle
+  assert.equal(await page.locator("[data-sonner-toast]").count(), 0, "one blocking notification");
+  assert.ok(
+    await page.evaluate(() =>
+      window.design.getDocument().pages[0].nodes.some((n) => n.name === "Pasted article"),
+    ),
+    "rejected node remains on canvas",
+  );
+  const saved = await page.evaluate(async () => {
+    const room = window.cloudWorkspace.room();
+    return window.cloudWorkspace.storedOutbox(room.server, room.id);
+  });
+  assert.ok(saved.retained.length, "rejected edits persisted in IndexedDB");
   await shot("size-sync-refused-dialog.png");
   await page.getByRole("button", { name: "Close size error" }).click();
   await dialog.waitFor({ state: "detached" });
+
+  await page.reload();
+  await waitForUiReady(page);
+  await page.waitForFunction(() => window.cloudWorkspace?.pendingCount() > 0, null, {
+    timeout: 30000,
+  });
+  assert.ok(
+    await page.evaluate(() =>
+      window.design.getDocument().pages[0].nodes.some((n) => n.name === "Pasted article"),
+    ),
+    "rejected work survives reload and reconnect",
+  );
+  await page.evaluate(() => {
+    const ids = window.design
+      .getDocument()
+      .pages[0].nodes.filter((n) => n.name !== "Pasted article")
+      .map((n) => n.id);
+    window.design.updateNodes(ids, { text: "Short copy" });
+  });
+  await page.waitForFunction(() => window.cloudWorkspace.pendingCount() === 0, null, {
+    timeout: 30000,
+  });
+  const recovered = await page.evaluate(async () => {
+    const room = window.cloudWorkspace.room();
+    return window.cloudWorkspace.storedOutbox(room.server, room.id);
+  });
+  assert.ok(
+    recovered.confirmed.pages[0].nodes.some((n) => n.name === "Pasted article"),
+    "rejected import synced after shrinking",
+  );
 
   // 5. Native save: a file over the 20 MiB limit of the design store is refused by the main
   // process; the refusal is the blocking size dialog for saving. The large page is not the open one.
@@ -189,6 +233,7 @@ try {
         nodes: Array.from({ length: 22 }, (_, i) => ({
           id: `a-${i}`,
           type: "text",
+          hidden: true,
           name: `Archive ${i + 1}`,
           x: 0,
           y: i * 60,
@@ -211,16 +256,20 @@ try {
   assert.match(await dialog.textContent(), /Document exceeds 20 MiB/);
   assert.doesNotMatch(await dialog.textContent(), /invoking remote method/);
   await assert.rejects(fs.access(target), "nothing was written");
-  await page.waitForTimeout(400); // the dialog's fade-in
   await shot("size-save-refused-dialog.png");
   await page.getByRole("button", { name: "Close size error" }).click();
   await dialog.waitFor({ state: "detached" });
 
   console.log(
-    "PASS size warnings: size in the Share panel, 80 % page warning with toast, blocking error before sharing an over-limit page (nothing sent), server size refusal while syncing shown as the blocking size dialog, native save over 20 MiB refused with the save dialog",
+    "PASS size warnings: size in the Share panel, 80 % page warning with toast, blocking error before sharing an over-limit page (nothing sent), server size refusal retains edits across reload and retries after shrinking with one notification, native save over 20 MiB refused with the save dialog",
   );
 } finally {
+  await app
+    ?.evaluate(({ BrowserWindow }) => {
+      for (const win of BrowserWindow.getAllWindows()) win.destroy();
+    })
+    .catch(() => {});
   await app?.close().catch(() => {});
   await mf.dispose();
-  await fs.rm(dir, { recursive: true, force: true });
+  await fs.rm(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 }

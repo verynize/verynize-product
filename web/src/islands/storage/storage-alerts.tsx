@@ -20,6 +20,7 @@ const RANK: Record<Level, number> = { ok: 0, warn: 1, over: 2 };
 
 export function StorageAlerts() {
   const report = useStorageReport();
+  const [blocked, setBlocked] = useState<StorageProblem | null>(null);
   // The problem the toast is about ("level:scope:page"): a new one is announced once, a cleared
   // one dismisses it, and growing or shrinking sizes of the same problem stay quiet.
   const previous = useRef("ok");
@@ -30,20 +31,32 @@ export function StorageAlerts() {
     const key = problem ? `${level}:${problem.scope}:${problem.pageId ?? ""}` : "ok";
     const before = previous.current;
     previous.current = key;
+    if (blocked) {
+      toast.dismiss("storage-limit");
+      return;
+    }
     if (key === before) return;
     if (!problem) toast.dismiss("storage-limit");
     else if (RANK[level] < RANK[(before.split(":")[0] as Level) || "ok"])
       toast.dismiss("storage-limit");
     else if (level === "over") toast.error(problem.message, { id: "storage-limit" });
     else toast.warning(problem.message, { id: "storage-limit" });
-  }, [report]);
+  }, [report, blocked]);
 
-  const [blocked, setBlocked] = useState<StorageProblem | null>(null);
   useWindowEvent(
     "storage-limit-error",
     useCallback((event: Event) => {
       if (document.getElementById("cloud-dialog")?.hasAttribute("open")) return;
+      toast.dismiss("storage-limit");
       setBlocked((event as CustomEvent<StorageProblem>).detail);
+    }, []),
+  );
+  useWindowEvent(
+    "document-will-change",
+    useCallback(() => {
+      setBlocked(null);
+      previous.current = "ok";
+      toast.dismiss("storage-limit");
     }, []),
   );
   // web/image-upload.js refuses an image before it reaches the canvas ("add image").
@@ -60,7 +73,9 @@ export function StorageAlerts() {
         <p className="text-xs text-muted-foreground">
           {imageRefused
             ? "The canvas was not changed. Remove large images, or split the page or file, then add the image again."
-            : "Your changes are kept on this device. Split large pages into several pages or files, or replace large embedded files, then try again."}
+            : blocked?.action === "sync"
+              ? "Your changes are kept on this device and will sync once the file fits. Remove unused content or move it to another file."
+              : "Your changes are still in the editor. Remove unused content or move it to another file, then try again."}
         </p>
         <DialogFooter>
           <Button size="sm" onClick={() => setBlocked(null)} aria-label="Close size error">

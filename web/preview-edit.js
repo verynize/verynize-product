@@ -79,7 +79,7 @@
         }
         return;
       }
-      if (!editing) probe(id, point(parts, event));
+      if (!editing) void probe(id, point(parts, event));
     });
     layer.addEventListener("pointerleave", () => {
       if (ctx.mode === "edit") {
@@ -308,7 +308,11 @@
         label: PROPS[edit.prop] || edit.prop,
         tag: edit.element?.tag || "",
         // The element is named by its text before any staged edit (Wonder X2: h1 "<original heading>").
-        text: s.changes.find((c) => c.path === edit.path)?.text ?? (edit.kind === "text" ? edit.original.replace(/\s+/g, " ").trim() : edit.element?.text || ""),
+        text:
+          s.changes.find((c) => c.path === edit.path)?.text ??
+          (edit.kind === "text"
+            ? edit.original.replace(/\s+/g, " ").trim()
+            : edit.element?.text || ""),
         from: edit.from,
         after: edit.after,
         hidden: false,

@@ -127,6 +127,38 @@ const exec = require("node:util").promisify(execFile);
         ]);
       return "data:image/png;base64," + (await fs.readFile(out)).toString("base64");
     };
+    // Override the generated @page margin so the PDF API's zero margins determine full bleed.
+    const bleed = await page.evaluate(() =>
+      window.desktop.renderPDF({
+        html: '<style>@page { margin: auto }</style><div style="position:fixed;inset:0;background:#ff0000"></div>',
+        width: 400,
+        height: 200,
+      }),
+    );
+    const corners = await page.evaluate(
+      async (src) => {
+        const image = new Image();
+        image.src = src;
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(image, 0, 0);
+        return [
+          [0, 0],
+          [image.width - 1, 0],
+          [0, image.height - 1],
+          [image.width - 1, image.height - 1],
+        ].map(([x, y]) => Array.from(ctx.getImageData(x, y, 1, 1).data));
+      },
+      await pdfRaster(bleed.dataURL, "zero-margins"),
+    );
+    assert.deepEqual(
+      corners,
+      Array(4).fill([255, 0, 0, 255]),
+      "PDF API uses zero margins on every edge",
+    );
     const captured = await renderAll();
     // Fallback: same layer without the embedded font (serif). Reference: the layer set in Inter Bold.
     await page.evaluate(() => {

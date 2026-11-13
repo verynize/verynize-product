@@ -143,9 +143,7 @@ export function SelectionFilters({
   if (selection.length < 2 || !groups.length) return null;
   const body = (
     <div className="flex flex-col gap-2" data-selection-filters={groups.length}>
-      <h4 className="h-11.5 pt-5 text-xs text-muted-foreground">
-        Selection filters
-      </h4>
+      <h4 className="h-11.5 pt-5 text-xs text-muted-foreground">Selection filters</h4>
       {groups.map(({ key, filter, ids }) => {
         const spec = FILTER_SPECS[filter.type];
         const name = (filter.backdrop ? "Backdrop " : "") + (spec?.label ?? filter.type);

@@ -15,24 +15,77 @@
     "Two plans: Digital $24/year and Print + Digital $48/year with inclusions",
     "Footer with newsletter signup"
   ],
-  "constraints": ["1440px wide, full-page capture", "English copy", "No lorem ipsum", "Section order as specified"],
-  "assetsAllowed": { "icons": true, "photos": true, "generatedImages": true, "avatars": false, "customFonts": true },
+  "constraints": [
+    "1440px wide, full-page capture",
+    "English copy",
+    "No lorem ipsum",
+    "Section order as specified"
+  ],
+  "assetsAllowed": {
+    "icons": true,
+    "photos": true,
+    "generatedImages": true,
+    "avatars": false,
+    "customFonts": true
+  },
   "inputs": [],
   "budget": { "maxMinutes": 25, "followUpTurns": 0 },
   "checklist": [
-    { "id": "c01", "text": "The six sections appear in the specified order (nav, hero, essays, pull quote, plans, footer)." },
-    { "id": "c02", "text": "\"Subscribe from $48/year\" is the single most visually prominent action above the fold (largest/most saturated button)." },
-    { "id": "c03", "text": "The hero headline is the largest text on the page and reads \"The Night Shift\" or clearly features it." },
-    { "id": "c04", "text": "The hero uses a real photographic or illustrated image (not a gray box, broken image icon or empty placeholder).", "critical": true },
-    { "id": "c05", "text": "Exactly three featured essays are shown, each with a title, author name, read time and an image." },
-    { "id": "c06", "text": "The page uses at least two clearly distinct typefaces or a serif display face, giving an editorial rather than generic-SaaS voice." },
-    { "id": "c07", "text": "Body text line length in essay teasers and dek is moderate (roughly 45-80 characters per line), not full-width." },
-    { "id": "c08", "text": "The pull quote is typographically distinct (size, style or treatment) and attributed to a named person." },
-    { "id": "c09", "text": "Both plans show prices $24/year and $48/year and list what is included; the recommended plan is visually distinguished." },
-    { "id": "c10", "text": "Section spacing is consistent: vertical gaps between major sections look like one deliberate rhythm, not random." },
-    { "id": "c11", "text": "No text is clipped, overlapping, or overflowing its container anywhere on the page.", "critical": true },
-    { "id": "c12", "text": "No placeholder text or broken/missing images remain.", "critical": true },
+    {
+      "id": "c01",
+      "text": "The six sections appear in the specified order (nav, hero, essays, pull quote, plans, footer)."
+    },
+    {
+      "id": "c02",
+      "text": "\"Subscribe from $48/year\" is the single most visually prominent action above the fold (largest/most saturated button)."
+    },
+    {
+      "id": "c03",
+      "text": "The hero headline is the largest text on the page and reads \"The Night Shift\" or clearly features it."
+    },
+    {
+      "id": "c04",
+      "text": "The hero uses a real photographic or illustrated image (not a gray box, broken image icon or empty placeholder).",
+      "critical": true
+    },
+    {
+      "id": "c05",
+      "text": "Exactly three featured essays are shown, each with a title, author name, read time and an image."
+    },
+    {
+      "id": "c06",
+      "text": "The page uses at least two clearly distinct typefaces or a serif display face, giving an editorial rather than generic-SaaS voice."
+    },
+    {
+      "id": "c07",
+      "text": "Body text line length in essay teasers and dek is moderate (roughly 45-80 characters per line), not full-width."
+    },
+    {
+      "id": "c08",
+      "text": "The pull quote is typographically distinct (size, style or treatment) and attributed to a named person."
+    },
+    {
+      "id": "c09",
+      "text": "Both plans show prices $24/year and $48/year and list what is included; the recommended plan is visually distinguished."
+    },
+    {
+      "id": "c10",
+      "text": "Section spacing is consistent: vertical gaps between major sections look like one deliberate rhythm, not random."
+    },
+    {
+      "id": "c11",
+      "text": "No text is clipped, overlapping, or overflowing its container anywhere on the page.",
+      "critical": true
+    },
+    {
+      "id": "c12",
+      "text": "No placeholder text or broken/missing images remain.",
+      "critical": true
+    },
     { "id": "c13", "text": "Footer contains a newsletter email field with a submit control." },
-    { "id": "c14", "text": "Text over images remains legible (overlay, quiet area or contrast treatment), or text is not placed over busy imagery." }
+    {
+      "id": "c14",
+      "text": "Text over images remains legible (overlay, quiet area or contrast treatment), or text is not placed over busy imagery."
+    }
   ]
 }

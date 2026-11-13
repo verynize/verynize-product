@@ -10,6 +10,7 @@
 // URLs are still checked against trusted origins. Rate limiting is done by the Worker with
 // the AUTH_LIMIT binding: Better Auth's built-in limiter keeps state in isolate memory, which is
 // not shared between Workers isolates.
+import { and, count, eq, gt } from "drizzle-orm";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { database } from "./db.js";
 import * as schema from "./schema.js";
@@ -113,4 +114,18 @@ export function createAuth(env, request) {
       database: drizzleAdapter(database(env), { provider: "sqlite", schema, transaction: false }),
     }),
   );
+}
+
+/** Count active sessions without the fresh-session requirement of listSessions. */
+export async function activeSessionCount(env, userId) {
+  const [result] = await database(env)
+    .select({ total: count() })
+    .from(schema.session)
+    .where(
+      and(
+        eq(schema.session.userId, userId),
+        gt(schema.session.expiresAt, new Date().toISOString()),
+      ),
+    );
+  return result.total;
 }

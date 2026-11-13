@@ -1,0 +1,13 @@
+{
+  "title": "Foreign SVG becomes one vector layer",
+  "roundTrip": true,
+  "covers": ["svg", "data-name", "vector"],
+  "expect": [
+    { "node": "Foreign icon", "prop": "type", "eq": "vector" },
+    { "node": "Foreign icon", "prop": "w", "eq": 24 },
+    { "node": "Foreign icon", "prop": "viewBox", "eq": "0 0 24 24" },
+    { "node": "Foreign icon", "prop": "paths", "eq": "M0 0L24 24" },
+    { "node": "Foreign icon", "prop": "strokeColor", "eq": "#ff0000" },
+    { "node": "Foreign icon", "prop": "strokeWidth", "eq": 1 }
+  ]
+}

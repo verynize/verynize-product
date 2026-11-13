@@ -79,7 +79,8 @@ export function usePreviewElement() {
 
 type LivePreviewApi = { getSelectionState?(): { mode?: string } | null };
 const inEditMode = () =>
-  (window as unknown as { livePreview?: LivePreviewApi }).livePreview?.getSelectionState?.()?.mode === "edit";
+  (window as unknown as { livePreview?: LivePreviewApi }).livePreview?.getSelectionState?.()
+    ?.mode === "edit";
 function subscribeMode(callback: () => void) {
   window.addEventListener("bd:preview-state", callback);
   return () => window.removeEventListener("bd:preview-state", callback);
@@ -123,7 +124,7 @@ const unitChevron = (unit?: string) => (
     <ChevronDown aria-hidden className="size-3 shrink-0" />
   </>
 );
-const READ_ONLY = "has-disabled:bg-field-disabled";
+const READ_ONLY = "bg-field-disabled";
 const noop = () => null;
 
 /** Fonts for the family picker: the catalog, plus installed fonts once the picker opens. */
@@ -175,8 +176,8 @@ export function PreviewElementBody({ element }: { element: PreviewElement }) {
     <div id="preview-element-inspector" data-element-path={element.path}>
       <Section title="Position" tools={<InertTool icon={Expand} label="Resize to fill" />}>
         <div className="grid grid-cols-3 gap-2">
-          {ALIGN_GROUPS.map((group, i) => (
-            <ToolGroup key={i} disabled>
+          {ALIGN_GROUPS.map((group) => (
+            <ToolGroup key={group[0]?.id} disabled>
               {group.map((b) => (
                 <ToolButton key={b.id} label={b.label} icon={b.icon} disabled onClick={noop} />
               ))}
@@ -282,7 +283,10 @@ export function PreviewElementBody({ element }: { element: PreviewElement }) {
             suffix={unitChevron()}
           />
         </Row>
-        <Group label="Padding" tool={<InertTool icon={PaddingSidesIcon} label="Independent padding" />}>
+        <Group
+          label="Padding"
+          tool={<InertTool icon={PaddingSidesIcon} label="Independent padding" />}
+        >
           <Field
             name="pe-padding-x"
             label="Horizontal padding"
@@ -302,7 +306,10 @@ export function PreviewElementBody({ element }: { element: PreviewElement }) {
             suffix="px"
           />
         </Group>
-        <Group label="Margin" tool={<InertTool icon={MarginSidesIcon} label="Independent margins" />}>
+        <Group
+          label="Margin"
+          tool={<InertTool icon={MarginSidesIcon} label="Independent margins" />}
+        >
           <Field
             name="pe-margin-x"
             label="Horizontal margin"

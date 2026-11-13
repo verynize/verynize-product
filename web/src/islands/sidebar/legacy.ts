@@ -30,6 +30,8 @@ export function quarantineLegacyPanel(root: HTMLElement): () => void {
   panelObserver.observe(panel, { childList: true });
 
   const list = document.getElementById("layers");
+  // Tells app.js render() not to build rows that `clear` would remove at once.
+  list?.setAttribute("data-island-owned", "");
   const clear = () => {
     if (list?.firstChild) list.replaceChildren();
   };
@@ -39,6 +41,7 @@ export function quarantineLegacyPanel(root: HTMLElement): () => void {
   return () => {
     panelObserver.disconnect();
     listObserver.disconnect();
+    list?.removeAttribute("data-island-owned");
   };
 }
 

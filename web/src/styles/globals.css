@@ -10,6 +10,9 @@
 @import "tailwindcss/utilities.css" layer(utilities) important;
 @import "tw-animate-css";
 
+/* Research quotes old utility names; never emit executable CSS from documentation. */
+@source not "../../../docs";
+
 @custom-variant dark (&:where(html:not([data-ui-theme="light"]) *));
 @custom-variant light (&:where(html[data-ui-theme="light"] *));
 
@@ -144,7 +147,10 @@ html[data-ui-theme="light"] {
   --spacing-chrome: 40px; /* window chrome height */
   --spacing-panel: 280px; /* left / right panel width */
   --spacing-chat: 499px; /* chat dock width */
-  --spacing-traffic: var(--traffic-inset, 80px); /* macOS traffic-light inset (8px on the web, below) */
+  --spacing-traffic: var(
+    --traffic-inset,
+    80px
+  ); /* macOS traffic-light inset (8px on the web, below) */
 
   --shadow-menu: 0 12px 32px rgb(0 0 0 / 0.4);
   --shadow-toolbar: 0 6px 24px rgb(0 0 0 / 0.3);
@@ -214,8 +220,11 @@ html[data-platform="web"] {
   outline: 1px solid var(--ring);
   outline-offset: 1px;
 }
-[data-bd] [hidden]:not([hidden="until-found"]) {
-  display: none !important;
+/* Important layer precedence is reversed: hidden must beat the important flex/grid utilities. */
+@layer theme {
+  [data-bd] [hidden]:not([hidden="until-found"]) {
+    display: none !important;
+  }
 }
 
 /* Legacy elements replaced by an island (see hideLegacy in lib/bridge.ts). */
@@ -236,10 +245,24 @@ html[data-platform="web"] {
  */
 @theme inline {
   /* <chrome-tokens> */
+  --color-find-active: #4e81ee;
+  --color-find-scrim: rgb(0 0 0 / 0.2); /* finder dim, only when the result fits the view */
   /* Measured from design/wonder 03/19/22/29 (dark values in comments; mixes follow the light theme too). */
-  --color-tab-edge: color-mix(in srgb, var(--foreground) 3%, var(--input)); /* #313131 active tab ring */
-  --color-toolbar-edge: color-mix(in srgb, var(--foreground) 11%, var(--background)); /* #333333 toolbar + pill outline */
-  --color-toolbar-divider: color-mix(in srgb, var(--foreground) 10%, var(--background)); /* #303030 */
+  --color-tab-edge: color-mix(
+    in srgb,
+    var(--foreground) 3%,
+    var(--input)
+  ); /* #313131 active tab ring */
+  --color-toolbar-edge: color-mix(
+    in srgb,
+    var(--foreground) 11%,
+    var(--background)
+  ); /* #333333 toolbar + pill outline */
+  --color-toolbar-divider: color-mix(
+    in srgb,
+    var(--foreground) 10%,
+    var(--background)
+  ); /* #303030 */
   --color-menu-edge: color-mix(in srgb, var(--foreground) 10.5%, var(--background)); /* #323232 */
   --color-help: color-mix(in srgb, var(--background) 94%, black); /* #181818 help button */
   --text-0: 0px; /* zoom-reset item: live % stays in textContent, visible label is a ::before */
@@ -257,7 +280,8 @@ html[data-platform="web"] {
   --shadow-field: 0 0 0 0.5px color-mix(in srgb, var(--foreground) 3%, var(--input));
   /* Active segment (Display, flex direction…): #363636 with a 1px #3c3c3c inner edge and a soft 2px drop. */
   --shadow-segment:
-    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 4%, var(--accent)), 0 0 2px rgb(0 0 0 / 0.15);
+    inset 0 0 0 1px color-mix(in srgb, var(--foreground) 4%, var(--accent)),
+    0 0 2px rgb(0 0 0 / 0.15);
   /* Bound-variable chip inside a #2b2b2b field (2026-10-30/05, 06, 07, 13): 16px tall, 4px radius, panel fill
    * #1c1c1c, 0.5px #343434 edge, #d4d4d4 label, 4px side padding; starts 27.5px into a field with a prefix icon. */
   --color-variable-chip: var(--background);
@@ -270,7 +294,11 @@ html[data-platform="web"] {
   /* Disabled field (properties-audit B4/C1): #242424 fill, #828282 value; its caret and the disabled constraint
    * diagram's ticks are #535353 (the diagram well itself is #363636 = accent; enabled it is #2b2b2b = input). */
   --color-field-disabled: color-mix(in srgb, var(--input) 53%, var(--background));
-  --color-field-disabled-foreground: color-mix(in srgb, var(--muted-foreground) 60%, var(--subtle-foreground));
+  --color-field-disabled-foreground: color-mix(
+    in srgb,
+    var(--muted-foreground) 60%,
+    var(--subtle-foreground)
+  );
   --color-disabled-glyph: color-mix(in srgb, var(--foreground) 16.3%, var(--accent));
   /* Purple "on" header toggle (Position absolute toggle, C1): #372441 fill, #ce86f8 glyph. */
   --color-toggle-on: color-mix(in srgb, var(--primary) 20%, var(--background));
@@ -285,16 +313,29 @@ html[data-platform="web"] {
   --color-preset-name: color-mix(in srgb, var(--foreground-2) 70%, var(--muted-foreground));
   /* Type-to-bind suggestion list (properties-audit G1): #1c1c1c panel with a 0.5px #2f2f2f edge and a soft drop. */
   --shadow-type-bind:
-    0 0 0 0.5px color-mix(in srgb, var(--foreground) 9.5%, var(--background)), 0 4px 12px rgb(0 0 0 / 0.3);
+    0 0 0 0.5px color-mix(in srgb, var(--foreground) 9.5%, var(--background)),
+    0 4px 12px rgb(0 0 0 / 0.3);
   /* </inspector-tokens> */
   /* <home-tokens> */
   /* </home-tokens> */
   /* <chat-tokens> */
-  --color-chat-chip: color-mix(in srgb, var(--foreground-2) 89%, var(--card)); /* composer chips #c0c0c0 */
+  --color-chat-chip: color-mix(
+    in srgb,
+    var(--foreground-2) 89%,
+    var(--card)
+  ); /* composer chips #c0c0c0 */
   --color-chat-claude: #d97757; /* Claude provider mark (30) */
   --color-chat-codex: #7c7cf2; /* Codex provider mark (30) */
-  --color-chat-chip-bg: color-mix(in srgb, var(--foreground) 8%, var(--card)); /* context chip fill #333 (51) */
-  --color-chat-chip-border: color-mix(in srgb, var(--foreground) 18%, var(--card)); /* context chip edge #454545 (51) */
+  --color-chat-chip-bg: color-mix(
+    in srgb,
+    var(--foreground) 8%,
+    var(--card)
+  ); /* context chip fill #333 (51) */
+  --color-chat-chip-border: color-mix(
+    in srgb,
+    var(--foreground) 18%,
+    var(--card)
+  ); /* context chip edge #454545 (51) */
   /* Changes panel diff colors: mixing with the foreground lightens them on dark and darkens them on light. */
   --color-diff-add: color-mix(in srgb, #3fb950 78%, var(--foreground));
   --color-diff-add-bg: color-mix(in srgb, #3fb950 13%, transparent);
@@ -319,6 +360,15 @@ html[data-platform="web"] {
   --color-warning: #e3b341; /* Agents › Commit author: email not linked on GitHub (Wonder 71 warning glyph) */
   --color-avatar: #c4612b; /* Agents › Commit author initials tile */
   --color-avatar-foreground: #ffffff;
+  /* Preview / Import HTML dialog (settings/preview-import.tsx): the exported page's own white surface, frame height
+     and widths (Phone 390, Tablet 768, Desktop 1000). */
+  --color-preview-page: #ffffff;
+  --spacing-preview-frame: 70vh;
+  --spacing-preview-phone: 390px;
+  --spacing-preview-tablet: 768px;
+  --spacing-preview-desktop: 1000px;
+  --spacing-templates: 880px; /* Templates dialog width */
+  --spacing-dialog-max: calc(100vh - 48px); /* tall dialogs keep a margin from the window edges */
   /* </settings-tokens> */
   /* <code-tokens> */
   /* Code workspace, measured from /tmp/wonder-code-mode.png and design/wonder 80/81 (1440×870). */
@@ -327,7 +377,11 @@ html[data-platform="web"] {
   --spacing-code-column: 770px; /* transcript + composer column */
   --spacing-code-tree-min: 96px; /* smallest file tree / terminal pane while resizing */
   --color-code-sidebar: color-mix(in srgb, var(--settings) 93%, black); /* #181818 sidebar */
-  --color-code-raised: color-mix(in srgb, var(--foreground) 3%, var(--settings)); /* #1f1f1f new-chat button, cards */
+  --color-code-raised: color-mix(
+    in srgb,
+    var(--foreground) 3%,
+    var(--settings)
+  ); /* #1f1f1f new-chat button, cards */
   --color-code-editor: color-mix(in srgb, var(--settings) 96%, black); /* file editor surface */
   --color-file-html: #e44d26; /* file-type icon tints (fixed brand hues, readable on both themes) */
   --color-file-css: #4f8fe6;
@@ -350,9 +404,21 @@ html[data-platform="web"] {
   /* </preview-header-tokens> */
   /* <preview-parity-tokens> */
   /* Final preview parity pass (design/wonder/preview-audit/README.md). */
-  --color-preview-mode-label: color-mix(in srgb, var(--foreground) 81%, var(--background)); /* idle Navigate/Edit/Capture #c0c0c0 (PM1) */
-  --color-preview-path-edit: color-mix(in srgb, var(--background) 86%, black); /* path editor well #181818 (PF2-path) */
-  --color-preview-request: color-mix(in srgb, var(--primary-text) 60%, var(--foreground)); /* "Set up the Preview" #d8a1fa (PS2) */
+  --color-preview-mode-label: color-mix(
+    in srgb,
+    var(--foreground) 81%,
+    var(--background)
+  ); /* idle Navigate/Edit/Capture #c0c0c0 (PM1) */
+  --color-preview-path-edit: color-mix(
+    in srgb,
+    var(--background) 86%,
+    black
+  ); /* path editor well #181818 (PF2-path) */
+  --color-preview-request: color-mix(
+    in srgb,
+    var(--primary-text) 60%,
+    var(--foreground)
+  ); /* "Set up the Preview" #d8a1fa (PS2) */
   /* </preview-parity-tokens> */
 }
 
@@ -612,6 +678,47 @@ html[data-ui-theme="light"] {
   --color-share-public-tint: color-mix(in srgb, var(--share-public) 14%, var(--background));
   --color-share-public-edge: color-mix(in srgb, var(--share-public) 24%, var(--background));
   --shadow-share:
-    0 0 0 0.5px color-mix(in srgb, var(--foreground) 10%, var(--background)), 0 12px 32px rgb(0 0 0 / 0.4);
+    0 0 0 0.5px color-mix(in srgb, var(--foreground) 10%, var(--background)),
+    0 12px 32px rgb(0 0 0 / 0.4);
 }
 /* </share-tokens> */
+
+/* <component-tokens> (main components, instances and slots: canvas chrome, layer rows, inspector, Components panel;
+ * design/component-audit/figma 25-instance-variant.png, dark: canvas outline rgb(128,61,236), labels rgb(203,170,249),
+ * slot outline rgb(223,55,172), slot row label rgb(239,160,220)). --component / --slot draw outlines and icons,
+ * the -foreground pair colours text, -muted is an inherited (instance) layer's label. */
+:root {
+  --component: #8f4ff0;
+  --component-foreground: #cbaaf9;
+  --component-muted: #9a8ab4;
+  --slot: #df37ac;
+  --slot-foreground: #efa0dc;
+}
+html[data-ui-theme="light"] {
+  --component: #7c3aed;
+  --component-foreground: #6d28d9;
+  --component-muted: #8a79a8;
+  --slot: #cf2a9c;
+  --slot-foreground: #b51f87;
+}
+@theme inline {
+  --color-component: var(--component);
+  --color-component-foreground: var(--component-foreground);
+  --color-component-muted: var(--component-muted);
+  --color-component-tint: color-mix(in srgb, var(--component) 16%, transparent);
+  --color-slot: var(--slot);
+  --color-slot-foreground: var(--slot-foreground);
+  --color-slot-tint: color-mix(in srgb, var(--slot) 16%, transparent);
+}
+/* </component-tokens> */
+
+/* <history-tokens> (version history panel, web/src/islands/history; docs/version-history.md)
+ * A floating panel over the canvas, 12px below the window chrome and 12px left of the inspector, 320 wide like a
+ * Wonder side panel; it never grows past the canvas height. */
+@theme inline {
+  --spacing-history-panel: 320px;
+  --spacing-history-top: calc(var(--spacing-chrome) + 12px);
+  --spacing-history-inset: calc(var(--panel-right-width) + 12px);
+  --spacing-history-height: calc(100vh - var(--spacing-chrome) - 72px);
+}
+/* </history-tokens> */

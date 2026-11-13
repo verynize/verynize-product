@@ -13,6 +13,7 @@ export const CAPABILITIES = [
   "projects",
   "git",
   "designFiles",
+  "versionHistory",
   "agents",
   "agentAccounts",
   "terminal",
@@ -33,6 +34,7 @@ export const CAPABILITIES = [
   "agentBridge",
   "onboarding",
   "cloudDefaults",
+  "telemetry",
 ] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 

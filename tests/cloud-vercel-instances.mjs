@@ -7,8 +7,8 @@
 //    revision exactly once and in order, and no batch is applied twice.
 // 2. A lease holder frozen mid-turn (SIGSTOP after running the batch, before committing) is
 //    taken over by another instance; when it resumes its commit is fenced, nothing it computed
-//    is acknowledged, and its client's resent batch is applied once.
-// 3. A lease holder killed mid-turn (SIGKILL): takeover, resend applied once, its sockets leave
+//    is acknowledged; its interrupted batch is retained/rejected and a fresh retry applies once.
+// 3. A lease holder killed mid-turn (SIGKILL): takeover, interrupted batch retained, its sockets leave
 //    the registry once its heartbeat lapses.
 // 4. A socket cut at the function's maximum duration reconnects without duplicates.
 // 5. Revoking a link on one instance disconnects its socket on another.
@@ -102,7 +102,7 @@ class Client {
     this.connections.push(connection);
     ws.on("open", () => (connection.open = true));
     ws.on("message", (data) => {
-      const message = JSON.parse(data.toString());
+      const message = JSON.parse(/** @type {Buffer} */ (data).toString());
       connection.messages.push(message);
       if (message.type === "snapshot") {
         this.pending = this.pending.filter((b) => b.n > (message.acked || 0));
@@ -287,7 +287,16 @@ try {
   const fenced = once(A.events, "fenced");
   A.child.kill("SIGCONT");
   assert.equal(await fenced, actor);
-  await erin.settled("erin's batch resent and acknowledged");
+  await erin.settled("erin's interrupted batch rejected after takeover");
+  const rejectedErin = erin.current.messages.find(
+    (m) => m.type === "ops" && m.client === "erin" && m.batch === 1,
+  );
+  assert.equal(rejectedErin?.retained, true);
+  assert.equal(rejectedErin?.tooLarge, true);
+  assert.match(rejectedErin.error, /interrupted room processing/);
+  assert.equal(byId(await roomState(C.origin), "erin").x, 0);
+  erin.edit(1); // Explicit fresh retry of retained intent, with a new batch number.
+  await erin.settled("erin's fresh retry acknowledged");
   revision++;
   assert.equal(
     erinFirst.messages.filter((m) => m.type === "ops" && m.client === "erin").length,
@@ -300,8 +309,11 @@ try {
   assert.equal(state.revision, revision);
   assert.equal(byId(state, "erin").x, 1);
   assert.equal(byId(state, "frank").x, 1);
-  assert.equal(applications(frank.ops, "erin", 1), 1);
-  console.log("ok 2: frozen lease holder fenced; takeover committed; resent batch applied once");
+  assert.equal(applications(frank.ops, "erin", 1), 0);
+  assert.equal(applications(frank.ops, "erin", 2), 1);
+  console.log(
+    "ok 2: frozen lease holder fenced; interrupted batch retained; fresh retry applied once",
+  );
 
   // 3. Kill the lease holder mid-turn.
   erin.reconnectTo = null;
@@ -309,7 +321,7 @@ try {
   const george = client(room, "george");
   await george.connect(B.origin);
   const erin2 = client(room, "erin");
-  erin2.batch = 1; // same device: continues its batch numbers
+  erin2.batch = 2; // same device: continues its batch numbers
   await erin2.connect(A.origin);
   const doomedId = erin2.current.messages.find((m) => m.type === "welcome").id;
   await fs.writeFile(pauseFile, actor);
@@ -320,14 +332,23 @@ try {
   await A.stop("SIGKILL");
   george.edit(1);
   await george.settled("george acknowledged after the crash");
-  await erin2.settled("erin's batch resent after the crash");
+  await erin2.settled("erin's interrupted batch rejected after the crash");
+  const rejectedAgain = erin2.current.messages.find(
+    (m) => m.type === "ops" && m.client === "erin" && m.batch === 3,
+  );
+  assert.equal(rejectedAgain?.retained, true);
+  assert.equal(rejectedAgain?.tooLarge, true);
+  assert.equal(byId(await roomState(C.origin), "erin").x, 1);
+  erin2.edit(2);
+  await erin2.settled("erin's fresh retry after the crash");
   revision += 2;
   state = await roomState(C.origin);
   assert.equal(state.revision, revision);
   assert.equal(byId(state, "erin").x, 2);
   assert.equal(byId(state, "george").x, 1);
-  await until(() => george.ops.some((m) => m.client === "erin" && m.batch === 2), "erin batch");
-  assert.equal(applications(george.ops, "erin", 2), 1);
+  await until(() => george.ops.some((m) => m.client === "erin" && m.batch === 4), "erin batch");
+  assert.equal(applications(george.ops, "erin", 3), 0);
+  assert.equal(applications(george.ops, "erin", 4), 1);
   // The dead instance's sockets leave the registry once its heartbeat lapses.
   await sleep(3200);
   const peers = await peersVia(room, B.origin);

@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 import WebSocket from "ws";
 import { publicWebFiles } from "../web-start/build/legacy-web.mjs";
 import { WORKER_PATH_PATTERNS, isWorkerPath } from "../web-start/worker-paths.mjs";
-import { freePort, launchBrowser, signedInContext } from "./helpers/web-app.mjs";
+import { freePort, launchBrowser, openStarterFile, signedInContext } from "./helpers/web-app.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const dist = path.join(root, "dist/web-nitro");
@@ -225,7 +225,9 @@ try {
     new Promise((resolve, reject) => {
       const ws = new WebSocket(url);
       const messages = [];
-      ws.on("message", (data) => messages.push(JSON.parse(data.toString())));
+      ws.on("message", (data) =>
+        messages.push(JSON.parse(/** @type {Buffer} */ (data).toString())),
+      );
       ws.once("open", () => resolve({ ws, messages }));
       ws.once("unexpected-response", (_request, response) =>
         reject(new Error(`HTTP ${response.statusCode}`)),
@@ -323,6 +325,8 @@ try {
   await page.waitForFunction(() => document.documentElement.dataset.uiReady === "true", null, {
     timeout: 20000,
   });
+  // A fresh profile has no file and lands on Files; open one to see the canvas.
+  await openStarterFile(page, { detached: true });
   await page.waitForSelector("#canvas .layer");
   assert.deepEqual(errors, []);
 } finally {

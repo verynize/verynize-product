@@ -8,6 +8,7 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     timeout: 20000,
     env,
@@ -69,6 +70,44 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
       }),
       true,
     );
+    // Page paint belongs to the viewport, even far beyond the transformed canvas.
+    const originalCamera = await p.evaluate(() => window.design.getCamera());
+    for (const pan of [0, 100000, -100000]) {
+      await p.evaluate((pan) => window.design.setCamera(pan, pan, 0.02), pan);
+      await p.waitForFunction(
+        () => document.querySelector("#zoom-menu-button").textContent === "2%",
+      );
+      const box = await p.locator("#canvas-wrap").boundingBox();
+      for (const [fx, fy] of [
+        [0.15, 0.25],
+        [0.85, 0.25],
+        [0.15, 0.65],
+        [0.85, 0.65],
+      ]) {
+        const png = await p.screenshot({
+          clip: {
+            x: Math.round(box.x + box.width * fx),
+            y: Math.round(box.y + box.height * fy),
+            width: 2,
+            height: 2,
+          },
+        });
+        const pixels = await app.evaluate(
+          ({ nativeImage }, bytes) => [
+            ...nativeImage.createFromBuffer(Buffer.from(bytes)).toBitmap(),
+          ],
+          [...png],
+        );
+        for (let i = 0; i < pixels.length; i += 4) {
+          assert.deepEqual(
+            pixels.slice(i, i + 4),
+            [51, 34, 17, 255],
+            `page background at 2%, pan ${pan}`,
+          );
+        }
+      }
+    }
+    await p.evaluate(({ x, y, zoom }) => window.design.setCamera(x, y, zoom), originalCamera);
     // Page eye (properties-audit C8, Wonder H8): hides the page background and keeps the colour. The page turns
     // transparent: the canvas shows a checkerboard, the field reads 0 % (dimmed) and still shows the hex.
     const opacity = () =>
@@ -284,7 +323,7 @@ const { waitForUiReady } = require("./helpers/ui-ready.cjs");
     const three = await heights();
     assert.ok(
       Math.max(...three) - Math.min(...three) <= 2,
-      `Three open sections split evenly (${three})`,
+      `Three open sections split evenly (${three.join(",")})`,
     );
     console.log(
       "PASS page: empty new page, no frame outline, page colour with variables collapsed, accordion properties, chat sidebar toggle, stable canvas, chat + layers, icon library",

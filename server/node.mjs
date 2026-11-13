@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 import worker, * as objects from "../cloud/worker.js";
 import { bindingsFromEnvironment, createNodeEnv } from "../cloud/platform/node/env.js";
 import { createServer } from "../cloud/platform/node/server.js";
+import { startServerTelemetry } from "./telemetry.mjs";
+
+// Crash reports when SENTRY_DSN_SERVER is set (server/telemetry.mjs).
+await startServerTelemetry("node");
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const vars = process.env;

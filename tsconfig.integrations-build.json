@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noEmitOnError": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "rootDir": "integrations/src",
+    "outDir": "integrations/generated",
+    "erasableSyntaxOnly": true,
+    "noUnusedLocals": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["integrations/src/**/*.mts"]
+}

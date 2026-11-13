@@ -101,7 +101,11 @@ class Actor {
     const actor = this;
     this.ctx = {
       id: { name, toString: () => name },
-      storage: { sql: this.storage },
+      storage: {
+        sql: this.storage,
+        sync: async () => actor.storage.commit(),
+        transactionSync: (fn) => actor.storage.transactionSync(fn),
+      },
       getWebSockets: () => [...actor.sockets],
       acceptWebSocket: () => {
         throw new Error("Create sockets with acceptWebSocket(ctx) from #cloud-runtime");

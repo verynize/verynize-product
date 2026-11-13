@@ -1,0 +1,138 @@
+ window scratch.pen 
+ group scratch.pen 
+ webarea Pencil 
+ group Notifications alt+T 
+ webarea Pencil 
+@s2wwf9p85yiaba:e1 combobox Add to context 
+@s2wwf9p85yiaba:e2 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s2wwf9p85yiaba:e3 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s2wwf9p85yiaba:e4 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s2wwf9p85yiaba:e5 combobox Claude Opus 5.5 
+@s2wwf9p85yiaba:e6 button Send message 
+@s2wwf9p85yiaba:e7 checkbox Chat history 
+@s2wwf9p85yiaba:e8 checkbox Chat 
+@s2wwf9p85yiaba:e9 checkbox Layers 
+@s2wwf9p85yiaba:e10 checkbox Slides 
+@s2wwf9p85yiaba:e11 checkbox Components 
+@s2wwf9p85yiaba:e12 checkbox Libraries 
+ heading Layers 
+ statictext Layers Layers
+@s2wwf9p85yiaba:e20 treeitem Note 
+ statictext Note Note
+@s2wwf9p85yiaba:e41 button Sidebar 
+@s2wwf9p85yiaba:e42 button Move 
+@s2wwf9p85yiaba:e43 combobox Move Tools 
+@s2wwf9p85yiaba:e44 button Rectangle 
+@s2wwf9p85yiaba:e45 combobox Primitives 
+@s2wwf9p85yiaba:e46 button Pen 
+@s2wwf9p85yiaba:e47 button Text 
+@s2wwf9p85yiaba:e48 button Frame 
+@s2wwf9p85yiaba:e49 button Sticky Note 
+@s2wwf9p85yiaba:e50 button Browser 
+@s2wwf9p85yiaba:e51 button Hand 
+@s2wwf9p85yiaba:e52 button Comment 
+@s2wwf9p85yiaba:e53 button Variables 
+@s2wwf9p85yiaba:e54 button Find layers 
+@s2wwf9p85yiaba:e55 button Command palette 
+@s2wwf9p85yiaba:e56 button Zoom Out 
+@s2wwf9p85yiaba:e57 combobox Zoom level 
+@s2wwf9p85yiaba:e58 button Zoom In 
+ group Notifications alt+T 
+ webarea Pencil 
+@s2wwf9p85yiaba:e59 combobox Add to context 
+@s2wwf9p85yiaba:e60 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s2wwf9p85yiaba:e61 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s2wwf9p85yiaba:e62 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s2wwf9p85yiaba:e63 combobox Claude Opus 5.5 
+@s2wwf9p85yiaba:e64 button Stop generation 
+@s2wwf9p85yiaba:e65 checkbox Chat history 
+@s2wwf9p85yiaba:e66 checkbox Chat 
+@s2wwf9p85yiaba:e67 checkbox Layers 
+@s2wwf9p85yiaba:e68 checkbox Slides 
+@s2wwf9p85yiaba:e69 checkbox Components 
+@s2wwf9p85yiaba:e70 checkbox Libraries 
+ group Chat 
+ toolbar Chat panel controls 
+ heading Show chat history 
+@s2wwf9p85yiaba:e71 button Show chat history 
+@s2wwf9p85yiaba:e72 button New conversation 
+ statictext In this scratch.pen only, generate one small raster image of a blue teapot on a white background using the built-in AI image generation tool and place it on the canvas. Do not edit any other document. Report which image provider was used. Do not create other assets. In this scratch.pen only, generate one small raster image of a blue teapot on a white background using the built-in AI image generation tool and place it on the canvas. Do not edit any other document. Report which image provider was used. Do not create other assets.
+@s2wwf9p85yiaba:e73 button Copy 
+@s2wwf9p85yiaba:e74 button Thought for 1s 
+@s2wwf9p85yiaba:e75 button Read skill 
+@s2wwf9p85yiaba:e76 button Generate blue teapot image frame 
+@s2wwf9p85yiaba:e77 button Check teapot image fill status 
+@s2wwf9p85yiaba:e78 button Thought for 2s 
+@s2wwf9p85yiaba:e79 button List scratch document directory 
+@s2wwf9p85yiaba:e80 button Thought for 1s 
+@s2wwf9p85yiaba:e81 button Recheck teapot image fill status 
+@s2wwf9p85yiaba:e82 button Thought for 2s 
+ statictext The image has arrived. I'm checking the file and looking for which provider made it. The image has arrived. I'm checking the file and looking for which provider made it.
+@s2wwf9p85yiaba:e83 button Inspect generated image and folder timestamps 
+@s2wwf9p85yiaba:e84 button Thought for 3s 
+@s2wwf9p85yiaba:e85 button Search captured evidence for image provider names 
+@s2wwf9p85yiaba:e86 button Search evidence and extracted app for provider names 
+@s2wwf9p85yiaba:e87 button Extract provider mentions with short context 
+@s2wwf9p85yiaba:e88 button Thought for 1s 
+@s2wwf9p85yiaba:e89 button Find image generation provider wiring in app 
+@s2wwf9p85yiaba:e90 button Locate image generation code by fixed strings 
+ statictext I'm tracing the editor's generate-image call to see which backend it uses. I'm tracing the editor's generate-image call to see which backend it uses.
+@s2wwf9p85yiaba:e91 button Show code around generate-image call sites 
+ statictext Echo Echo
+ statictext Claude Opus 5.5 Claude Opus 5.5
+ statictext Working for 1m 10s Working for 1m 10s
+@s2wwf9p85yiaba:e92 button Find image provider config key and options 
+@s2wwf9p85yiaba:e93 button Sidebar 
+@s2wwf9p85yiaba:e94 button Move 
+@s2wwf9p85yiaba:e95 combobox Move Tools 
+@s2wwf9p85yiaba:e96 button Rectangle 
+@s2wwf9p85yiaba:e97 combobox Primitives 
+@s2wwf9p85yiaba:e98 button Pen 
+@s2wwf9p85yiaba:e99 button Text 
+@s2wwf9p85yiaba:e100 button Frame 
+@s2wwf9p85yiaba:e101 button Sticky Note 
+@s2wwf9p85yiaba:e102 button Browser 
+@s2wwf9p85yiaba:e103 button Hand 
+@s2wwf9p85yiaba:e104 button Comment 
+@s2wwf9p85yiaba:e105 button Variables 
+@s2wwf9p85yiaba:e106 button Find layers 
+@s2wwf9p85yiaba:e107 button Command palette 
+@s2wwf9p85yiaba:e108 button Zoom Out 
+@s2wwf9p85yiaba:e109 combobox Zoom level 
+@s2wwf9p85yiaba:e110 button Zoom In 
+ group Notifications alt+T 
+ webarea Pencil 
+@s2wwf9p85yiaba:e111 combobox pen.dev menu 
+ image pen.dev 
+@s2wwf9p85yiaba:e112 checkbox Home 
+ tablist Open documents 
+@s2wwf9p85yiaba:e114 button Workspace folder menu 
+@s2wwf9p85yiaba:e117 button Workspace folder menu 
+@s2wwf9p85yiaba:e119 radiobutton Workspace folder menu scratch.pen Edited Close scratch.pen 1
+@s2wwf9p85yiaba:e120 button Workspace folder menu 
+ statictext scratch.pen scratch.pen
+ image Edited 
+@s2wwf9p85yiaba:e121 button Close scratch.pen 
+@s2wwf9p85yiaba:e122 button New 
+@s2wwf9p85yiaba:e123 button Account menu 
+ statictext M M
+ statictext Free Free
+@s2wwf9p85yiaba:e124 button Share 
+@s2wwf9p85yiaba:e125 button Goodies 
+@s2wwf9p85yiaba:e126 button Present 
+@s2wwf9p85yiaba:e127 button Open a webpage and reproduce it on the canvas 
+@s2wwf9p85yiaba:e128 button Close 
+@s2wwf9p85yiaba:e129 button Full Screen 
+@s2wwf9p85yiaba:e130 button Minimize 

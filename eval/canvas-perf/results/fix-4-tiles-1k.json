@@ -1,0 +1,370 @@
+{
+  "at": "2026-11-04T23:22:35.697Z",
+  "cpu": "Apple M1",
+  "notes": "Concurrent work may affect load. rAF intervals are not presentation timestamps. DOM completeness is unmeasured.",
+  "samples": [
+    {
+      "n": 1000,
+      "flag": false,
+      "loadAverage": [30.81689453125, 19.60986328125, 11.8515625],
+      "freeBytes": 200179712,
+      "loadMs": 734.5999999998603,
+      "motion": {
+        "handlers": [
+          389.5, 431.19999999995343, 381, 385.89999999990687, 374.19999999995343,
+          374.70000000018626, 359.69999999995343, 423.5, 357.10000000009313, 362.10000000009313,
+          352.89999999990687, 374.30000000004657, 347.5, 333.89999999990687, 339.69999999995343,
+          351.10000000009313, 356.19999999995343, 411.20000000018626, 364.89999999990687,
+          369.79999999981374, 374.69999999995343, 411.79999999981374, 366.69999999995343,
+          422.10000000009313
+        ],
+        "intervals": [
+          399.89999999999964, 466.6999999999998, 399.90000000000055, 398.89999999999964,
+          401.10000000000036, 397.89999999999964, 418.1999999999998, 433.8000000000002,
+          366.60000000000036, 400, 366.6999999999989, 400, 349.10000000000036, 365.5,
+          368.60000000000036, 365.89999999999964, 384, 431.5, 366.89999999999964, 401.5,
+          398.2000000000007, 435.10000000000036, 382.2999999999993
+        ],
+        "completeness": [
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "final": null,
+        "settleMs": 0
+      },
+      "summary": {
+        "handlerP50": 369.79999999981374,
+        "handlerP95": 423.5,
+        "over16_7Pct": 100
+      }
+    },
+    {
+      "n": 1000,
+      "flag": true,
+      "loadAverage": [31.0361328125, 20.41943359375, 12.3232421875],
+      "freeBytes": 365985792,
+      "loadMs": 692.5,
+      "motion": {
+        "handlers": [
+          412.9000000001397, 429, 423, 369.69999999995343, 426, 387.5, 403.89999999990687,
+          357.60000000009313, 396.30000000004657, 371.9000000001397, 351.89999999990687, 359.5,
+          352.30000000004657, 359.69999999995343, 351.89999999990687, 405.19999999995343,
+          350.19999999995343, 387.5, 370.4000000001397, 422, 342.30000000004657, 364.60000000009313,
+          322, 335.19999999995343
+        ],
+        "intervals": [
+          466.5999999999999, 450, 450, 399.3000000000002, 467.2999999999997, 416.60000000000036,
+          466.6999999999998, 366.60000000000036, 416.09999999999945, 400.5, 383.40000000000055,
+          366.5, 383.39999999999964, 382.60000000000036, 367.2999999999993, 416.60000000000036,
+          366.7000000000007, 416.59999999999854, 399.90000000000146, 431.5, 366.59999999999854,
+          385.2000000000007, 333.2999999999993
+        ],
+        "completeness": [
+          {
+            "blank": 0.9870181874033561,
+            "scaled": 0,
+            "exact": 0.012981812596643825,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 9,
+            "bytes": 9585216
+          },
+          {
+            "blank": 0.9383176441529215,
+            "scaled": 0,
+            "exact": 0.06168235584707853,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 18,
+            "bytes": 19170432
+          },
+          {
+            "blank": 0.9301259708538026,
+            "scaled": 0,
+            "exact": 0.06987402914619754,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 18,
+            "bytes": 19170432
+          },
+          {
+            "blank": 0.9398164869043371,
+            "scaled": 0,
+            "exact": 0.060183513095662826,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 9,
+            "bytes": 9585216
+          },
+          {
+            "blank": 0.940565908280045,
+            "scaled": 0,
+            "exact": 0.05943409171995501,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 12,
+            "bytes": 12780288
+          },
+          {
+            "blank": 0.5402170155489079,
+            "scaled": 0,
+            "exact": 0.459782984451092,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0.3414474844556663,
+            "scaled": 0,
+            "exact": 0.6585525155443339,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0.09798046600982527,
+            "scaled": 0,
+            "exact": 0.9020195339901744,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 20,
+            "bytes": 21300480
+          },
+          {
+            "blank": 0.9383176441529215,
+            "scaled": 0,
+            "exact": 0.06168235584707853,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 29,
+            "bytes": 30885696
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999999,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 29,
+            "bytes": 30885696
+          },
+          {
+            "blank": 0.003257601034357628,
+            "scaled": 0,
+            "exact": 0.9967423989656422,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999996,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999998,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999999,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999996,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1.0000000000000002,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999998,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999999,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          }
+        ],
+        "final": {
+          "blank": 0,
+          "scaled": 0,
+          "exact": 1,
+          "refinedMs": 10068.5,
+          "active": false,
+          "revision": 4,
+          "invalidated": 0,
+          "tiles": 36,
+          "bytes": 38340864
+        },
+        "settleMs": 33.300000000046566
+      },
+      "summary": {
+        "handlerP50": 369.69999999995343,
+        "handlerP95": 426,
+        "over16_7Pct": 100
+      }
+    }
+  ]
+}

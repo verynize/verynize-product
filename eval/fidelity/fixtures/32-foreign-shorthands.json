@@ -1,0 +1,9 @@
+{
+  "title": "Foreign arbitrary CSS shorthands",
+  "covers": ["border", "radius", "outline"],
+  "expect": [
+    { "node": "Shorthands", "prop": "strokeWidth", "eq": 2 },
+    { "node": "Shorthands", "prop": "outlineWidth", "eq": 3 },
+    { "node": "Shorthands", "prop": "radius", "eq": { "tl": 1, "tr": 2, "br": 3, "bl": 4 } }
+  ]
+}

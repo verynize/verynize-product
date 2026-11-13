@@ -390,7 +390,7 @@ async function corsProxy(target) {
       up.write(
         `${req.method} ${req.url} HTTP/1.1\r\n` +
           Object.entries(req.headers)
-            .map(([k, v]) => `${k}: ${v}`)
+            .map(([k, v]) => `${k}: ${String(v)}`)
             .join("\r\n") +
           "\r\n\r\n",
       );
@@ -419,7 +419,7 @@ const focusWindow = (app) =>
     w.focus();
   });
 
-(async () => {
+void (async () => {
   const tmp = await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(), "vz-share-audit-")));
   const state = path.join(tmp, "cf-state");
   const { launchBrowser, signedInContext, startProcess, freePort } = await imp(

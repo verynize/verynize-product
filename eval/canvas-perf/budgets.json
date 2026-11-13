@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "budgets": [
+    {
+      "metric": "pan.handlerMs.p95",
+      "nodeCount": 1000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "pan.handlerMs.p95",
+      "nodeCount": 13000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "pan.handlerMs.p95",
+      "nodeCount": 100000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.handlerMs.p95",
+      "nodeCount": 1000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.handlerMs.p95",
+      "nodeCount": 13000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.handlerMs.p95",
+      "nodeCount": 100000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 8
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "edit.syncMs.p95",
+      "nodeCount": 1000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "edit.syncMs.p95",
+      "nodeCount": 13000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "edit.syncMs.p95",
+      "nodeCount": 100000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "drag.frameP95Ms",
+      "nodeCount": 1000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16.7
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "drag.frameP95Ms",
+      "nodeCount": 13000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16.7
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "drag.frameP95Ms",
+      "nodeCount": 100000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 16.7
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "selectAll.syncMs.p95",
+      "nodeCount": 2000,
+      "unit": "ms",
+      "budget": {
+        "operator": "lt",
+        "value": 500
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fitAll.fullyDrawnMs",
+      "nodeCount": 1000,
+      "unit": "ms",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fitAll.fullyDrawnMs",
+      "nodeCount": 13000,
+      "unit": "ms",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fitAll.fullyDrawnMs",
+      "nodeCount": 100000,
+      "unit": "ms",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.incompleteVisibleAreaPct",
+      "nodeCount": 1000,
+      "unit": "percent",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.incompleteVisibleAreaPct",
+      "nodeCount": 13000,
+      "unit": "percent",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "zoom.incompleteVisibleAreaPct",
+      "nodeCount": 100000,
+      "unit": "percent",
+      "budget": {
+        "operator": "report",
+        "value": null
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fidelity.export100Pct",
+      "nodeCount": 1000,
+      "unit": "percent",
+      "budget": {
+        "operator": "eq",
+        "value": 0
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fidelity.export100Pct",
+      "nodeCount": 13000,
+      "unit": "percent",
+      "budget": {
+        "operator": "eq",
+        "value": 0
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    },
+    {
+      "metric": "fidelity.export100Pct",
+      "nodeCount": 100000,
+      "unit": "percent",
+      "budget": {
+        "operator": "eq",
+        "value": 0
+      },
+      "source": "../../docs/canvas-performance/README.md#acceptance-criteria-to-use-from-now-on"
+    }
+  ]
+}

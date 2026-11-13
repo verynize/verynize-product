@@ -32,11 +32,25 @@ export const ChatMenuSeparator = DropdownMenuSeparator;
 
 const surface = "min-w-0 bg-background p-1 text-sm text-foreground-2";
 
-export function ChatMenuContent({ className, sideOffset = 6, ...props }: ComponentProps<typeof DropdownMenuContent>) {
-  return <DropdownMenuContent sideOffset={sideOffset} collisionPadding={8} className={cn(surface, className)} {...props} />;
+export function ChatMenuContent({
+  className,
+  sideOffset = 6,
+  ...props
+}: ComponentProps<typeof DropdownMenuContent>) {
+  return (
+    <DropdownMenuContent
+      sideOffset={sideOffset}
+      collisionPadding={8}
+      className={cn(surface, className)}
+      {...props}
+    />
+  );
 }
 
-export function ChatMenuSubContent({ className, ...props }: ComponentProps<typeof DropdownMenuSubContent>) {
+export function ChatMenuSubContent({
+  className,
+  ...props
+}: ComponentProps<typeof DropdownMenuSubContent>) {
   // Portalled so the parent's scroll box and open animation never clip or offset the submenu.
   return (
     <DropdownMenuPortal>
@@ -44,7 +58,11 @@ export function ChatMenuSubContent({ className, ...props }: ComponentProps<typeo
         sideOffset={6}
         alignOffset={-5}
         collisionPadding={8}
-        className={cn(surface, "max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto", className)}
+        className={cn(
+          surface,
+          "max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto",
+          className,
+        )}
         {...props}
       />
     </DropdownMenuPortal>
@@ -64,7 +82,12 @@ function RightCheck() {
   );
 }
 
-export function ChatMenuItem({ className, checked, children, ...props }: ComponentProps<typeof DropdownMenuItem> & { checked?: boolean }) {
+export function ChatMenuItem({
+  className,
+  checked,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuItem> & { checked?: boolean }) {
   return (
     <DropdownMenuItem className={cn(row, className)} {...props}>
       {children}
@@ -73,7 +96,11 @@ export function ChatMenuItem({ className, checked, children, ...props }: Compone
   );
 }
 
-export function ChatMenuRadioItem({ className, children, ...props }: ComponentProps<typeof DropdownMenuRadioItem>) {
+export function ChatMenuRadioItem({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuRadioItem>) {
   return (
     <DropdownMenuRadioItem className={cn(indicatorRow, className)} {...props}>
       {children}
@@ -83,7 +110,11 @@ export function ChatMenuRadioItem({ className, children, ...props }: ComponentPr
 }
 
 /** Two-line radio row (31): icon, title and a 12px hint; the check sits on the right, vertically centred. */
-export function ChatMenuOptionItem({ className, children, ...props }: ComponentProps<typeof DropdownMenuRadioItem>) {
+export function ChatMenuOptionItem({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuRadioItem>) {
   return (
     <DropdownMenuRadioItem
       className={cn(indicatorRow, "h-auto items-start py-1.5", className)}
@@ -95,7 +126,11 @@ export function ChatMenuOptionItem({ className, children, ...props }: ComponentP
   );
 }
 
-export function ChatMenuCheckboxItem({ className, children, ...props }: ComponentProps<typeof DropdownMenuCheckboxItem>) {
+export function ChatMenuCheckboxItem({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuCheckboxItem>) {
   return (
     <DropdownMenuCheckboxItem className={cn(indicatorRow, className)} {...props}>
       {children}
@@ -104,10 +139,18 @@ export function ChatMenuCheckboxItem({ className, children, ...props }: Componen
   );
 }
 
-export function ChatMenuSubTrigger({ className, children, ...props }: ComponentProps<typeof DropdownMenuSubTrigger>) {
+export function ChatMenuSubTrigger({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof DropdownMenuSubTrigger>) {
   return (
     <DropdownMenuSubTrigger
-      className={cn(row, "data-[state=open]:bg-muted data-[state=open]:text-foreground-2 [&>svg:last-child]:text-muted-foreground", className)}
+      className={cn(
+        row,
+        "data-[state=open]:bg-muted data-[state=open]:text-foreground-2 [&>svg:last-child]:text-muted-foreground",
+        className,
+      )}
       {...props}
     >
       <span className="flex min-w-0 flex-1 items-center gap-2">{children}</span>
@@ -116,10 +159,23 @@ export function ChatMenuSubTrigger({ className, children, ...props }: ComponentP
 }
 
 export function ChatMenuLabel({ className, ...props }: ComponentProps<typeof DropdownMenuLabel>) {
-  return <DropdownMenuLabel className={cn("flex h-6 items-center py-0 text-sm font-normal text-muted-foreground", className)} {...props} />;
+  return (
+    <DropdownMenuLabel
+      className={cn(
+        "flex h-6 items-center py-0 text-sm font-normal text-muted-foreground",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 /** Wrapping explanatory text inside a menu (the rewind confirmation). */
 export function ChatMenuNote({ className, ...props }: ComponentProps<typeof DropdownMenuLabel>) {
-  return <DropdownMenuLabel className={cn("py-1 text-sm leading-4.5 font-normal text-muted-foreground", className)} {...props} />;
+  return (
+    <DropdownMenuLabel
+      className={cn("py-1 text-sm leading-4.5 font-normal text-muted-foreground", className)}
+      {...props}
+    />
+  );
 }

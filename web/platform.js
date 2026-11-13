@@ -21,6 +21,8 @@
     git: ["repositories.list", "gitStatus", "gitChanges", "gitDiff", "gitCommit"],
     // Native *.verynize.json files next to the code (desktop/design-files.cjs).
     designFiles: ["designOpen", "designSave", "designDetach", "onDesignFileChanged"],
+    // Version history sidecar of the open native file (desktop/design-files.cjs, docs/version-history.md).
+    versionHistory: ["versionsList", "versionsGet", "versionsAdd"],
     // Local Claude/Codex agents (desktop/agent-runtime.cjs) and their sign-in.
     agents: ["discoverAgents", "runAgent", "cancelAgent", "onAgentEvent"],
     agentAccounts: ["agentAccountStatus", "startAgentLogin", "agentLogout"],
@@ -32,7 +34,7 @@
     // Offscreen PNG/PDF rendering and native save (desktop/render.cjs).
     rasterExport: ["renderDesign", "renderPDF", "saveExport"],
     codeExport: ["exportCode"],
-    imageGeneration: ["generateVector", "imageProvider.generate"],
+    imageGeneration: ["imageProvider.generate"],
     // Figma import: link (REST or connected account), clipboard paste and .fig files (desktop/figma*.cjs).
     figma: ["importFigma", "figmaClipboard", "figmaFile", "figmaFileOpen", "figmaOAuth.status"],
     // Native HTML import (integrations codec) and template packs as zip files (desktop/template-packs.cjs).
@@ -52,6 +54,8 @@
     onboarding: ["onboardingState"],
     // Share panel server default (desktop/cloud-defaults.cjs).
     cloudDefaults: ["cloudDefaults"],
+    // Crash report opt-in (desktop/telemetry.cjs).
+    telemetry: ["telemetry.get", "telemetry.set"],
   };
   const exposed = root.desktop;
   const desktop = exposed && typeof exposed === "object" ? exposed : null;

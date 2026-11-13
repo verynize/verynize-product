@@ -1,0 +1,11 @@
+{
+  "title": "Foreign SVG a vector cannot hold stays one image",
+  "covers": ["svg", "vector-fallback"],
+  "expect": [
+    { "node": "Labelled badge", "prop": "type", "eq": "image" },
+    { "node": "Labelled badge", "prop": "w", "eq": 24 },
+    { "node": "Labelled badge", "prop": "src", "matches": "^data:image/svg\\+xml;base64," },
+    { "node": "Labelled badge", "prop": "svgMarkup", "matches": "M0 0 L24 24" },
+    { "warns": ["text"] }
+  ]
+}

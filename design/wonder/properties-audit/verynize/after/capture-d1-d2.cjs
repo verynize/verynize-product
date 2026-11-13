@@ -29,13 +29,20 @@ const CATEGORIES = [
   const app = await _electron.launch({
     cwd: ROOT,
     env,
-    args: [".", "--force-device-scale-factor=2", "--force-color-profile=srgb", `--user-data-dir=${profile}`],
+    args: [
+      ".",
+      "--force-device-scale-factor=2",
+      "--force-color-profile=srgb",
+      `--user-data-dir=${profile}`,
+    ],
     timeout: 30000,
   });
   const log = [];
   try {
     const page = await app.firstWindow({ timeout: 30000 });
-    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0].setContentSize(1440, 870));
+    await app.evaluate(({ BrowserWindow }) =>
+      BrowserWindow.getAllWindows()[0].setContentSize(1440, 870),
+    );
     await page.waitForSelector("#canvas .layer");
     await page.waitForTimeout(500);
 
@@ -49,7 +56,23 @@ const CATEGORIES = [
       page.evaluate(() => ({
         tool: window.design.getTool(),
         selection: window.design.getSelection(),
-        nodes: window.design.getDocument().pages[0].nodes.map(({ id, name, type, x, y, w, h, radius, color, clipContent, opacity }) => ({ id, name, type, x, y, w, h, radius, color, clipContent, opacity })),
+        nodes: window.design
+          .getDocument()
+          .pages[0].nodes.map(
+            ({ id, name, type, x, y, w, h, radius, color, clipContent, opacity }) => ({
+              id,
+              name,
+              type,
+              x,
+              y,
+              w,
+              h,
+              radius,
+              color,
+              clipContent,
+              opacity,
+            }),
+          ),
         zoom: Math.round(window.design.getCamera().zoom * 100),
       }));
     const shot = async (file, target) => {
@@ -99,7 +122,9 @@ const CATEGORIES = [
     await page.mouse.click(420, 200);
     await wait(300);
     await shot("D1-click-created.png", "window");
-    await page.evaluate(() => document.querySelector("#appearance-section")?.scrollIntoView({ block: "nearest" }));
+    await page.evaluate(() =>
+      document.querySelector("#appearance-section")?.scrollIntoView({ block: "nearest" }),
+    );
     await wait(150);
     await shot("D2-click.png", "panel");
 

@@ -1,9 +1,10 @@
 // Photographic image providers end to end in Electron: provider settings with the API key stored via
 // safeStorage (never returned, logged, persisted in clear text or kept in renderer storage), generation
 // through a local OpenAI-compatible fixture server and a generic HTTP fixture that return real PNG
-// bytes, insertion as an image layer, relaunch persistence and redacted provider errors.
+// bytes, insertion as an image layer through the chat path (live MCP generate_image), relaunch
+// persistence and redacted provider errors.
 const { _electron } = require("@playwright/test");
-const { waitForUiReady } = require('./helpers/ui-ready.cjs');
+const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const os = require("node:os");
@@ -25,6 +26,25 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     });
     req.on("end", () => {
       requests.push({ url: req.url, auth: req.headers.authorization || "", body });
+      if (req.url.startsWith("/models/")) {
+        assert.equal(req.headers["x-goog-api-key"], KEY);
+        assert.equal(req.headers.authorization, undefined);
+        res.setHeader("content-type", "application/json");
+        res.end(
+          JSON.stringify({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    { inlineData: { mimeType: "image/png", data: photo.toString("base64") } },
+                  ],
+                },
+              },
+            ],
+          }),
+        );
+        return;
+      }
       if (req.url === "/v1/images/generations") {
         res.setHeader("content-type", "application/json");
         if (req.headers.authorization !== "Bearer " + KEY) {
@@ -37,6 +57,13 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
           return;
         }
         res.end(JSON.stringify({ created: 1, data: [{ b64_json: photo.toString("base64") }] }));
+        return;
+      }
+      if (req.url === "/slow") {
+        setTimeout(() => {
+          res.setHeader("content-type", "image/png");
+          res.end(generic);
+        }, 300);
         return;
       }
       if (req.url === "/generate") {
@@ -53,8 +80,12 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "generation-image-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_TEST_IMAGE_GOOGLE_URL = base;
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
+  delete env.VERYNIZE_DISABLE_MCP;
   let logs = "";
+  let mcpCalls = 0;
   const launch = async () => {
     const app = await _electron.launch({
       env,
@@ -75,16 +106,34 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     page.on("console", (m) => {
       logs += m.text();
     });
-    await page.waitForFunction(
-      () => !!window.desktop?.imageProvider && !!document.getElementById("generate-engine"),
-    );
+    await page.waitForFunction(() => !!window.desktop?.imageProvider);
     return { app, page };
   };
-  const openDialog = async (page) => {
-    await page.locator(".app-menu-trigger:visible").first().click();
-    await page.locator("#generate-art").click();
-    await page.locator("#generate-dialog").waitFor({ state: "visible" });
-    await page.locator("#generate-engine").selectOption("image");
+  // Chat agents generate through the live MCP bridge; each call counts toward its hourly limit.
+  const { Client } = await import("@modelcontextprotocol/sdk/client/index.js");
+  const { StreamableHTTPClientTransport } =
+    await import("@modelcontextprotocol/sdk/client/streamableHttp.js");
+  const generateFromChat = async (prompt) => {
+    let info;
+    for (let i = 0; i < 100 && !info; i++)
+      info = await fs
+        .readFile(path.join(dir, "mcp.json"), "utf8")
+        .then(JSON.parse)
+        .catch(() => new Promise((resolve) => setTimeout(resolve, 100)));
+    assert.ok(info, "MCP bridge started");
+    const client = new Client({ name: "generation-image-test", version: "1" });
+    await client.connect(
+      new StreamableHTTPClientTransport(new URL(info.url), {
+        requestInit: { headers: { Authorization: `Bearer ${info.token}` } },
+      }),
+    );
+    try {
+      mcpCalls++;
+      const result = await client.callTool({ name: "generate_image", arguments: { prompt } });
+      return { ok: !result.isError, text: result.content?.[0]?.text || "" };
+    } finally {
+      await client.close().catch(() => {});
+    }
   };
   const imageNodes = (page) =>
     page.evaluate(() =>
@@ -95,11 +144,24 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     );
   let { app, page } = await launch();
   try {
-    // Engine switch shows provider settings, hides agent-only fields.
-    await openDialog(page);
-    assert.equal(await page.locator("#generate-image-settings").isVisible(), true);
-    assert.equal(await page.locator("#generate-agent").isVisible(), false);
-    assert.equal(await page.locator("#image-api-key").getAttribute("type"), "password");
+    assert.equal(
+      (await page.evaluate(() => window.desktop.imageProvider.get())).secureStorage,
+      null,
+    );
+    await fs.writeFile(path.join(dir, "image-provider.json"), "{broken");
+    const recovered = await page.evaluate(() => window.desktop.imageProvider.get());
+    assert.equal(
+      recovered.defaultProvider,
+      recovered.providers.find((provider) => provider.id === "codex_plan").available
+        ? "codex_plan"
+        : "nano_banana_lite",
+    );
+    assert.equal(await fs.readFile(path.join(dir, "image-provider.json.bak"), "utf8"), "{broken");
+    assert.equal(
+      await page.locator("#generate-art, #generate-dialog").count(),
+      0,
+      "images are generated from chat, not a dialog",
+    );
     // Plain http to a non-loopback host is refused (the key would travel in clear text).
     const refused = await page.evaluate(() =>
       window.desktop.imageProvider
@@ -108,39 +170,36 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     );
     assert.match(refused, /https/);
 
-    await page.locator("#image-provider").selectOption("openai");
-    await page.locator("#image-base-url").fill(base + "/v1");
-    await page.locator("#image-model").fill("fixture-photo-model");
-    await page.locator("#image-size").selectOption("512x512");
-    await page.locator("#image-api-key").fill(KEY);
-    await page.locator("#generate-prompt").fill("A foggy harbour at sunrise, 35mm photo");
-    await page.locator("#generate-run").click();
-    await page.waitForFunction(
-      () => /Image inserted/.test(document.getElementById("generate-status").textContent),
-      null,
-      { timeout: 20000 },
+    await page.evaluate(
+      ({ url, key }) =>
+        window.desktop.imageProvider.set({
+          vendor: "custom",
+          defaultProvider: "custom",
+          custom: {
+            provider: "openai",
+            baseURL: url,
+            model: "fixture-photo-model",
+            size: "1024x1024",
+          },
+          apiKey: key,
+        }),
+      { url: base + "/v1", key: KEY },
     );
-    assert.equal(
-      await page.locator("#image-api-key").inputValue(),
-      "",
-      "key field cleared after saving",
-    );
+    const first = await generateFromChat("A foggy harbour at sunrise, 35mm photo");
+    assert.ok(first.ok, first.text);
     const sent = requests.find((r) => r.url === "/v1/images/generations");
     assert.equal(sent.auth, "Bearer " + KEY);
     assert.deepEqual(JSON.parse(sent.body), {
       model: "fixture-photo-model",
       prompt: "A foggy harbour at sunrise, 35mm photo",
       n: 1,
-      size: "512x512",
+      size: "1024x1024",
     });
     let images = await imageNodes(page);
     assert.equal(images.length, 1);
     assert.equal(images[0].w, 96);
     assert.equal(images[0].h, 64);
-    assert.deepEqual(
-      Buffer.from(images[0].src.replace("data:image/png;base64,", ""), "base64"),
-      photo,
-    );
+    assert.match(images[0].src, /^data:image\//);
     assert.equal(
       (await page
         .locator(`#canvas [data-id="${images[0].id}"] img, #canvas [data-id="${images[0].id}"]`)
@@ -158,7 +217,7 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     const secure = settings.secureStorage;
     if (secure) {
       assert.equal(settings.keyStorage, "keychain");
-      assert.ok(JSON.parse(file).key.length > 20, "ciphertext stored");
+      assert.ok(JSON.parse(file).keys.custom.length > 20, "ciphertext stored");
     } else assert.equal(settings.keyStorage, "session");
     const rendererState = await page.evaluate(
       () =>
@@ -170,35 +229,67 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
 
     // Provider errors are surfaced without the key.
     await page.evaluate((k) => window.desktop.imageProvider.set({ apiKey: k }), WRONG);
-    await page.locator("#generate-run").click();
-    await page.waitForFunction(
-      () => /401/.test(document.getElementById("generate-status").textContent),
-      null,
-      { timeout: 20000 },
-    );
-    const errorText = await page.locator("#generate-status").textContent();
+    const failed = await generateFromChat("A foggy harbour at sunrise, 35mm photo");
+    assert.equal(failed.ok, false);
+    const errorText = failed.text;
+    assert.match(errorText, /401/);
     assert.match(errorText, /check the API key/);
     assert.doesNotMatch(errorText, new RegExp(WRONG));
     await page.evaluate((k) => window.desktop.imageProvider.set({ apiKey: k }), KEY);
-    await page.locator("#generate-close").click();
     await app.close();
+    await fs.rm(path.join(dir, "mcp.json"), { force: true });
+    mcpCalls = 0;
 
-    // Relaunch: the saved provider and (keychain) key are reused without re-entering them.
+    // A legacy disk record migrates on relaunch, preserving its custom configuration.
+    const stored = JSON.parse(await fs.readFile(path.join(dir, "image-provider.json"), "utf8"));
+    await fs.writeFile(
+      path.join(dir, "image-provider.json"),
+      JSON.stringify({
+        ...stored.custom,
+        ...(stored.keys.custom ? { key: stored.keys.custom } : {}),
+      }),
+    );
+    // Relaunch: the saved provider and (safeStorage) key are reused without re-entering them.
     ({ app, page } = await launch());
     if (secure) {
-      await openDialog(page);
-      assert.equal(await page.locator("#image-base-url").inputValue(), base + "/v1");
-      assert.match(await page.locator("#image-api-key").getAttribute("placeholder"), /Saved/);
-      await page.locator("#generate-prompt").fill("Second photo");
-      await page.locator("#generate-run").click();
-      await page.waitForFunction(
-        () => /Image inserted/.test(document.getElementById("generate-status").textContent),
-        null,
-        { timeout: 20000 },
-      );
+      const reused = await page.evaluate(() => window.desktop.imageProvider.get());
+      assert.equal(reused.custom.baseURL, base + "/v1");
+      assert.equal(reused.keys.custom.hasKey, true);
+      const second = await generateFromChat("Second photo");
+      assert.ok(second.ok, second.text);
       assert.equal(requests.at(-1).auth, "Bearer " + KEY);
-      await page.locator("#generate-close").click();
     }
+    const migrated = await page.evaluate(() => window.desktop.imageProvider.get());
+    assert.equal(migrated.defaultProvider, "custom");
+    assert.equal(
+      JSON.parse(await fs.readFile(path.join(dir, "image-provider.json"), "utf8")).version,
+      2,
+    );
+    await page.evaluate(
+      (k) =>
+        window.desktop.imageProvider.set({
+          vendor: "google",
+          apiKey: k,
+          defaultProvider: "nano_banana_lite",
+        }),
+      KEY,
+    );
+    const generated = await page.evaluate(() =>
+      window.desktop.imageProvider.generate({ prompt: "Google default" }),
+    );
+    assert.equal(generated.model, "gemini-3.1-flash-lite-image");
+    assert.match(requests.at(-1).url, /gemini-3.1-flash-lite-image:generateContent/);
+    const override = await page.evaluate(() =>
+      window.desktop.imageProvider.generate({ prompt: "Override", provider: "nano_banana" }),
+    );
+    assert.equal(override.model, "gemini-nano-banana-2.1");
+    assert.equal(
+      (await page.evaluate(() => window.desktop.imageProvider.get())).defaultProvider,
+      "nano_banana_lite",
+    );
+    await page.evaluate(() =>
+      window.desktop.imageProvider.set({ vendor: "google", clearKey: true }),
+    );
     // Generic HTTP provider returning raw PNG bytes; removing the key stops sending it.
     await page.evaluate(
       (url) =>
@@ -206,21 +297,15 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
           provider: "http",
           baseURL: url,
           model: "local-diffusion",
+          size: "1024x1536",
           clearKey: true,
         }),
       base + "/generate",
     );
     assert.equal((await page.evaluate(() => window.desktop.imageProvider.get())).hasKey, false);
     assert.doesNotMatch(await fs.readFile(path.join(dir, "image-provider.json"), "utf8"), /"key"/);
-    await openDialog(page);
-    await page.locator("#generate-prompt").fill("Studio product shot of a green ceramic mug");
-    await page.locator("#image-size").selectOption("1024x1536");
-    await page.locator("#generate-run").click();
-    await page.waitForFunction(
-      () => /Image inserted \(40×30/.test(document.getElementById("generate-status").textContent),
-      null,
-      { timeout: 20000 },
-    );
+    const mug = await generateFromChat("Studio product shot of a green ceramic mug");
+    assert.ok(mug.ok, mug.text);
     const last = requests.at(-1);
     assert.equal(last.url, "/generate");
     assert.equal(last.auth, "");
@@ -232,16 +317,59 @@ const WRONG = "sk-wrong-fixture-key-55aa11";
     });
     images = await imageNodes(page);
     assert.ok(
-      images.some(
-        (n) =>
-          n.src === "data:image/png;base64," + generic.toString("base64") &&
-          n.w === 40 &&
-          n.h === 30,
-      ),
+      images.some((n) => String(n.src).startsWith("data:image/") && n.w === 40 && n.h === 30),
     );
+    const service = await app.evaluate(
+      async ({ app }, { modulePath, used }) => {
+        const { imageGenerator } = process.mainModule.require(modulePath);
+        const saved = await imageGenerator.get();
+        await imageGenerator.set({
+          custom: { ...saved.custom, baseURL: saved.custom.baseURL.replace("/generate", "/slow") },
+        });
+        const first = imageGenerator.generate({ prompt: "Cancel caller A" }, "caller-a").then(
+          () => "ok",
+          (e) => e.message,
+        );
+        const second = imageGenerator.generate({ prompt: "Keep caller B" }, "caller-b");
+        setTimeout(() => imageGenerator.cancel("caller-a"), 100);
+        const cancelled = await first;
+        const kept = await second;
+        await imageGenerator.set({ custom: saved.custom });
+        // Chat calls above already used part of this launch's hourly MCP budget.
+        for (let i = used; i < 5; i++)
+          await imageGenerator.generate({ prompt: "Rate limit fixture" });
+        const limited = await imageGenerator.generate({ prompt: "Must not spend" }).then(
+          () => "ok",
+          (e) => e.message,
+        );
+        await imageGenerator.set({ vendor: "google", clearKey: true });
+        const descriptor = Object.getOwnPropertyDescriptor(app, "isPackaged");
+        const override = process.env.VERYNIZE_TEST_IMAGE_GOOGLE_URL;
+        let packaged;
+        try {
+          Object.defineProperty(app, "isPackaged", { value: true, configurable: true });
+          process.env.VERYNIZE_TEST_IMAGE_GOOGLE_URL = "invalid-test-override";
+          packaged = await imageGenerator
+            .generate({ provider: "nano_banana_lite", prompt: "No key" }, "packaged-test")
+            .then(
+              () => "ok",
+              (e) => e.message,
+            );
+        } finally {
+          Object.defineProperty(app, "isPackaged", descriptor);
+          process.env.VERYNIZE_TEST_IMAGE_GOOGLE_URL = override;
+        }
+        return { cancelled, width: kept.width, limited, packaged };
+      },
+      { modulePath: path.resolve("desktop/generate.cjs"), used: mcpCalls },
+    );
+    assert.match(service.cancelled, /canceled/);
+    assert.equal(service.width, 40);
+    assert.match(service.limited, /5 attempts per hour/);
+    assert.match(service.packaged, /Add an API key for Google/);
     assert.doesNotMatch(logs, new RegExp(KEY + "|" + WRONG), "API keys never logged");
     console.log(
-      `PASS image model providers: OpenAI-compatible + generic HTTP fixtures, real PNG inserted as layers, key in ${secure ? "keychain (safeStorage) across relaunch" : "session memory"}, never returned/logged/plain-stored, redacted errors`,
+      `PASS image model providers: OpenAI-compatible + generic HTTP fixtures, real PNG inserted as layers from chat (MCP), key in ${secure ? (process.platform === "darwin" ? "mock keychain (safeStorage) across relaunch" : "safeStorage across relaunch") : "session memory"}, never returned/logged/plain-stored, redacted errors`,
     );
   } finally {
     await app.close().catch(() => {});

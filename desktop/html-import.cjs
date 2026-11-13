@@ -6,7 +6,7 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const { pathToFileURL } = require("node:url");
 
-const HTML_LIMIT = 5 * 1024 * 1024;
+const HTML_LIMIT = 5_000_000;
 const codec = () =>
   import(pathToFileURL(path.join(__dirname, "../integrations/codec-html.mjs")).href);
 
@@ -34,6 +34,7 @@ function importOptions(options = {}) {
     document: options.document,
     pageId: typeof options.pageId === "string" ? options.pageId : undefined,
     allowRemote: options.allowRemote === true,
+    assetSink: async (bytes, type) => (await require("./assets.cjs").store()).put(bytes, type),
   };
 }
 const summary = (result) => ({
@@ -47,7 +48,7 @@ const summary = (result) => ({
 async function importSource(options = {}) {
   const html = options.html;
   if (typeof html !== "string" || !html.trim()) throw Error("Paste some HTML to import");
-  if (Buffer.byteLength(html) > HTML_LIMIT) throw Error("HTML must be under 5 MB");
+  if (Buffer.byteLength(html) > HTML_LIMIT) throw Error("HTML source exceeds limit 5000000 bytes");
   let baseUrl;
   if (typeof options.baseUrl === "string" && options.baseUrl.trim()) {
     const url = new URL(options.baseUrl.trim());
@@ -60,7 +61,8 @@ async function importSource(options = {}) {
 
 async function importFile(file, options = {}) {
   const stat = await fs.stat(file);
-  if (!stat.isFile() || stat.size > HTML_LIMIT) throw Error("Choose an HTML file under 5 MB");
+  if (!stat.isFile()) throw Error("Choose an HTML file");
+  if (stat.size > HTML_LIMIT) throw Error("HTML source exceeds limit 5000000 bytes");
   const { importHtml } = await codec();
   // Local stylesheets and images resolve relative to the file and must stay inside its folder.
   const result = await importHtml(await fs.readFile(file, "utf8"), {
@@ -68,7 +70,7 @@ async function importFile(file, options = {}) {
     baseUrl: file,
     root: path.dirname(file),
     allowFiles: true,
-    name: path.basename(file).replace(/\.html?$/i, ""),
+    fallbackName: path.basename(file).replace(/\.html?$/i, ""),
   });
   return { ...summary(result), file: path.basename(file) };
 }

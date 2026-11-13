@@ -115,17 +115,23 @@ export const nearestWeight = (weights: number[], weight: number) =>
   [...weights].sort((a, b) => Math.abs(a - weight) - Math.abs(b - weight) || b - a)[0] ?? weight;
 
 const previewed = new Set<string>();
-/** Load a web font's 400 face for previews (no-op for local/system fonts and outside the desktop app). */
-export async function previewFont(font: FontEntry) {
-  if (font.kind !== "web" || previewed.has(font.family)) return;
-  previewed.add(font.family);
+/**
+ * Load the 400 face of each web font for previews, in one `desktop.fontFaces` call (it takes up to 40 families).
+ * No-op for local/system fonts and outside the desktop app; resolves once the CSS is in the page.
+ */
+export async function previewFonts(fonts: FontEntry[]) {
+  const wanted = fonts.filter((f) => f.kind === "web" && !previewed.has(f.family)).slice(0, 40);
   const fontFaces = desktop()?.fontFaces;
-  if (!fontFaces) return;
+  if (!wanted.length || !fontFaces) return;
+  for (const f of wanted) previewed.add(f.family);
   try {
-    const weight = nearestWeight(font.weights, 400);
-    const { css } = await fontFaces([
-      { family: font.family, weights: [weight], styles: ["normal"] },
-    ]);
+    const { css } = await fontFaces(
+      wanted.map((f) => ({
+        family: f.family,
+        weights: [nearestWeight(f.weights, 400)],
+        styles: ["normal"],
+      })),
+    );
     if (!css) return;
     let style = document.getElementById("bd-font-previews");
     if (!style) {
@@ -135,6 +141,8 @@ export async function previewFont(font: FontEntry) {
     }
     style.append(document.createTextNode(css + "\n"));
   } catch {
-    previewed.delete(font.family);
+    for (const f of wanted) previewed.delete(f.family);
   }
 }
+/** Load one web font's preview face (the highlighted row). */
+export const previewFont = (font: FontEntry) => previewFonts([font]);

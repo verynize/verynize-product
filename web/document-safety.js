@@ -113,7 +113,8 @@
     document.body.append(stack);
     return stack;
   }
-  function notify({ key, kind, title, detail, items = [], text, name, onExport }) {
+  /** @param {{key: any, kind: any, title: any, detail: any, items?: any[], text?: any, name?: any, onExport?: any, action?: any}} notice */
+  function notify({ key, kind, title, detail, items = [], text, name, onExport, action }) {
     if (dismissed.has(key)) return null;
     const add = () => {
       const stack = host();
@@ -152,6 +153,13 @@
       }
       const actions = document.createElement("div");
       actions.style.cssText = "display:flex;gap:8px;justify-content:flex-end";
+      if (action) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = action.label;
+        button.onclick = action.run;
+        actions.append(button);
+      }
       if (text) {
         const save = document.createElement("button");
         save.type = "button";
@@ -230,16 +238,18 @@
   function load(d) {
     const ctx = sources[sources.length - 1] || {},
       repairs = [];
+    if (ctx.source === "library" && window.switchCache?.isTrustedLocal(d))
+      return structuredClone(d);
     let prepared;
     try {
-      prepared = core.prepareDocument(structuredClone(d), defaults, repairs);
+      prepared = window.VerynizeLazyDocument.prepare(structuredClone(d), defaults, repairs);
     } catch (error) {
       error.problems = failure(error, d).count;
       throw error;
     }
     if (repairs.length) {
       if (ctx.backup)
-        backup(JSON.stringify(d), {
+        void backup(JSON.stringify(d), {
           source: ctx.source,
           reason: "repaired",
           name: nameOf(d),
@@ -258,9 +268,9 @@
     }
     const repairs = [];
     try {
-      const prepared = core.prepareDocument(structuredClone(raw), defaults, repairs);
+      const prepared = window.VerynizeLazyDocument.prepare(structuredClone(raw), defaults, repairs);
       if (repairs.length) {
-        backup(text, {
+        void backup(text, {
           source: "startup",
           reason: "repaired",
           name: nameOf(raw),
@@ -287,7 +297,7 @@
       onExport: () => (startup.exported = true),
     });
     const box = () => document.querySelector(`#document-notices [data-key="${CSS.escape(f.key)}"]`);
-    backup(text, {
+    void backup(text, {
       source: "startup",
       reason: "invalid",
       name: nameOf(raw),
@@ -306,6 +316,29 @@
   }
 
   window.documentSafety = {
+    editRejected(detail) {
+      notify({
+        key: "world-bounds-edit",
+        kind: "advisory",
+        title: "Edit exceeds world bounds",
+        detail,
+      });
+    },
+    worldBounds(page, recenter) {
+      const key = "world-bounds";
+      if (!core.pageWorldBounds(page).advisory) {
+        document.querySelector(`[data-key="${key}"]`)?.remove();
+        dismissed.delete(key);
+        return;
+      }
+      notify({
+        key,
+        kind: "advisory",
+        title: "Content is far from the origin",
+        detail: "This page extends beyond ±100,000 world px. Recenter it to keep editing precise.",
+        action: { label: "Recenter page", run: recenter },
+      });
+    },
     configure(canvasDefaults) {
       defaults = canvasDefaults;
     },
@@ -324,7 +357,11 @@
       if (checked.has(d)) return checked.get(d);
       let result = null;
       try {
-        core.prepareDocument(structuredClone(d), defaults, []);
+        try {
+          core.validateDocument(d);
+        } catch {
+          core.prepareDocument(structuredClone(d), defaults, []);
+        }
       } catch (error) {
         const f = failure(error, d);
         result = { error: f.error, count: f.count };

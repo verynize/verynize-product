@@ -32,7 +32,9 @@ import {
   signedInContext,
   startProcess,
   freePort,
+  openStarterFile,
 } from "./helpers/web-app.mjs";
+import { checkDeferredHome } from "./helpers/web-home-boot.mjs";
 import { checkWebRouter } from "./helpers/web-router.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
@@ -197,6 +199,20 @@ async function checkApp(origin, mode) {
     assert.doesNotMatch(await response.text(), /import |export /, route);
   }
   assert.equal((await get("/style.css")).status, 200);
+  if (mode === "preview") {
+    // The build's `_headers`: content-hashed assets are immutable, fixed names revalidate.
+    const hashed = (await (await get("/")).text()).match(/\/assets\/[\w.-]+-[\w-]{8}\.js/)?.[0];
+    assert.ok(hashed, "the page loads a hashed asset");
+    const cacheControl = async (route) => {
+      const response = await get(route);
+      assert.equal(response.status, 200, route);
+      return response.headers.get("cache-control") || "";
+    };
+    assert.equal(await cacheControl(hashed), "public, max-age=31536000, immutable");
+    for (const route of ["/app.js", "/style.css", "/assets/fonts/inter-latin-400-normal.woff2"])
+      assert.doesNotMatch(await cacheControl(route), /immutable/, route);
+    assert.notEqual((await get("/_headers")).status, 200, "_headers is configuration, not a file");
+  }
   assert.equal((await get("/dist/ui.js")).status, 200);
   assert.equal((await get("/storage-migration.html")).status, 404);
   const legacyIndex = await get("/index.html?x=1");
@@ -220,6 +236,7 @@ async function checkApp(origin, mode) {
   const session = signedIn.headers.get("set-auth-token");
   const me = await (await get("/api/me", { headers: { "x-verynize-session": session } })).json();
   assert.equal(me.account.email, EMAIL);
+  await checkDeferredHome(browser, origin, { session, account: me.account }, mode);
 
   // ---- signed out: the sign-in screen at the requested address, with the invite fragment ----
   const anonymous = await browser.newContext({ viewport });
@@ -329,7 +346,13 @@ async function checkApp(origin, mode) {
     timeout: 20000,
   });
   await page.waitForFunction(() => window.shellRouter?.state.status === "idle");
-  assert.equal(await page.evaluate(() => window.shellRouter.state.location.pathname), "/editor");
+  // No file of its own: a fresh profile lands on Files until the user opens or makes one.
+  await page.waitForFunction(() => location.pathname === "/" && !window.fileLibrary.currentId);
+  await openStarterFile(page);
+  assert.equal(
+    await page.evaluate(() => window.shellRouter.state.location.pathname),
+    await page.evaluate(() => "/editor/" + encodeURIComponent(window.fileLibrary.currentId)),
+  );
   assert.equal(await page.evaluate(() => document.body.classList.contains("files-view")), false);
   // Legacy markup sits directly in <body>, before Start's nodes, and the scripts ran in order.
   assert.equal(
@@ -356,12 +379,27 @@ async function checkApp(origin, mode) {
 
   // Shell navigation keeps the editor mounted (one boot, same layers) and moves the URL.
   await page.evaluate(() => window.shellRouter.navigate({ to: "/" }));
-  await page.waitForFunction(
-    () => location.pathname === "/" && document.body.classList.contains("files-view"),
-  );
+  await page
+    .waitForFunction(
+      () => location.pathname === "/" && document.body.classList.contains("files-view"),
+    )
+    .catch(async (error) => {
+      console.error(
+        "Files route state",
+        await page.evaluate(() => ({
+          path: location.pathname,
+          classes: document.body.className,
+          active: window.fileLibrary.currentId,
+          route: window.shellRouter.state.location.pathname,
+        })),
+      );
+      throw error;
+    });
   await page.goBack();
   await page.waitForFunction(
-    () => location.pathname === "/editor" && !document.body.classList.contains("files-view"),
+    () =>
+      location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId) &&
+      !document.body.classList.contains("files-view"),
   );
   assert.equal(await layers(), before + 1);
 
@@ -487,7 +525,9 @@ async function checkLinks(engine, origin, { session, me, viewport, mode, label }
     timeout: 30000,
   });
   await page.waitForFunction(
-    () => location.pathname === "/editor" && !document.body.classList.contains("files-view"),
+    () =>
+      location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId) &&
+      !document.body.classList.contains("files-view"),
   );
   assert.equal(await page.evaluate(() => window.design.getDocument().name), `Linked ${label}`);
   assert.equal(await page.evaluate(() => location.hash), `#room=${owned.id}`);
@@ -499,6 +539,10 @@ async function checkLinks(engine, origin, { session, me, viewport, mode, label }
   await page.waitForFunction((id) => window.cloudWorkspace?.room()?.id === id, owned.id, {
     timeout: 30000,
   });
+  // Let the router settle on the editor address first: its history update would abort the next goto.
+  await page.waitForFunction(
+    () => location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId),
+  );
 
   // No access: the screen, then Back to files.
   await page.goto(`${origin}/#room=${stranger.id}`);

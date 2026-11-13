@@ -17,7 +17,9 @@ import { defaultFillPreset, isParam } from "./shader-library";
  * layer's glyphs. Shader layers are shaders already; a Text Fill (the glyphs) cannot be a shader.
  */
 export const shaderModeApplies = (node: Node, target: PaintTarget) =>
-  target === "backgroundFills" ? node.type === "text" : node.type !== "text" && node.type !== "shader";
+  target === "backgroundFills"
+    ? node.type === "text"
+    : node.type !== "text" && node.type !== "shader";
 
 /** Turn Shader mode on or off for every selected layer it applies to (one undo step). */
 export function setShaderMode(selection: string[], target: PaintTarget, on: boolean) {
@@ -33,7 +35,12 @@ export function setShaderMode(selection: string[], target: PaintTarget, on: bool
       animated: "",
       ...(keep || !preset
         ? {}
-        : { shaderPreset: preset.id, shaderSpeed: preset.defaults.speed, shaderColors: undefined, shaderParams: undefined }),
+        : {
+            shaderPreset: preset.id,
+            shaderSpeed: preset.defaults.speed,
+            shaderColors: undefined,
+            shaderParams: undefined,
+          }),
     };
   });
 }

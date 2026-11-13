@@ -1,0 +1,62 @@
+{
+  "files-cache-disabled.json": {
+    "first10sResourceCount": 87,
+    "transferBytes": 3450240,
+    "decodedBytes": 20214515,
+    "js": {
+      "count": 56,
+      "encoded": 1056086,
+      "decoded": 3454820
+    },
+    "css": {
+      "count": 12,
+      "encoded": 65511,
+      "decoded": 337097
+    }
+  },
+  "files-warm.json": {
+    "first10sResourceCount": 84,
+    "transferBytes": 1697079,
+    "decodedBytes": 16126083,
+    "js": {
+      "count": 56,
+      "encoded": 1056086,
+      "decoded": 3454820
+    },
+    "css": {
+      "count": 12,
+      "encoded": 65511,
+      "decoded": 337097
+    }
+  },
+  "audit-cache-disabled.json": {
+    "first10sResourceCount": 10,
+    "transferBytes": 2250660,
+    "decodedBytes": 19386169,
+    "js": {
+      "count": 1,
+      "encoded": 283,
+      "decoded": 447
+    },
+    "css": {
+      "count": 0,
+      "encoded": 0,
+      "decoded": 0
+    }
+  },
+  "spaces-cache-disabled.json": {
+    "first10sResourceCount": 32,
+    "transferBytes": 3655708,
+    "decodedBytes": 16964348,
+    "js": {
+      "count": 1,
+      "encoded": 283,
+      "decoded": 447
+    },
+    "css": {
+      "count": 0,
+      "encoded": 0,
+      "decoded": 0
+    }
+  }
+}

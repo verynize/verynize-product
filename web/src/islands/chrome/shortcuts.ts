@@ -15,6 +15,7 @@ export const SECTION_ORDER = [
   "SELECTION",
   "VIEW",
   "TRANSFORM",
+  "COMPONENTS",
   "SHAPE",
   "ALIGNMENT",
   "MOVEMENT",
@@ -28,6 +29,7 @@ const REGISTRY_SECTION: Record<string, string> = {
   Selection: "SELECTION",
   View: "VIEW",
   Transform: "TRANSFORM",
+  Components: "COMPONENTS",
   Shape: "SHAPE",
   Alignment: "ALIGNMENT",
   Pages: "PAGES",
@@ -93,6 +95,7 @@ const ENTRIES: Record<(typeof SECTION_ORDER)[number], Entry[]> = {
     { command: "tool.ellipse", label: "Ellipse tool" },
   ],
   EDIT: [
+    { id: "app.findLayers", label: "Find layers", chips: [mod, "F"] },
     { command: "edit.copy", label: "Copy" },
     { command: "edit.copyCode", label: "Copy as code" },
     { command: "edit.copyStyle", label: "Copy styles" },
@@ -143,6 +146,10 @@ const ENTRIES: Record<(typeof SECTION_ORDER)[number], Entry[]> = {
     { command: "arrange.front", label: "Bring to front" },
     { command: "transform.rotate90", label: "Rotate 90° right" },
     { command: "transform.rotate90ccw", label: "Rotate 90° left" },
+  ],
+  COMPONENTS: [
+    { command: "component.create", label: "Create component" },
+    { command: "component.detach", label: "Detach instance" },
   ],
   SHAPE: [],
   ALIGNMENT: [
@@ -241,8 +248,13 @@ export function registryCommands(): RegistryCommand[] {
 }
 
 /* ---------- Open state for the drawer and the palette (shared by the help menu, ⌘K and the palette) ---------- */
-type Panel = "shortcuts" | "palette" | "files";
-const state: Record<Panel, boolean> = { shortcuts: false, palette: false, files: false };
+type Panel = "shortcuts" | "palette" | "files" | "find";
+const state: Record<Panel, boolean> = {
+  shortcuts: false,
+  palette: false,
+  files: false,
+  find: false,
+};
 const listeners = new Set<() => void>();
 export function setPanelOpen(panel: Panel, open: boolean) {
   if (state[panel] === open) return;

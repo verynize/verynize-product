@@ -246,7 +246,7 @@ async function corsProxy(target) {
       up.write(
         `${req.method} ${req.url} HTTP/1.1\r\n` +
           Object.entries(req.headers)
-            .map(([k, v]) => `${k}: ${v}`)
+            .map(([k, v]) => `${k}: ${String(v)}`)
             .join("\r\n") +
           "\r\n\r\n",
       );

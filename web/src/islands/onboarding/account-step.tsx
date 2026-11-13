@@ -29,7 +29,7 @@ export function AccountStep({
   intro = "Share designs, edit together and work in team workspaces. Everything else works offline too.",
   footer,
 }: {
-  onDone(): void;
+  onDone: () => void;
   api?: AccountFormApi | null;
   /** Show the server and let the user change it (desktop). */
   serverEditable?: boolean;

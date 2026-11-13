@@ -3,7 +3,14 @@
 // web/node-style.js (effectsOf / validateEffects), so the canvas, HTML export and JSX codec agree.
 import { useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { Check, Droplet, Eye, Unlink } from "lucide-react";
-import { ClosedEyeIcon, OutlineOffsetIcon, PlusIcon, RemoveIcon, SlidersIcon, StrokeWeightIcon } from "@/components/icons";
+import {
+  ClosedEyeIcon,
+  OutlineOffsetIcon,
+  PlusIcon,
+  RemoveIcon,
+  SlidersIcon,
+  StrokeWeightIcon,
+} from "@/components/icons";
 import { type DesignDocument } from "@/lib/bridge";
 import { cn } from "@/lib/utils";
 import {
@@ -319,7 +326,8 @@ export function EffectColorField({
               className="w-6.5 shrink-0 text-right"
               onCommit={(raw) => {
                 const next = withAlpha(value, Number(raw));
-                if (!next || !raw.trim() || !Number.isFinite(Number(raw))) return "Enter a percentage";
+                if (!next || !raw.trim() || !Number.isFinite(Number(raw)))
+                  return "Enter a percentage";
                 onCommit(next);
               }}
             />

@@ -8,6 +8,8 @@
 //                                                      integrations/figma-kiwi.mjs + figma-scene.mjs)
 //   - File:      figmaFile({bytes}) / figmaFileOpen()   a .fig file (zip with canvas.fig + images, or bare archive)
 // OAuth account connection lives in desktop/figma-oauth.cjs.
+require("../web/document-core.js");
+const { NODE_LIMITS } = globalThis.VerynizeDocument;
 const { randomUUID } = require("node:crypto");
 const fs = require("node:fs/promises");
 require("../web/node-style.js");
@@ -363,7 +365,10 @@ function convertFigma(payload, { nodeId = null, images = {} } = {}) {
     function walk(source, parent = null, depth = 0) {
       if (source.visible === false) return;
       if (depth > 80) throw Error("Figma hierarchy exceeds 80 levels");
-      if (++count > 5000) throw Error("Import exceeds 5,000 layers; select a smaller node");
+      if (++count > NODE_LIMITS.perDocument)
+        throw Error(
+          `Figma import visited ${count} source nodes; limit is ${NODE_LIMITS.perDocument}. Select fewer pages or split into multiple documents.`,
+        );
       const bounds = source.absoluteBoundingBox;
       if (!bounds && !source.children?.length) {
         warn(source, "No drawable bounds; skipped");
@@ -810,8 +815,11 @@ function imageReferences(payload, nodeId) {
   let count = 0;
   function walk(n, depth = 0) {
     if (!n || n.visible === false) return;
-    if (depth > 80 || ++count > 10000)
-      throw Error("Figma document too large; select a smaller node");
+    if (depth > 80) throw Error("Figma hierarchy exceeds 80 levels; select a smaller node");
+    if (++count > NODE_LIMITS.perDocument)
+      throw Error(
+        `Figma import visited ${count} source nodes; limit is ${NODE_LIMITS.perDocument}. Select fewer pages or split into multiple documents.`,
+      );
     for (const p of visibleFills(n))
       if (p.type === "IMAGE" && typeof p.imageRef === "string") refs.add(p.imageRef);
     for (const child of n.children || []) walk(child, depth + 1);
@@ -1013,8 +1021,21 @@ function convertFigFile(bytes, { name } = {}) {
     name: name || decoded.meta?.file_name || undefined,
   });
 }
-const PEN_MESSAGE =
-  ".pen files are encrypted by their vendor and can only be opened with the vendor's own tools. Export the design to another format (for example SVG or PNG) and import that instead.";
+async function convertPenFile(bytes, name) {
+  const { importPen } = await import("../integrations/codec-pen.mjs");
+  const result = await importPen(Buffer.from(bytes), {
+    name: name?.replace(/\.pen$/i, ""),
+    assetSink: async (data, type) => (await require("./assets.cjs").store()).put(data, type),
+  });
+  return {
+    document: result.document,
+    warnings: result.unsupportedFeatures.map(
+      (item) => `Pen ${item.sourceId || "document"}: unsupported ${item.feature}`,
+    ),
+    source: { format: result.sourceFormat, digest: result.sourceDigest },
+    fidelityStatus: result.fidelityStatus,
+  };
+}
 function registerFigma(handle, parent, { dialog } = {}) {
   handle("importFigma", async (options) => {
     let bearer;
@@ -1026,7 +1047,7 @@ function registerFigma(handle, parent, { dialog } = {}) {
   });
   handle("figmaClipboard", (html) => convertFigmaClipboard(html));
   handle("figmaFile", ({ bytes, name } = {}) => {
-    if (typeof name === "string" && /\.pen$/i.test(name)) throw Error(PEN_MESSAGE);
+    if (typeof name === "string" && /\.pen$/i.test(name)) return convertPenFile(bytes, name);
     return convertFigFile(bytes, {
       name: typeof name === "string" ? name.replace(/\.fig$/i, "").slice(0, 200) : undefined,
     });
@@ -1036,15 +1057,18 @@ function registerFigma(handle, parent, { dialog } = {}) {
     const picked = await electron.showOpenDialog(parent, {
       title: "Import Figma file",
       properties: ["openFile"],
-      filters: [{ name: "Figma file", extensions: ["fig"] }],
+      filters: [{ name: "Design file", extensions: ["fig", "pen"] }],
     });
     if (picked.canceled || !picked.filePaths[0]) return null;
     const file = picked.filePaths[0];
     const stat = await fs.stat(file);
     if (!stat.isFile() || stat.size > FILE_LIMIT) throw Error("Choose a .fig file under 200 MB");
+    if (/\.pen$/i.test(file) && stat.size > 5_000_000)
+      throw Error("Pen source exceeds limit 5000000 bytes");
     const name = require("node:path")
       .basename(file)
       .replace(/\.fig$/i, "");
+    if (/\.pen$/i.test(file)) return convertPenFile(await fs.readFile(file), name);
     return convertFigFile(await fs.readFile(file), { name });
   });
 }
@@ -1056,5 +1080,5 @@ module.exports = {
   convertFigFile,
   parseFigmaURL,
   vectorSvg,
-  PEN_MESSAGE,
+  convertPenFile,
 };

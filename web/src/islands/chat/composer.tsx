@@ -63,30 +63,66 @@ const Mark = ({ agent }: { agent: string }) =>
   ) : (
     <CodexMark />
   );
-const agentLabel = (agent: string) => (agent === "claude" ? "Claude" : agent === MODEL_API ? "OpenRouter" : "Codex");
+const agentLabel = (agent: string) =>
+  agent === "claude" ? "Claude" : agent === MODEL_API ? "OpenRouter" : "Codex";
 
 const ACCESS = [
-  { value: "ask", label: "Ask", title: "Ask", hint: "Asks before edits and commands.", Icon: HandIcon },
-  { value: "edit", label: "Edit", title: "Edit automatically", hint: "Edits freely; asks before commands.", Icon: PencilIcon },
-  { value: "auto", label: "Auto", title: "Auto", hint: "Asks only about risky actions.", Icon: NavigationIcon },
-  { value: "full", label: "Full access", title: "Full access", hint: "Edits and runs without asking.", Icon: LockOpenIcon },
+  {
+    value: "ask",
+    label: "Ask",
+    title: "Ask",
+    hint: "Asks before edits and commands.",
+    Icon: HandIcon,
+  },
+  {
+    value: "edit",
+    label: "Edit",
+    title: "Edit automatically",
+    hint: "Edits freely; asks before commands.",
+    Icon: PencilIcon,
+  },
+  {
+    value: "auto",
+    label: "Auto",
+    title: "Auto",
+    hint: "Asks only about risky actions.",
+    Icon: NavigationIcon,
+  },
+  {
+    value: "full",
+    label: "Full access",
+    title: "Full access",
+    hint: "Edits and runs without asking.",
+    Icon: LockOpenIcon,
+  },
 ] as const;
 const EFFORTS = ["", "low", "medium", "high", "xhigh", "max"];
-const effortLabel = (value: string) => (value ? value[0].toUpperCase() + value.slice(1) : "Default");
+const effortLabel = (value: string) =>
+  value ? value[0].toUpperCase() + value.slice(1) : "Default";
 const AGENTS = [
   { id: "claude", label: "Claude" },
   { id: "codex", label: "Codex" },
 ];
 
 /* ---------- Model picker (30). Trigger is `.agent-config summary` (test contract). ---------- */
-function ModelMenu({ state, open, onOpenChange }: { state: ChatState; open: boolean; onOpenChange: (open: boolean) => void }) {
+function ModelMenu({
+  state,
+  open,
+  onOpenChange,
+}: {
+  state: ChatState;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
   const { agent, model, effort } = state.defaults;
   const claude = useModels("claude", !WEB && open && agentAvailable("claude"));
   const codex = useModels("codex", !WEB && open && agentAvailable("codex"));
   const modelApi = useModels(MODEL_API, WEB && open && agentAvailable(MODEL_API));
   const lists: Record<string, AgentModel[]> = { claude, codex, [MODEL_API]: modelApi };
   const providers = WEB ? [{ id: MODEL_API, label: "OpenRouter" }] : AGENTS;
-  const name = model ? (lists[agent]?.find((m) => m.id === model)?.name ?? model) : agentLabel(agent);
+  const name = model
+    ? (lists[agent]?.find((m) => m.id === model)?.name ?? model)
+    : agentLabel(agent);
   const choose = (next: Partial<ChatState["defaults"]>) => {
     const ws = workspace();
     if (ws) ws.setDefaults({ ...ws.getDefaults(), ...next });
@@ -120,7 +156,11 @@ function ModelMenu({ state, open, onOpenChange }: { state: ChatState; open: bool
               {i > 0 && <ChatMenuSeparator />}
               <ChatMenuLabel className="justify-between">
                 {WEB ? "Model API" : i === 0 ? "Agent model" : provider.label}
-                {!available && <span className="text-subtle-foreground">{WEB ? "Not available" : "Not installed"}</span>}
+                {!available && (
+                  <span className="text-subtle-foreground">
+                    {WEB ? "Not available" : "Not installed"}
+                  </span>
+                )}
               </ChatMenuLabel>
               <ChatMenuItem
                 disabled={!available}
@@ -147,33 +187,36 @@ function ModelMenu({ state, open, onOpenChange }: { state: ChatState; open: bool
         })}
         {/* The model API takes the server's model list only (VERYNIZE_AI_MODELS): no free-text id, no effort. */}
         <div className={cn("contents", WEB && "hidden")}>
-        <ChatMenuSeparator />
-        {/* Free-text model id: the legacy #agent-model input (datalist + change handler) adopted here. */}
-        <div
-          className="flex h-7 items-center gap-2 px-2"
-          onKeyDown={(event) => {
-            if (event.key !== "Escape") event.stopPropagation();
-          }}
-        >
-          <PlusIcon className="size-3.5 shrink-0 text-muted-foreground" />
-          <div ref={modelSlot} className="flex min-w-0 flex-1" />
-        </div>
-        <ChatMenuSeparator />
-        <ChatMenuSub>
-          <ChatMenuSubTrigger>
-            Effort
-            <span className="ml-auto text-muted-foreground">{effortLabel(effort)}</span>
-          </ChatMenuSubTrigger>
-          <ChatMenuSubContent className="w-36">
-            <ChatMenuRadioGroup value={effort} onValueChange={(value) => choose({ effort: value })}>
-              {EFFORTS.map((value) => (
-                <ChatMenuRadioItem key={value || "default"} value={value}>
-                  {effortLabel(value)}
-                </ChatMenuRadioItem>
-              ))}
-            </ChatMenuRadioGroup>
-          </ChatMenuSubContent>
-        </ChatMenuSub>
+          <ChatMenuSeparator />
+          {/* Free-text model id: the legacy #agent-model input (datalist + change handler) adopted here. */}
+          <div
+            className="flex h-7 items-center gap-2 px-2"
+            onKeyDown={(event) => {
+              if (event.key !== "Escape") event.stopPropagation();
+            }}
+          >
+            <PlusIcon className="size-3.5 shrink-0 text-muted-foreground" />
+            <div ref={modelSlot} className="flex min-w-0 flex-1" />
+          </div>
+          <ChatMenuSeparator />
+          <ChatMenuSub>
+            <ChatMenuSubTrigger>
+              Effort
+              <span className="ml-auto text-muted-foreground">{effortLabel(effort)}</span>
+            </ChatMenuSubTrigger>
+            <ChatMenuSubContent className="w-36">
+              <ChatMenuRadioGroup
+                value={effort}
+                onValueChange={(value) => choose({ effort: value })}
+              >
+                {EFFORTS.map((value) => (
+                  <ChatMenuRadioItem key={value || "default"} value={value}>
+                    {effortLabel(value)}
+                  </ChatMenuRadioItem>
+                ))}
+              </ChatMenuRadioGroup>
+            </ChatMenuSubContent>
+          </ChatMenuSub>
         </div>
       </ChatMenuContent>
     </ChatMenu>
@@ -233,12 +276,29 @@ function Chip({
   // Wonder's context chip (29, 51): 24px, bordered, raised fill. The remove button takes the icon's place on hover/focus,
   // so the chip never reserves blank space for it.
   return (
-    <span className={cn(hook.mention, "group/chip flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border bg-chat-chip-bg px-2 text-base leading-5.25 text-foreground-2")}>
+    <span
+      className={cn(
+        hook.mention,
+        "group/chip flex h-6 max-w-full items-center gap-1.5 rounded-md border border-chat-chip-border bg-chat-chip-bg px-2 text-base leading-5.25 text-foreground-2",
+      )}
+    >
       <span className="relative flex size-3.5 shrink-0 items-center justify-center">
-        <span className={cn("flex transition-opacity", removable && "group-hover/chip:opacity-0 group-has-focus-visible/chip:opacity-0")}>{icon}</span>
+        <span
+          className={cn(
+            "flex transition-opacity",
+            removable && "group-hover/chip:opacity-0 group-focus-within/chip:opacity-0",
+          )}
+        >
+          {icon}
+        </span>
         {removable && (
-          <span className="absolute inset-0 flex opacity-0 group-hover/chip:opacity-100 has-focus-visible:opacity-100">
-            <ChatIconButton size="xs" aria-label={`Remove ${label}`} onClick={onRemove} className="size-full">
+          <span className="absolute inset-0 flex opacity-0 group-hover/chip:opacity-100 focus-within:opacity-100">
+            <ChatIconButton
+              size="xs"
+              aria-label={`Remove ${label}`}
+              onClick={onRemove}
+              className="size-full"
+            >
               <XIcon className="size-3.5" />
             </ChatIconButton>
           </span>
@@ -310,7 +370,8 @@ export function Composer({ state }: { state: ChatState }) {
     // Backspace right after a command badge removes the whole command.
     const removeCommand = (event: KeyboardEvent) => {
       const caret = prompt.selectionStart;
-      if (event.key !== "Backspace" || event.defaultPrevented || caret !== prompt.selectionEnd) return;
+      if (event.key !== "Backspace" || event.defaultPrevented || caret !== prompt.selectionEnd)
+        return;
       const start = commandEndingAt(prompt.value, caret);
       if (start < 0) return;
       event.preventDefault();
@@ -320,7 +381,8 @@ export function Composer({ state }: { state: ChatState }) {
     // Enter sends (the default way while a turn runs), Shift+Enter adds a line, ⌘↵ sends the other way. The @ and /
     // lists take Enter first in the capture phase; IME composition keeps its own Enter.
     const enterSends = (event: KeyboardEvent) => {
-      if (event.key !== "Enter" || event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key !== "Enter" || event.shiftKey || event.metaKey || event.ctrlKey || event.altKey)
+        return;
       if (event.defaultPrevented || event.isComposing || event.keyCode === 229) return;
       event.preventDefault();
       if (prompt.value.trim()) document.getElementById("project-run")?.click();
@@ -384,8 +446,18 @@ export function Composer({ state }: { state: ChatState }) {
     // While a turn runs the arrow sends the follow-up the default way (Settings › Agents: Queue or Steer); ⌘↵ the other way.
     const run = document.getElementById("project-run");
     const steers = followUp === "steer";
-    run?.setAttribute("aria-label", state.busy ? (steers ? "Steer message" : "Queue message") : "Send");
-    run?.setAttribute("title", state.busy ? (steers ? "Send now to the running agent" : "Queue after the current turn") : "Send");
+    run?.setAttribute(
+      "aria-label",
+      state.busy ? (steers ? "Steer message" : "Queue message") : "Send",
+    );
+    run?.setAttribute(
+      "title",
+      state.busy
+        ? steers
+          ? "Send now to the running agent"
+          : "Queue after the current turn"
+        : "Send",
+    );
   }, [state, placeholder, followUp]);
 
   // Restore the saved draft when switching conversations (never over text the user is typing).
@@ -435,7 +507,8 @@ export function Composer({ state }: { state: ChatState }) {
         dragging && "border-ring",
       )}
       onClick={(event) => {
-        if (event.target === event.currentTarget) document.getElementById("project-prompt")?.focus();
+        if (event.target === event.currentTarget)
+          document.getElementById("project-prompt")?.focus();
       }}
       onDragEnter={(event) => {
         if (hasFiles(event)) setDragging(true);
@@ -452,7 +525,9 @@ export function Composer({ state }: { state: ChatState }) {
         if (!hasFiles(event)) return;
         event.preventDefault();
         setDragging(false);
-        const images = [...event.dataTransfer.files].filter((file) => file.type.startsWith("image/"));
+        const images = [...event.dataTransfer.files].filter((file) =>
+          file.type.startsWith("image/"),
+        );
         if (images.length) ws?.attachImages?.(images);
       }}
     >
@@ -470,16 +545,31 @@ export function Composer({ state }: { state: ChatState }) {
       <StylePicker />
       <WorkingDirectories state={state} />
       {(state.attachments.length > 0 || mentions.length > 0) && (
-        <div className={cn(hook.mentions, "flex flex-wrap gap-1.5 px-2 pt-2 pb-1.5")}>
+        <div
+          className={cn(
+            hook.mentions,
+            "flex max-h-32 flex-wrap gap-1.5 overflow-y-auto px-2 pt-2 pb-1.5",
+          )}
+        >
           {mentions.map((mention) => (
             <Chip
               key={mention.id}
               label={mention.label}
-              icon={mention.type ? <MentionIcon type={mention.type} /> : <CircleDotIcon className="size-3.5 text-muted-foreground" />}
+              icon={
+                mention.type ? (
+                  <MentionIcon type={mention.type} />
+                ) : (
+                  <CircleDotIcon className="size-3.5 text-muted-foreground" />
+                )
+              }
               onRemove={() => ws?.removeMention?.(mention.id)}
               removable={!!ws?.removeMention}
             >
-              {mention.type === "element" ? <span className="text-primary-text">{mention.label}</span> : mention.label}
+              {mention.type === "element" ? (
+                <span className="text-primary-text">{mention.label}</span>
+              ) : (
+                mention.label
+              )}
             </Chip>
           ))}
           {state.attachments.map((item, index) => (
@@ -514,9 +604,20 @@ export function Composer({ state }: { state: ChatState }) {
         )}
       </div>
       {!WEB && state.defaults.agent === "codex" && (
-        <div data-chat-plan="chatgpt" className="flex items-center justify-between gap-2 px-2.5 pb-1 text-xs text-muted-foreground">
+        <div
+          data-chat-plan="chatgpt"
+          className="flex items-center justify-between gap-2 px-2.5 pb-1 text-xs text-muted-foreground"
+        >
           <span>Using ChatGPT plan</span>
-          <button type="button" className="hover:text-foreground" onClick={() => void platform.desktop?.openExternal("https://chatgpt.com/settings/usage")}>Manage usage</button>
+          <button
+            type="button"
+            className="hover:text-foreground"
+            onClick={() =>
+              void platform.desktop?.openExternal("https://chatgpt.com/settings/usage")
+            }
+          >
+            Manage usage
+          </button>
         </div>
       )}
       <div className="flex h-7.5 items-center gap-0.5 px-1.5 pb-1.5">
@@ -532,9 +633,16 @@ export function Composer({ state }: { state: ChatState }) {
         {canSendOther && (
           <button
             type="button"
-            title={otherWay === "steer" ? "Send now to the running agent (⌘↵)" : "Queue after the current turn (⌘↵)"}
+            title={
+              otherWay === "steer"
+                ? "Send now to the running agent (⌘↵)"
+                : "Queue after the current turn (⌘↵)"
+            }
             onClick={sendOtherWay}
-            className={cn(hook.steer, "ml-1 flex h-6 items-center rounded-md bg-accent px-2 text-sm text-foreground hover:bg-row")}
+            className={cn(
+              hook.steer,
+              "ml-1 flex h-6 items-center rounded-md bg-accent px-2 text-sm text-foreground hover:bg-row",
+            )}
           >
             {otherWay === "steer" ? "Steer" : "Queue"}
           </button>
@@ -542,7 +650,11 @@ export function Composer({ state }: { state: ChatState }) {
         <span ref={cancelSlot} className={cn(hook.stopSlot, state.busy ? "ml-1 flex" : "hidden")} />
         <span
           ref={runSlot}
-          className={cn("ml-1 flex", state.busy && empty && "hidden", !state.busy && empty && "opacity-50")}
+          className={cn(
+            "ml-1 flex",
+            state.busy && empty && "hidden",
+            !state.busy && empty && "opacity-50",
+          )}
         />
       </div>
     </div>

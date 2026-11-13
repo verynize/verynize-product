@@ -15,3 +15,9 @@
 #page-loading[hidden] {
   display: none;
 }
+/* Preserve the unique status/offline text hook without hiding the outgoing canvas. */
+#workspace[data-switch-loading="page"] #page-loading {
+  background: transparent;
+  color: transparent;
+  pointer-events: none;
+}

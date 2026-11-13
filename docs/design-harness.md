@@ -6,18 +6,18 @@ How Verynize steers a coding agent (Claude or Codex) toward finished, intentiona
 
 ## Knowledge layer (`integrations/design-knowledge/`)
 
-| File | Content |
-|---|---|
+| File               | Content                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `fundamentals.mjs` | `fundamentals`: one markdown text, 14 numbered sections (direction, hierarchy and composition, layout and sizing, spacing rhythm, typography, color, elevation and shape, contrast, content, states, icons, imagery, the reduction pass, verify). Opens with the layering rule: a chosen style overrides the fundamentals where they disagree, but contrast, legible sizes and realistic content never yield. |
-| `styles/` | 31 named styles, one module per slug, registered in `styles/index.mjs`. Contract and rules: [`styles/README.md`](../integrations/design-knowledge/styles/README.md). |
-| `styles/index.mjs` | `styles`, `styleIds`, `listStyles()` (`{id, name, summary, density, fonts}`), `getStyle(idOrName)` (slug, display name or loose spelling), `pickStyle(brief)` (keyword scoring with a `saas` / `professional` / `swiss-minimalist` fallback), `styleTokens(id)` (color, font, radius and shadow tokens, same shape as `archetypeTokens`) and `styleMarkdown(style)`. |
-| `elevation.mjs` | Shared shadow and radius helpers (`shadow`, `softElevation`, `darkElevation`, `flatElevation`, `radius`, `rgba`) used by the styles and the archetypes. |
-| `archetypes.mjs` | The 27 earlier style archetypes (`editorial-ink`, `swiss-grid`, …), kept as legacy styles. |
-| `playbooks.mjs` | Domain playbooks with numeric contracts (landing, web app, mobile, dashboard, slides, …). |
-| `skills.mjs` | The skill catalog (below). |
-| `persona.mjs` | The designer persona the desktop runtime prepends to every chat (below). |
-| `color.mjs` | `contrastRatio`, `relativeLuminance`, used by the style contrast tests. |
-| `index.mjs` | Re-exports, `resolveStyle(idOrName)` (named style first, then archetype), `designTokens(idOrName)` and `getDesignGuidelines({style, domain, brief})`, which returns the fundamentals, the style section, the playbook, suggestions and notes as separate parts for the tool to compose. |
+| `styles/`          | 31 named styles, one module per slug, registered in `styles/index.mjs`. Contract and rules: [`styles/README.md`](../integrations/design-knowledge/styles/README.md).                                                                                                                                                                                                                                          |
+| `styles/index.mjs` | `styles`, `styleIds`, `listStyles()` (`{id, name, summary, density, fonts}`), `getStyle(idOrName)` (slug, display name or loose spelling), `pickStyle(brief)` (keyword scoring with a `saas` / `professional` / `swiss-minimalist` fallback), `styleTokens(id)` (color, font, radius and shadow tokens, same shape as `archetypeTokens`) and `styleMarkdown(style)`.                                          |
+| `elevation.mjs`    | Shared shadow and radius helpers (`shadow`, `softElevation`, `darkElevation`, `flatElevation`, `radius`, `rgba`) used by the styles and the archetypes.                                                                                                                                                                                                                                                       |
+| `archetypes.mjs`   | The 27 earlier style archetypes (`editorial-ink`, `swiss-grid`, …), kept as legacy styles.                                                                                                                                                                                                                                                                                                                    |
+| `playbooks.mjs`    | Domain playbooks with numeric contracts (landing, web app, mobile, dashboard, slides, …).                                                                                                                                                                                                                                                                                                                     |
+| `skills.mjs`       | The skill catalog (below).                                                                                                                                                                                                                                                                                                                                                                                    |
+| `persona.mjs`      | The designer persona the desktop runtime prepends to every chat (below).                                                                                                                                                                                                                                                                                                                                      |
+| `color.mjs`        | `contrastRatio`, `relativeLuminance`, used by the style contrast tests.                                                                                                                                                                                                                                                                                                                                       |
+| `index.mjs`        | Re-exports, `resolveStyle(idOrName)` (named style first, then archetype), `designTokens(idOrName)` and `getDesignGuidelines({style, domain, brief})`, which returns the fundamentals, the style section, the playbook, suggestions and notes as separate parts for the tool to compose.                                                                                                                       |
 
 The 31 styles: academia, art-deco, bauhaus, bold-typography, botanical, claymorphism, cyberpunk, enterprise, flat-design, glassmorphism, industrial, kinetic, luxury, material-design, maximalism, minimal-dark, modern-dark, monochrome, neo-brutalism, neumorphism, newsprint, organic, playful-geometric, professional, retro, saas, sketch, swiss-minimalist, terminal, vaporwave, web3.
 
@@ -64,13 +64,13 @@ The system prompt append for a chat is assembled by `desktop/agent-runtime.cjs` 
 
 Enforcement:
 
-| Runtime | approve | blocked |
-|---|---|---|
-| Claude SDK | `PreToolUse` hook raises an approval card for every call (`requireUser`: no "always allow", no autonomy or Settings › Tools allow defaults); a decline denies with `PREFERENCE_DECLINED_REASON` | the same hook denies with `PREFERENCE_BLOCKED_REASON` |
-| Claude CLI fallback | n/a | `--disallowedTools` for the three tools |
-| Codex app-server | persona rule only (Codex has no per-tool approval hook for MCP tools) | thread config `mcp_servers.verynize.disabled_tools` (keeps `ask_agent` disabled when that switch is off) |
-| Codex exec fallback | n/a | `-c mcp_servers.verynize.disabled_tools=[…]` |
-| Helpers | n/a | the tools are in `HELPER_BLOCKED_DESIGN_TOOLS` |
+| Runtime             | approve                                                                                                                                                                                         | blocked                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Claude SDK          | `PreToolUse` hook raises an approval card for every call (`requireUser`: no "always allow", no autonomy or Settings › Tools allow defaults); a decline denies with `PREFERENCE_DECLINED_REASON` | the same hook denies with `PREFERENCE_BLOCKED_REASON`                                                    |
+| Claude CLI fallback | n/a                                                                                                                                                                                             | `--disallowedTools` for the three tools                                                                  |
+| Codex app-server    | persona rule only (Codex has no per-tool approval hook for MCP tools)                                                                                                                           | thread config `mcp_servers.verynize.disabled_tools` (keeps `ask_agent` disabled when that switch is off) |
+| Codex exec fallback | n/a                                                                                                                                                                                             | `-c mcp_servers.verynize.disabled_tools=[…]`                                                             |
+| Helpers             | n/a                                                                                                                                                                                             | the tools are in `HELPER_BLOCKED_DESIGN_TOOLS`                                                           |
 
 ## Design style: renderer → runtime → context → agent
 
@@ -91,15 +91,15 @@ Enforcement:
 
 ## Tests
 
-| Area | Test |
-|---|---|
-| Style registry, contract, contrast, fonts, lookup, tokens, markdown, `pickStyle` | `node --test integrations/design-styles.test.mjs` |
-| Skill catalog, kinds, aliases, routing, tool names in skills, fundamentals sections, persona rules | `node --test integrations/design-skills.test.mjs` |
-| Archetypes, playbooks, contrast helper | `node --test integrations/design-knowledge.test.mjs` |
-| Preference store, 50 × 280 limits, trimming, serialized saves | `node --test integrations/preferences.test.mjs` |
-| `resolveStyle`, `designTokens`, `getDesignGuidelines` with slugs and archetypes | `node --test integrations/design-knowledge.test.mjs` |
-| Tool output order, `get_skills {skill}` / `{name}` / catalog, `guidelines: "none"`, `apply_style_tokens {style}` with alpha extras | `node --test integrations/mcp.test.mjs` |
-| Preferences block, IPC validator, gate per runtime and access, `designStyle` validation and context line, `designStylesList` | `node --test tests/agent-runtime.cjs` |
-| No Style chip in the composer, `/style` opens the picker (keyboard and click), run carries `designStyle` | `node tests/chat-composer-menu.cjs` |
-| Twelve styled starter briefs, four shown, click selects the style | `node tests/agent-chat.cjs` |
-| Preference counters and limits in Settings | `node tests/settings.cjs` |
+| Area                                                                                                                               | Test                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Style registry, contract, contrast, fonts, lookup, tokens, markdown, `pickStyle`                                                   | `node --test integrations/design-styles.test.mjs`    |
+| Skill catalog, kinds, aliases, routing, tool names in skills, fundamentals sections, persona rules                                 | `node --test integrations/design-skills.test.mjs`    |
+| Archetypes, playbooks, contrast helper                                                                                             | `node --test integrations/design-knowledge.test.mjs` |
+| Preference store, 50 × 280 limits, trimming, serialized saves                                                                      | `node --test integrations/preferences.test.mjs`      |
+| `resolveStyle`, `designTokens`, `getDesignGuidelines` with slugs and archetypes                                                    | `node --test integrations/design-knowledge.test.mjs` |
+| Tool output order, `get_skills {skill}` / `{name}` / catalog, `guidelines: "none"`, `apply_style_tokens {style}` with alpha extras | `node --test integrations/mcp.test.mjs`              |
+| Preferences block, IPC validator, gate per runtime and access, `designStyle` validation and context line, `designStylesList`       | `node --test tests/agent-runtime.cjs`                |
+| No Style chip in the composer, `/style` opens the picker (keyboard and click), run carries `designStyle`                           | `node tests/chat-composer-menu.cjs`                  |
+| Twelve styled starter briefs, four shown, click selects the style                                                                  | `node tests/agent-chat.cjs`                          |
+| Preference counters and limits in Settings                                                                                         | `node tests/settings.cjs`                            |

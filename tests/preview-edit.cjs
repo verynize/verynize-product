@@ -25,9 +25,11 @@ const HTML =
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({ env, args: [".", `--user-data-dir=${profile}`] });
   try {
-    const page = await app.firstWindow(); await moveOffCursor(app);
+    const page = await app.firstWindow();
+    await moveOffCursor(app);
     await page.setViewportSize({ width: 1440, height: 870 });
     page.on("console", (m) => {
       if (m.type() === "warning" || m.type() === "error") console.log("PAGE", m.text());
@@ -110,12 +112,19 @@ const HTML =
         "Text Fill",
       ]);
       for (const label of ["Align left", "Align top", "Rotate 90°"])
-        assert.equal(await inspector.getByRole("button", { name: label, exact: true }).isDisabled(), true, label + " disabled");
+        assert.equal(
+          await inspector.getByRole("button", { name: label, exact: true }).isDisabled(),
+          true,
+          label + " disabled",
+        );
       for (const name of ["pe-y", "pe-rotation", "pe-z"])
         assert.equal(await page.locator(`[name=${name}]`).isDisabled(), true, name + " disabled");
       assert.equal(await page.locator("[name=pe-rotation]").inputValue(), "0");
       assert.equal(await page.locator("[name=pe-z]").getAttribute("placeholder"), "Auto");
-      for (const [axis, text] of [["h", "Left"], ["v", "Top"]]) {
+      for (const [axis, text] of [
+        ["h", "Left"],
+        ["v", "Top"],
+      ]) {
         const select = inspector.locator(`[data-constraint-menu=${axis}]`);
         assert.equal(await select.isDisabled(), true, axis + " constraint disabled");
         assert.equal((await select.textContent()).trim(), text);
@@ -123,10 +132,18 @@ const HTML =
       assert.equal(await inspector.locator("[aria-label=Constraints][data-disabled]").count(), 1);
       assert.equal(await page.locator("[name=pe-min-width]").inputValue(), "0");
       assert.equal(await page.locator("[name=pe-min-height]").inputValue(), "0");
-      assert.equal(await inspector.getByRole("checkbox", { name: "Clip content" }).getAttribute("aria-checked"), "false");
+      assert.equal(
+        await inspector
+          .getByRole("checkbox", { name: "Clip content" })
+          .getAttribute("aria-checked"),
+        "false",
+      );
       assert.equal(await page.locator("[name=pe-line-height]").inputValue(), "Auto");
       // The page's system-ui is not a font a design can carry: "(unsupported)", as in Wonder.
-      await inspector.getByRole("button", { name: "Font family" }).filter({ hasText: "system-ui (unsupported)" }).waitFor();
+      await inspector
+        .getByRole("button", { name: "Font family" })
+        .filter({ hasText: "system-ui (unsupported)" })
+        .waitFor();
     }
     // Style edit through the inspector is staged on the live DOM.
     await page.locator("[name=pe-font-size]").fill("40");
@@ -141,14 +158,29 @@ const HTML =
     assert.equal(await page.evaluate((id) => window.previewEdits.count(id), frameId), 1);
     // The badge sits in the breadcrumb row above the browser toolbar, never over Publish / Stop (Wonder PM3-edited).
     {
-      const badge = await page.locator("#live-preview [data-pe=preview-changes-badge]").boundingBox();
+      const badge = await page
+        .locator("#live-preview [data-pe=preview-changes-badge]")
+        .boundingBox();
       const bar = await page.locator("#live-preview .pf-bar").boundingBox();
-      assert.ok(badge.y + badge.height <= bar.y + 0.5, `badge ${JSON.stringify(badge)} is above the toolbar ${JSON.stringify(bar)}`);
-      assert.ok(Math.abs(badge.x + badge.width - (bar.x + bar.width - 5)) < 2, "badge is right-aligned with the frame");
+      assert.ok(
+        badge.y + badge.height <= bar.y + 0.5,
+        `badge ${JSON.stringify(badge)} is above the toolbar ${JSON.stringify(bar)}`,
+      );
+      assert.ok(
+        Math.abs(badge.x + badge.width - (bar.x + bar.width - 5)) < 2,
+        "badge is right-aligned with the frame",
+      );
     }
     // Wonder PF4-resize: on a phone-width frame the breadcrumb truncates with an ellipsis before the badge.
     {
-      const width = await page.evaluate((id) => window.design.getDocument().pages.flatMap((p) => p.nodes).find((n) => n.id === id).w, frameId);
+      const width = await page.evaluate(
+        (id) =>
+          window.design
+            .getDocument()
+            .pages.flatMap((p) => p.nodes)
+            .find((n) => n.id === id).w,
+        frameId,
+      );
       await page.evaluate((id) => window.design.updateNodes([id], { w: 402 }), frameId);
       await page.waitForFunction(() => {
         const text = document.querySelector("#live-preview .pf-crumb-text");
@@ -159,9 +191,14 @@ const HTML =
         right: el.parentElement.getBoundingClientRect().right,
         local: el.parentElement.querySelector(".pf-local").getBoundingClientRect().right,
       }));
-      const badge = await page.locator("#live-preview [data-pe=preview-changes-badge]").boundingBox();
+      const badge = await page
+        .locator("#live-preview [data-pe=preview-changes-badge]")
+        .boundingBox();
       assert.equal(crumb.overflow, "ellipsis");
-      assert.ok(crumb.local <= badge.x, `breadcrumb ends (${crumb.local}) before the badge (${badge.x})`);
+      assert.ok(
+        crumb.local <= badge.x,
+        `breadcrumb ends (${crumb.local}) before the badge (${badge.x})`,
+      );
       await page.evaluate(([id, w]) => window.design.updateNodes([id], { w }), [frameId, width]);
       await page.waitForFunction(() => {
         const text = document.querySelector("#live-preview .pf-crumb-text");
@@ -193,7 +230,11 @@ const HTML =
     await page.keyboard.press("Escape");
     await page.waitForFunction((id) => window.previewEdits.count(id) === 2, frameId);
     assert.equal(
-      await frame.evaluate(() => !!document.getElementById("verynize-edit-style") || document.getElementById("title").hasAttribute("data-verynize-editing")),
+      await frame.evaluate(
+        () =>
+          !!document.getElementById("verynize-edit-style") ||
+          document.getElementById("title").hasAttribute("data-verynize-editing"),
+      ),
       false,
       "editing styles are removed when the edit ends",
     );
@@ -259,7 +300,10 @@ const HTML =
     // Add to chat ⌘L: an element chip, nothing sent. Wonder PM5: the composer then holds only the element chip, not the
     // preview frame's own selection chip.
     assert.ok(
-      await page.evaluate((id) => (window.agentWorkspace.getState().mentions || []).some((m) => m.id === id), frameId),
+      await page.evaluate(
+        (id) => (window.agentWorkspace.getState().mentions || []).some((m) => m.id === id),
+        frameId,
+      ),
       "the selected preview frame starts as a selection chip",
     );
     await page.keyboard.press(mod("L"));
@@ -377,12 +421,19 @@ const HTML =
     assert.equal(result.text.clipContent, true);
     assert.equal(await page.locator("#properties [name=lineHeight]").inputValue(), "Auto");
     assert.equal(
-      await page.locator("#properties").getByRole("checkbox", { name: "Clip content" }).getAttribute("aria-checked"),
+      await page
+        .locator("#properties")
+        .getByRole("checkbox", { name: "Clip content" })
+        .getAttribute("aria-checked"),
       "true",
     );
     assert.deepEqual(result.selection, [result.text.id]);
     assert.notEqual(result.camera.x, before.x, "camera pans to the capture");
-    assert.equal(result.camera.y, before.y, "an in-view capture is revealed by a sideways pan only");
+    assert.equal(
+      result.camera.y,
+      before.y,
+      "an in-view capture is revealed by a sideways pan only",
+    );
     // ⌘Return captures the whole page (one region frame, as the toolbar capture always did).
     await page.evaluate((id) => window.design.setSelection([id]), frameId);
     await page.locator("#live-capture").click();

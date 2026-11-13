@@ -142,7 +142,9 @@ export function openRoomLink(link: RoomLink, { fromAddress = false } = {}): Prom
           anonymous: !token && !signedIn,
         });
       forgetToken();
-      library()?.showEditor?.();
+      // A superseded or canceled open (another file, or back to Files) resolves without the room: stay put.
+      const now = cw.room?.();
+      if (now && now.id === link.id && now.server === link.server) library()?.showEditor?.();
     } catch (e) {
       const error = e as RoomError;
       const denied =
@@ -202,13 +204,16 @@ declare global {
   }
 }
 
-/** Installs `window.cloudLinks` (desktop deep links) and opens this page's own `#room=` link once. */
+/**
+ * Installs `window.cloudLinks` (desktop deep links) and opens this page's own `#room=` link once. Both wait for
+ * `ready`: a cold-start deep link can arrive before the shell boots, and the boot would replace the opened room.
+ */
 export function installLinks(ready: Promise<void>) {
   window.cloudLinks = {
     open(href: string) {
       const link = parseRoomLink(href);
       if (!link) return false;
-      void openRoomLink(link);
+      void ready.then(() => openRoomLink(link));
       return true;
     },
   };

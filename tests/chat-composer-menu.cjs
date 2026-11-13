@@ -7,6 +7,7 @@
 // attached images as a collection, attach it again), Commands, the "Runs in this chat" list (filtering, keyboard,
 // Claude + Codex sources), a Codex custom prompt expanded and sent, and the /add-dir built-in.
 // CHAT_MENU_SHOT=/dir saves screenshots of the menu, submenus and command list.
+const { waitForAsync } = require("./helpers/wait-for-async.cjs");
 const { _electron } = require("@playwright/test");
 const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 const assert = require("node:assert/strict");
@@ -270,11 +271,12 @@ async function write(file, text) {
       (id) => window.desktop.terminalWrite({ id, data: "echo chat-menu-$((40+2))\r" }),
       term.id,
     );
-    await page.waitForFunction(
+    await waitForAsync(
+      page,
       async (cwd) =>
         /chat-menu-42/.test((await window.desktop.terminalRecentOutput({ cwd }))?.text || ""),
       second.chatRoot,
-      { timeout: 15000, polling: 300 },
+      { timeout: 15000, interval: 300 },
     );
     await openMenu();
     await page.locator("#chat-attach-terminal").click();

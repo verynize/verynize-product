@@ -88,7 +88,11 @@ export function parseColor(input: string): Rgba | null {
   const hex = /^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/.exec(v);
   if (hex) {
     let h = hex[1];
-    if (h.length <= 4) h = [...h].map((c) => c + c).join("");
+    if (h.length <= 4)
+      h = h
+        .split("")
+        .map((c) => c + c)
+        .join("");
     const n = (i: number) => parseInt(h.slice(i, i + 2), 16);
     return { r: n(0), g: n(2), b: n(4), a: h.length === 8 ? n(6) / 255 : 1 };
   }

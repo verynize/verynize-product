@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { markIslandCommitted, registerIsland } from "@/lib/bridge";
 import { queryClient } from "@/lib/query/client";
+import { reportError } from "@/lib/telemetry/runtime";
 import "@/styles/globals.css";
 
 // The shell is a fixed one-viewport layout; undo any document scroll caused by focus or scrollIntoView
@@ -52,7 +53,17 @@ export function mountIsland(
     const container = typeof target === "function" ? target() : target;
     container.setAttribute("data-bd", "");
     container.dataset.island = name;
-    createRoot(container).render(
+    // Errors an error boundary caught still go to crash reports (when on); uncaught ones reach them through
+    // React's default window error event.
+    createRoot(container, {
+      onCaughtError: (error, info) => {
+        console.error(error);
+        reportError(error, {
+          mechanism: "react.caught",
+          componentStack: info.componentStack ?? undefined,
+        });
+      },
+    }).render(
       <StrictMode>
         {/* One QueryClient for every island root: server state is shared across islands. */}
         <IslandProviders>{node()}</IslandProviders>

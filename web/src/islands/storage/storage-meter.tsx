@@ -147,8 +147,8 @@ export function StorageMeter() {
           ))}
           {level === "warn" && (
             <li className="text-muted-foreground">
-              Embedded images are moved to room assets when shared. Split large pages to stay under
-              the limit.
+              Embedded images are moved to room assets when shared. Move content to another file to
+              stay under the shared file limit.
             </li>
           )}
         </ul>

@@ -14,7 +14,7 @@ Verynize is a macOS Electron design editor (canvas + inspector + local Claude/Co
 
 ## Commands
 
-Toolchain is Vite+ (`vp`), installed locally and pinned in `package.json`. No global CLI is needed. Node `^22.18 || ^24.11 || >=26`.
+Toolchain is Vite+ (`vp`), installed locally and pinned in `package.json`. No global CLI is needed. Node 24 (`>=24.11`, also in `package.json` `engines` and `.nvmrc`).
 
 ```sh
 npm install

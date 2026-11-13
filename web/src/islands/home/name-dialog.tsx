@@ -14,7 +14,13 @@ export type NameRequest = {
 };
 
 /** Small single-field dialog used for "Rename file" and "New folder". */
-export function NameDialog({ request, onClose }: { request: NameRequest | null; onClose(): void }) {
+export function NameDialog({
+  request,
+  onClose,
+}: {
+  request: NameRequest | null;
+  onClose: () => void;
+}) {
   const [value, setValue] = useState("");
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => {

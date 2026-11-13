@@ -144,6 +144,108 @@ async function openBrowser(url) {
       layer: true,
     });
 
+    // The browser cover path rasterizes real editor markup without a desktop preload.
+    const cover = await page.evaluate(async () => {
+      const original = window.design.getDocument();
+      const doc = structuredClone(original);
+      doc.pages[0].nodes.push({
+        id: "web-cover",
+        name: "Cover",
+        type: "frame",
+        parentId: null,
+        x: 0,
+        y: 0,
+        w: 64,
+        h: 32,
+        layout: "free",
+        color: "#ff0000",
+        radius: 0,
+        opacity: 100,
+      });
+      window.design.loadDocument(doc);
+      const before = JSON.stringify(window.design.getDocument());
+      const src = await window.fileThumbnails.render("web-cover");
+      const image = new Image();
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+        image.src = src;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      const result = {
+        width: image.width,
+        height: image.height,
+        pixel: [...context.getImageData(60, 28, 1, 1).data],
+        unchanged: before === JSON.stringify(window.design.getDocument()),
+      };
+      window.design.loadDocument(original);
+      return result;
+    });
+    assert.deepEqual(cover, { width: 64, height: 32, pixel: [255, 0, 0, 255], unchanged: true });
+
+    // Default covers render every first-page root, with negative bounds and the file's own tokens.
+    const fullPage = await page.evaluate(async () => {
+      const before = JSON.stringify(window.design.getDocument());
+      const doc = window.design.getDocument();
+      doc.tokens = { coverInk: "#ff0000" };
+      doc.pages = [
+        {
+          id: "cover-first",
+          name: "First",
+          nodes: Array.from({ length: 40 }, (_, index) => ({
+            id: `root-${index}`,
+            type: "rectangle",
+            name: `Root ${index}`,
+            parentId: null,
+            x: index * 10 - 100,
+            y: -50,
+            w: 10,
+            h: 10,
+            radius: 0,
+            opacity: 100,
+            token: index === 39 ? undefined : "coverInk",
+            color: index === 39 ? "#00ff00" : "#0000ff",
+          })),
+        },
+        { id: "cover-second", name: "Second", nodes: [] },
+      ];
+      doc.activePage = "cover-second";
+      delete doc.thumbnailNodeId;
+      const markup = window.design.thumbnailMarkup(null, doc);
+      const src = await window.fileThumbnails.render(null, doc);
+      const image = new Image();
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+        image.src = src;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      return {
+        width: image.width,
+        height: image.height,
+        first: [...context.getImageData(5, 5, 1, 1).data],
+        last: [...context.getImageData(395, 5, 1, 1).data],
+        roots: (markup.html.match(/data-id=/g) || []).length,
+        unchanged: before === JSON.stringify(window.design.getDocument()),
+      };
+    });
+    assert.deepEqual(fullPage, {
+      width: 400,
+      height: 10,
+      first: [255, 0, 0, 255],
+      last: [0, 255, 0, 255],
+      roots: 40,
+      unchanged: true,
+    });
+
     // Desktop-only entry points keep their web behaviour.
     assert.equal(
       await page.locator("#project-agent-status").textContent(),
@@ -157,7 +259,8 @@ async function openBrowser(url) {
     // No window controls on the web: the title bar starts at the 8px edge gap, and there is no repositories sidebar.
     const chrome = await page.evaluate(() => ({
       platform: document.documentElement.dataset.platform,
-      inset: getComputedStyle(document.querySelector('[data-chrome-bar][role="banner"]')).paddingLeft,
+      inset: getComputedStyle(document.querySelector('[data-chrome-bar][role="banner"]'))
+        .paddingLeft,
       sidebar: !!document.getElementById("chrome-sidebar"),
     }));
     assert.deepEqual(chrome, { platform: "web", inset: "8px", sidebar: false });
@@ -169,16 +272,21 @@ async function openBrowser(url) {
         await window.fileLibrary.createFromDocument(doc);
       }, name);
     const tabNames = () =>
-      page.locator("[data-file-tab]:visible").evaluateAll((tabs) =>
-        tabs.map((tab) => tab.querySelector("input")?.value ?? tab.textContent.trim()),
-      );
+      page
+        .locator("[data-file-tab]:visible")
+        .evaluateAll((tabs) =>
+          tabs.map((tab) => tab.querySelector("input")?.value ?? tab.textContent.trim()),
+        );
     assert.deepEqual((await tabNames()).slice(-2), ["Tab two", "Tab three"]);
     await page.locator("#shell-new-file").click();
     const switcher = page.locator("#file-switcher");
     await switcher.waitFor();
     assert.equal(await switcher.locator("[data-switcher-new]").isVisible(), true, "New file row");
     assert.equal(
-      await switcher.locator('[data-switcher-section="Recents"] [data-switcher-file] [data-switcher-name]').first().innerText(),
+      await switcher
+        .locator('[data-switcher-section="Recents"] [data-switcher-file] [data-switcher-name]')
+        .first()
+        .innerText(),
       "Tab three",
       "Recents are newest first",
     );
@@ -186,33 +294,37 @@ async function openBrowser(url) {
     await page.keyboard.press("Enter");
     await switcher.waitFor({ state: "detached" });
     await page.waitForFunction(() => window.design.getDocument().name === "Tab two");
-    assert.deepEqual((await tabNames()).slice(-2), ["Tab two", "Tab three"], "opening keeps every tab");
+    assert.deepEqual(
+      (await tabNames()).slice(-2),
+      ["Tab two", "Tab three"],
+      "opening keeps every tab",
+    );
     await page.locator("[data-document-tab]").hover();
     await page.locator("[data-document-tab] [data-file-tab-close]").click();
     await page.waitForFunction(() => window.design.getDocument().name === "Tab three");
     assert.equal((await tabNames()).includes("Tab two"), false, "closed tab is gone");
+    // The Figma dialog (a shadcn Dialog) exists only while open.
+    await page.evaluate(() => document.getElementById("figma-import").click());
+    await page.locator("#figma-run").click();
+    await page.locator("#figma-status").filter({ hasText: /\S/ }).waitFor();
+    const figma = await page.locator("#figma-status").textContent();
+    await page.keyboard.press("Escape");
+    await page.locator("#figma-dialog").waitFor({ state: "detached" });
     const notes = await page.evaluate(async () => {
       const $ = (id) => document.getElementById(id);
       const settle = () => new Promise((resolve) => setTimeout(resolve, 50));
-      $("figma-run").click();
-      await settle();
-      $("generate-run").click();
-      await settle();
       $("capture-web-url").value = "https://example.com/";
       $("capture-web-form").requestSubmit();
       await settle();
       $("cloud-app-section").open = true;
       await settle();
       return {
-        figma: $("figma-status").textContent,
-        generate: $("generate-status").textContent,
         capture: $("capture-web-status").textContent,
         publish: $("cloud-app-project").textContent,
       };
     });
+    assert.equal(figma, "Open the desktop app to import from Figma.");
     assert.deepEqual(notes, {
-      figma: "Open the desktop app to import from Figma.",
-      generate: "Open the desktop app to generate images.",
       capture: "Open the desktop app to capture web pages.",
       publish: "App publishing runs in the Verynize desktop app.",
     });

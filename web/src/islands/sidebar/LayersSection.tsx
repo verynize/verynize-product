@@ -44,7 +44,8 @@ function buildRows(nodes: TreeNode[], expanded: Set<string>, query: string): Row
       const node = list[i];
       const hasChildren = children.has(node.id);
       const open = q ? true : expanded.has(node.id);
-      if (!q || node.name.toLowerCase().includes(q)) rows.push({ node, depth, hasChildren, expanded: open });
+      if (!q || node.name.toLowerCase().includes(q))
+        rows.push({ node, depth, hasChildren, expanded: open });
       if (hasChildren && open) walk(node.id, depth + 1);
     }
   };
@@ -72,7 +73,9 @@ function toggleFlag(node: TreeNode, key: "locked" | "hidden") {
 function select(id: string, event: MouseEvent | KeyboardEvent) {
   const current = design().getSelection();
   if (event.shiftKey || event.metaKey || event.ctrlKey) {
-    design().setSelection(current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+    design().setSelection(
+      current.includes(id) ? current.filter((x) => x !== id) : [...current, id],
+    );
   } else if (current.length !== 1 || current[0] !== id) {
     design().setSelection([id]);
   }
@@ -101,12 +104,14 @@ const LayerRow = memo(function LayerRow({
 }: RowProps) {
   const { node, depth, hasChildren, expanded } = row;
   const action = cn(
-    "hidden size-6 shrink-0 items-center justify-center rounded-md bg-transparent group-hover:flex group-has-focus-visible:flex hover:bg-foreground/10 hover:text-foreground",
+    "hidden size-6 shrink-0 items-center justify-center rounded-md bg-transparent group-hover:flex group-focus-within:flex hover:bg-foreground/10 hover:text-foreground",
     selected ? "text-foreground-2/85" : "text-foreground-3",
   );
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
-    const rows = Array.from(e.currentTarget.parentElement?.querySelectorAll<HTMLElement>(".layer-row") ?? []);
+    const rows = Array.from(
+      e.currentTarget.parentElement?.querySelectorAll<HTMLElement>(".layer-row") ?? [],
+    );
     const index = rows.indexOf(e.currentTarget);
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
@@ -136,8 +141,14 @@ const LayerRow = memo(function LayerRow({
           aria-expanded={hasChildren ? expanded : undefined}
           tabIndex={focusable ? 0 : -1}
           data-id={node.id}
+          data-role={node.role}
           className={cn(
-            contract("layer-row", selected && "active", node.hidden && "is-hidden", node.locked && "is-locked"),
+            contract(
+              "layer-row",
+              selected && "active",
+              node.hidden && "is-hidden",
+              node.locked && "is-locked",
+            ),
             "group relative m-0 flex h-7.5 w-full shrink-0 items-center rounded-md border-0 bg-transparent py-0 pr-2 text-xs text-foreground-2 hover:bg-muted",
             selected && "bg-selection hover:bg-selection",
             dragging && "opacity-50",
@@ -179,10 +190,20 @@ const LayerRow = memo(function LayerRow({
             className={cn(
               "ml-1 size-4 shrink-0",
               selected ? "text-foreground" : "text-muted-foreground",
+              (node.role === "main" || node.role === "instance") && "text-component",
+              node.role === "slot" && "text-slot",
               node.hidden && "opacity-50",
             )}
           />
-          <div className={cn("ml-2.25 flex min-w-0 flex-1 items-center", node.hidden && "opacity-50")}>
+          <div
+            className={cn(
+              "ml-2.25 flex min-w-0 flex-1 items-center",
+              (node.role === "main" || node.role === "instance") && "text-component-foreground",
+              node.role === "slot" && "text-slot-foreground",
+              node.role === "inherited" && "text-component-muted",
+              node.hidden && "opacity-50",
+            )}
+          >
             {renaming ? (
               <InlineRename
                 value={node.name}
@@ -217,7 +238,11 @@ const LayerRow = memo(function LayerRow({
                   data-toggle="locked"
                   aria-pressed={Boolean(node.locked)}
                   aria-label={`${node.locked ? "Unlock" : "Lock"} ${node.name}`}
-                  className={cn(contract(node.locked && "on"), action, node.locked && "flex text-foreground")}
+                  className={cn(
+                    contract(node.locked && "on"),
+                    action,
+                    node.locked && "flex text-foreground",
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFlag(node, "locked");
@@ -233,7 +258,11 @@ const LayerRow = memo(function LayerRow({
                   data-toggle="hidden"
                   aria-pressed={Boolean(node.hidden)}
                   aria-label={`${node.hidden ? "Show" : "Hide"} ${node.name}`}
-                  className={cn(contract(node.hidden && "on"), action, node.hidden && "flex text-foreground")}
+                  className={cn(
+                    contract(node.hidden && "on"),
+                    action,
+                    node.hidden && "flex text-foreground",
+                  )}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFlag(node, "hidden");
@@ -274,11 +303,13 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   // Reveal layers selected on the canvas: expand their ancestors and scroll them into view.
   const selectionKey = selection.join(",");
   useEffect(() => {
-    if (!selectionKey) return;
+    if (!selectionKey || selection.length > 200) return;
     const ids = selectionKey.split(",");
     const parents = ancestorsOf(ids, nodes);
     if (parents.length) {
-      setExpanded((prev) => (parents.every((p) => prev.has(p)) ? prev : new Set([...prev, ...parents])));
+      setExpanded((prev) =>
+        parents.every((p) => prev.has(p)) ? prev : new Set([...prev, ...parents]),
+      );
     }
     requestAnimationFrame(() => {
       const row = treeRef.current?.querySelector(`[data-id="${CSS.escape(ids[ids.length - 1])}"]`);
@@ -293,6 +324,24 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   const shown = useMemo(() => applyLayerPreview(nodes, preview), [nodes, preview]);
   const rows = useMemo(() => buildRows(shown, expanded, query), [shown, expanded, query]);
   const selected = useMemo(() => new Set(selection), [selection]);
+  const [scrollTop, setScrollTop] = useState(0);
+  const start =
+    rows.length > 100
+      ? Math.min(Math.max(0, Math.floor(scrollTop / 32) - 8), Math.max(0, rows.length - 60))
+      : 0;
+  const end = rows.length > 100 ? Math.min(rows.length, start + 60) : rows.length;
+
+  useEffect(() => {
+    if (selection.length !== 1 || rows.length <= 100) return;
+    const index = rows.findIndex((row) => row.node.id === selection[0]);
+    if (index < 0 || !treeRef.current) return;
+    const tree = treeRef.current;
+    const top = index * 32;
+    if (top < tree.scrollTop || top + 32 > tree.scrollTop + tree.clientHeight) {
+      tree.scrollTop = Math.max(0, top - tree.clientHeight / 2);
+      setScrollTop(tree.scrollTop);
+    }
+  }, [rows, selection]);
 
   const toggleExpand = useMemo(
     () => (id: string) =>
@@ -310,8 +359,17 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
   };
 
   return (
-    <section aria-label="Layers" className="flex min-h-0 flex-1 flex-col">
-      <SectionHeader title="Layers" open={open} onToggle={onToggle} controls="bd-layer-tree" className="-mt-px">
+    <section
+      aria-label="Layers"
+      className={cn("flex flex-col", open ? "min-h-24 flex-1" : "min-h-9 shrink-0")}
+    >
+      <SectionHeader
+        title="Layers"
+        open={open}
+        onToggle={onToggle}
+        controls="bd-layer-tree"
+        className="-mt-px"
+      >
         <IconButton
           label="Collapse all"
           disabled={expanded.size === 0 || Boolean(query)}
@@ -360,11 +418,41 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
         role="tree"
         aria-label="Layers"
         aria-multiselectable="true"
+        onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+        onKeyDownCapture={(event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+          if (
+            !(event.target instanceof HTMLElement) ||
+            event.target.getAttribute("role") !== "treeitem"
+          )
+            return;
+          const index = rows.findIndex(
+            (row) => row.node.id === (event.target as HTMLElement).dataset.id,
+          );
+          const next = index + (event.key === "ArrowDown" ? 1 : -1);
+          if (next < 0 || next >= rows.length || (next >= start && next < end)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          event.currentTarget.scrollTop = next * 32;
+          setScrollTop(next * 32);
+          requestAnimationFrame(() =>
+            treeRef.current
+              ?.querySelector<HTMLElement>(`[data-id="${CSS.escape(rows[next].node.id)}"]`)
+              ?.focus(),
+          );
+        }}
         hidden={!open}
         className="min-h-0 flex-1 overflow-y-auto px-1.5 pt-1 pb-3"
       >
         <div ref={listRef} className="relative flex flex-col gap-0.5">
-          {rows.map((row, index) => (
+          {start > 0 && (
+            <div
+              aria-hidden="true"
+              data-layer-spacer
+              style={{ "--spacer-height": `${start * 32 - 2}px` } as CSSProperties}
+            />
+          )}
+          {rows.slice(start, end).map((row, index) => (
             <LayerRow
               key={row.node.id}
               row={row}
@@ -377,6 +465,13 @@ export function LayersSection({ open, onToggle }: { open: boolean; onToggle: () 
               onDragStart={onPointerDown}
             />
           ))}
+          {end < rows.length && (
+            <div
+              aria-hidden="true"
+              data-layer-spacer
+              style={{ "--spacer-height": `${(rows.length - end) * 32 - 2}px` } as CSSProperties}
+            />
+          )}
           {drop && <DropIndicator drop={drop} />}
         </div>
         {rows.length === 0 && (
@@ -400,9 +495,17 @@ function DropIndicator({ drop }: { drop: Drop }) {
       data-position={drop.position}
       className={cn(
         "pointer-events-none absolute right-0 z-10",
-        inside ? "left-0 rounded-md border border-primary" : "h-0.5 -translate-y-1/2 rounded-full bg-primary",
+        inside
+          ? "left-0 rounded-md border border-primary"
+          : "h-0.5 -translate-y-1/2 rounded-full bg-primary",
       )}
-      style={{ "--drop-top": `${drop.top}px`, "--drop-height": `${drop.height}px`, "--drop-depth": drop.indent } as CSSProperties}
+      style={
+        {
+          "--drop-top": `${drop.top}px`,
+          "--drop-height": `${drop.height}px`,
+          "--drop-depth": drop.indent,
+        } as CSSProperties
+      }
     />
   );
 }

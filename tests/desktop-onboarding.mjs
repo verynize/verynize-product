@@ -2,6 +2,7 @@
 // against local workerd (verification through the outbox), sign in, then "Bring your own agent"
 // with a scripted Claude CLI and local SIWC provider: Claude already signed in, Codex
 // connects through PKCE/OIDC from the page, Cursor coming soon. Completion is remembered; skipping works too.
+import { testElectronArgs } from "./helpers/electron-args.cjs";
 import { Miniflare } from "miniflare";
 import { _electron as electron } from "@playwright/test";
 import assert from "node:assert/strict";
@@ -43,7 +44,7 @@ exit 0`,
     const app = await electron.launch({
       executablePath: (await import("electron")).default,
       env,
-      args: [".", `--user-data-dir=${path.join(dir, profile)}`],
+      args: testElectronArgs([".", `--user-data-dir=${path.join(dir, profile)}`]),
       timeout: 20000,
     });
     apps.push(app);
@@ -51,14 +52,26 @@ exit 0`,
     // Restrict discovery to fixture binaries; a host Homebrew install must not
     // turn the missing-agent case into a real CLI account lookup.
     await app.evaluate((_electron, bin) => {
-      const require = process.getBuiltinModule('module').createRequire(process.cwd() + '/package.json');
-      const { AgentTools, providerAccounts } = require('./desktop/agent-tools.cjs');
-      const fs = require('node:fs/promises'), path = require('node:path');
-      AgentTools.prototype.accounts = function() {
-        return providerAccounts({ home: this.home, siwc: this.siwc, lookup: async name => {
-          const file = path.join(bin, name);
-          try { await fs.access(file, 1); return file; } catch { return null; }
-        }});
+      const require = process
+        .getBuiltinModule("module")
+        .createRequire(process.cwd() + "/package.json");
+      const { AgentTools, providerAccounts } = require("./desktop/agent-tools.cjs");
+      const fs = require("node:fs/promises"),
+        path = require("node:path");
+      AgentTools.prototype.accounts = function () {
+        return providerAccounts({
+          home: this.home,
+          siwc: this.siwc,
+          lookup: async (name) => {
+            const file = path.join(bin, name);
+            try {
+              await fs.access(file, 1);
+              return file;
+            } catch {
+              return null;
+            }
+          },
+        });
       };
     }, bin);
 
@@ -93,9 +106,7 @@ exit 0`,
   await page.locator("#onboarding-submit").click();
   await page.waitForSelector("#onboarding-error");
   assert.match(await page.locator("#onboarding-error").textContent(), /Verify your email first/);
-  const { messages } = await (
-    await fetch(`${server}/api/dev/outbox?to=ana%40example.test`)
-  ).json();
+  const { messages } = await (await fetch(`${server}/api/dev/outbox?to=ana%40example.test`)).json();
   const link = new URL(messages.find((m) => /Verify/.test(m.subject)).link);
   await fetch(server + link.pathname + link.search, { redirect: "manual" });
   await page.locator("#onboarding-submit").click();

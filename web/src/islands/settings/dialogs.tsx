@@ -1,18 +1,10 @@
 // Behaviour upgrades for the legacy <dialog>s this island restyles (see settings.css):
-// accessible names, icon close buttons, focus on open, and toasts for export results.
+// accessible names, icon close buttons and focus on open. Export results toast from the inspector's Export section.
 import { useEffect } from "react";
-import { toast } from "sonner";
-import { legacy } from "@/lib/bridge";
 
 /** Dialog id → heading element id (`title`) or accessible name (`label`), and its close button id. */
 const DIALOGS: Record<string, { title?: string; label?: string; close?: string }> = {
   "cloud-dialog": { label: "Share", close: "cloud-close" },
-  "templates-dialog": { label: "Templates", close: "templates-close" },
-  "views-dialog": { label: "Saved views", close: "views-close" },
-  "generate-dialog": { label: "Generate illustration", close: "generate-close" },
-  "figma-dialog": { label: "Import from Figma", close: "figma-close" },
-  "text-prompt": { title: "text-prompt-label" },
-  modal: { title: "modal-title", close: "close" },
 };
 
 function labelDialogs() {
@@ -21,7 +13,8 @@ function labelDialogs() {
     if (!dialog) continue;
     dialog.dataset.bdDialog = "settings";
     if (info.title) dialog.setAttribute("aria-labelledby", info.title);
-    else if (info.label && !dialog.hasAttribute("aria-label")) dialog.setAttribute("aria-label", info.label);
+    else if (info.label && !dialog.hasAttribute("aria-label"))
+      dialog.setAttribute("aria-label", info.label);
     const close = info.close && document.getElementById(info.close);
     if (close) {
       close.setAttribute("aria-label", "Close");
@@ -30,8 +23,7 @@ function labelDialogs() {
     }
   }
   // Primary actions get the purple button treatment.
-  for (const id of ["cloud-create", "generate-run", "figma-run", "text-prompt-ok", "apply", "view-save"])
-    document.getElementById(id)?.classList.add("bd-primary");
+  for (const id of ["cloud-create"]) document.getElementById(id)?.classList.add("bd-primary");
   // Cloud share: group the room actions so the panel reads like Wonder's share popover.
   const publicLink = document.getElementById("cloud-public");
   if (publicLink && !publicLink.textContent) publicLink.hidden = true;
@@ -42,7 +34,7 @@ function focusFirstField(dialog: HTMLDialogElement) {
   const field = dialog.querySelector<HTMLElement>(
     "input:not([type=hidden]):not([type=file]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [data-template]",
   );
-  if (field && dialog.id !== "modal") field.focus();
+  if (field) field.focus();
 }
 
 export function DialogEnhancer() {
@@ -55,7 +47,10 @@ export function DialogEnhancer() {
       const observer = new MutationObserver(() => {
         if (dialog.open) {
           labelDialogs();
-          if (!dialog.contains(document.activeElement) || document.activeElement?.classList.contains("bd-dialog-close"))
+          if (
+            !dialog.contains(document.activeElement) ||
+            document.activeElement?.classList.contains("bd-dialog-close")
+          )
             focusFirstField(dialog);
         }
       });
@@ -72,35 +67,6 @@ export function DialogEnhancer() {
       observers.push(observer);
     }
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
-  return null;
-}
-
-/** Export result toast (ref 50: "Exported 1 element"). Mirrors `#artwork-status`, which the inspector island owns. */
-export function ExportToasts() {
-  useEffect(() => {
-    let observed: HTMLElement | null = null;
-    // Every assignment replaces the text node, so repeated identical results still produce a mutation.
-    const observer = new MutationObserver(() => {
-      const text = observed?.textContent?.trim() ?? "";
-      if (!text) return;
-      if (/^Exported/i.test(text)) toast.success(text);
-      else if (!/^Exporting/i.test(text)) toast.error(text);
-    });
-    const attach = () => {
-      const el = legacy("artwork-status");
-      if (!el || el === observed) return;
-      observer.disconnect();
-      observed = el;
-      observer.observe(el, { childList: true, characterData: true, subtree: true });
-    };
-    attach();
-    // Another island may take over / move the element after we mount.
-    const timer = window.setInterval(attach, 2000);
-    return () => {
-      observer.disconnect();
-      window.clearInterval(timer);
-    };
   }, []);
   return null;
 }

@@ -179,7 +179,11 @@ export function OptionalSection({
       {/* Wonder's optional body: first row 36px below the section top (31px header + 5), 12px bottom padding. */}
       <div
         hidden={!present}
-        className={cn(present ? "flex" : "hidden", "flex-col gap-2 px-3 pt-1.25 pb-3", bodyClassName)}
+        className={cn(
+          present ? "flex" : "hidden",
+          "flex-col gap-2 px-3 pt-1.25 pb-3",
+          bodyClassName,
+        )}
       >
         {children}
       </div>
@@ -417,7 +421,7 @@ export function NativeSelect({
         bare
           ? "relative flex h-6 shrink-0 items-center"
           : // Disabled field (properties-audit B4/C1): #242424 fill, #828282 value, dim caret.
-            cn(fieldBox, "pr-0 has-disabled:bg-field-disabled", prefix && fieldPrefixInset),
+            cn(fieldBox, "pr-0", disabled && "bg-field-disabled", prefix && fieldPrefixInset),
         className,
       )}
     >
@@ -539,7 +543,8 @@ export function Swatch({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
-    if (ref.current) ref.current.style.background = checker ? SWATCH_CHECKER : swatchBackground(color);
+    if (ref.current)
+      ref.current.style.background = checker ? SWATCH_CHECKER : swatchBackground(color);
   }, [color, checker]);
   return (
     <span

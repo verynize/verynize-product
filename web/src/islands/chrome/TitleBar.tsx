@@ -1,13 +1,26 @@
 // Window chrome (03/11/22/29): 40px bar, traffic-light inset, sidebar + chat toggles, Files tab, document tab,
 // new file, search and the design/code mode switch. The bar drags the window; controls opt out (no-drag).
-import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type DragEvent,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { Braces, File, LayoutGrid, MessageSquare, Palette, Search, X } from "lucide-react";
 import { PanelLeftIcon, PlusIcon } from "@/components/icons";
 import { legacy, legacySet, useBodyClass, useDesign } from "@/lib/bridge";
 import { can } from "@/lib/platform";
 import { cn } from "@/lib/utils";
 import { Menu, MenuContent, MenuItem, MenuSeparator } from "../context-menu/parts";
-import { closeFileTab, closeOtherFileTabs, moveFileTab, openFileTab, useFileTabs } from "./file-tabs";
+import {
+  closeFileTab,
+  closeOtherFileTabs,
+  moveFileTab,
+  openFileTab,
+  useFileTabs,
+} from "./file-tabs";
 import { openFileSwitcher } from "./FileSwitcher";
 import { run } from "./legacy";
 import { PreviewTabs } from "./preview-tab/PreviewTabs";
@@ -46,7 +59,7 @@ export function TitleBar() {
     nameRef.current?.select();
   }, [renaming]);
   const { tabs: previewTabs } = usePreviewTabs();
-  const { tabs: fileTabs, currentId, hidden: currentHidden } = useFileTabs();
+  const { tabs: fileTabs, currentId, hidden: currentHidden, pendingId } = useFileTabs();
   // The repositories / chats sidebar lists local repositories: desktop only.
   const repositories = can("projects");
 
@@ -158,12 +171,13 @@ export function TitleBar() {
       className={cn(
         tab,
         "group/document-tab min-w-0 shrink gap-0 pr-1 data-dragging:opacity-50",
-        documentActive && tabActive,
+        documentActive && !pendingId && tabActive,
         currentHidden && "hidden",
       )}
       onClick={() => {
         showPreviewTab(null);
-        if (filesView) (window.fileLibrary as { showEditor?: () => void } | undefined)?.showEditor?.();
+        if (filesView)
+          (window.fileLibrary as { showEditor?: () => void } | undefined)?.showEditor?.();
       }}
       onDoubleClick={() => setRenaming(true)}
     >
@@ -294,7 +308,12 @@ export function TitleBar() {
                 <div
                   data-file-tab={file.id}
                   {...dragProps(file.id)}
-                  className={cn(tab, "group/file-tab min-w-0 shrink gap-0 pr-1 data-dragging:opacity-50")}
+                  data-switch-pending={file.id === pendingId ? "" : undefined}
+                  className={cn(
+                    tab,
+                    "group/file-tab min-w-0 shrink gap-0 pr-1 data-dragging:opacity-50",
+                    file.id === pendingId && tabActive,
+                  )}
                   onClick={() => showFile(file.id)}
                 >
                   <File className="mr-1.5" />

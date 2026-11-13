@@ -1,60 +1,218 @@
-const {onWindowClosed}=require('./window-cleanup.cjs');
-const fs=require('node:fs/promises');const os=require('node:os');const path=require('node:path');
-const {execFile}=require('node:child_process');const {app,safeStorage}=require('electron');const {pathToFileURL}=require('node:url');const exec=require('node:util').promisify(execFile);const agents=require('./agents.cjs');
-function registerGeneration(handle,parent){let active=null;
- onWindowClosed(parent,()=>active?.cancel());
- handle('generateVector',async options=>{
-  if(active)throw Error('A vector is already being generated');
-  if(!options||!['claude','codex'].includes(options.agent)||typeof options.prompt!=='string'||!options.prompt.trim()||options.prompt.length>4000)throw Error('Choose an agent and a prompt under 4000 characters');
-  const provider=(await agents.discover()).find(a=>a.id===options.agent&&a.available);if(!provider)throw Error('Selected agent CLI is not installed');
-  const root=await fs.mkdtemp(path.join(os.tmpdir(),'better-vector-'));
-  try{
-   await exec('git',['init',root]);
-   const svg=await new Promise((resolve,reject)=>{
-    let output='',done=false,timer;
-    const finish=(error,value)=>{if(done)return;done=true;clearTimeout(timer);error?reject(error):resolve(value);};
-    active=agents.start(provider.path,provider.id,'Create one original standalone SVG illustration for the following request. Return only the SVG markup, starting with <svg and ending with </svg>. Use a viewBox of 0 0 512 512. Use vector shapes, paths and text only. No external references, images, scripts, foreignObject, event handlers, or tools. Do not read or change any files. Request: '+options.prompt,root,event=>{
-     if(event.type==='stdout'){output+=event.text;if(output.length>2*1024*1024){active?.cancel();finish(Error('Generated SVG exceeded 2 MB'));}}
-     if(event.type==='error')finish(Error(event.text));
-     if(event.type==='exit'){if(event.code!==0){finish(Error('Agent generation failed; check CLI account and permissions'));return;}const match=output.match(/<svg\b[\s\S]*?<\/svg>/i);if(!match)finish(Error('Agent did not return SVG; try a more specific illustration prompt'));else finish(null,match[0]);}
-    });timer=setTimeout(()=>{active?.cancel();finish(Error('Vector generation timed out'));},90000);
-   });return {svg};
-  }finally{active=null;await fs.rm(root,{recursive:true,force:true});}
- });
- handle('cancelGeneration',()=>{active?.cancel();imageAbort?.abort();return true;});
- // Photographic image providers (integrations/image-provider.mjs). Settings live in
- // userData/image-provider.json; the API key is stored only as safeStorage ciphertext (macOS Keychain
- // backed). When OS encryption is unavailable the key is kept in memory for this session and never
- // written. The key is never returned to the renderer, logged, or included in error messages.
- const settingsFile=()=>path.join(app.getPath('userData'),'image-provider.json');
- let sessionKey='',imageAbort=null;
- const loadProvider=()=>import(pathToFileURL(path.join(__dirname,'../integrations/image-provider.mjs')).href);
- async function readSettings(){try{return JSON.parse(await fs.readFile(settingsFile(),'utf8'));}catch{return {};}}
- function storedKey(saved){if(saved.key&&safeStorage.isEncryptionAvailable()){try{return safeStorage.decryptString(Buffer.from(saved.key,'base64'));}catch{return '';}}return sessionKey;}
- async function publicSettings(){const provider=await loadProvider(),saved=await readSettings();let settings;try{settings=provider.normalizeSettings(saved);}catch{settings=provider.normalizeSettings({});}const secure=safeStorage.isEncryptionAvailable();const hasKey=!!storedKey(saved);return {...settings,hasKey,keyStorage:hasKey?(saved.key?'keychain':'session'):'none',secureStorage:secure,configured:!!saved.baseURL};}
- handle('imageProviderGet',()=>publicSettings());
- handle('imageProviderSet',async(options={})=>{
-  if(!options||typeof options!=='object')throw Error('Provider settings are required');
-  const provider=await loadProvider(),saved=await readSettings();
-  const settings=provider.normalizeSettings({...saved,...Object.fromEntries(['provider','baseURL','model','size'].filter(k=>options[k]!==undefined).map(k=>[k,options[k]]))});
-  const next={...settings,...(saved.key?{key:saved.key}:{})};
-  if(options.clearKey){delete next.key;sessionKey='';}
-  if(options.apiKey!==undefined&&options.apiKey!==''){
-   if(typeof options.apiKey!=='string'||options.apiKey.length>4096||/\s/.test(options.apiKey))throw Error('Invalid API key');
-   if(safeStorage.isEncryptionAvailable()){next.key=safeStorage.encryptString(options.apiKey).toString('base64');sessionKey='';}
-   else{delete next.key;sessionKey=options.apiKey;}
-  }
-  await fs.mkdir(path.dirname(settingsFile()),{recursive:true});
-  const temp=settingsFile()+'.'+process.pid+'.tmp';await fs.writeFile(temp,JSON.stringify(next,null,1),{mode:0o600});await fs.rename(temp,settingsFile());
-  return publicSettings();
- });
- handle('generateImage',async(options={})=>{
-  if(imageAbort)throw Error('An image is already being generated');
-  const provider=await loadProvider(),saved=await readSettings();
-  if(!saved.baseURL&&!saved.provider)throw Error('Configure an image provider first');
-  imageAbort=new AbortController();
-  try{return await provider.generateImage({settings:{...saved,...(options.size?{size:options.size}:{})},apiKey:storedKey(saved),prompt:options.prompt,signal:imageAbort.signal});}
-  finally{imageAbort=null;}
- });
+const { onWindowClosed } = require("./window-cleanup.cjs");
+const fs = require("node:fs/promises");
+const path = require("node:path");
+const { app, safeStorage } = require("electron");
+const { isEncryptionAvailable, seal, unseal } = require("./secure-storage.cjs");
+const { pathToFileURL } = require("node:url");
+const codexImage = require("./codex-image.cjs");
+function registerGeneration(handle, parent) {
+  onWindowClosed(parent, () => imageGenerator.cancel(parent));
+  handle("imageProviderGet", () => imageGenerator.get());
+  handle("imageProviderSet", (options) => imageGenerator.set(options));
+  handle("generateImage", (options) => imageGenerator.generate(options, parent));
 }
-module.exports={registerGeneration};
+
+// One service shared by all windows and MCP. Only ciphertext is persisted.
+function createImageGenerator() {
+  const settingsFile = () => path.join(app.getPath("userData"), "image-provider.json");
+  const sessionKeys = {};
+  const imageAborts = new Map();
+  const mcpAttempts = [];
+  let queue = Promise.resolve();
+  const load = () =>
+    import(pathToFileURL(path.join(__dirname, "../integrations/image-provider.mjs")).href);
+  const secure = () => isEncryptionAvailable(safeStorage);
+  async function save(settings) {
+    await fs.mkdir(path.dirname(settingsFile()), { recursive: true });
+    const temp = settingsFile() + "." + process.pid + ".tmp";
+    await fs.writeFile(temp, JSON.stringify(settings, null, 2), { mode: 0o600 });
+    await fs.rename(temp, settingsFile());
+  }
+  async function read() {
+    let raw = {};
+    try {
+      raw = JSON.parse(await fs.readFile(settingsFile(), "utf8"));
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        await fs.copyFile(settingsFile(), settingsFile() + ".bak");
+      }
+    }
+    const engine = await load();
+    const saved = engine.migrateSettings(raw);
+    if (raw?.version !== 2) await save(saved);
+    if (
+      !saved.providerChosen &&
+      !Object.values(saved.keys).some(Boolean) &&
+      !Object.values(sessionKeys).some(Boolean)
+    )
+      saved.defaultProvider = (await codexImage.status()).available
+        ? "codex_plan"
+        : engine.DEFAULT_IMAGE_PROVIDER;
+    return saved;
+  }
+  async function key(saved, vendor) {
+    if (saved.keys[vendor] && (await secure())) {
+      try {
+        return await unseal(safeStorage, saved.keys[vendor]);
+      } catch {
+        return "";
+      }
+    }
+    return sessionKeys[vendor] || "";
+  }
+  async function publicSettings(saved) {
+    const engine = await load();
+    const keys = Object.fromEntries(
+      await Promise.all(
+        ["openai", "google", "custom"].map(async (v) => {
+          const hasKey = !!(await key(saved, v));
+          return [
+            v,
+            { hasKey, keyStorage: hasKey ? (saved.keys[v] ? "keychain" : "session") : "none" },
+          ];
+        }),
+      ),
+    );
+    const codex = await codexImage.status();
+    return {
+      defaultProvider: saved.defaultProvider,
+      providers: engine.IMAGE_PROVIDERS.map((p) => ({
+        id: p.id,
+        label: p.label,
+        vendor: p.vendor,
+        model: p.vendor === "custom" ? saved.custom.model : p.model,
+        hasKey: keys[p.vendor]?.hasKey || false,
+        ...(p.vendor === "codex" ? { status: codex.status } : {}),
+        available:
+          p.vendor === "codex"
+            ? codex.available
+            : keys[p.vendor].hasKey || (p.vendor === "custom" && saved.custom.provider === "http"),
+      })),
+      keys,
+      custom: saved.custom,
+      secureStorage:
+        Object.keys(saved.keys).length || Object.keys(sessionKeys).length ? await secure() : null,
+      ...saved.custom,
+      ...keys.custom,
+      configured:
+        saved.defaultProvider === "codex_plan"
+          ? codex.available
+          : saved.defaultProvider === "custom" ||
+            keys[engine.IMAGE_PROVIDERS.find((p) => p.id === saved.defaultProvider).vendor].hasKey,
+    };
+  }
+  function locked(fn) {
+    const result = queue.then(fn);
+    queue = result.catch(() => {});
+    return result;
+  }
+  return {
+    get: () => locked(async () => publicSettings(await read())),
+    set: (options = {}) =>
+      locked(async () => {
+        if (!options || typeof options !== "object") throw Error("Provider settings are required");
+        const engine = await load(),
+          saved = await read();
+        const legacy = Object.fromEntries(
+          ["provider", "baseURL", "model", "size"]
+            .filter((k) => options[k] !== undefined)
+            .map((k) => [k, options[k]]),
+        );
+        const vendor = options.vendor || "custom";
+        if (!["openai", "google", "custom"].includes(vendor)) throw Error("Unknown key vendor");
+        if (
+          options.defaultProvider &&
+          !engine.IMAGE_PROVIDERS.some((p) => p.id === options.defaultProvider)
+        )
+          throw Error("Unknown image provider");
+        if (options.custom || Object.keys(legacy).length) {
+          const custom = engine.normalizeSettings({
+            ...saved.custom,
+            ...options.custom,
+            ...legacy,
+          });
+          if (!["openai", "http"].includes(custom.provider)) throw Error("Invalid custom adapter");
+        }
+        const next = engine.migrateSettings({
+          ...saved,
+          providerChosen:
+            saved.providerChosen || !!options.defaultProvider || !!Object.keys(legacy).length,
+          defaultProvider:
+            options.defaultProvider ??
+            (Object.keys(legacy).length ? "custom" : saved.defaultProvider),
+          custom: { ...saved.custom, ...options.custom, ...legacy },
+        });
+        if (
+          options.apiKey !== undefined &&
+          (typeof options.apiKey !== "string" ||
+            options.apiKey.length > 4096 ||
+            /\s/.test(options.apiKey))
+        )
+          throw Error("Invalid API key");
+        if (options.clearKey) {
+          delete next.keys[vendor];
+          delete sessionKeys[vendor];
+        }
+        if (options.apiKey) {
+          if (await secure()) {
+            next.keys[vendor] = await seal(safeStorage, options.apiKey);
+            delete sessionKeys[vendor];
+          } else {
+            delete next.keys[vendor];
+            sessionKeys[vendor] = options.apiKey;
+          }
+        }
+        await save(next);
+        return publicSettings(next);
+      }),
+    cancel: (caller = "mcp") => imageAborts.get(caller)?.abort(),
+    generate: async (options = {}, caller = "mcp") => {
+      if (imageAborts.has(caller)) throw Error("An image is already being generated");
+      if (caller === "mcp") {
+        const now = Date.now();
+        while (mcpAttempts.length && mcpAttempts[0] <= now - 3600000) mcpAttempts.shift();
+        if (mcpAttempts.length >= 5)
+          throw Error("Image generation limit reached (5 attempts per hour)");
+        mcpAttempts.push(now);
+      }
+      const imageAbort = new AbortController();
+      imageAborts.set(caller, imageAbort);
+      const signal = imageAbort.signal;
+      try {
+        const saved = await locked(read),
+          engine = await load();
+        const id = options.provider || saved.defaultProvider;
+        const entry = engine.IMAGE_PROVIDERS.find((p) => p.id === id);
+        if (!entry) throw Error("Unknown image provider");
+        // Test-only loopback overrides are never accepted through renderer IPC.
+        const overrides = {};
+        for (const vendor of ["google", "openai"]) {
+          const raw = process.env["VERYNIZE_TEST_IMAGE_" + vendor.toUpperCase() + "_URL"];
+          if (raw && !app.isPackaged) {
+            const url = new URL(raw);
+            if (
+              url.protocol !== "http:" ||
+              !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)
+            )
+              throw Error("Image test override must be loopback HTTP");
+            overrides[vendor] = raw;
+          }
+        }
+        return await engine.generateImage({
+          settings: {
+            ...engine.providerSettings(saved, id, overrides),
+            ...(options.size ? { size: options.size } : {}),
+          },
+          apiKey: await key(saved, entry.vendor),
+          prompt: options.prompt,
+          signal,
+          codex: codexImage.generate,
+        });
+      } finally {
+        imageAborts.delete(caller);
+      }
+    },
+  };
+}
+const imageGenerator = createImageGenerator();
+module.exports = { registerGeneration, imageGenerator };

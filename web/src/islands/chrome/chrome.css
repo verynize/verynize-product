@@ -84,7 +84,7 @@ body.bd-chrome.agent-chat-open > main {
   width: calc(100% - var(--chat-dock-width)) !important;
 }
 body.bd-chrome.agent-chat-open > main > #layer-panel {
-  display: block !important;
+  display: flex !important;
 }
 body.bd-chrome.agent-chat-open #agent-chat-dock {
   top: 0 !important;
@@ -141,7 +141,7 @@ body.bd-chrome.chat-sidebar-open.agent-chat-open:not(.code-mode) #file-home {
 }
 
 /* Menu items reuse legacy ids, so unscoped legacy rules (`#project-toggle{position:fixed;left:12px…}`,
- * `#generate-art{margin-top:8px}`, …) would leak in. Island utilities are layered !important and still win. */
+ * `#import{…}`, …) would leak in. Island utilities are layered !important and still win. */
 :is(#bd-app-menu, #bd-zoom-menu) [role^="menuitem"][id] {
   inset: auto !important;
   margin: 0 !important;
@@ -160,4 +160,25 @@ body.bd-chrome.chat-sidebar-open.agent-chat-open:not(.code-mode) #file-home {
 }
 :is(#bd-app-menu, #bd-zoom-menu) [role^="menuitem"][id] img {
   display: none;
+}
+
+/* Finder focus is above the artwork, below chrome, and never intercepts canvas input.
+ * A light dim marks finder mode, but only when the whole result is in view: dimming around a result larger
+ * than the view would draw a straight edge that reads as a different page background. */
+#find-layers-spotlight {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  border-radius: 2px;
+  outline: 2px solid var(--color-find-active);
+  outline-offset: 1px;
+}
+#find-layers-spotlight[data-fits] {
+  box-shadow: 0 0 0 100vmax var(--color-find-scrim);
+}
+
+/* Home owns the opening surface, including the interval before its island mounts.
+   Keep editor geometry measurable without exposing the previous document/chrome. */
+body.files-view > main {
+  visibility: hidden;
 }

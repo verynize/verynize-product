@@ -1,0 +1,27 @@
+{
+  "title": "Horizontal elliptical radius approximation and contained image background",
+  "covers": ["border-radius", "background-size"],
+  "expect": [
+    {
+      "node": "Panel",
+      "prop": "radius",
+      "eq": {
+        "tl": 12,
+        "tr": 12,
+        "br": 12,
+        "bl": 12
+      }
+    },
+    {
+      "node": "Panel",
+      "prop": "fills",
+      "eq": [
+        {
+          "type": "image",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jJ1kAAAAASUVORK5CYII=",
+          "fit": "contain"
+        }
+      ]
+    }
+  ]
+}

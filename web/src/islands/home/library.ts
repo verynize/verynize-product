@@ -45,6 +45,7 @@ type FileLibraryApi = {
   readonly currentId: string | null;
   setFolder(id: string | null): void;
   open(id: string): Promise<string | undefined>;
+  openRoomFile(room: CloudRoom): Promise<string | undefined>;
   create(): Promise<void>;
   rename(id: string, name: string): Promise<boolean>;
   duplicate(id: string): Promise<string | null>;

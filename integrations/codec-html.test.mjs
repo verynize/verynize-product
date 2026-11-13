@@ -211,7 +211,11 @@ test("remote stylesheets over http: opt-in, size limit and timeout", async () =>
       off.warnings.some((w) => /remote loading is off/.test(w)),
       "remote CSS is not fetched unless allowed",
     );
-    const on = await importHtml(html, {
+    await assert.rejects(
+      importHtml(html, { baseUrl: `${url}/index.html`, allowRemote: true, maxBytes: 4096 }),
+      /exceeds limit 4096 bytes/,
+    );
+    const on = await importHtml(html.replace('<link rel="stylesheet" href="/big.css">', ""), {
       baseUrl: `${url}/index.html`,
       allowRemote: true,
       maxBytes: 4096,
@@ -228,18 +232,15 @@ test("remote stylesheets over http: opt-in, size limit and timeout", async () =>
       "a :root colour used through var() becomes a bound colour variable",
     );
     assert.equal(on.document.tokens.brand, "#4f46e5");
-    assert.ok(
-      on.warnings.some((w) => /big\.css exceeds 4096 bytes/.test(w)),
-      "size limit",
-    );
+
     assert.ok(
       on.warnings.some((w) => /slow\.css/.test(w) && /abort|timeout|timed out/i.test(w)),
       "time limit",
     );
-    assert.equal(
-      byName(on.document, "Logo").srcRemote,
-      `${url}/logo.png`,
-      "remote images keep their absolute URL for the asset fetcher",
+    assert.match(
+      byName(on.document, "Logo").src,
+      /^data:image\//,
+      "opted-in remote images are embedded during import",
     );
   } finally {
     server.close();

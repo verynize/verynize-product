@@ -6,7 +6,7 @@ import path from "node:path";
 import { _electron as electron } from "@playwright/test";
 import { Miniflare, cloudOptions, passwordUser } from "./cloud-harness.mjs";
 import { waitForUiReady } from "./helpers/ui-ready.cjs";
-import { freePort, startProcess, launchBrowser } from "./helpers/web-app.mjs";
+import { freePort, startProcess, launchBrowser, readLibrary } from "./helpers/web-app.mjs";
 import { execFileSync } from "node:child_process";
 
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-database-sync-"));
@@ -29,6 +29,8 @@ try {
   desktop.on("dialog", (dialog) => dialog.accept());
   const errors = [];
   desktop.on("pageerror", (error) => errors.push(error.message));
+  // Other devices' changes are read on focus and every 30 s or more while focused: read them now.
+  const reread = (client) => client.evaluate(() => window.accountStore.refresh());
   const login = (page) =>
     page.evaluate(
       (server) =>
@@ -59,7 +61,7 @@ try {
   await desktop.waitForFunction(() => window.accountStore.ready() && window.cloudWorkspace.room());
   await desktop.evaluate(() => window.cloudWorkspace.flush());
 
-  if (!process.env.VERYNIZE_WEB_NODE_BUILT)
+  if (!process.env.TEST_WEB_NODE_BUILT)
     execFileSync(
       process.execPath,
       ["node_modules/vite-plus/bin/vp", "build", "-c", "vite.node.config.ts"],
@@ -96,22 +98,64 @@ try {
   page.setDefaultTimeout(30000);
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("dialog", (dialog) => dialog.accept());
+  const transcriptReads = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "GET" &&
+      decodeURIComponent(new URL(request.url()).pathname).startsWith("/api/me/state/chat:")
+    )
+      transcriptReads.push(request.url());
+  });
   await page.goto(origin + "/");
 
   await waitForUiReady(page);
 
   await page.waitForFunction(() => window.accountStore?.ready());
+  assert.equal(transcriptReads.length, 0, "deferred Home does not fetch a transcript");
+  assert.equal(await page.evaluate(() => typeof window.agentWorkspace), "undefined");
+  // The chat runtime is editor-only. Initialize it explicitly while keeping its panel closed
+  // before checking summary hydration and transcript fetching below.
+  await page.evaluate(() => window.verynizeEditorBoot());
 
   await page.waitForFunction(() =>
     window.agentWorkspace.getState().conversations.some((chat) => chat.id === "legacy-history"),
   );
-  await page.evaluate(() => window.agentWorkspace.selectChat("legacy-history"));
+  // The list holds chat summaries; selecting a chat fetches its transcript.
+  assert.equal(
+    await page.evaluate(
+      () =>
+        window.agentWorkspace.getState().conversations.find((c) => c.id === "legacy-history").count,
+    ),
+    2,
+  );
+  assert.equal(transcriptReads.length, 0, "closed chat initializes summaries only");
+  await page.evaluate(() => window.accountStore.refresh());
+  assert.equal(transcriptReads.length, 0, "closed-panel refresh does not fetch a transcript");
+  await page.evaluate(() => {
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.selectChat("legacy-history");
+  });
+  await page.waitForFunction(() => window.agentWorkspace.getState().messages.length === 2);
   assert.deepEqual(
     await page.evaluate(() =>
       window.agentWorkspace.getState().messages.map((message) => message.text),
     ),
     ["Make a landing page", "The design is ready " + "🌴".repeat(300000)],
   );
+  assert.equal(transcriptReads.length, 1, "opening and selecting share one request");
+  await page
+    .locator(".chat-message.user")
+    .filter({ hasText: "Make a landing page" })
+    .waitFor({ state: "attached" });
+  await page.evaluate(() => {
+    window.agentWorkspace.closeChat();
+    window.agentWorkspace.openChat();
+    window.agentWorkspace.selectChat("legacy-history");
+  });
+  await page.evaluate(() => window.accountStore.refresh());
+  assert.equal(transcriptReads.length, 1, "reopening uses the cached transcript");
+  await page.evaluate(() => window.agentWorkspace.closeChat());
   const fileId = await desktop.evaluate(async () => {
     const document = {
       version: 2,
@@ -124,6 +168,8 @@ try {
   });
   const cloud = await desktop.evaluate((id) => window.fileLibrary.cloudOf(id), fileId);
   assert.ok(cloud, "creation resolves only after database storage");
+  // Another device's new file shows on focus or the next minute's poll: ask now.
+  await page.evaluate(() => window.dispatchEvent(new CustomEvent("cloud-files-changed")));
   await page.locator(`[data-room-id="${cloud.roomId}"] .file-open`).waitFor();
   await page.locator(`[data-room-id="${cloud.roomId}"] .file-open`).click();
   await page.waitForFunction((id) => window.cloudWorkspace.room()?.id === id, cloud.roomId);
@@ -168,6 +214,7 @@ try {
   await desktop.evaluate(() => window.agentBehavior.set({ followUp: "steer", expandWork: true }));
   const chatId = await desktop.evaluate(() => window.agentWorkspace.getState().conversationId);
   await desktop.evaluate(() => window.accountStore.flush());
+  await reread(page);
   await page.waitForFunction(
     (id) =>
       window.agentWorkspace.getState().conversations.some((c) => c.id === id) &&
@@ -190,6 +237,7 @@ try {
   );
   await page.evaluate(() => window.appPreferences.set({ largeNudge: 42 }));
   await page.evaluate(() => window.accountStore.flush());
+  await reread(desktop);
   await desktop.waitForFunction(() => window.appPreferences.get().largeNudge === 42);
   const folder = await desktop.evaluate(() => window.fileLibrary.createFolder("Shared folder"));
   await desktop.evaluate(
@@ -200,6 +248,7 @@ try {
     { id: fileId, folder },
   );
   await desktop.evaluate(() => window.accountStore.flush());
+  await reread(page);
   await page.waitForFunction(
     ({ folder, roomId }) =>
       window.fileLibrary.folders().some((f) => f.id === folder) &&
@@ -213,14 +262,18 @@ try {
   for (const client of [desktop, page]) {
     assert.equal(await client.evaluate(() => localStorage.getItem("verynize-v2")), null);
     assert.equal(await client.evaluate(() => localStorage.getItem("better-preferences")), null);
-    const stored = await client.evaluate(() =>
+    // The library lives in IndexedDB (web/library-storage.js); an older localStorage copy, if any, holds no design either.
+    const noDesign = (library) =>
+      library.files
+        .filter((f) => f.cloud && !f.cloud.detached)
+        .every((f) => f.document.pages.every((p) => p.nodes.length === 0));
+    const stored = await readLibrary(client);
+    assert.ok(stored.files.some((f) => f.cloud && !f.cloud.detached));
+    assert.ok(noDesign(stored));
+    const legacy = await client.evaluate(() =>
       JSON.parse(localStorage.getItem("verynize-library-v1")),
     );
-    assert.ok(
-      stored.files
-        .filter((f) => f.cloud && !f.cloud.detached)
-        .every((f) => f.document.pages.every((p) => p.nodes.length === 0)),
-    );
+    assert.ok(legacy === null || noDesign(legacy));
   }
   // Reload reads the room from the database, never the empty local reference.
   await page.reload();
@@ -242,12 +295,14 @@ try {
       body: JSON.stringify({ displayName: "Synced profile name" }),
     }),
   );
+  await reread(page);
   await page.waitForFunction(
     () => window.cloudAccount.get().account.displayName === "Synced profile name",
   );
 
   await desktop.evaluate((id) => window.agentWorkspace.removeChat(id), chatId);
   await desktop.evaluate(() => window.accountStore.flush());
+  await reread(page);
   await page.waitForFunction(
     (id) => !window.agentWorkspace.getState().conversations.some((chat) => chat.id === id),
     chatId,

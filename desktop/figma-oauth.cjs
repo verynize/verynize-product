@@ -11,6 +11,7 @@
 // loopback port is a setting. Secrets never leave the main process: the renderer only sees status.
 // Endpoints default to Figma's; VERYNIZE_FIGMA_OAUTH_ORIGIN (loopback http only) points them at a local
 // fixture server for tests.
+const { isEncryptionAvailable, seal, unseal } = require("./secure-storage.cjs");
 const http = require("node:http");
 const fs = require("node:fs/promises");
 const path = require("node:path");
@@ -42,8 +43,8 @@ const validClientId = (v) => typeof v === "string" && /^[A-Za-z0-9_-]{4,200}$/.t
 const validPort = (v) => Number.isInteger(v) && v >= 1024 && v <= 65535;
 
 /**
- * @param {{file:string, safeStorage:{isEncryptionAvailable():boolean, encryptString(s:string):Buffer, decryptString(b:Buffer):string},
- *          openExternal(url:string):Promise<unknown>, fetcher?:typeof fetch, origin?:string, timeoutMs?:number, now?:()=>number}} options
+ * @param {{file:string, safeStorage:{isAsyncEncryptionAvailable():Promise<boolean>, encryptStringAsync(s:string):Promise<Buffer>, decryptStringAsync(b:Buffer):Promise<{result:string}>},
+ *          openExternal:(url:string)=>Promise<unknown>, fetcher?:typeof fetch, origin?:string, timeoutMs?:number, now?:()=>number}} options
  */
 function createFigmaOAuth({
   file,
@@ -69,24 +70,27 @@ function createFigmaOAuth({
       port: validPort(raw.port) ? raw.port : DEFAULT_PORT,
     };
     let secrets = {};
-    if (typeof raw.sealed === "string" && raw.sealed) {
+    if (
+      typeof raw.sealed === "string" &&
+      raw.sealed &&
+      (await isEncryptionAvailable(safeStorage))
+    ) {
       try {
-        secrets = JSON.parse(safeStorage.decryptString(Buffer.from(raw.sealed, "base64")));
+        secrets = JSON.parse(await unseal(safeStorage, raw.sealed));
       } catch {
         secrets = {};
       }
     }
-    return { config, secrets };
+    return { config, secrets, sealed: typeof raw.sealed === "string" && !!raw.sealed };
   }
   async function save(config, secrets) {
     const hasSecrets = Object.values(secrets).some(
       (v) => v !== undefined && v !== null && v !== "",
     );
-    if (hasSecrets && !safeStorage.isEncryptionAvailable())
+    if (hasSecrets && !(await isEncryptionAvailable(safeStorage)))
       throw new Error("Secure storage is unavailable; the Figma account cannot be saved");
     const body = { clientId: config.clientId || "", port: config.port || DEFAULT_PORT };
-    if (hasSecrets)
-      body.sealed = safeStorage.encryptString(JSON.stringify(secrets)).toString("base64");
+    if (hasSecrets) body.sealed = await seal(safeStorage, JSON.stringify(secrets));
     await fs.mkdir(path.dirname(file), { recursive: true });
     const temp = `${file}.${crypto.randomUUID()}.tmp`;
     await fs.writeFile(temp, JSON.stringify(body), { mode: 0o600 });
@@ -94,7 +98,7 @@ function createFigmaOAuth({
   }
 
   async function status() {
-    const { config, secrets } = await load();
+    const { config, secrets, sealed } = await load();
     return {
       clientId: config.clientId || "",
       port: config.port || DEFAULT_PORT,
@@ -104,7 +108,7 @@ function createFigmaOAuth({
       expiresAt: secrets.expiresAt || null,
       pending: !!pending,
       redirectUri: `http://127.0.0.1:${config.port || DEFAULT_PORT}${CALLBACK}`,
-      secureStorage: safeStorage.isEncryptionAvailable(),
+      secureStorage: sealed ? await isEncryptionAvailable(safeStorage) : null,
     };
   }
 
@@ -184,7 +188,7 @@ function createFigmaOAuth({
     if (pending) throw new Error("A Figma sign-in is already in progress");
     const { config, secrets } = await load();
     if (!config.clientId) throw new Error("Add your Figma OAuth client ID first");
-    if (!safeStorage.isEncryptionAvailable())
+    if (!(await isEncryptionAvailable(safeStorage)))
       throw new Error("Secure storage is unavailable; the Figma account cannot be saved");
     const verifier = base64url(crypto.randomBytes(32)),
       challenge = base64url(crypto.createHash("sha256").update(verifier).digest()),

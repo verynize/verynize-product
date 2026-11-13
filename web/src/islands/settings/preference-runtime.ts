@@ -4,15 +4,27 @@
 import { preferencesApi, type Preferences } from "./api";
 import { platform } from "@/lib/platform";
 
-type AgentEvent = { type: string; chatId?: string; code?: number; stopped?: boolean; toolName?: string };
+type AgentEvent = {
+  type: string;
+  chatId?: string;
+  code?: number;
+  stopped?: boolean;
+  toolName?: string;
+};
 
 export type AppPreferencesApi = {
   chooseSound(): Promise<{ name: string; size: number } | null>;
   readSound(): Promise<Uint8Array | null>;
   clearSound(): Promise<boolean>;
-  linksReady(options: { enabled: boolean }): Promise<{ enabled: boolean; registered: boolean; reason?: string; pending: string[] }>;
-  setLinksEnabled(enabled: boolean): Promise<{ enabled: boolean; registered: boolean; reason?: string }>;
-  worktreeLineStats(roots: string[]): Promise<Record<string, { added: number; removed: number; files: number } | { error: string }>>;
+  linksReady(options: {
+    enabled: boolean;
+  }): Promise<{ enabled: boolean; registered: boolean; reason?: string; pending: string[] }>;
+  setLinksEnabled(
+    enabled: boolean,
+  ): Promise<{ enabled: boolean; registered: boolean; reason?: string }>;
+  worktreeLineStats(
+    roots: string[],
+  ): Promise<Record<string, { added: number; removed: number; files: number } | { error: string }>>;
   onOpenLink(callback: (url: string) => void): () => void;
 };
 
@@ -22,7 +34,15 @@ export const appPreferencesApi = () => desktop()?.appPreferences;
 const prefs = (): Partial<Preferences> => preferencesApi()?.get() ?? {};
 
 /* ---------- Sounds ---------- */
-export const BUILT_IN_SOUNDS = ["chime", "bell", "marimba", "crystal", "rise", "droplet", "pop"] as const;
+export const BUILT_IN_SOUNDS = [
+  "chime",
+  "bell",
+  "marimba",
+  "crystal",
+  "rise",
+  "droplet",
+  "pop",
+] as const;
 
 // [frequency Hz, start s, length s, peak gain, waveform]
 type Note = [number, number, number, number, OscillatorType];
@@ -68,7 +88,8 @@ function synth(kind: string) {
     const t = audio.currentTime + start;
     oscillator.frequency.setValueAtTime(frequency, t);
     // Droplet glides down like a water drop.
-    if (kind === "droplet") oscillator.frequency.exponentialRampToValueAtTime(frequency / 2.4, t + length);
+    if (kind === "droplet")
+      oscillator.frequency.exponentialRampToValueAtTime(frequency / 2.4, t + length);
     gain.gain.setValueAtTime(0.0001, t);
     gain.gain.exponentialRampToValueAtTime(peak, t + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, t + length);
@@ -116,16 +137,27 @@ const NEEDS_YOU = new Set(["permission-request", "question-request"]);
 function handleAgentEvent(event: AgentEvent): boolean {
   const p = prefs();
   const notify = (title: string, body: string) => {
-    if (p.notifications && !document.hasFocus()) void desktop()?.notifyTask({ title, body }).catch(() => {});
+    if (p.notifications && !document.hasFocus())
+      void desktop()
+        ?.notifyTask({ title, body })
+        .catch(() => {});
   };
   if (event.type === "done") {
     if (event.stopped) return true;
-    notify("Chat finished", event.code === 0 ? "Your chat is ready." : "The chat ended with an error.");
+    notify(
+      "Chat finished",
+      event.code === 0 ? "Your chat is ready." : "The chat ended with an error.",
+    );
     if (p.sound && p.sound !== "none") void playSound(p.sound);
     return true;
   }
   if (NEEDS_YOU.has(event.type)) {
-    notify("Verynize needs you", event.type === "question-request" ? "A chat has a question for you." : "A chat is waiting for your approval.");
+    notify(
+      "Verynize needs you",
+      event.type === "question-request"
+        ? "A chat has a question for you."
+        : "A chat is waiting for your approval.",
+    );
     return true;
   }
   return false;
@@ -141,7 +173,9 @@ function openDesignLink(url: string) {
   }
   if (parsed.protocol !== "verynize:") return;
   window.appSettings?.close?.();
-  const ws = window.agentWorkspace as unknown as { setCodeMode?(on: boolean): void; openLink?(url: string): boolean } | undefined;
+  const ws = window.agentWorkspace as unknown as
+    | { setCodeMode?(on: boolean): void; openLink?(url: string): boolean }
+    | undefined;
   // verynize://join?invite=<https invite URL>: the share dialog joins the room (it asks before loading).
   if (parsed.host === "join") {
     const invite = parsed.searchParams.get("invite") ?? "";
@@ -171,7 +205,9 @@ let started = false;
 export function startPreferenceRuntime() {
   if (started) return;
   started = true;
-  (window as unknown as { verynizeAlerts?: { handle(event: AgentEvent): boolean } }).verynizeAlerts = { handle: handleAgentEvent };
+  (
+    window as unknown as { verynizeAlerts?: { handle(event: AgentEvent): boolean } }
+  ).verynizeAlerts = { handle: handleAgentEvent };
   const api = appPreferencesApi();
   if (!api) return;
   let enabled = prefs().openLinksInApp !== false;

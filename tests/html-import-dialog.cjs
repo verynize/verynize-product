@@ -2,7 +2,7 @@
 // (resolved relative to the file by desktop/html-import.cjs -> integrations/codec-html.mjs), the
 // viewport selector (media queries), :root variables becoming colour/typed variables, and pasted HTML.
 const { _electron } = require("@playwright/test");
-const { waitForUiReady } = require('./helpers/ui-ready.cjs');
+const { waitForUiReady } = require("./helpers/ui-ready.cjs");
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const os = require("node:os");
@@ -26,7 +26,8 @@ const path = require("node:path");
   );
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     timeout: 20000,
     env,
@@ -47,13 +48,18 @@ const path = require("node:path");
       await page.locator("#import").click();
       await page.waitForSelector("#import-viewport", { state: "visible" });
     };
+    // The viewport picker is a shadcn Select (a listbox, not a native <select>).
+    const chooseViewport = async (label) => {
+      await page.locator("#import-viewport").click();
+      await page.getByRole("option", { name: label, exact: true }).click();
+    };
     const closed = () =>
-      page.waitForFunction(() => !document.getElementById("modal").open, null, { timeout: 15000 });
+      page.waitForFunction(() => !document.getElementById("modal"), null, { timeout: 15000 });
     const before = await page.evaluate(() => window.design.getDocument().pages[0].nodes.length);
 
     await open();
     assert.equal(await page.locator("#html-import-options").isVisible(), true);
-    await page.locator("#import-viewport").selectOption("1280x800");
+    await chooseViewport("Laptop · 1280");
     await page.locator("#import-file").click();
     await closed();
     let doc = await page.evaluate(() => window.design.getDocument());
@@ -83,7 +89,7 @@ const path = require("node:path");
 
     // Phone viewport: the stylesheet's media query applies.
     await open();
-    await page.locator("#import-viewport").selectOption("390x844");
+    await chooseViewport("Phone · 390");
     await page.locator("#import-file").click();
     await closed();
     doc = await page.evaluate(() => window.design.getDocument());

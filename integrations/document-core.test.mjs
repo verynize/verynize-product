@@ -5,6 +5,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
+  NODE_LIMITS,
+  nodeLimitMessage,
   validateDocument as coreValidate,
   normalizeDocument,
   prepareDocument,
@@ -15,8 +17,9 @@ import { validateDocument } from "./design-store.mjs";
 
 const read = (rel) => readFileSync(new URL("../" + rel, import.meta.url), "utf8");
 // The canvas layer defaults (`const defaults={…}` in web/app.js), a plain object literal.
+// oxlint-disable-next-line typescript/no-implied-eval -- evaluates the object literal copied from web/app.js
 const DEFAULTS = Function(
-  `return (${read("web/app.js").match(/const defaults=(\{[^}]*\})/)[1]})`,
+  `return (${read("web/app.js").match(/const defaults\s*=\s*(\{[^}]*\})/)[1]})`,
 )();
 const page = (nodes) => ({ id: "p1", name: "Page 1", nodes });
 const doc = (nodes, extra = {}) => ({
@@ -42,7 +45,7 @@ test("web/app.js has no validator of its own: validate() is prepareDocument with
   const app = read("web/app.js");
   assert.match(
     app,
-    /function validate\(d\)\{return window\.VerynizeDocument\.prepareDocument\(d,defaults\)\}/,
+    /function validate\(d\)\s*\{\s*return window\.VerynizeDocument\.prepareDocument\(d,\s*defaults\);?\s*\}/,
   );
   assert.doesNotMatch(app, /function roomAssetUrl/);
   const html = read("web/index.html");
@@ -121,20 +124,9 @@ test("rules the two validators used to disagree on now hold for both", () => {
   );
   both(doc([rect({ name: "x".repeat(201) })]), /Node name/, "names ≤ 200");
   both(
-    {
-      ...doc([]),
-      pages: [
-        page(Array.from({ length: 5000 }, (_, i) => rect({ id: "a" + i }))),
-        {
-          id: "p2",
-          name: "B",
-          nodes: Array.from({ length: 5000 }, (_, i) => rect({ id: "b" + i })),
-        },
-        { id: "p3", name: "C", nodes: [rect({ id: "c" })] },
-      ],
-    },
-    /10000 nodes/,
-    "10000 layers in total",
+    sizedDocument(NODE_LIMITS.perDocument + 1),
+    /Split the design into multiple documents/,
+    "document node limit",
   );
   both(
     doc([rect()], {
@@ -301,21 +293,7 @@ test("load repairs never rewrite ids or token names and never drop layers", () =
   refuse(doc([rect({ id: "i".repeat(201) })]), /Node id/);
   refuse({ ...doc([rect()]), pages: [{ ...page([rect()]), id: "p".repeat(201) }] }, /Page id/);
   refuse(doc([rect()], { tokens: { ["t".repeat(201)]: "#ffffff" } }), /Token name/);
-  refuse(
-    {
-      ...doc([]),
-      pages: [
-        page(Array.from({ length: 5000 }, (_, i) => rect({ id: "a" + i }))),
-        {
-          id: "p2",
-          name: "B",
-          nodes: Array.from({ length: 5000 }, (_, i) => rect({ id: "b" + i })),
-        },
-        { id: "p3", name: "C", nodes: [rect({ id: "c" })] },
-      ],
-    },
-    /10000 nodes/,
-  );
+  refuse(sizedDocument(NODE_LIMITS.perDocument + 1), /Split the design into multiple documents/);
 });
 
 test("documentProblems lists every problem with its path, not only the first", () => {
@@ -336,4 +314,51 @@ test("documentProblems lists every problem with its path, not only the first", (
   assert.match(problems[1].message, /Node id/);
   assert.deepEqual(documentProblems(doc([rect()])), []);
   assert.equal(documentProblems(null).length, 1);
+});
+
+// Spread full pages without cross-page parents; ids remain document-unique.
+function sizedDocument(count) {
+  const pages = [];
+  for (let offset = 0; offset < count; offset += NODE_LIMITS.perPage)
+    pages.push({
+      id: `p${pages.length + 1}`,
+      name: `Page ${pages.length + 1}`,
+      nodes: Array.from({ length: Math.min(NODE_LIMITS.perPage, count - offset) }, (_, i) =>
+        rect({ id: `node${offset + i}` }),
+      ),
+    });
+  return { ...doc([]), pages };
+}
+
+test("node limits accept boundaries and reject excess without dropping content", () => {
+  for (const count of [NODE_LIMITS.perDocument - 1, NODE_LIMITS.perDocument]) {
+    const d = sizedDocument(count);
+    assert.doesNotThrow(() => coreValidate(d));
+    assert.deepEqual(documentProblems(d), []);
+  }
+  for (const count of [NODE_LIMITS.perPage - 1, NODE_LIMITS.perPage])
+    assert.doesNotThrow(() =>
+      coreValidate(doc(Array.from({ length: count }, (_, i) => rect({ id: `n${i}` })))),
+    );
+  const cases = [
+    [
+      sizedDocument(NODE_LIMITS.perDocument + 1),
+      nodeLimitMessage(NODE_LIMITS.perDocument + 1, NODE_LIMITS.perDocument),
+    ],
+    [
+      doc(Array.from({ length: NODE_LIMITS.perPage + 1 }, (_, i) => rect({ id: `n${i}` }))),
+      nodeLimitMessage(NODE_LIMITS.perPage + 1, NODE_LIMITS.perPage, "Page 1"),
+    ],
+  ];
+  for (const [d, message] of cases) {
+    const original = structuredClone(d);
+    assert.throws(() => coreValidate(d), { message });
+    assert.throws(() => validateDocument(d), { message });
+    assert.throws(() => prepareDocument(d, DEFAULTS, []), { message });
+    assert.deepEqual(
+      d.pages.map((p) => p.nodes.map((n) => n.id)),
+      original.pages.map((p) => p.nodes.map((n) => n.id)),
+    );
+    assert.ok(documentProblems(d).some((p) => p.message === message));
+  }
 });

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "WebWorker"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "types": ["node"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./web/src/*"]
+    }
+  },
+  "include": ["cloud/**/*.js"]
+}

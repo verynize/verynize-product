@@ -6,6 +6,10 @@ import { upgradeWebSocket, waitUntil } from "@vercel/functions";
 import worker, * as objects from "../cloud/worker.js";
 import { createVercelEnv, optionsFromEnvironment } from "../cloud/platform/vercel/env.js";
 import { createHandler } from "../cloud/platform/vercel/handler.js";
+import { startServerTelemetry } from "../server/telemetry.mjs";
+
+// Crash reports when SENTRY_DSN_SERVER is set (server/telemetry.mjs).
+await startServerTelemetry("vercel");
 
 const { env, ready } = createVercelEnv({
   classes: objects,

@@ -11,7 +11,8 @@ const path = require("node:path");
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "inspector-shader-library-"));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
-  env.VERYNIZE_SKIP_ONBOARDING = '1';
+  env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${profile}`],
@@ -33,7 +34,15 @@ const path = require("node:path");
       return page.locator('#canvas [data-id="sh"] canvas.shader-surface').evaluate((c) => {
         const gl = c.getContext("webgl"),
           p = new Uint8Array(4);
-        gl.readPixels(Math.floor(c.width / 2), Math.floor(c.height / 2), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, p);
+        gl.readPixels(
+          Math.floor(c.width / 2),
+          Math.floor(c.height / 2),
+          1,
+          1,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          p,
+        );
         return { rgba: [...p], error: gl.getError() };
       });
     };
@@ -68,7 +77,11 @@ const path = require("node:path");
       });
     await setup();
     await page.waitForSelector("#shader-settings:not([hidden])");
-    assert.equal(await page.locator("#shader-parameters").count(), 0, "classic presets have no colour rows");
+    assert.equal(
+      await page.locator("#shader-parameters").count(),
+      0,
+      "classic presets have no colour rows",
+    );
 
     // Picker: search filters by name and family; no match shows an empty message.
     await page.locator("#shader-settings summary").click();
@@ -79,7 +92,9 @@ const path = require("node:path");
     assert.ok(total >= 19, `catalog has ${total} presets`);
     await gallery.locator("[name=shaderSearch]").fill("ripple");
     assert.deepEqual(
-      await gallery.locator("[data-shader-option]").evaluateAll((els) => els.map((e) => e.dataset.shaderOption)),
+      await gallery
+        .locator("[data-shader-option]")
+        .evaluateAll((els) => els.map((e) => e.dataset.shaderOption)),
       ["ripple-pool-1", "ripple-pool-2", "ripple-pool-3"],
     );
     await gallery.locator("[name=shaderSearch]").fill("zzz");
@@ -102,18 +117,23 @@ const path = require("node:path");
     assert.equal((await node()).shaderSpeed, 0);
     const base = await pixel();
     assert.equal(base.error, 0);
-    assert.ok(base.rgba[3] > 0 && base.rgba.slice(0, 3).some((v) => v > 0), "parametric shader paints");
+    assert.ok(
+      base.rgba[3] > 0 && base.rgba.slice(0, 3).some((v) => v > 0),
+      "parametric shader paints",
+    );
     assert.equal((await params()).colors.center, "#2fb5a3");
 
     // Four colour rows with hex + alpha; a custom colour is stored and rendered.
     for (const label of ["Gradient Center", "Gradient Edge", "Ripple Color", "Background"])
-      assert.ok(await page.locator("#shader-parameters").getByText(label, { exact: true }).isVisible());
+      assert.ok(
+        await page.locator("#shader-parameters").getByText(label, { exact: true }).isVisible(),
+      );
     await page.locator("[name=shader-center]").fill("0000FF");
     await page.locator("[name=shader-center]").press("Enter");
     assert.deepEqual((await node()).shaderColors.center, { color: "#0000ff" });
     assert.equal((await params()).colors.center, "#0000ff");
     const blue = await pixel();
-    assert.ok(blue.rgba[2] > blue.rgba[0], `centre turns blue ${blue.rgba}`);
+    assert.ok(blue.rgba[2] > blue.rgba[0], `centre turns blue ${blue.rgba.join(",")}`);
     await page.locator("[name=shader-backgroundAlpha]").fill("50");
     await page.locator("[name=shader-backgroundAlpha]").press("Enter");
     assert.equal((await node()).shaderColors.background.color, "#020a0b80");
@@ -127,7 +147,7 @@ const path = require("node:path");
     assert.deepEqual(n.shaderColors.center, { color: "#ff0000", token: "brand/glow" });
     assert.equal((await params()).colors.center, "#ff0000");
     const red = await pixel();
-    assert.ok(red.rgba[0] > red.rgba[2], `centre follows the variable ${red.rgba}`);
+    assert.ok(red.rgba[0] > red.rgba[2], `centre follows the variable ${red.rgba.join(",")}`);
     await page.keyboard.press("Escape");
     // Changing the variable re-renders the shader with the new value.
     await page.evaluate(() => {
@@ -138,7 +158,10 @@ const path = require("node:path");
     });
     assert.equal((await params()).colors.center, "#00ff00");
     const green = await pixel();
-    assert.ok(green.rgba[1] > green.rgba[0] && green.rgba[1] > green.rgba[2], `variable change ${green.rgba}`);
+    assert.ok(
+      green.rgba[1] > green.rgba[0] && green.rgba[1] > green.rgba[2],
+      `variable change ${green.rgba.join(",")}`,
+    );
 
     // Shader settings: six sliders, each change one undo step.
     await page.locator("#shader-options-open").click();

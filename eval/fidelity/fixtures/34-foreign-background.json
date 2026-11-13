@@ -1,0 +1,17 @@
+{
+  "title": "Foreign Tailwind URL background",
+  "covers": ["background-image"],
+  "expect": [
+    {
+      "node": "Background",
+      "prop": "fills",
+      "eq": [
+        {
+          "type": "image",
+          "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jJ1kAAAAASUVORK5CYII=",
+          "fit": "cover"
+        }
+      ]
+    }
+  ]
+}

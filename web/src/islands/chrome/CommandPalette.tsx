@@ -28,7 +28,13 @@ import { activePage, design, portalContainer, type LayerNode } from "@/lib/bridg
 import { HELP_LINKS, openExternal } from "./help-links";
 import { applyLayout, currentLayout } from "./hooks";
 import { run } from "./legacy";
-import { keyChips, registryCommands, sectionOfCommand, setPanelOpen, usePanelOpen } from "./shortcuts";
+import {
+  keyChips,
+  registryCommands,
+  sectionOfCommand,
+  setPanelOpen,
+  usePanelOpen,
+} from "./shortcuts";
 
 type Icon = ComponentType<{ className?: string }>;
 
@@ -68,6 +74,14 @@ const mod = /Mac/.test(navigator.platform) ? "⌘" : "Ctrl";
 function appCommands(): PaletteCommand[] {
   const layout = (name: "details" | "design" | "canvas") => () => applyLayout(name);
   return [
+    {
+      id: "app.findLayers",
+      label: "Find layers",
+      section: "Edit",
+      chips: [mod, "F"],
+      icon: Search,
+      run: () => setPanelOpen("find", true),
+    },
     {
       id: "app.shortcuts",
       label: "Open keyboard shortcuts",
@@ -126,8 +140,18 @@ function appCommands(): PaletteCommand[] {
       keywords: ["select", "design"],
       run: layout("design"),
     },
-    { id: "layout.applyDesign", label: "Apply Design view", section: "Workspace", run: layout("design") },
-    { id: "layout.applyDetails", label: "Apply Details view", section: "Workspace", run: layout("details") },
+    {
+      id: "layout.applyDesign",
+      label: "Apply Design view",
+      section: "Workspace",
+      run: layout("design"),
+    },
+    {
+      id: "layout.applyDetails",
+      label: "Apply Details view",
+      section: "Workspace",
+      run: layout("details"),
+    },
     {
       id: "layout.applyCanvas",
       label: "Apply Canvas view",
@@ -260,7 +284,7 @@ function remember(id: string) {
  * Whether ⌘K belongs to the palette here: the code workspace, any focused terminal (⌘K clears it) and the Files home
  * keep their own ⌘K.
  */
-function paletteKeyAllowed(target: EventTarget | null) {
+export function paletteKeyAllowed(target: EventTarget | null) {
   if (target instanceof Element && target.closest(".xterm")) return false;
   const body = document.body.classList;
   return !["code-mode", "files-view", "settings-open", "onboarding-open"].some((c) =>

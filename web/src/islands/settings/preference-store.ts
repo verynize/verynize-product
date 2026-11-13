@@ -17,5 +17,7 @@ export function getPreference<K extends keyof Preferences>(key: K): Preferences[
 
 /** Re-renders when the preference changes. */
 export function usePreference<K extends keyof Preferences>(key: K): Preferences[K] | undefined {
-  return useSyncExternalStore(subscribe, () => getPreference(key) as Primitive) as Preferences[K] | undefined;
+  return useSyncExternalStore(subscribe, () => getPreference(key) as Primitive) as
+    | Preferences[K]
+    | undefined;
 }

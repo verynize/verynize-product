@@ -10,7 +10,16 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+
 import { cloudOptions, passwordUser } from "./cloud-harness.mjs";
+
+// Radix keeps a closing menu mounted during its exit animation; wait for it to go before reopening the
+// switcher, and only click items inside the open menu (same fix as tests/inspector-type-bind.cjs).
+async function switcherItem(page, id) {
+  await page.locator("[role=menu][data-state=closed]").waitFor({ state: "detached" });
+  await page.locator("#workspace-profile").click();
+  await page.locator(`[role=menu][data-state=open] #${id}`).click();
+}
 
 const dir = await fs.mkdtemp(path.join(os.tmpdir(), "verynize-workspaces-"));
 const mf = new Miniflare(await cloudOptions(path.join(dir, "state")));
@@ -72,8 +81,7 @@ try {
   );
 
   // Create an organization from the switcher; it becomes the active workspace.
-  await page.locator("#workspace-profile").click();
-  await page.locator("#workspace-create").click();
+  await switcherItem(page, "workspace-create");
   await page.locator("#text-prompt-input").fill("Studio");
   await page.locator("#text-prompt-ok").click();
   await page.waitForFunction(() =>
@@ -108,8 +116,7 @@ try {
   // Settings › Members: invite Budi, see the pending invitation, he accepts.
   await page.locator("#cloud-close").click();
   await page.evaluate(() => window.fileLibrary.showHome());
-  await page.locator("#workspace-profile").click();
-  await page.locator("#workspace-members").click();
+  await switcherItem(page, "workspace-members");
   await page.waitForSelector(`#members-page[data-organization="${studio.id}"]`);
   await page.waitForSelector('[data-org-member="ana@example.test"]');
   await page.locator("#members-invite").click();

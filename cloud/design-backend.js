@@ -29,13 +29,17 @@ import * as profiles from "./profiles.js";
 import { extractInline } from "./inline-binaries.js";
 
 const Ops = globalThis.VerynizeOps;
-const MAX_IMAGE = 512 * 1024; // a room page holds at most 2 MB (cloud/limits.js)
+const MAX_IMAGE = 512 * 1024; // conservative inline image budget; larger images should use room assets
 const ASSET_WAIT_MS = 25_000;
 export const ROOM_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
 /** Tools that cannot run on the hosted server, with the reason a caller gets if it calls one anyway. */
 export const UNAVAILABLE = {
+  upload_asset:
+    "upload_asset reads a permitted local file and requires the desktop/stdio backend. Use the authenticated room binary upload API on the hosted server.",
+  import_pen: "import_pen requires a local unencrypted JSON file; use the desktop/stdio backend.",
+  preflight_import: "preflight_import inspects local files; use the desktop/stdio backend.",
   take_screenshot:
     'take_screenshot is unavailable on the hosted (headless) server: there is no renderer. Inspect elements with get_element_code or get_element_tree; finish_artboard reports "unverified" without a screenshot. Open the room in the Verynize desktop app to render it.',
   ask_agent:
@@ -107,7 +111,7 @@ export const HOSTED_INSTRUCTIONS = `${INSTRUCTIONS.split("## Live editing")[0].t
 ## Hosted server (headless)
 This is the hosted Verynize MCP server. Documents are the shared cloud rooms of the signed-in account: list_documents lists them and every tool takes a room id as "document" (or "name" on the low-level tools). Edits are applied to the room immediately and appear live in every editor that has the room open; each tool call is one change for the room's collaborators. Your role in a room decides what you may do: viewers and commenters can read but not edit.
 - take_screenshot, ask_agent, import_html, design preferences and the desktop shell tools are not available here. Skip the screenshot steps of the workflow: check your work with get_element_code / get_element_tree and the lint report finish_artboard returns; finish_artboard reports "unverified" (say so honestly).
-- Remote <img src="https://…"> photos are embedded while the call runs when they are small enough (a room page holds at most 2 MB, a room 20 MB); larger ones are marked missing.
+- Remote <img src="https://…"> photos are embedded while the call runs when they are small enough (pages share a 20 MB room budget); larger ones are marked missing.
 - Give the user the room's editor URL (open_document or list_documents) so they can open it.`;
 
 /**
@@ -240,7 +244,7 @@ export function createRoomBackend(env, request, url, account, { roomId: scope } 
         selection: [],
       };
     },
-    async transact(ref, fn) {
+    async transact(ref, fn, options = {}) {
       const id = await resolve(ref);
       for (let attempt = 0; attempt < 5; attempt++) {
         const state = await readRoom(id);
@@ -267,6 +271,8 @@ export function createRoomBackend(env, request, url, account, { roomId: scope } 
             orgRole: state.orgRole,
             baseRevision: state.revision,
             ops,
+            // Version history: a restore_version edit stores the state it replaces first.
+            ...(options.actor ? { actor: options.actor } : {}),
           }),
         );
         if (applied.conflict) continue; // someone edited in between: recompute on the new snapshot
@@ -370,6 +376,42 @@ export function createRoomBackend(env, request, url, account, { roomId: scope } 
       };
     },
     focus: async () => ({ focused: false, headless: true }),
+    /** Version history of a room (cloud/room-history.js); the room checks access on every call. */
+    versions: {
+      async list(ref, artboardId) {
+        const id = await resolve(ref);
+        const stub = env.ROOMS.getByName(id);
+        const caller = { accountId: account.id, orgRole: await orgRole(id) };
+        if (artboardId) return rpc(stub.historyList({ ...caller, artboardId }));
+        const boards = await rpc(stub.historyList(caller));
+        const out = [];
+        for (const board of boards)
+          out.push(...(await rpc(stub.historyList({ ...caller, artboardId: board.artboardId }))));
+        return out.sort((a, b) => b.at - a.at);
+      },
+      async get(ref, versionId) {
+        const id = await resolve(ref);
+        return rpc(
+          env.ROOMS.getByName(id).historyGet({
+            accountId: account.id,
+            orgRole: await orgRole(id),
+            id: versionId,
+          }),
+        );
+      },
+      async capture(ref, artboardId, { reason, label } = {}) {
+        const id = await resolve(ref);
+        return rpc(
+          env.ROOMS.getByName(id).historyCapture({
+            accountId: account.id,
+            orgRole: await orgRole(id),
+            artboardId,
+            reason,
+            label,
+          }),
+        );
+      },
+    },
     fetchImage: (src) => fetchImageAsDataUrl(src, { maxBytes: MAX_IMAGE }),
     preferences: { list: async () => [] },
   };

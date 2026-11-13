@@ -1,0 +1,70 @@
+ window scratch.pen 
+ group scratch.pen 
+ webarea Pencil 
+ group Notifications alt+T 
+ webarea Pencil 
+@s294j1s36vq5wk:e1 combobox Add to context 
+@s294j1s36vq5wk:e2 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s294j1s36vq5wk:e3 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s294j1s36vq5wk:e4 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s294j1s36vq5wk:e5 combobox Claude Opus 5.5 
+@s294j1s36vq5wk:e6 button Send message 
+@s294j1s36vq5wk:e7 checkbox Chat history 
+@s294j1s36vq5wk:e8 checkbox Chat 
+@s294j1s36vq5wk:e9 checkbox Layers 
+@s294j1s36vq5wk:e10 checkbox Slides 
+@s294j1s36vq5wk:e11 checkbox Components 
+@s294j1s36vq5wk:e12 checkbox Libraries 
+ heading Layers 
+ statictext Layers Layers
+@s294j1s36vq5wk:e20 treeitem Note 
+ statictext Note Note
+@s294j1s36vq5wk:e41 button Sidebar 
+@s294j1s36vq5wk:e42 button Move 
+@s294j1s36vq5wk:e43 combobox Move Tools 
+@s294j1s36vq5wk:e44 button Rectangle 
+@s294j1s36vq5wk:e45 combobox Primitives 
+@s294j1s36vq5wk:e46 button Pen 
+@s294j1s36vq5wk:e47 button Text 
+@s294j1s36vq5wk:e48 button Frame 
+@s294j1s36vq5wk:e49 button Sticky Note 
+@s294j1s36vq5wk:e50 button Browser 
+@s294j1s36vq5wk:e51 button Hand 
+@s294j1s36vq5wk:e52 button Comment 
+@s294j1s36vq5wk:e53 button Variables 
+@s294j1s36vq5wk:e54 button Find layers 
+@s294j1s36vq5wk:e55 button Command palette 
+@s294j1s36vq5wk:e56 button Zoom Out 
+@s294j1s36vq5wk:e57 combobox Zoom level 
+@s294j1s36vq5wk:e58 button Zoom In 
+ group Notifications alt+T 
+ webarea Pencil 
+@s294j1s36vq5wk:e59 combobox Add to context 
+@s294j1s36vq5wk:e60 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s294j1s36vq5wk:e61 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s294j1s36vq5wk:e62 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s294j1s36vq5wk:e63 combobox Claude Opus 5.5 
+@s294j1s36vq5wk:e64 button Send message 
+ group Notifications alt+T 
+ menu Nano Banana Lite 
+@s294j1s36vq5wk:e65 menuitem Nano Banana Lite 
+@s294j1s36vq5wk:e66 menuitem Nano Banana 2.1 Upgrade 
+@s294j1s36vq5wk:e67 menuitem OpenAI Image 2 Upgrade 
+@s294j1s36vq5wk:e68 menuitem OpenAI Image 2.5 Flare Upgrade 
+@s294j1s36vq5wk:e69 menuitem OpenAI Image 2.5 Sunburst Upgrade 
+ webarea Pencil 
+@s294j1s36vq5wk:e70 button Close 
+@s294j1s36vq5wk:e71 button Full Screen 
+@s294j1s36vq5wk:e72 button Minimize 

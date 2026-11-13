@@ -158,6 +158,10 @@ export async function cloudOptions(persistence, extra = {}) {
             ASSETS_BUCKET: { type: "r2", name: "verynize-assets" },
             ASSET_SIGNING_SECRET: { type: "text", value: ASSET_SECRET },
             EMAIL_PROVIDER: { type: "text", value: "outbox" },
+            // Version history idle capture (cloud/room-history.js); tests shorten it.
+            ...(process.env.VERSION_IDLE_MS
+              ? { VERSION_IDLE_MS: { type: "text", value: process.env.VERSION_IDLE_MS } }
+              : {}),
           },
           exports: {
             DesignRoom: { type: "durable-object", storage: "sqlite" },

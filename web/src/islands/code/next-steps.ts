@@ -8,7 +8,11 @@ const listeners = new Set<() => void>();
 function read(): Steps {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
-    return { dismissed: saved.dismissed === true, invited: saved.invited === true, published: saved.published === true };
+    return {
+      dismissed: saved.dismissed === true,
+      invited: saved.invited === true,
+      published: saved.published === true,
+    };
   } catch {
     return { dismissed: false, invited: false, published: false };
   }

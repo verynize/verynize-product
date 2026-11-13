@@ -19,16 +19,39 @@ import {
   SquarePenIcon,
   XIcon,
 } from "lucide-react";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@/components/ui/context-menu";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { PlusIcon } from "@/components/icons";
 import { openSharePopover } from "../share/api";
-import { cn } from "@/lib/utils";
-import { ChatMenu, ChatMenuContent, ChatMenuItem, ChatMenuSeparator, ChatMenuTrigger } from "../chat/menu";
+import { cn, textOf } from "@/lib/utils";
+import {
+  ChatMenu,
+  ChatMenuContent,
+  ChatMenuItem,
+  ChatMenuSeparator,
+  ChatMenuTrigger,
+} from "../chat/menu";
 import type { ChatState, ChatSummary } from "../chat/store";
 import { workspace, type Repository } from "./api";
 import { usePreference } from "../settings/preference-store";
-import { addRepository, archiveChat, archiveRepository, chatFolder, newChat, newQuickChat, openChat, openRepository, QUICK, useRepositories } from "./controller";
+import {
+  addRepository,
+  archiveChat,
+  archiveRepository,
+  chatFolder,
+  newChat,
+  newQuickChat,
+  openChat,
+  openRepository,
+  QUICK,
+  useRepositories,
+} from "./controller";
 import { openMemory } from "./editor-state";
 import { useLineStats, type LineStat } from "./line-stats";
 import { useNextSteps } from "./next-steps";
@@ -38,10 +61,24 @@ const iconButton =
 const row =
   "group/row relative flex h-7.5 w-full min-w-0 items-center gap-2 rounded-lg pr-1 text-sm text-foreground-2 outline-none hover:bg-muted focus-visible:ring-1 focus-visible:ring-ring";
 
-type MenuEntry = { id?: string; label: string; icon: ReactNode; run: () => void; separator?: boolean };
+type MenuEntry = {
+  id?: string;
+  label: string;
+  icon: ReactNode;
+  run: () => void;
+  separator?: boolean;
+};
 
 /** The same entries as a "…" dropdown and as a right-click context menu. */
-function RowMenus({ label, entries, children }: { label: string; entries: MenuEntry[]; children: ReactNode }) {
+function RowMenus({
+  label,
+  entries,
+  children,
+}: {
+  label: string;
+  entries: MenuEntry[];
+  children: ReactNode;
+}) {
   return (
     <ContextMenu>
       <ContextMenuTrigger asChild>
@@ -104,7 +141,11 @@ function RunningDot() {
 function LineChanges({ stat }: { stat?: LineStat }) {
   if (!stat || (!stat.added && !stat.removed)) return null;
   return (
-    <span data-line-changes className="flex shrink-0 items-center gap-1 text-xs tabular-nums" title={`${stat.files} ${stat.files === 1 ? "file" : "files"} changed`}>
+    <span
+      data-line-changes
+      className="flex shrink-0 items-center gap-1 text-xs tabular-nums"
+      title={`${stat.files} ${stat.files === 1 ? "file" : "files"} changed`}
+    >
       <span className="text-diff-add">+{stat.added}</span>
       <span className="text-diff-remove">−{stat.removed}</span>
     </span>
@@ -129,7 +170,12 @@ function ChatRow({
 }) {
   const entries: MenuEntry[] = [
     { label: "Open chat", icon: <MessageSquareIcon />, run: () => openChat(chatKey, chat.id) },
-    { label: "Archive chat", icon: <ArchiveIcon />, run: () => void archiveChat(chatKey, chat.id), separator: true },
+    {
+      label: "Archive chat",
+      icon: <ArchiveIcon />,
+      run: () => void archiveChat(chatKey, chat.id),
+      separator: true,
+    },
   ];
   return (
     <li className="group/rows">
@@ -145,12 +191,21 @@ function ChatRow({
           {quick ? (
             <MessageSquareIcon className="size-3.5 shrink-0 text-muted-foreground" />
           ) : (
-            <GitBranchIcon className={cn("size-3.5 shrink-0", active ? "text-primary-text" : "text-muted-foreground")} />
+            <GitBranchIcon
+              className={cn(
+                "size-3.5 shrink-0",
+                active ? "text-primary-text" : "text-muted-foreground",
+              )}
+            />
           )}
           <span className="min-w-0 flex-1 truncate text-left">{chat.title}</span>
           <LineChanges stat={stat} />
           {tabs > 1 && (
-            <span data-tab-count={tabs} title={`${tabs} tabs`} className="shrink-0 rounded-sm bg-muted px-1 text-xs text-muted-foreground tabular-nums">
+            <span
+              data-tab-count={tabs}
+              title={`${tabs} tabs`}
+              className="shrink-0 rounded-sm bg-muted px-1 text-xs text-muted-foreground tabular-nums"
+            >
               {tabs}
             </span>
           )}
@@ -188,12 +243,35 @@ function RepositoryGroup({ repo, state }: { repo: Repository; state: ChatState }
   } else rows.push(...chats.map((chat) => ({ chat, tabs: 1, busy: !!chat.busy })));
   const entries: MenuEntry[] = [
     { label: "New chat", icon: <SquarePenIcon />, run: () => void newChat(repo) },
-    { label: "Project memory", icon: <FolderOpenIcon />, run: () => void openRepositoryThen(repo, openMemory), separator: true },
-    { label: "Git status", icon: <GitBranchIcon />, run: () => void openRepositoryThen(repo, () => actions?.gitStatus?.()) },
-    { label: "Create worktree…", icon: <GitForkIcon />, run: () => void openRepositoryThen(repo, () => actions?.createWorktree?.()) },
-    { label: "Open design…", icon: <FolderOpenIcon />, run: () => actions?.openDesign?.(), separator: true },
+    {
+      label: "Project memory",
+      icon: <FolderOpenIcon />,
+      run: () => void openRepositoryThen(repo, openMemory),
+      separator: true,
+    },
+    {
+      label: "Git status",
+      icon: <GitBranchIcon />,
+      run: () => void openRepositoryThen(repo, () => actions?.gitStatus?.()),
+    },
+    {
+      label: "Create worktree…",
+      icon: <GitForkIcon />,
+      run: () => void openRepositoryThen(repo, () => actions?.createWorktree?.()),
+    },
+    {
+      label: "Open design…",
+      icon: <FolderOpenIcon />,
+      run: () => actions?.openDesign?.(),
+      separator: true,
+    },
     { label: "Save design", icon: <FolderIcon />, run: () => actions?.saveDesign?.() },
-    { label: "Remove from list", icon: <ArchiveIcon />, run: () => void archiveRepository(repo), separator: true },
+    {
+      label: "Remove from list",
+      icon: <ArchiveIcon />,
+      run: () => void archiveRepository(repo),
+      separator: true,
+    },
   ];
   return (
     <li data-repository={repo.name} className="flex flex-col">
@@ -237,7 +315,12 @@ async function openRepositoryThen(repo: Repository, then: () => void) {
 function AddRepositoryMenu() {
   return (
     <ChatMenu modal={false}>
-      <ChatMenuTrigger id="code-add-repository" aria-label="Add repository" title="Add repository" className={iconButton}>
+      <ChatMenuTrigger
+        id="code-add-repository"
+        aria-label="Add repository"
+        title="Add repository"
+        className={iconButton}
+      >
         <FolderPlusIcon className="size-3.5" />
       </ChatMenuTrigger>
       <ChatMenuContent align="start" className="w-56">
@@ -262,7 +345,12 @@ function NextSteps({ connected }: { connected: boolean }) {
   const steps = useNextSteps();
   if (steps.dismissed) return null;
   const items: { id: string; label: string; done: boolean; run: () => void }[] = [
-    { id: "connect", label: "Connect a repository", done: connected, run: () => void addRepository("local") },
+    {
+      id: "connect",
+      label: "Connect a repository",
+      done: connected,
+      run: () => void addRepository("local"),
+    },
     {
       id: "invite",
       label: "Invite a teammate",
@@ -273,20 +361,36 @@ function NextSteps({ connected }: { connected: boolean }) {
         requestAnimationFrame(openSharePopover);
       },
     },
-    { id: "publish", label: "Publish a Preview", done: steps.published, run: () => document.getElementById("code-start-preview")?.click() },
+    {
+      id: "publish",
+      label: "Publish a Preview",
+      done: steps.published,
+      run: () => document.getElementById("code-start-preview")?.click(),
+    },
   ];
   return (
-    <section aria-labelledby="code-next-steps-title" id="code-next-steps" className="mx-3 mb-3 shrink-0 rounded-xl border border-border bg-code-raised">
+    <section
+      aria-labelledby="code-next-steps-title"
+      id="code-next-steps"
+      className="mx-3 mb-3 shrink-0 rounded-xl border border-border bg-code-raised"
+    >
       <div className="flex flex-col gap-1 px-3 pt-2.5 pb-2.5">
         <div className="flex items-center justify-between">
           <h2 id="code-next-steps-title" className="text-sm font-medium text-foreground">
             Next steps
           </h2>
-          <button type="button" aria-label="Dismiss next steps" className={cn(iconButton, "-mr-1 size-5")} onClick={() => steps.mark("dismissed")}>
+          <button
+            type="button"
+            aria-label="Dismiss next steps"
+            className={cn(iconButton, "-mr-1 size-5")}
+            onClick={() => steps.mark("dismissed")}
+          >
             <XIcon className="size-3" />
           </button>
         </div>
-        <p className="text-xs text-muted-foreground">A few next steps to get started with Verynize.</p>
+        <p className="text-xs text-muted-foreground">
+          A few next steps to get started with Verynize.
+        </p>
       </div>
       <ul className="m-0 flex list-none flex-col border-t border-border p-1">
         {items.map((item) => (
@@ -303,7 +407,9 @@ function NextSteps({ connected }: { connected: boolean }) {
               ) : (
                 <CircleIcon className="size-3.5 shrink-0 text-muted-foreground" />
               )}
-              <span className={cn("truncate", item.done && "text-muted-foreground line-through")}>{item.label}</span>
+              <span className={cn("truncate", item.done && "text-muted-foreground line-through")}>
+                {item.label}
+              </span>
             </button>
           </li>
         ))}
@@ -313,10 +419,16 @@ function NextSteps({ connected }: { connected: boolean }) {
 }
 
 function Footer() {
-  const name = String(window.appPreferences?.get?.().displayName || "You");
+  const name = textOf(window.appPreferences?.get?.().displayName || "You");
   return (
-    <div id="code-profile" className="m-0 flex h-11 shrink-0 items-center gap-2 border-t border-border p-0 pr-2 pl-3">
-      <span aria-hidden="true" className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary-tint text-xs font-medium text-primary-text">
+    <div
+      id="code-profile"
+      className="m-0 flex h-11 shrink-0 items-center gap-2 border-t border-border p-0 pr-2 pl-3"
+    >
+      <span
+        aria-hidden="true"
+        className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary-tint text-xs font-medium text-primary-text"
+      >
         {name.trim().charAt(0).toUpperCase() || "?"}
       </span>
       <span className="min-w-0 flex-1 truncate text-sm text-foreground-2">{name}</span>
@@ -335,7 +447,13 @@ function Footer() {
           </ul>
         </PopoverContent>
       </Popover>
-      <button type="button" aria-label="Settings" title="Settings" className={iconButton} onClick={() => window.appSettings?.open()}>
+      <button
+        type="button"
+        aria-label="Settings"
+        title="Settings"
+        className={iconButton}
+        onClick={() => window.appSettings?.open()}
+      >
         <SettingsIcon className="size-3.5" />
       </button>
     </div>
@@ -348,7 +466,11 @@ export function CodeSidebar({ state }: { state: ChatState }) {
   const quickChats = workspace()?.chatSummaries?.(QUICK) ?? [];
   const inQuick = state.projectKey === QUICK;
   return (
-    <aside id="code-sidebar" aria-label="Repositories and chats" className="m-0 flex w-code-sidebar shrink-0 flex-col border-r border-border bg-code-sidebar p-0 pt-chrome">
+    <aside
+      id="code-sidebar"
+      aria-label="Repositories and chats"
+      className="m-0 flex w-code-sidebar shrink-0 flex-col border-r border-border bg-code-sidebar p-0 pt-chrome"
+    >
       <div className="shrink-0 px-3 pt-1.5">
         <button
           type="button"
@@ -361,7 +483,10 @@ export function CodeSidebar({ state }: { state: ChatState }) {
           Create new chat
         </button>
       </div>
-      <nav aria-label="Chats" className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-3">
+      <nav
+        aria-label="Chats"
+        className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-3"
+      >
         <div className="flex h-7 shrink-0 items-center gap-1 pr-1 pl-1">
           <button
             type="button"
@@ -370,7 +495,12 @@ export function CodeSidebar({ state }: { state: ChatState }) {
             className="flex h-6 items-center gap-1 rounded-md px-1 text-xs text-muted-foreground outline-none hover:text-foreground-2 focus-visible:ring-1 focus-visible:ring-ring"
           >
             Repositories
-            <ChevronDownIcon className={cn("size-3 transition-transform motion-reduce:transition-none", !reposOpen && "-rotate-90")} />
+            <ChevronDownIcon
+              className={cn(
+                "size-3 transition-transform motion-reduce:transition-none",
+                !reposOpen && "-rotate-90",
+              )}
+            />
           </button>
           <span className="flex-1" />
           <button
@@ -379,7 +509,9 @@ export function CodeSidebar({ state }: { state: ChatState }) {
             title="Archive current chat"
             disabled={!state.conversationId}
             className={cn(iconButton, "disabled:opacity-40")}
-            onClick={() => state.conversationId && void archiveChat(state.projectKey, state.conversationId)}
+            onClick={() =>
+              state.conversationId && void archiveChat(state.projectKey, state.conversationId)
+            }
           >
             <ArchiveIcon className="size-3.5" />
           </button>
@@ -391,7 +523,9 @@ export function CodeSidebar({ state }: { state: ChatState }) {
               <RepositoryGroup key={repo.id} repo={repo} state={state} />
             ))}
             {!repositories.length && (
-              <li className="px-2 py-1 text-xs text-subtle-foreground">Add a repository to work on code with an agent.</li>
+              <li className="px-2 py-1 text-xs text-subtle-foreground">
+                Add a repository to work on code with an agent.
+              </li>
             )}
           </ul>
         )}
@@ -402,10 +536,21 @@ export function CodeSidebar({ state }: { state: ChatState }) {
           </div>
           <ul aria-label="Quick chats" className="m-0 flex list-none flex-col p-0">
             {quickChats.map((chat) => (
-              <ChatRow key={chat.id} chat={chat} chatKey={QUICK} active={inQuick && chat.id === state.conversationId} quick />
+              <ChatRow
+                key={chat.id}
+                chat={chat}
+                chatKey={QUICK}
+                active={inQuick && chat.id === state.conversationId}
+                quick
+              />
             ))}
             <li>
-              <button type="button" id="code-new-quick-chat" onClick={() => void newQuickChat()} className={cn(row, "pl-7 text-muted-foreground")}>
+              <button
+                type="button"
+                id="code-new-quick-chat"
+                onClick={() => void newQuickChat()}
+                className={cn(row, "pl-7 text-muted-foreground")}
+              >
                 <PlusIcon className="size-3.5 shrink-0" />
                 <span className="truncate">Create quick chat</span>
               </button>

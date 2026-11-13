@@ -12,6 +12,7 @@ import "./islands/onboarding";
 import "./islands/storage";
 import "./islands/collab";
 import "./islands/share";
+import "./islands/history";
 
 import "./islands/router";
 

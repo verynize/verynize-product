@@ -21,7 +21,8 @@
   let visibility = "private",
     visibilityRoom = "",
     creating = null,
-    lastState = "";
+    lastState = "",
+    opened = { key: "", promise: null };
   const uploads = new Map();
   window.addEventListener("beforeunload", (event) => {
     if (uploads.size) {
@@ -41,7 +42,8 @@
       .storeDocument(file.document)
       .then(async (cloud) => {
         lib.setCloud(id, cloud, true);
-        if (lib.currentId === id && !ws.room()) await ws.attachRoom(cloud, file.document);
+        if (window.design && lib.currentId === id && !ws.room())
+          await ws.attachRoom(cloud, file.document);
         return cloud;
       })
       .finally(() => uploads.delete(id));
@@ -216,13 +218,29 @@
     return url.href;
   }
 
+  /**
+   * The access of the room being opened, requested once for everyone who needs it on open (this service and
+   * presence, web/src/islands/collab/presence-engine.ts). `id`: the room the caller means; another room asks
+   * the server itself. The Share popover calls `access()` for a current answer.
+   */
+  function roomAccess(id = ws.room()?.id) {
+    const room = ws.room();
+    if (!id) return Promise.resolve(null);
+    if (room?.id !== id) return ws.request(`/api/rooms/${id}/access`);
+    const key = roomKey(room);
+    if (opened.key !== key) opened = { key, promise: access() };
+    return opened.promise;
+  }
+
   function roomChanged() {
     const key = roomKey();
     if (key !== visibilityRoom) {
       visibility = "private";
       visibilityRoom = key;
+      // Reopening the room later asks again.
+      if (opened.key !== key) opened = { key: "", promise: null };
       // Learn the room's visibility (and the server's role) in the background.
-      if (key) access().catch(() => {});
+      if (key) roomAccess().catch(() => {});
     }
     emit();
   }
@@ -240,6 +258,7 @@
     storeFile,
     ensureRoom,
     access,
+    roomAccess,
     setVisibility,
     invite,
     shareLink,
@@ -264,6 +283,7 @@
   }
   window.addEventListener("cloud-account-changed", migrateFiles);
   window.addEventListener("online", migrateFiles);
-  window.addEventListener("DOMContentLoaded", migrateFiles);
+  // Home and the editor each dispatch DOMContentLoaded (web-start legacy boot); migrate once.
+  window.addEventListener("DOMContentLoaded", migrateFiles, { once: true });
   roomChanged();
 })();

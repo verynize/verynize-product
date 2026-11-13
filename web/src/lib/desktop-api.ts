@@ -18,6 +18,7 @@ import type {
   ToolServer,
 } from "@/islands/settings/workspace-ipc";
 import type { AppPreferencesApi } from "@/islands/settings/preference-runtime";
+import type { TelemetryIpc } from "./telemetry/types.js";
 import type { BehaviorIpc } from "@/islands/settings/behavior-store";
 import type { AgentToolsIpc } from "@/islands/settings/agents-tools";
 import type { AllowRule, PreferencesIpc } from "@/islands/settings/agent-memory";
@@ -59,7 +60,13 @@ export type AuthEvent = {
   type: string;
   message: string;
 };
-export type RenderResult = { dataURL: string; width: number; height: number };
+export type RenderResult = {
+  dataURL: string;
+  width: number;
+  height: number;
+  scale?: number;
+  requestedScale?: number;
+};
 export type PreviewTarget = { target?: string };
 export type CapturedPreview = {
   document?: { pages: { nodes: { id: string; parentId: string | null }[] }[] };
@@ -68,14 +75,18 @@ export type CapturedPreview = {
 export interface DesktopApi {
   // Agent sign-in and onboarding (desktop/agent-auth.cjs).
   agentAccountStatus(options: { agent: Agent; profile?: string }): Promise<ProfileStatus>;
-  startAgentLogin(options: { agent: Agent | string; profile?: string }): Promise<{ id: string }>;
+  startAgentLogin(options: {
+    agent: Agent | (string & {});
+    profile?: string;
+  }): Promise<{ id: string }>;
   cancelAgentLogin(options: { id: string }): Promise<unknown>;
   agentLogout(options: { agent: Agent; profile?: string }): Promise<unknown>;
-  openExternal(url: string): Promise<unknown>;
+  openExternal: (url: string) => Promise<unknown>;
   onboardingState(): Promise<{ skip: boolean }>;
   /** Share panel server default (desktop/cloud-defaults.cjs): production, or VERYNIZE_CLOUD_SERVER. */
   cloudDefaults(): Promise<{ server: string }>;
   onAuthEvent(callback: (event: AuthEvent) => void): Unsubscribe;
+  writeClipboardImage(dataURL: string): Promise<void>;
   notifyTask(options: { title: string; body: string }): Promise<boolean>;
   // Share › Publish app and passkeys (desktop/app-publish.cjs, desktop/cloud-passkey.cjs).
   cloudAppDetect: Untyped;
@@ -83,6 +94,8 @@ export interface DesktopApi {
   cloudPasskeyOpen: Untyped;
   cloudPasskeyClose: Untyped;
   appPreferences: AppPreferencesApi;
+  /** Crash reports, opt-in (desktop/telemetry.cjs). */
+  telemetry: TelemetryIpc;
   agentUsage: UsageIpc;
   agentProfiles: {
     list(): Promise<ProfileList>;
@@ -132,8 +145,8 @@ export interface DesktopApi {
     chooseDestination(): Promise<string | null>;
   };
   agentLiveStatus: {
-    mcp(options: { agent: string; chatId?: string | null }): Promise<Omit<McpSnapshot, "at">>;
-    context(options: { chatId?: string | null }): Promise<ContextBreakdown | null>;
+    mcp: (options: { agent: string; chatId?: string | null }) => Promise<Omit<McpSnapshot, "at">>;
+    context: (options: { chatId?: string | null }) => Promise<ContextBreakdown | null>;
   };
   agentMemory: MemoryIpc;
   // Integrated terminal (desktop/terminal.cjs).
@@ -145,17 +158,28 @@ export interface DesktopApi {
   onTerminalExit(callback: (event: TerminalExitEvent) => void): Unsubscribe;
   reviewAgent: Untyped;
   agentTools: AgentToolsIpc;
-  agentBridge: { onCall: Untyped; reply: Untyped };
+  agentBridge: {
+    onCall(
+      callback: (request: { requestId: string; op: string; args: unknown }) => void,
+    ): Unsubscribe;
+    reply(
+      requestId: string,
+      payload: { ok: true; result: unknown } | { ok: false; error: string },
+    ): void;
+  };
   // Rendering, fonts and export (desktop/render.cjs).
   renderDesign(options: {
+    screenshot?: boolean;
+    /** File covers: waits its turn, and an export waits for it instead of failing. */
+    background?: boolean;
     html: string;
     width: number;
     height: number;
     scale: number;
   }): Promise<RenderResult>;
-  fontFaces(
+  fontFaces: (
     families: { family: string; weights: number[]; styles: string[] }[],
-  ): Promise<{ css: string }>;
+  ) => Promise<{ css: string }>;
   renderPDF(options: {
     html: string;
     width: number;
@@ -183,14 +207,16 @@ export interface DesktopApi {
     cancel: Untyped;
     disconnect: Untyped;
   };
-  generateVector: Untyped;
-  cancelGeneration: Untyped;
   // Native design files (desktop/design-files.cjs).
   designDetach: Untyped;
   designOpen: Untyped;
   designSave: Untyped;
   designReload: Untyped;
   onDesignFileChanged: Untyped;
+  // Version history sidecar of the open native file (desktop/design-files.cjs).
+  versionsList: Untyped;
+  versionsGet: Untyped;
+  versionsAdd: Untyped;
   // Running-app preview frames, Preview Edit and web capture (desktop/preview*.cjs, desktop/capture-remote.cjs).
   previewInput: Untyped;
   previewOpenBrowser(options?: PreviewTarget): Promise<unknown>;
@@ -201,7 +227,7 @@ export interface DesktopApi {
   onPreviewNavigated: Untyped;
   previewInspect: Untyped;
   previewEdit: Untyped;
-  previewClearData(options: { url: string; logins: boolean }): Promise<unknown>;
+  previewClearData: (options: { url: string; logins: boolean }) => Promise<unknown>;
   previewDom: Untyped;
   captureLivePreview(
     options: PreviewTarget & { url: string; region?: unknown },
@@ -213,7 +239,10 @@ export interface DesktopApi {
   previewApp(options: { url: string }): Promise<unknown>;
   exportPDF: Untyped;
   // Projects, repositories, dev server and git (desktop/projects.cjs, repositories.cjs, dev-server.cjs, git-changes.cjs).
-  createProject: Untyped;
+  createProject(options: {
+    name: string;
+    repository?: string;
+  }): Promise<{ root: string; name: string; repoId: string }>;
   repositories: {
     list(): Promise<{ repositories: Repository[]; active: { root: string } | null }>;
     addLocal(): Promise<Repository | null>;
@@ -237,7 +266,7 @@ export interface DesktopApi {
     start(options?: { root?: string }): Promise<DevServerStatus>;
     stop(options?: { root?: string }): Promise<DevServerStatus>;
   };
-  openProject: Untyped;
+  openProject(): Promise<{ root: string; name: string; repoId: string } | null>;
   listFiles(): Promise<ProjectFile[]>;
   readFile(path: string): Promise<string>;
   writeFile(path: string, text: string): Promise<boolean>;
@@ -251,7 +280,7 @@ export interface DesktopApi {
   respondAgentQuestion: Untyped;
   steerAgent: Untyped;
   listAgentRuns: Untyped;
-  listAllowRules(): Promise<AllowRule[]>;
+  listAllowRules: (options?: { projectKey?: string }) => Promise<AllowRule[]>;
   removeAllowRule(rule: unknown): Promise<unknown>;
   agentToolsVersion: Untyped;
   agentTitle: Untyped;
@@ -266,14 +295,14 @@ export interface DesktopApi {
   gitPullRequest: GitApi["gitPullRequest"];
   gitCreatePullRequest: GitApi["gitCreatePullRequest"];
   designPreferences: PreferencesIpc;
-  designStylesList(): Promise<{ id: string; name: string; summary?: string }[]>;
+  designStylesList: () => Promise<{ id: string; name: string; summary?: string }[]>;
   agentBehavior: BehaviorIpc;
   // Composer: slash commands, design references, worktree files (desktop/agent-commands.cjs, chat-attachments.cjs).
   listAgentModels: Untyped;
-  listAgentCommands(options: {
+  listAgentCommands: (options: {
     agent: string;
     root?: string | null;
-  }): Promise<{ commands: AgentCommand[] }>;
+  }) => Promise<{ commands: AgentCommand[] }>;
   designReferencesList(): Promise<ReferenceCollection[]>;
   designReferencesSave(options: { name: string; images: string[] }): Promise<ReferenceCollection>;
   designReferencesAttach(options: {
@@ -320,6 +349,7 @@ export const DESKTOP_API_SHAPE = {
     worktreeLineStats: true,
     onOpenLink: true,
   },
+  telemetry: { config: true, get: true, set: true },
   agentUsage: { read: true, layers: true },
   agentProfiles: {
     list: true,
@@ -359,6 +389,7 @@ export const DESKTOP_API_SHAPE = {
     getAccess: true,
     setAccess: true,
   },
+  writeClipboardImage: true,
   agentBridge: { onCall: true, reply: true },
   renderDesign: true,
   fontFaces: true,
@@ -373,13 +404,14 @@ export const DESKTOP_API_SHAPE = {
   figmaFile: true,
   figmaFileOpen: true,
   figmaOAuth: { status: true, configure: true, connect: true, cancel: true, disconnect: true },
-  generateVector: true,
-  cancelGeneration: true,
   designDetach: true,
   designOpen: true,
   designSave: true,
   designReload: true,
   onDesignFileChanged: true,
+  versionsList: true,
+  versionsGet: true,
+  versionsAdd: true,
   previewInput: true,
   previewOpenBrowser: true,
   previewLocation: true,

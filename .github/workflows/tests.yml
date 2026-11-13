@@ -1,5 +1,6 @@
 name: Tests
-# Runs on GitHub-hosted Ubuntu 24.04 runners. See docs/ci.md.
+# Ubuntu 24.04: Instabox for quality/Node/cloud, Blacksmith for Electron/serial.
+# Planning and result aggregation stay on GitHub-hosted runners. See docs/ci.md.
 # PR -> staging: quality + affected tests. PR -> main, push to staging, nightly, manual: full suite.
 # Required status checks: `quality` and `tests` (the aggregate job at the bottom).
 on:
@@ -28,38 +29,35 @@ env:
 jobs:
   quality:
     name: quality
-    runs-on: ubuntu-24.04
+    runs-on: instabox-medium
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/design/
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
       - name: Restore Electron download cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.cache/electron
           key: electron-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
+      - name: Install Node dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          diagnostics-name: npm-install-quality
       - run: npm run build:ui
       - run: npm run check
       - run: npm run lint
       - run: npm run typecheck:ui
-      # The tree predates the formatter (hundreds of unformatted files), so only files a PR adds
-      # must be formatted. Run `npm run format:check` locally for the whole tree.
-      - name: Format check (files added by this PR)
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          git diff --name-only -z --diff-filter=A "$BASE_SHA" HEAD -- \
-            | grep -zE '\.(js|cjs|mjs|ts|tsx|json|css|md|yml|yaml)$' \
-            | xargs -0 -r npx --no-install vp fmt --check
+      - run: npm run typecheck:ratchet
+      # Whole tree. The sparse checkout leaves out /design/; the check covers the files that exist.
+      - run: npm run format:check
 
   plan:
     name: plan
@@ -78,9 +76,17 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          # Affected-test selection diffs base.sha..head.sha, so it needs full history.
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/design/
           persist-credentials: false
+      - name: Fetch PR comparison history
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci-fetch-history.mjs
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -135,18 +141,23 @@ jobs:
     name: node + cloud
     needs: plan
     if: needs.plan.outputs.node_count != '0'
-    runs-on: ubuntu-24.04
+    runs-on: instabox-medium
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/design/
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
+      - name: Fetch PR comparison history
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci-fetch-history.mjs
       - name: Restore Electron and Playwright caches
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -154,7 +165,11 @@ jobs:
             ~/.cache/electron
             ~/.cache/ms-playwright
           key: browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
+      - name: Install Node dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          diagnostics-name: npm-install-node-cloud
       - name: Install Playwright Chromium (web tests)
         if: needs.plan.outputs.node_browser == 'true'
         run: npx --no-install playwright install --with-deps chromium
@@ -173,7 +188,7 @@ jobs:
     name: electron (${{ matrix.shard }})
     needs: plan
     if: needs.plan.outputs.electron_count != '0'
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -184,61 +199,29 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/design/
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - name: Install Electron system dependencies
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          # Ubuntu 24.04 names: the t64 packages replace libgtk-3-0 / libatk-bridge2.0-0 / libasound2.
-          # Also: Mesa (software GL/WebGL under xvfb: shaders, canvas-shaders), zsh (the terminal tests'
-          # shell), poppler-utils (pdftoppm, capture-export-fonts), and a toolchain in case node-pty has
-          # to build from source (it ships a linux-x64 prebuild).
-          sudo apt-get install -y --no-install-recommends xvfb xauth libnss3 libatk-bridge2.0-0t64 \
-            libgtk-3-0t64 libgbm1 libasound2t64 libxss1 libxkbcommon0 libdrm2 libcups2t64 fonts-liberation \
-            libgl1 libegl1 libgl1-mesa-dri mesa-utils zsh poppler-utils build-essential python3 fonts-inter
-          # The system UI font (CSS system-ui; documents' default font-sans) is SF Pro on macOS, where the
-          # text-layout tests were measured, and fontconfig's "Sans" (DejaVu Sans, much wider) here. Inter has
-          # close to SF metrics, so headings wrap as on macOS. Arial/Helvetica keep Liberation Sans.
-          # The aliases go straight into conf.d (52, after 51-local.conf, before 60-latin's DejaVu
-          # preferences). A run with them in /etc/fonts/local.conf still matched DejaVu Sans, so the
-          # step prints what fontconfig sees. fc-match parses "-" as a size: system-ui is written system\-ui.
-          sudo tee /etc/fonts/conf.d/52-ci-system-font.conf > /dev/null <<'XML'
-          <?xml version="1.0"?>
-          <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-          <fontconfig>
-            <alias binding="strong"><family>Sans</family><prefer><family>Inter</family></prefer></alias>
-            <alias binding="strong"><family>system-ui</family><prefer><family>Inter</family></prefer></alias>
-            <alias binding="strong"><family>sans-serif</family><prefer><family>Inter</family></prefer></alias>
-          </fontconfig>
-          XML
-          sudo fc-cache -f > /dev/null
-          echo "Inter files: $(fc-list :family=Inter file | wc -l); conf.d: $(ls /etc/fonts/conf.d | tr '\n' ' ')"
-          for family in 'system\-ui' Sans sans\-serif Sans:semibold Arial; do
-            match=$(fc-match "$family"); echo "$family -> $match"
-            case "$family:$match" in Arial:*|*'"Inter"'*) ;; *) echo "::warning::fontconfig maps $family to $match, not Inter; text-layout tests will wrap differently" ;; esac
-          done
-      - name: Allow the Chromium sandbox
-        # Ubuntu 24.04 blocks unprivileged user namespaces through AppArmor, so Electron's Chromium
-        # sandbox aborts ("No usable sandbox") unless chrome-sandbox is setuid root, which npm cannot
-        # do. Re-enable user namespaces on this throwaway VM so tests keep the real sandbox; only if
-        # that fails, fall back to ELECTRON_DISABLE_SANDBOX=1 (Electron's equivalent of --no-sandbox).
-        run: |
-          knob=/proc/sys/kernel/apparmor_restrict_unprivileged_userns
-          if [ -e "$knob" ] && ! sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0; then
-            echo "ELECTRON_DISABLE_SANDBOX=1" >> "$GITHUB_ENV"
-            echo '::warning::User namespaces unavailable; Electron runs with ELECTRON_DISABLE_SANDBOX=1'
-          fi
+      - name: Fetch PR comparison history
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci-fetch-history.mjs
+      - name: Set up Electron Linux dependencies
+        uses: ./.github/actions/setup-electron-linux
       - name: Restore Electron cache
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ~/.cache/electron
           key: electron-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
+      - name: Install Node dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          diagnostics-name: npm-install-electron-${{ strategy.job-index }}
       - name: Download Electron
         # npm 11 may skip dependency install scripts, and electron fetches its binary lazily on first
         # use otherwise (inside a timed test). install.js is a no-op when it is already there.
@@ -267,59 +250,25 @@ jobs:
     name: serial
     needs: plan
     if: needs.plan.outputs.serial_count != '0'
-    runs-on: ubuntu-24.04
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ env.CHECKOUT_REF }}
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/design/
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-      - name: Install Electron system dependencies
-        run: |
-          set -euo pipefail
-          sudo sed -i 's#http://[a-z.]*archive.ubuntu.com#http://fr.archive.ubuntu.com#g' /etc/apt/sources.list.d/ubuntu.sources
-          sudo apt-get update
-          # Ubuntu 24.04 names: the t64 packages replace libgtk-3-0 / libatk-bridge2.0-0 / libasound2.
-          # Also: Mesa (software GL/WebGL under xvfb: shaders, canvas-shaders), zsh (the terminal tests'
-          # shell), poppler-utils (pdftoppm, capture-export-fonts), and a toolchain in case node-pty has
-          # to build from source (it ships a linux-x64 prebuild).
-          sudo apt-get install -y --no-install-recommends xvfb xauth libnss3 libatk-bridge2.0-0t64 \
-            libgtk-3-0t64 libgbm1 libasound2t64 libxss1 libxkbcommon0 libdrm2 libcups2t64 fonts-liberation \
-            libgl1 libegl1 libgl1-mesa-dri mesa-utils zsh poppler-utils build-essential python3 fonts-inter
-          # The system UI font (CSS system-ui; documents' default font-sans) is SF Pro on macOS, where the
-          # text-layout tests were measured, and fontconfig's "Sans" (DejaVu Sans, much wider) here. Inter has
-          # close to SF metrics, so headings wrap as on macOS. Arial/Helvetica keep Liberation Sans.
-          # The aliases go straight into conf.d (52, after 51-local.conf, before 60-latin's DejaVu
-          # preferences). A run with them in /etc/fonts/local.conf still matched DejaVu Sans, so the
-          # step prints what fontconfig sees. fc-match parses "-" as a size: system-ui is written system\-ui.
-          sudo tee /etc/fonts/conf.d/52-ci-system-font.conf > /dev/null <<'XML'
-          <?xml version="1.0"?>
-          <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-          <fontconfig>
-            <alias binding="strong"><family>Sans</family><prefer><family>Inter</family></prefer></alias>
-            <alias binding="strong"><family>system-ui</family><prefer><family>Inter</family></prefer></alias>
-            <alias binding="strong"><family>sans-serif</family><prefer><family>Inter</family></prefer></alias>
-          </fontconfig>
-          XML
-          sudo fc-cache -f > /dev/null
-          echo "Inter files: $(fc-list :family=Inter file | wc -l); conf.d: $(ls /etc/fonts/conf.d | tr '\n' ' ')"
-          for family in 'system\-ui' Sans sans\-serif Sans:semibold Arial; do
-            match=$(fc-match "$family"); echo "$family -> $match"
-            case "$family:$match" in Arial:*|*'"Inter"'*) ;; *) echo "::warning::fontconfig maps $family to $match, not Inter; text-layout tests will wrap differently" ;; esac
-          done
-      - name: Allow the Chromium sandbox
-        # See the electron job.
-        run: |
-          knob=/proc/sys/kernel/apparmor_restrict_unprivileged_userns
-          if [ -e "$knob" ] && ! sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0; then
-            echo "ELECTRON_DISABLE_SANDBOX=1" >> "$GITHUB_ENV"
-            echo '::warning::User namespaces unavailable; Electron runs with ELECTRON_DISABLE_SANDBOX=1'
-          fi
+      - name: Fetch PR comparison history
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/ci-fetch-history.mjs
+      - name: Set up Electron Linux dependencies
+        uses: ./.github/actions/setup-electron-linux
       - name: Restore Electron and Playwright caches
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
@@ -327,7 +276,11 @@ jobs:
             ~/.cache/electron
             ~/.cache/ms-playwright
           key: browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-      - run: npm ci
+      - name: Install Node dependencies
+        uses: ./.github/actions/setup-node-deps
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          diagnostics-name: npm-install-serial
       - name: Download Electron
         # See the electron job.
         run: node node_modules/electron/install.js

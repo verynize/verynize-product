@@ -29,7 +29,7 @@ async function appObjects() {
     }
   };
   await walk(path.join(root, "apps"));
-  return found.sort();
+  return found.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }
 const png = Buffer.from(
   "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000d49444154789c6360f8cfc0f01f0005000201a5f1b6f40000000049454e44ae426082",

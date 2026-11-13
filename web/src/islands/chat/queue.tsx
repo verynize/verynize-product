@@ -1,13 +1,30 @@
 // Follow-up tasks queued behind the running turn, shown above the composer: edit inline, reorder, remove, send now.
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowDownIcon, ArrowUpIcon, CornerDownLeftIcon, ImageIcon, ListOrderedIcon, Trash2Icon } from "lucide-react";
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CornerDownLeftIcon,
+  ImageIcon,
+  ListOrderedIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChatActionButton, ChatIconButton, ChatRowButton } from "./controls";
 import { hook } from "./hooks";
 import { ChatTip } from "./tip";
 import { workspace, type ChatState, type QueuedTask } from "./store";
 
-function Action({ label, disabled, onClick, children }: { label: string; disabled?: boolean; onClick: () => void; children: ReactNode }) {
+function Action({
+  label,
+  disabled,
+  onClick,
+  children,
+}: {
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
     <ChatTip label={label}>
       <ChatIconButton size="sm" aria-label={label} disabled={disabled} onClick={onClick}>
@@ -38,7 +55,12 @@ function Item({ task, first, last }: { task: QueuedTask; first: boolean; last: b
   };
   const canEdit = !!ws?.editQueued;
   return (
-    <li className={cn(hook.queueItem, "group/q flex min-h-8 items-start gap-1 rounded-lg px-1.5 py-1 hover:bg-muted/60")}>
+    <li
+      className={cn(
+        hook.queueItem,
+        "group/q flex min-h-8 items-start gap-1 rounded-lg px-1.5 py-1 hover:bg-muted/60",
+      )}
+    >
       {editing ? (
         // Inline editor in the row's place (not a form field): native, sized to its content.
         <textarea
@@ -112,7 +134,10 @@ export function QueueList({ state }: { state: ChatState }) {
   return (
     <section
       aria-label="Queued messages"
-      className={cn(hook.queue, "mx-4 mb-2 shrink-0 rounded-xl border border-card-border bg-card p-1")}
+      className={cn(
+        hook.queue,
+        "mx-4 mb-2 shrink-0 rounded-xl border border-card-border bg-card p-1",
+      )}
     >
       <p className="flex h-6 items-center gap-2 px-1.5 text-sm text-muted-foreground">
         <ListOrderedIcon className="size-3.5" />

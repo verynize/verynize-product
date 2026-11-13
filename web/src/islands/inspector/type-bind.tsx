@@ -9,6 +9,7 @@
 // panel fill with a 0.5px edge and 10px radius; the name truncates with an ellipsis and the value sits on the right.
 // The field itself is untouched: the wrapper listens in the capture phase and only swallows keys while the list is open.
 import {
+  useLayoutEffect,
   useRef,
   useState,
   type FocusEvent,
@@ -59,7 +60,9 @@ export function TypeBind({
   const open = items.length > 0;
   // Read by the key handler: a synthetic Escape sent while binding must reach the field, not this list.
   const openRef = useRef(open);
-  openRef.current = open;
+  useLayoutEffect(() => {
+    openRef.current = open;
+  });
 
   const show = (target: EventTarget) => {
     if (!(target instanceof HTMLInputElement)) return;
@@ -77,7 +80,9 @@ export function TypeBind({
     close();
     // Drop the typed text first (the field's own Escape: clear the draft, blur), so the blur never commits the name
     // as a value; then bind, which swaps the field for the variable chip.
-    input.current?.dispatchEvent(new globalThis.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    input.current?.dispatchEvent(
+      new globalThis.KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
+    );
     bindVariable(doc, selection, field, name);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -89,7 +94,9 @@ export function TypeBind({
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       swallow();
       const step = event.key === "ArrowDown" ? 1 : -1;
-      setActive((i) => (i < 0 ? (step > 0 ? 0 : items.length - 1) : (i + step + items.length) % items.length));
+      setActive((i) =>
+        i < 0 ? (step > 0 ? 0 : items.length - 1) : (i + step + items.length) % items.length,
+      );
     } else if (event.key === "Enter" && active >= 0 && items[active]) {
       swallow();
       pick(items[active][0]);
@@ -151,6 +158,7 @@ export function TypeBind({
               <div
                 key={name}
                 role="option"
+                tabIndex={-1}
                 aria-selected={index === active}
                 data-variable={name}
                 data-active={index === active || undefined}

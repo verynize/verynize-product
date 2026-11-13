@@ -1,0 +1,143 @@
+ window scratch.pen 
+ group scratch.pen 
+ webarea Pencil 
+ group Notifications alt+T 
+ webarea Pencil 
+@s18nt7m9um4obx:e1 combobox Add to context 
+@s18nt7m9um4obx:e2 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s18nt7m9um4obx:e3 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s18nt7m9um4obx:e4 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s18nt7m9um4obx:e5 combobox Claude Opus 5.5 
+@s18nt7m9um4obx:e6 button Send message 
+@s18nt7m9um4obx:e7 checkbox Chat history 
+@s18nt7m9um4obx:e8 checkbox Chat 
+@s18nt7m9um4obx:e9 checkbox Layers 
+@s18nt7m9um4obx:e10 checkbox Slides 
+@s18nt7m9um4obx:e11 checkbox Components 
+@s18nt7m9um4obx:e12 checkbox Libraries 
+ heading Layers 
+ statictext Layers Layers
+@s18nt7m9um4obx:e20 treeitem Note 
+ statictext Note Note
+@s18nt7m9um4obx:e41 button Sidebar 
+@s18nt7m9um4obx:e42 button Move 
+@s18nt7m9um4obx:e43 combobox Move Tools 
+@s18nt7m9um4obx:e44 button Rectangle 
+@s18nt7m9um4obx:e45 combobox Primitives 
+@s18nt7m9um4obx:e46 button Pen 
+@s18nt7m9um4obx:e47 button Text 
+@s18nt7m9um4obx:e48 button Frame 
+@s18nt7m9um4obx:e49 button Sticky Note 
+@s18nt7m9um4obx:e50 button Browser 
+@s18nt7m9um4obx:e51 button Hand 
+@s18nt7m9um4obx:e52 button Comment 
+@s18nt7m9um4obx:e53 button Variables 
+@s18nt7m9um4obx:e54 button Find layers 
+@s18nt7m9um4obx:e55 button Command palette 
+@s18nt7m9um4obx:e56 button Zoom Out 
+@s18nt7m9um4obx:e57 combobox Zoom level 
+@s18nt7m9um4obx:e58 button Zoom In 
+ group Notifications alt+T 
+ webarea Pencil 
+@s18nt7m9um4obx:e59 combobox Add to context 
+@s18nt7m9um4obx:e60 textfield  Create, plan or research... @ to attach, / for skills
+
+ statictext Create, plan or research... @ to attach, / for skills Create, plan or research... @ to attach, / for skills
+@s18nt7m9um4obx:e61 combobox Parallel agents 
+ statictext 1 1
+ statictext x x
+@s18nt7m9um4obx:e62 combobox Let it cook 
+ statictext 1 1
+ statictext x x
+@s18nt7m9um4obx:e63 combobox Claude Opus 5.5 
+@s18nt7m9um4obx:e64 button Stop generation 
+ group Notifications alt+T 
+ dialog Settings 
+ heading Settings 
+ statictext Settings Settings
+ heading Settings 
+ statictext Settings Settings
+ navigation Settings sections 
+@s18nt7m9um4obx:e65 button General 
+@s18nt7m9um4obx:e66 button Agents 
+@s18nt7m9um4obx:e67 button Agent names 
+@s18nt7m9um4obx:e68 button Chat 
+@s18nt7m9um4obx:e69 button MCP 
+@s18nt7m9um4obx:e70 button Account 
+@s18nt7m9um4obx:e71 button Usage and billing 
+ statictext [email redacted] [email redacted]
+@s18nt7m9um4obx:e72 button Account settings 
+ heading Connect your AI provider 
+ statictext Connect your AI provider Connect your AI provider
+ statictext Use tokens from your existing subscriptions. pen.dev automatically connects to Claude Code and Codex on your system. Use tokens from your existing subscriptions. pen.dev automatically connects to Claude Code and Codex on your system.
+@s18nt7m9um4obx:e73 button Sign in with ChatGPT 
+@s18nt7m9um4obx:e74 button Sign in with GitHub Copilot 
+ heading Setup providers 
+ statictext Setup providers Setup providers
+ statictext OpenAI ChatGPT OpenAI ChatGPT
+ statictext GPT 6.1 Sol · GPT 6.1 Terra · GPT 6 Astra · GPT 6 Luna GPT 6.1 Sol · GPT 6.1 Terra · GPT 6 Astra · GPT 6 Luna
+ statictext Checking status… Checking status…
+ statictext Anthropic Claude Code Anthropic Claude Code
+ statictext Fable 5.1 · Opus 5.5 · Sonnet 5.5 · Haiku 5.5 Fable 5.1 · Opus 5.5 · Sonnet 5.5 · Haiku 5.5
+ statictext Connected automatically Connected automatically
+ statictext Cursor Cursor
+ statictext Gemini 3.8 Flash · Grok 4.6 · Composer 2.5 and other models Gemini 3.8 Flash · Grok 4.6 · Composer 2.5 and other models
+ statictext Not connected Not connected
+ statictext xAI xAI
+ statictext Grok 4.6 · Grok 4.5 Grok 4.6 · Grok 4.5
+ statictext Not connected Not connected
+ statictext Google Gemini Google Gemini
+ statictext Gemini 3.7 Flash · Gemini 3.6 Flash · Gemini 3.1 Pro Gemini 3.7 Flash · Gemini 3.6 Flash · Gemini 3.1 Pro
+ statictext Not connected Not connected
+ statictext OpenCode Go OpenCode Go
+@s18nt7m9um4obx:e75 link Models/Provider info 
+ statictext Multiple models*, e.g. DeepSeek V4 Pro · Kimi K2.7 Code Multiple models*, e.g. DeepSeek V4 Pro · Kimi K2.7 Code
+ statictext Not connected Not connected
+ statictext Open Router Open Router
+@s18nt7m9um4obx:e76 link Models/Provider info 
+ statictext Multiple models*, e.g. Claude Opus 5 · Claude Haiku 4.5 · GPT-5.5 Multiple models*, e.g. Claude Opus 5 · Claude Haiku 4.5 · GPT-5.5
+ statictext Not connected Not connected
+ statictext GitHub Copilot GitHub Copilot
+@s18nt7m9um4obx:e77 link Models/Provider info 
+ statictext Multiple models*, e.g. Claude Opus 5 Multiple models*, e.g. Claude Opus 5
+ statictext Not connected Not connected
+ statictext Meta Meta
+ statictext Muse Wonder · Muse Spark 1.3 Muse Wonder · Muse Spark 1.3
+ statictext Not connected Not connected
+ statictext Moonshot AI Moonshot AI
+ statictext e.g. Kimi K2.5 · Kimi K2.6 · Kimi K2.7 Code e.g. Kimi K2.5 · Kimi K2.6 · Kimi K2.7 Code
+ statictext Not connected Not connected
+ statictext Kimi For Coding Kimi For Coding
+ statictext e.g. Kimi K3 · Kimi K2.7 Code e.g. Kimi K3 · Kimi K2.7 Code
+ statictext Not connected Not connected
+ statictext Deepseek Deepseek
+ statictext e.g. DeepSeek V4 Flash · DeepSeek V4 Pro e.g. DeepSeek V4 Flash · DeepSeek V4 Pro
+ statictext Not connected Not connected
+ statictext Together AI Together AI
+@s18nt7m9um4obx:e78 link Models/Provider info 
+ statictext e.g. MiniMax-M3 · Qwen3 235B · Qwen3.5 397B e.g. MiniMax-M3 · Qwen3 235B · Qwen3.5 397B
+ statictext Not connected Not connected
+ statictext Fireworks AI Fireworks AI
+@s18nt7m9um4obx:e79 link Models/Provider info 
+ statictext Multiple models, e.g. Opus 4.8 · GPT-5.5 · DeepSeek V4 Pro · GLM 5.2 · GLM 5.1 Multiple models, e.g. Opus 4.8 · GPT-5.5 · DeepSeek V4 Pro · GLM 5.2 · GLM 5.1
+ statictext Not connected Not connected
+ statictext Z.AI Z.AI
+ statictext e.g. GLM-5.3 Flash · GLM-5.3 · GLM-5.2 e.g. GLM-5.3 Flash · GLM-5.3 · GLM-5.2
+ statictext Not connected Not connected
+ statictext OpenCode Zen OpenCode Zen
+@s18nt7m9um4obx:e80 link Models/Provider info 
+ statictext Multiple models*, e.g. Claude Opus 5.5 · Claude Sonnet 5.5 · Claude Haiku 5.5 Multiple models*, e.g. Claude Opus 5.5 · Claude Sonnet 5.5 · Claude Haiku 5.5
+ statictext Not connected Not connected
+ statictext Add custom provider Add custom provider
+ statictext *Not all models from each provider are supported by pen.dev, we are working on validating and adding more models as they fit. *Not all models from each provider are supported by pen.dev, we are working on validating and adding more models as they fit.
+@s18nt7m9um4obx:e81 button Close 
+ webarea Pencil 
+@s18nt7m9um4obx:e82 button Close 
+@s18nt7m9um4obx:e83 button Full Screen 
+@s18nt7m9um4obx:e84 button Minimize 

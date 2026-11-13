@@ -28,7 +28,9 @@ const DESIGN_TOOL = /^mcp__verynize__|^verynize\b/i;
 const str = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : "");
 
 export function fileRefs(messages: ChatMessage[]): FileRefs {
-  const names = new Set<string>(), ids = new Set<string>(), pages = new Set<string>();
+  const names = new Set<string>(),
+    ids = new Set<string>(),
+    pages = new Set<string>();
   const decode = (value: string) => {
     try {
       return decodeURIComponent(value);
@@ -49,8 +51,10 @@ export function fileRefs(messages: ChatMessage[]): FileRefs {
     }
     for (const part of message.parts ?? []) {
       if (part.kind !== "tool" || !DESIGN_TOOL.test(part.name || "")) continue;
-      const input = part.input && typeof part.input === "object" ? (part.input as Record<string, unknown>) : {};
-      for (const key of ["document", "name"] as const) if (str(input[key])) names.add(str(input[key]));
+      const input =
+        part.input && typeof part.input === "object" ? (part.input as Record<string, unknown>) : {};
+      for (const key of ["document", "name"] as const)
+        if (str(input[key])) names.add(str(input[key]));
       if (str(input.fileId)) ids.add(str(input.fileId));
       if (str(input.pageId)) pages.add(str(input.pageId));
     }
@@ -68,8 +72,16 @@ export function resolveFiles(refs: FileRefs, files: LibraryFile[]): Match[] {
   for (const file of files) {
     if (file.archived) continue;
     const page = file.document?.pages?.find((p) => pages.has(p.id));
-    if (ids.has(file.id) || names.has(String(file.name || file.document?.name || "").toLowerCase()) || page)
-      out.push({ id: file.id, name: file.name || file.document?.name || "Untitled", ...(page ? { pageId: page.id } : {}) });
+    if (
+      ids.has(file.id) ||
+      names.has(String(file.name || file.document?.name || "").toLowerCase()) ||
+      page
+    )
+      out.push({
+        id: file.id,
+        name: file.name || file.document?.name || "Untitled",
+        ...(page ? { pageId: page.id } : {}),
+      });
   }
   return out;
 }
@@ -86,7 +98,8 @@ async function openFile(match: Match) {
   if (document.body.classList.contains("code-mode")) workspace()?.setCodeMode?.(false);
   if (lib.currentId !== match.id) await lib.open(match.id);
   lib.showEditor?.();
-  if (match.pageId && window.design?.getDocument?.().activePage !== match.pageId) window.design?.setActivePage?.(match.pageId);
+  if (match.pageId && window.design?.getDocument?.().activePage !== match.pageId)
+    window.design?.setActivePage?.(match.pageId);
 }
 
 export function WorksWith({ state }: { state: ChatState }) {
@@ -118,27 +131,34 @@ export function WorksWith({ state }: { state: ChatState }) {
           </Badge>
         </Button>
       </PopoverTrigger>
-      <PopoverContent side="top" align="end" sideOffset={8} collisionPadding={8} data-chat-popover="works-with" className="w-64">
+      <PopoverContent
+        side="top"
+        align="end"
+        sideOffset={8}
+        collisionPadding={8}
+        data-chat-popover="works-with"
+        className="w-64"
+      >
         <div className="-m-1.5">
-        <div className="px-1.5 pt-0.5 pb-1 text-sm text-muted-foreground">Works with</div>
-        <ul className="flex flex-col">
-          {files.map((file) => (
-            <li key={file.id}>
-              <button
-                type="button"
-                data-works-with-file={file.id}
-                className="flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left text-sm text-foreground outline-hidden hover:bg-muted focus-visible:bg-muted"
-                onClick={() => {
-                  setOpen(false);
-                  void openFile(file);
-                }}
-              >
-                <FileIcon className="size-4 shrink-0 text-muted-foreground" />
-                <span className="min-w-0 truncate">{file.name}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+          <div className="px-1.5 pt-0.5 pb-1 text-sm text-muted-foreground">Works with</div>
+          <ul className="flex flex-col">
+            {files.map((file) => (
+              <li key={file.id}>
+                <button
+                  type="button"
+                  data-works-with-file={file.id}
+                  className="flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left text-sm text-foreground outline-hidden hover:bg-muted focus-visible:bg-muted"
+                  onClick={() => {
+                    setOpen(false);
+                    void openFile(file);
+                  }}
+                >
+                  <FileIcon className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="min-w-0 truncate">{file.name}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       </PopoverContent>
     </Popover>

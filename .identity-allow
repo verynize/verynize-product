@@ -12,3 +12,11 @@ eval/references/08-start.*:hello@pinecone.app
 
 # Fake account email inside a synthetic Figma OAuth token fixture.
 tests/figma-import.cjs:secret@figma.com
+
+# Invented home directories the crash-report scrubber tests feed in to prove they are removed before
+# anything is sent (docs/telemetry.md); fictional users, not personal paths.
+tests/telemetry-*.cjs:/Users/alice
+tests/web-telemetry.mjs:/Users/alice
+tests/telemetry-scrub.cjs:/home/bob
+tests/telemetry-scrub.cjs:Carol
+tests/telemetry-scrub.cjs:/Users/zed.smith

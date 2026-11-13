@@ -4,6 +4,8 @@ docs/wonder-evidence.json
 dist/
 
 # Credentials and machine-local deployment state
+# Packaged crash-report settings (scripts/package-macos.cjs writes it into the app bundle only).
+desktop/telemetry-build.json
 .env
 .env.*
 !.env.example
@@ -19,3 +21,10 @@ secrets*.json
 
 # Node server state (server/node.mjs default DATA_DIR)
 /data/
+
+# macOS metadata
+.DS_Store
+
+.typecheck/
+
+integrations/generated/

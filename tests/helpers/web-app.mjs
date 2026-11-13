@@ -2,6 +2,7 @@
 import { spawn } from "node:child_process";
 import net from "node:net";
 import { chromium } from "@playwright/test";
+import { readLibrary, writeLibrary } from "./library-store.cjs";
 
 /** A TCP port that was free a moment ago. */
 export function freePort() {
@@ -32,11 +33,11 @@ export async function startProcess(command, args, { cwd, env, ready, timeout = 9
   const exited = new Promise((resolve) => child.once("exit", resolve));
   const stop = async () => {
     try {
-      process.kill(-child.pid, "SIGTERM");
+      if (child.pid) process.kill(-child.pid, "SIGTERM");
     } catch {}
     const timer = setTimeout(() => {
       try {
-        process.kill(-child.pid, "SIGKILL");
+        if (child.pid) process.kill(-child.pid, "SIGKILL");
       } catch {}
     }, 5000);
     await exited;
@@ -102,4 +103,50 @@ export async function screenshot(page, name) {
   const { mkdir } = await import("node:fs/promises");
   await mkdir(dir, { recursive: true });
   await page.screenshot({ path: `${dir}/${name}` });
+}
+
+// The stored file library (IndexedDB), shared with the Electron tests.
+export { readLibrary, writeLibrary };
+
+/**
+ * Opens a file in a signed-in web editor that has none. The app never creates a file on its own (a fresh profile
+ * lands on Files), so tests that need an open document make one the way a user does, from the editor's starting
+ * document: `fileLibrary.createFromDocument`, which stores it as a room on the backend, or, `detached` (stub backends
+ * that cannot create rooms), a local file record detached from any room. Resolves the file id once the editor shows it.
+ */
+export async function openStarterFile(page, { detached = false } = {}) {
+  const ready = () =>
+    page.waitForFunction(
+      () =>
+        document.documentElement.dataset.uiReady === "true" &&
+        window.shellRouter?.state.status === "idle" &&
+        !!window.fileLibrary?.currentId &&
+        location.pathname === "/editor/" + encodeURIComponent(window.fileLibrary.currentId),
+      null,
+      { timeout: 20000 },
+    );
+  if (!detached) {
+    await page.evaluate(() => window.fileLibrary.createFromDocument(window.design.getDocument()));
+    await ready();
+    return page.evaluate(() => window.fileLibrary.currentId);
+  }
+  const library = await readLibrary(page);
+  const document = await page.evaluate(() => window.design.getDocument());
+  const id = crypto.randomUUID();
+  library.files.push({
+    id,
+    name: document.name,
+    document,
+    updated: Date.now(),
+    folder: null,
+    archived: false,
+    cloud: { server: new URL(page.url()).origin, roomId: "starter-" + id, detached: true },
+  });
+  library.active = id;
+  library.seeded = true;
+  await writeLibrary(page, library);
+  await page.goto(new URL("/editor/" + encodeURIComponent(id), page.url()).href);
+  await page.waitForFunction(() => document.documentElement.dataset.legacyEditor === "ready");
+  await ready();
+  return id;
 }

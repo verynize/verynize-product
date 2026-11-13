@@ -14,6 +14,7 @@ const os = require("node:os");
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await electron.launch({ env, args: [".", `--user-data-dir=${profile}`] });
   try {
     const page = await app.firstWindow();
@@ -178,8 +179,10 @@ const os = require("node:os");
     assert.ok(Math.abs(small.x - (wide.x + 1640)) < 0.01);
     assert.ok(Math.abs(small.y - (local.y - 30)) < 0.01, "shorter images are centred in the row");
     assert.deepEqual(
-      (await page.evaluate(() => window.design.getSelection())).sort(),
-      [...second.ids].sort(),
+      (await page.evaluate(() => window.design.getSelection())).sort((a, b) =>
+        a < b ? -1 : a > b ? 1 : 0,
+      ),
+      [...second.ids].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)),
     );
     await page.evaluate(() => window.design.runCommand("edit.undo"));
     assert.equal((await images()).length, 1, "one undo step removes the whole drop");
@@ -424,11 +427,15 @@ const os = require("node:os");
     assert.equal(await page.locator(`#canvas [data-id="${photo.id}"] img`).count(), 1);
 
     // 5. An image on the real system clipboard pastes as an image layer (⌘V on the canvas).
-    await app.evaluate(({ clipboard, nativeImage }) => {
+    await app.evaluate(async ({ clipboard, ClipboardItem }) => {
       const png =
         "iVBORw0KGgoAAAANSUhEUgAAACgAAAAeCAIAAADRv8uKAAAAK0lEQVR4nO3NMQ0AAAgDsHnCE/4dgAw4mvRvpvpExGKxWCwWi8VisVj8N15JsXjqNugkJgAAAABJRU5ErkJggg==";
       clipboard.clear();
-      clipboard.writeImage(nativeImage.createFromBuffer(Buffer.from(png, "base64")));
+      await clipboard.write([
+        new ClipboardItem({
+          "image/png": new Blob([Buffer.from(png, "base64")], { type: "image/png" }),
+        }),
+      ]);
     });
     await page.evaluate(() => window.design.setSelection([]));
     await page.locator("#workspace").click({ position: { x: 40, y: 300 } });

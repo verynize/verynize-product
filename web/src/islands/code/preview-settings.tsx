@@ -6,14 +6,26 @@
 // (run when the Preview stops). Opened with window.previewSettings.open(root?); the dialog itself is mounted once by
 // <PreviewSettingsHost> (chat island).
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
-import { FolderIcon, GlobeIcon, LoaderCircleIcon, PlusIcon, Trash2Icon, PanelTopIcon } from "lucide-react";
+import {
+  FolderIcon,
+  GlobeIcon,
+  LoaderCircleIcon,
+  PlusIcon,
+  Trash2Icon,
+  PanelTopIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { ChatState } from "../chat/store";
 import { desktop, errorMessage, setStatus, workspace, type PreviewCommand } from "./api";
 import { repositoryByKey } from "./controller";
-import { formatCommand, formatSteps, parsePreviewCommand, parsePreviewSteps } from "./preview-command";
+import {
+  formatCommand,
+  formatSteps,
+  parsePreviewCommand,
+  parsePreviewSteps,
+} from "./preview-command";
 import { announce, requestSetup } from "./preview-state";
 
 declare global {
@@ -48,26 +60,45 @@ export function PreviewSettingsHost({ state }: { state: ChatState }) {
     },
     () => openRoot,
   );
-  return root ? <PreviewSettingsDialog key={root} root={root} state={state} onClose={() => setOpenRoot(null)} /> : null;
+  return root ? (
+    <PreviewSettingsDialog key={root} root={root} state={state} onClose={() => setOpenRoot(null)} />
+  ) : null;
 }
 
-type Row = { name: string; command: string; url: string };
-const emptyRow = (index: number): Row => ({ name: index ? "" : "App", command: "", url: "" });
+/** `key`: a stable React key, so removing a row does not reuse another row's inputs. Never saved. */
+type Row = { key: number; name: string; command: string; url: string };
+let rowKeys = 0;
+const emptyRow = (index: number): Row => ({
+  key: ++rowKeys,
+  name: index ? "" : "App",
+  command: "",
+  url: "",
+});
 
 /** Opens at: blank = the address the command prints; a port, host:port or a localhost URL. */
 function opensAt(value: string): string | undefined {
   const text = value.trim();
   if (!text || /^default$/i.test(text)) return undefined;
-  const candidate = /^\d+$/.test(text) ? `http://localhost:${text}/` : /^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : `http://${text}`;
+  const candidate = /^\d+$/.test(text)
+    ? `http://localhost:${text}/`
+    : /^[a-z][a-z0-9+.-]*:\/\//i.test(text)
+      ? text
+      : `http://${text}`;
   let url: URL;
   try {
     url = new URL(candidate);
   } catch {
-    throw new Error(`“${text}” is not an address. Use a port such as 5173 or http://localhost:5173/.`);
+    throw new Error(
+      `“${text}” is not an address. Use a port such as 5173 or http://localhost:5173/.`,
+    );
   }
-  if (!["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) || !["http:", "https:"].includes(url.protocol))
+  if (
+    !["localhost", "127.0.0.1", "[::1]"].includes(url.hostname) ||
+    !["http:", "https:"].includes(url.protocol)
+  )
     throw new Error("Opens at must be a localhost address, such as http://localhost:5173/.");
-  if (url.port && (Number(url.port) < 1 || Number(url.port) > 65535)) throw new Error("Port must be between 1 and 65535.");
+  if (url.port && (Number(url.port) < 1 || Number(url.port) > 65535))
+    throw new Error("Port must be between 1 and 65535.");
   return url.href;
 }
 const shownURL = (url?: string) => (url ? url.replace(/^http:\/\//, "").replace(/\/$/, "") : "");
@@ -84,13 +115,18 @@ function CommandField({
   id?: string;
   label: string;
   value: string;
-  onChange(value: string): void;
+  onChange: (value: string) => void;
   placeholder: string;
   disabled?: boolean;
   className?: string;
 }) {
   return (
-    <label className={cn("m-0 flex h-7.25 min-w-0 items-center gap-2 rounded-md border border-card-border bg-background px-2.5 focus-within:ring-1 focus-within:ring-ring", className)}>
+    <label
+      className={cn(
+        "m-0 flex h-7.25 min-w-0 items-center gap-2 rounded-md border border-card-border bg-background px-2.5 focus-within:ring-1 focus-within:ring-ring",
+        className,
+      )}
+    >
       <span aria-hidden className="font-mono text-xs text-muted-foreground">
         $
       </span>
@@ -108,19 +144,37 @@ function CommandField({
   );
 }
 
-function Section({ title, description, children }: { title: string; description?: string; children: ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="flex flex-col gap-3">
       <div className="px-4">
         <h3 className="text-sm font-medium text-foreground">{title}</h3>
         {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
       </div>
-      <div className="flex flex-col gap-3 rounded-xl border border-card-border bg-card p-4">{children}</div>
+      <div className="flex flex-col gap-3 rounded-xl border border-card-border bg-card p-4">
+        {children}
+      </div>
     </section>
   );
 }
 
-function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: ChatState; onClose(): void }) {
+function PreviewSettingsDialog({
+  root,
+  state,
+  onClose,
+}: {
+  root: string;
+  state: ChatState;
+  onClose: () => void;
+}) {
   const [rows, setRows] = useState<Row[]>([emptyRow(0)]);
   const [setup, setSetup] = useState("");
   const [stop, setStop] = useState("");
@@ -144,7 +198,12 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
             : [];
         setRows(
           commands.length
-            ? commands.map((c) => ({ name: c.name, command: formatCommand(c.command), url: shownURL(c.url) }))
+            ? commands.map((c) => ({
+                key: ++rowKeys,
+                name: c.name,
+                command: formatCommand(c.command),
+                url: shownURL(c.url),
+              }))
             : [{ ...emptyRow(0), command: formatCommand(status.detected?.command) }],
         );
         setSetup(formatSteps(config?.setupSteps || (config?.setup ? [config.setup] : null)));
@@ -170,8 +229,13 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
       if (!filled.length) throw new Error("Enter a start command.");
       const commands = filled.map((row, index) => {
         const command = parsePreviewCommand(row.command);
-        if (!command.length) throw new Error(`Enter a start command for ${row.name.trim() || `row ${index + 1}`}.`);
-        return { name: row.name.trim() || (index ? `Command ${index + 1}` : "App"), command, url: opensAt(row.url) };
+        if (!command.length)
+          throw new Error(`Enter a start command for ${row.name.trim() || `row ${index + 1}`}.`);
+        return {
+          name: row.name.trim() || (index ? `Command ${index + 1}` : "App"),
+          command,
+          url: opensAt(row.url),
+        };
       });
       const setupSteps = parsePreviewSteps(setup);
       const stopSteps = parsePreviewSteps(stop);
@@ -208,18 +272,27 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
         // Var syntax so tailwind-merge replaces DialogContent's max-w-lg (it does not know the theme's size).
         className="flex h-(--spacing-preview-settings-height) max-h-full max-w-(--spacing-preview-settings) gap-0 overflow-hidden rounded-preview-settings border-card-border p-0 sm:max-w-(--spacing-preview-settings)"
       >
-        <nav aria-label="Repository settings" className="flex w-(--spacing-preview-settings-nav) shrink-0 flex-col gap-4 border-r border-card-border bg-code-sidebar px-2 py-6">
+        <nav
+          aria-label="Repository settings"
+          className="flex w-(--spacing-preview-settings-nav) shrink-0 flex-col gap-4 border-r border-card-border bg-code-sidebar px-2 py-6"
+        >
           <div className="flex items-start gap-2.5 px-2">
             <FolderIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
             <div className="min-w-0">
-              <p id="preview-settings-repository" className="truncate text-sm font-medium text-foreground">
+              <p
+                id="preview-settings-repository"
+                className="truncate text-sm font-medium text-foreground"
+              >
                 {repoName}
               </p>
               <p className="text-xs text-muted-foreground">Repository settings</p>
             </div>
           </div>
           <div className="flex flex-col">
-            <span aria-current="page" className="flex h-7.5 items-center gap-2.5 rounded-lg bg-input px-2 text-sm text-foreground">
+            <span
+              aria-current="page"
+              className="flex h-7.5 items-center gap-2.5 rounded-lg bg-input px-2 text-sm text-foreground"
+            >
               <PanelTopIcon className="size-4 text-muted-foreground" />
               Preview
             </span>
@@ -229,9 +302,13 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
           <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-7 pb-8">
             <div className="flex flex-col gap-10">
               <div className="px-4">
-                <DialogTitle asChild><h2 className="text-xl font-medium text-foreground">Preview</h2></DialogTitle>
+                <DialogTitle asChild>
+                  <h2 className="text-xl font-medium text-foreground">Preview</h2>
+                </DialogTitle>
                 <DialogDescription asChild>
-                  <p className="mt-3 text-sm text-muted-foreground">How the Preview starts, opens and stops your app in a worktree.</p>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    How the Preview starts, opens and stops your app in a worktree.
+                  </p>
                 </DialogDescription>
               </div>
               <Section
@@ -240,13 +317,24 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
               >
                 <div className="flex flex-col gap-2" role="table" aria-label="Preview commands">
                   <div role="row" className="flex items-center gap-2 text-sm text-foreground-2">
-                    <span role="columnheader" className="w-32 shrink-0">Name</span>
-                    <span role="columnheader" className="min-w-0 flex-1">Start command</span>
-                    <span role="columnheader" className="w-47 shrink-0">Opens at</span>
+                    <span role="columnheader" className="w-32 shrink-0">
+                      Name
+                    </span>
+                    <span role="columnheader" className="min-w-0 flex-1">
+                      Start command
+                    </span>
+                    <span role="columnheader" className="w-47 shrink-0">
+                      Opens at
+                    </span>
                     {rows.length > 1 && <span className="w-7.25 shrink-0" />}
                   </div>
                   {rows.map((row, index) => (
-                    <div role="row" key={index} data-preview-command={index} className="flex items-center gap-2">
+                    <div
+                      role="row"
+                      key={row.key}
+                      data-preview-command={index}
+                      className="flex items-center gap-2"
+                    >
                       <input
                         aria-label={index ? `Name ${index + 1}` : "Name"}
                         value={row.name}
@@ -308,34 +396,82 @@ function PreviewSettingsDialog({ root, state, onClose }: { root: string; state: 
                   <div>
                     <p className="text-sm text-foreground-2">Setup command</p>
                     <p className="text-sm text-muted-foreground">
-                      Runs in each worktree before the Preview first starts your app, and again after you change it or if it didn’t finish. Chain steps
-                      with &&.
+                      Runs in each worktree before the Preview first starts your app, and again
+                      after you change it or if it didn’t finish. Chain steps with &&.
                     </p>
                   </div>
-                  <CommandField id="preview-setup-command" label="Setup command" value={setup} onChange={(value) => { setMessage(""); setSetup(value); }} placeholder="npm install" disabled={!loaded || busy} />
+                  <CommandField
+                    id="preview-setup-command"
+                    label="Setup command"
+                    value={setup}
+                    onChange={(value) => {
+                      setMessage("");
+                      setSetup(value);
+                    }}
+                    placeholder="npm install"
+                    disabled={!loaded || busy}
+                  />
                 </div>
                 <div className="mt-3 flex flex-col gap-2">
                   <div>
                     <p className="text-sm text-foreground-2">Stop command</p>
-                    <p className="text-sm text-muted-foreground">Runs when you stop the Preview, to end what the start command left running, like containers.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Runs when you stop the Preview, to end what the start command left running,
+                      like containers.
+                    </p>
                   </div>
-                  <CommandField id="preview-stop-command" label="Stop command" value={stop} onChange={(value) => { setMessage(""); setStop(value); }} placeholder="docker compose down" disabled={!loaded || busy} />
+                  <CommandField
+                    id="preview-stop-command"
+                    label="Stop command"
+                    value={stop}
+                    onChange={(value) => {
+                      setMessage("");
+                      setStop(value);
+                    }}
+                    placeholder="docker compose down"
+                    disabled={!loaded || busy}
+                  />
                 </div>
               </Section>
             </div>
           </div>
           <div className="flex h-15 shrink-0 items-center gap-2 border-t border-card-border px-6">
-            <Button type="button" variant="ghost" id="preview-detect" disabled={busy || state.busy || !state.activeRoot || state.activeRoot !== root} onClick={detect} className="h-7 px-2 text-sm text-foreground-2">
-              {state.busy && <LoaderCircleIcon className="size-3.5 animate-spin motion-reduce:animate-none" />}
+            <Button
+              type="button"
+              variant="ghost"
+              id="preview-detect"
+              disabled={busy || state.busy || !state.activeRoot || state.activeRoot !== root}
+              onClick={detect}
+              className="h-7 px-2 text-sm text-foreground-2"
+            >
+              {state.busy && (
+                <LoaderCircleIcon className="size-3.5 animate-spin motion-reduce:animate-none" />
+              )}
               Detect with agent
             </Button>
-            <p role="status" className="min-w-0 flex-1 truncate text-sm text-muted-foreground" title={message}>
+            <p
+              role="status"
+              className="min-w-0 flex-1 truncate text-sm text-muted-foreground"
+              title={message}
+            >
               {message}
             </p>
-            <Button type="button" variant="outline" disabled={busy} onClick={onClose} className="h-7 px-3 text-sm">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={onClose}
+              className="h-7 px-3 text-sm"
+            >
               Cancel
             </Button>
-            <Button type="button" id="preview-settings-save" disabled={busy || !loaded} onClick={() => void save()} className="h-7 px-3 text-sm">
+            <Button
+              type="button"
+              id="preview-settings-save"
+              disabled={busy || !loaded}
+              onClick={() => void save()}
+              className="h-7 px-3 text-sm"
+            >
               Save
             </Button>
           </div>

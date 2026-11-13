@@ -1,0 +1,36 @@
+{
+  "title": "HTML inline SVG becomes vector layers (one per paint)",
+  "roundTrip": true,
+  "covers": ["svg", "vector", "currentColor", "transform", "html"],
+  "expect": [
+    { "node": "Search icon", "prop": "type", "eq": "vector" },
+    { "node": "Search icon", "prop": "box", "eq": { "w": 32, "h": 32 } },
+    { "node": "Search icon", "prop": "viewBox", "eq": "0 0 24 24" },
+    {
+      "node": "Search icon",
+      "prop": "paths",
+      "matches": "^M3 11C3 15\\.418 .*Z \\| M21 21L16\\.7 16\\.7$"
+    },
+    { "node": "Search icon", "prop": "strokeColor", "eq": "#0f172a" },
+    { "node": "Search icon", "prop": "strokeWidth", "eq": 2.667, "tol": 0.001 },
+    { "node": "Search icon", "prop": "strokeCap", "eq": "round" },
+    { "node": "Search icon", "prop": "fills", "eq": [] },
+    { "node": "Brand mark", "prop": "type", "eq": "frame" },
+    { "node": "Brand mark", "prop": "box", "eq": { "w": 80, "h": 40 } },
+    { "node": "Brand mark 1", "prop": "type", "eq": "vector" },
+    { "node": "Brand mark 1", "prop": "box", "eq": { "x": 4, "y": 4, "w": 32, "h": 32 } },
+    { "node": "Brand mark 1", "prop": "fill", "eq": "#2563eb" },
+    { "node": "Brand mark 2", "prop": "box", "eq": { "x": 44, "y": 4, "w": 32, "h": 32 } },
+    {
+      "node": "Brand mark 2",
+      "prop": "fills",
+      "eq": [{ "type": "solid", "color": "#f97316", "opacity": 50 }]
+    },
+    { "rendered": "Search icon", "prop": "w", "eq": 32 },
+    {
+      "rendered": "Brand mark 2",
+      "relTo": "Brand mark",
+      "eq": { "x": 44, "y": 4, "w": 32, "h": 32 }
+    }
+  ]
+}

@@ -5,7 +5,6 @@
 import { useSyncExternalStore } from "react";
 import type { ChatSummary } from "../chat/store";
 import { desktop, errorMessage, setStatus, workspace, type Repository } from "./api";
-import { isLaunchEntry, request } from "@/lib/router/shell-router";
 
 type Store = { repositories: Repository[]; loaded: boolean; pending: boolean };
 let store: Store = { repositories: [], loaded: false, pending: false };
@@ -101,9 +100,14 @@ export function newTab() {
     const ws = workspace();
     const state = ws?.getState();
     const repo = state ? repositoryByKey(state.projectKey) : null;
-    const current = state?.conversationId ? ws?.chatSummaries?.(state.projectKey).find((c) => c.id === state.conversationId) : null;
+    const current = state?.conversationId
+      ? ws?.chatSummaries?.(state.projectKey).find((c) => c.id === state.conversationId)
+      : null;
     if (!ws || !repo || !current) return newChat();
-    ws.createChat?.({ repoId: repo.id, worktree: current.root ? { path: current.root, branch: current.branch ?? null } : null });
+    ws.createChat?.({
+      repoId: repo.id,
+      worktree: current.root ? { path: current.root, branch: current.branch ?? null } : null,
+    });
     setStatus(current.branch ? `New tab on ${current.branch}` : `New tab in ${repo.name}`);
   });
 }
@@ -192,7 +196,9 @@ export function archiveChat(key: string, chatId: string) {
     if (!chat) return;
     if (chat.busy) throw Error("Stop the chat before archiving it");
     // Chat tabs share a worktree: keep it while another chat still works in it.
-    const shared = (ws.chatSummaries?.(key) ?? []).some((c) => c.id !== chatId && !!chat.root && c.root === chat.root);
+    const shared = (ws.chatSummaries?.(key) ?? []).some(
+      (c) => c.id !== chatId && !!chat.root && c.root === chat.root,
+    );
     if (
       !window.confirm(
         `Archive “${chat.title}”?${chat.branch && !shared ? ` Its worktree is removed; branch ${chat.branch} is kept.` : ""}`,
@@ -234,10 +240,7 @@ export async function start() {
     const repo = repositoryByKey(last.key);
     if (repo) openChat(repo.root, typeof last.chatId === "string" ? last.chatId : "");
   }
-  // Code mode persists across desktop launches (the window opens /editor): reopen it in place of that launch entry.
-  // Anywhere else the URL wins (reload, Back/Forward, a typed or shared URL).
-  if (desktop() && localStorage.getItem("verynize-code-mode") === "1" && isLaunchEntry("/editor"))
-    request({ view: "/code" }, { replace: true });
+  // The entry URL owns the initial view, including explicit editor links.
 }
 
 export type CodeWorkspaceApi = {
@@ -253,7 +256,11 @@ export type CodeWorkspaceApi = {
 declare global {
   interface Window {
     codeWorkspace?: CodeWorkspaceApi;
-    livePreview?: { show(url: string, options?: {root?: string; name?: string; chatId?: string}): void; ensure(options: {root: string; name?: string; chatId?: string; url?: string}): unknown; hide(): void };
+    livePreview?: {
+      show(url: string, options?: { root?: string; name?: string; chatId?: string }): void;
+      ensure(options: { root: string; name?: string; chatId?: string; url?: string }): unknown;
+      hide(): void;
+    };
   }
 }
 export const codeWorkspace = () => window.codeWorkspace;

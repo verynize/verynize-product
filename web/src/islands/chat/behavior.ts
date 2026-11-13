@@ -11,7 +11,8 @@ function read(): ChatBehavior {
   const value = (window as unknown as { agentBehavior?: Published }).agentBehavior?.get?.();
   const followUp = value?.followUp === "steer" ? "steer" : "queue";
   const expandWork = value?.expandWork === true;
-  if (cached.followUp !== followUp || cached.expandWork !== expandWork) cached = { followUp, expandWork };
+  if (cached.followUp !== followUp || cached.expandWork !== expandWork)
+    cached = { followUp, expandWork };
   return cached;
 }
 function subscribe(fn: () => void) {

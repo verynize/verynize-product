@@ -1,0 +1,32 @@
+[
+  {
+    "operation": "spaces-select-1000",
+    "longTasks": 5,
+    "maxOverlapMs": 1734.996,
+    "totalOverlapMs": 1979.855
+  },
+  {
+    "operation": "spaces-select-all",
+    "longTasks": 5,
+    "maxOverlapMs": 11127.316,
+    "totalOverlapMs": 12278.571
+  },
+  {
+    "operation": "spaces-clear-selection",
+    "longTasks": 4,
+    "maxOverlapMs": 3442.725,
+    "totalOverlapMs": 3645.354
+  },
+  {
+    "operation": "spaces-pan",
+    "longTasks": 2,
+    "maxOverlapMs": 561.742,
+    "totalOverlapMs": 629.911
+  },
+  {
+    "operation": "spaces-zoom",
+    "longTasks": 1,
+    "maxOverlapMs": 62.566,
+    "totalOverlapMs": 62.566
+  }
+]

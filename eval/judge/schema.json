@@ -9,13 +9,25 @@
         "type": "object",
         "additionalProperties": false,
         "required": ["id", "pass", "evidence"],
-        "properties": { "id": { "type": "string" }, "pass": { "type": "boolean" }, "evidence": { "type": "string" } }
+        "properties": {
+          "id": { "type": "string" },
+          "pass": { "type": "boolean" },
+          "evidence": { "type": "string" }
+        }
       }
     },
     "scores": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["hierarchy", "typography", "spacing", "color", "content", "assets", "consistency"],
+      "required": [
+        "hierarchy",
+        "typography",
+        "spacing",
+        "color",
+        "content",
+        "assets",
+        "consistency"
+      ],
       "properties": {
         "hierarchy": { "type": "integer", "minimum": 1, "maximum": 10 },
         "typography": { "type": "integer", "minimum": 1, "maximum": 10 },

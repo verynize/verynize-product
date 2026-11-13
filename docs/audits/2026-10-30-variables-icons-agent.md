@@ -10,19 +10,19 @@ Screenshot 42 establishes the five creation categories: Colors, Dimensions, Numb
 
 The table below records the state **before** this session's fixes; later sections mark which gaps were closed.
 
-| Workflow | Verynize implementation | Evidence boundary / gap |
-|---|---|---|
-| Five variable categories | Color tokens plus four typed variable types | Present in `variables.tsx` / `vars.ts`; existing creation tests cover four typed types |
-| Find variables | Name and value search, grouped by type | Slash names remain flat; reference shows a collapsible name hierarchy |
-| Edit variables | Color picker; typed inline value; font-weight selector | Color and typed creation use different validation paths |
-| Rename variables | Double-click typed names | Color names are non-interactive text; no color rename control |
-| Delete variables | Removes bindings while preserving resolved value | Existing typed tests cover this; color deletion uses hidden legacy DOM |
-| Bind properties | Radius, gap, padding, stroke width, font size, letter spacing, line height, opacity, family, weight | Width/height, individual sides, shadow, stroke color, page background and SVG colors are outside the binding model |
-| Mix colors and typed values | Fill/text/shader `token` plus independent `bindings` | Functional foundation present; global color-token creation can invalidate typed variables |
-| CSS export | Colors and typed values in one `:root` | Distinct valid names can produce the same CSS identifier |
-| Icon library | Upload/paste SVG, add selection, grid/list, search, rename/delete, insert | Inserted icon is an image with embedded SVG, not editable SVG colors |
-| Icon reuse | Each insertion copies source | No library instance reference or propagation from library to inserted nodes |
-| Icon validation | SVG prefix and length checks in document validators | Malformed base64 accepted; insertion can throw before error handling |
+| Workflow                    | Verynize implementation                                                                             | Evidence boundary / gap                                                                                            |
+| --------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Five variable categories    | Color tokens plus four typed variable types                                                         | Present in `variables.tsx` / `vars.ts`; existing creation tests cover four typed types                             |
+| Find variables              | Name and value search, grouped by type                                                              | Slash names remain flat; reference shows a collapsible name hierarchy                                              |
+| Edit variables              | Color picker; typed inline value; font-weight selector                                              | Color and typed creation use different validation paths                                                            |
+| Rename variables            | Double-click typed names                                                                            | Color names are non-interactive text; no color rename control                                                      |
+| Delete variables            | Removes bindings while preserving resolved value                                                    | Existing typed tests cover this; color deletion uses hidden legacy DOM                                             |
+| Bind properties             | Radius, gap, padding, stroke width, font size, letter spacing, line height, opacity, family, weight | Width/height, individual sides, shadow, stroke color, page background and SVG colors are outside the binding model |
+| Mix colors and typed values | Fill/text/shader `token` plus independent `bindings`                                                | Functional foundation present; global color-token creation can invalidate typed variables                          |
+| CSS export                  | Colors and typed values in one `:root`                                                              | Distinct valid names can produce the same CSS identifier                                                           |
+| Icon library                | Upload/paste SVG, add selection, grid/list, search, rename/delete, insert                           | Inserted icon is an image with embedded SVG, not editable SVG colors                                               |
+| Icon reuse                  | Each insertion copies source                                                                        | No library instance reference or propagation from library to inserted nodes                                        |
+| Icon validation             | SVG prefix and length checks in document validators                                                 | Malformed base64 accepted; insertion can throw before error handling                                               |
 
 ## Findings
 
@@ -98,7 +98,6 @@ Existing UI coverage to extend: `tests/inspector-parity.cjs:62–130` (typed cre
 
 Prioritize V1 and I1 as bounded reliability fixes. Coordinate V2 across UI and headless codec ownership. Keep I2 and V3 as explicitly tracked parity gaps until implemented and evidenced. Preserve all pre-existing dirty files, especially `package.json`, desktop modules and canvas interaction/styles. This audit added only this document and changed no application code.
 
-
 ## Implemented follow-up (same audit session)
 
 The root agent authorized bounded fixes after reviewing this audit:
@@ -110,7 +109,6 @@ The root agent authorized bounded fixes after reviewing this audit:
 Added `tests/inspector-variable-library.cjs` for duplicate/cross-type/reserved-name creation, successful reveal/selection/undo, clipboard preservation on export collision, and malformed base64/non-SVG/XML insertion. The root agent must wire this new file into the test script because `package.json` contains pre-existing user changes. No Electron run was started by this agent while the Wonder session was active.
 
 Validation after edits: `node --test integrations/variables.test.mjs` **8/8 passed** (including new color/color, color/dimension, and dimension/number CSS-collision regressions); `npm run lint:ui` passed; `npm run typecheck:ui` passed; `node --check web/app.js` and `node --check tests/inspector-variable-library.cjs` passed. Existing dirty files were preserved, and no commit was made. The other agent independently edits `bindVariable` in `vars.ts`; this agent edits only its `variablesCss` function.
-
 
 ## Fresh Wonder evidence and bounded SVG Colors implementation
 
@@ -127,7 +125,6 @@ Implemented an original, deliberately bounded equivalent for **simple monochrome
 
 This supports one paint for a simple monochrome SVG. It does not implement per-color replacement on multicolor artwork or claim full Wonder Icons parity.
 
-
 ## Electron evidence — first completed pass
 
 `VERYNIZE_EVIDENCE_DIR=design/verynize/2026-10-30 node tests/inspector-variable-library.cjs` passed after rebuilding the combined UI. It verifies creation rejection/reveal/undo, export-collision errors, malformed assets, SVG variable updates, real rendered shape pixels, independent background, multi-selection detach with different colors and missing-variable fallback, reload/export/restore, and no uncaught renderer errors. Screenshot pixels are decoded through an sRGB canvas with a two-level quantization tolerance because macOS `nativeImage.toBitmap()` converts into display color space; the unpainted sample avoids resize handles.
@@ -139,21 +136,20 @@ The workflow screenshot was captured from the root agent's `workflow.verynize.js
 
 SVG mask sizing now follows `contain`, `cover`, `fill` and `none`; `scale-down` currently falls back to contain. Per-color SVG replacement, complex SVG effects, and exact scale-down sizing remain outside this bounded implementation. Multi-selection detach now preserves each selected image's own resolved paint.
 
-
 ## Final verification and artifacts
 
 The desktop was released by the root agent and every Electron command below ran **sequentially**, using temporary profiles that were closed and removed afterward. Both new suites are registered in `package.json` → `test:canvas`; the lockfile resync produced no lockfile diff.
 
-| Command | Final result |
-|---|---|
-| `npm run build:ui` | Passed with existing unresolved asset warnings for `x.png` and `…` |
+| Command                                     | Final result                                                                                                                                                                                                                  |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run build:ui`                          | Passed with existing unresolved asset warnings for `x.png` and `…`                                                                                                                                                            |
 | `node tests/inspector-variable-library.cjs` | Passed on the latest combined build; safe variable creation, export collision, malformed icon handling, actual SVG pixels, variable propagation, independent background, multi-selection detach, source/reload/export/restore |
-| `node tests/inspector-variable-binding.cjs` | Passed; fill detach with alpha/mixed selection/missing token/undo/redo/reload, scalar override replacement, individual corners/borders and independent gaps |
-| `node tests/canvas-page.cjs` | Passed; page, panel accordion and icon-library regression |
-| `node tests/inspector-parity.cjs` | Passed; color picker, typed variables, fonts, 0.5×/4× PNG and PDF save, layout controls |
-| `node tests/render-export.cjs` | Passed; real pixel coverage at 0.5×/1×/2×/4× and unchanged CSS layout measurements |
-| `npm run lint:ui` / `npm run typecheck:ui` | Passed |
-| `git diff --check` | Passed |
+| `node tests/inspector-variable-binding.cjs` | Passed; fill detach with alpha/mixed selection/missing token/undo/redo/reload, scalar override replacement, individual corners/borders and independent gaps                                                                   |
+| `node tests/canvas-page.cjs`                | Passed; page, panel accordion and icon-library regression                                                                                                                                                                     |
+| `node tests/inspector-parity.cjs`           | Passed; color picker, typed variables, fonts, 0.5×/4× PNG and PDF save, layout controls                                                                                                                                       |
+| `node tests/render-export.cjs`              | Passed; real pixel coverage at 0.5×/1×/2×/4× and unchanged CSS layout measurements                                                                                                                                            |
+| `npm run lint:ui` / `npm run typecheck:ui`  | Passed                                                                                                                                                                                                                        |
+| `git diff --check`                          | Passed                                                                                                                                                                                                                        |
 
 The properties agent fixed the native scaling bug by setting the Electron zoom factor **after** navigation. The regenerated [workflow export](../../design/verynize/2026-10-30/workflow-export.png) is **1600×1140** and fills the intended artboard extent. PNG header dimensions and opaque pixels in the right/lower, bottom-center and right-center regions were checked; [export-verification.json](../../design/verynize/2026-10-30/export-verification.json) records the result. Visual inspection confirms the title, icon and grid fit, with no extra transparent half-canvas. The [before-fix export](../../design/verynize/2026-10-30/workflow-export-before-scale-fix.png) is retained only as bug evidence.
 

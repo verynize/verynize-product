@@ -1,9 +1,19 @@
+import { IMAGE_FILL_TYPES } from "./document-core.mjs";
 // Image provider adapters against local HTTP fixture servers that return real PNG/JPEG bytes.
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
 import http from "node:http";
 import { createRequire } from "node:module";
-import { generateImage, normalizeSettings, inspectImage, redact } from "./image-provider.mjs";
+import {
+  generateImage,
+  normalizeSettings,
+  inspectImage,
+  redact,
+  IMAGE_PROVIDERS,
+  DEFAULT_IMAGE_PROVIDER,
+  migrateSettings,
+  providerSettings,
+} from "./image-provider.mjs";
 
 const { png } = createRequire(import.meta.url)("../tests/fixtures/png.cjs");
 const KEY = "sk-fixture-0123456789abcdef";
@@ -22,8 +32,27 @@ before(async () => {
         url: req.url,
         method: req.method,
         auth: req.headers.authorization || "",
+        googleKey: req.headers["x-goog-api-key"],
         body: body ? JSON.parse(body) : null,
       });
+      if (req.url.startsWith("/models/")) {
+        res.setHeader("content-type", "application/json");
+        res.end(
+          JSON.stringify({
+            candidates: [
+              {
+                content: {
+                  parts: [
+                    { text: "Done" },
+                    { inlineData: { mimeType: "image/png", data: photo.toString("base64") } },
+                  ],
+                },
+              },
+            ],
+          }),
+        );
+        return;
+      }
       if (req.url === "/v1/images/generations") {
         if (req.headers.authorization !== "Bearer " + KEY) {
           res.statusCode = 401;
@@ -91,7 +120,7 @@ test("settings: https anywhere, plain http only on loopback, no credentials in U
   assert.deepEqual(normalizeSettings({}), {
     provider: "openai",
     baseURL: "https://api.openai.com/v1",
-    model: "gpt-image-1",
+    model: "gpt-image-2",
     size: "1024x1024",
   });
   assert.equal(
@@ -111,7 +140,7 @@ test("OpenAI-compatible provider: request shape, bearer key and decoded PNG", as
       provider: "openai",
       baseURL: base + "/v1",
       model: "fixture-image-model",
-      size: "512x512",
+      size: "1024x1024",
     },
     apiKey: KEY,
     prompt: "A misty pine forest at dawn",
@@ -123,7 +152,7 @@ test("OpenAI-compatible provider: request shape, bearer key and decoded PNG", as
     model: "fixture-image-model",
     prompt: "A misty pine forest at dawn",
     n: 1,
-    size: "512x512",
+    size: "1024x1024",
   });
   assert.equal(result.mime, "image/png");
   assert.equal(result.width, 64);
@@ -220,4 +249,157 @@ test("image inspection and redaction helpers", () => {
     redact(`bad key ${KEY} and Bearer abcdefghijklmnop`, KEY),
     "bad key [redacted] and Bearer [redacted]",
   );
+});
+
+test("catalog, fresh default, migration and vendor routing", () => {
+  assert.equal(new Set(IMAGE_PROVIDERS.map((p) => p.id)).size, IMAGE_PROVIDERS.length);
+  for (const p of IMAGE_PROVIDERS) {
+    assert.ok(p.label);
+    assert.ok(["codex", "google", "openai", "custom"].includes(p.vendor));
+    if (!["custom", "codex"].includes(p.vendor)) assert.ok(p.model);
+  }
+  assert.deepEqual(IMAGE_FILL_TYPES, ["frame", "rectangle"]);
+  assert.equal(IMAGE_PROVIDERS[0].label, "Codex · ChatGPT plan");
+  const fresh = migrateSettings();
+  assert.equal(fresh.defaultProvider, DEFAULT_IMAGE_PROVIDER);
+  assert.equal(providerSettings(fresh).model, "gemini-3.1-flash-lite-image");
+  const old = {
+    provider: "openai",
+    baseURL: "https://api.openai.com/v1",
+    model: "old-model",
+    size: "1024x1024",
+    key: "ciphertext",
+  };
+  const migrated = migrateSettings(old);
+  assert.equal(migrated.defaultProvider, "custom");
+  assert.equal(migrated.keys.custom, "ciphertext");
+  assert.equal(migrated.keys.openai, "ciphertext");
+  assert.equal(migrated.custom.model, "old-model");
+  assert.deepEqual(migrateSettings(migrated), migrated);
+  assert.throws(() => providerSettings(fresh, "missing"), /Unknown/);
+  assert.equal(redact("bad AIza123456789abcdefghijk"), "bad [redacted]");
+  assert.equal(redact("key: xyz", "xyz"), "key: [redacted]");
+});
+test("Gemini uses header key, generateContent and inline image parts", async () => {
+  const saved = migrateSettings();
+  const settings = providerSettings(saved, undefined, { google: base });
+  const result = await generateImage({
+    settings,
+    apiKey: "AIza-fixture123456789",
+    prompt: "A mountain",
+  });
+  const req = requests.at(-1);
+  assert.equal(req.url, "/models/gemini-3.1-flash-lite-image:generateContent");
+  assert.equal(req.auth, "");
+  assert.equal(req.googleKey, "AIza-fixture123456789");
+  assert.deepEqual(req.body, {
+    contents: [{ parts: [{ text: "A mountain" }] }],
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
+  });
+  assert.equal(result.width, 64);
+  assert.equal(result.height, 40);
+});
+
+test("settings recover unknown providers and invalid custom blocks", () => {
+  for (const value of [
+    null,
+    { version: 2, defaultProvider: "retired", custom: { baseURL: "bad" } },
+    { version: 2, custom: null },
+  ]) {
+    const settings = migrateSettings(value);
+    assert.equal(settings.defaultProvider, DEFAULT_IMAGE_PROVIDER);
+    assert.equal(settings.custom.model, "gpt-image-2");
+  }
+  for (const model of ["gpt-image-1", "dall-e-2", "dall-e-3"]) {
+    assert.equal(
+      migrateSettings({
+        provider: "openai",
+        baseURL: "https://api.openai.com/v1",
+        model,
+        key: "cipher",
+      }).defaultProvider,
+      "openai_gpt_image_2",
+    );
+  }
+  assert.throws(() => normalizeSettings({ size: "512x512" }), /Unsupported/);
+  assert.match(providerSettings(migrateSettings()).baseURL, /v1beta$/);
+});
+test("Gemini skips thoughts and takes the last output image", async () => {
+  const result = await generateImage({
+    settings: providerSettings(migrateSettings()),
+    apiKey: "fixture",
+    prompt: "Landscape",
+    fetch: async () =>
+      new Response(
+        JSON.stringify({
+          candidates: [
+            {
+              content: {
+                parts: [
+                  { inlineData: { data: png(12, 12, [0, 0, 0]).toString("base64") } },
+                  { text: "Final" },
+                  { inlineData: { data: photo.toString("base64") } },
+                  { thought: true, inlineData: { data: png(8, 8, [0, 0, 0]).toString("base64") } },
+                ],
+              },
+            },
+          ],
+        }),
+        { headers: { "content-type": "application/json" } },
+      ),
+  });
+  assert.equal(result.width, 64);
+  assert.equal(result.height, 40);
+});
+test("provider output respects the renderer's 8 MB limit", async () => {
+  await assert.rejects(
+    generateImage({
+      settings: { provider: "http", baseURL: "http://localhost/image" },
+      prompt: "Large fixture",
+      fetch: async () =>
+        new Response(new Uint8Array(8_000_001), { headers: { "content-type": "image/png" } }),
+    }),
+    /8 MB/,
+  );
+  const saved = migrateSettings({
+    provider: "openai",
+    baseURL: "https://custom.example/v1",
+    size: "bad",
+    key: "custom-cipher",
+  });
+  assert.equal(saved.keys.custom, "custom-cipher");
+  assert.equal(saved.keys.openai, undefined);
+});
+
+test("Codex provider uses shared validation and preserves explicit choices", async () => {
+  const fresh = migrateSettings();
+  assert.equal(fresh.providerChosen, false);
+  // A keyless old default never worked, so it may move to Codex; anything else was a real choice.
+  assert.equal(
+    migrateSettings({ version: 2, defaultProvider: "nano_banana_lite" }).providerChosen,
+    false,
+  );
+  assert.equal(
+    migrateSettings({ version: 2, defaultProvider: "nano_banana_lite", keys: { google: "c" } })
+      .providerChosen,
+    true,
+  );
+  assert.equal(
+    migrateSettings({ version: 2, defaultProvider: "openai_gpt_image_2" }).providerChosen,
+    true,
+  );
+  assert.equal(
+    migrateSettings({ ...fresh, defaultProvider: "codex_plan", providerChosen: true })
+      .defaultProvider,
+    "codex_plan",
+  );
+  const settings = providerSettings(fresh, "codex_plan");
+  const result = await generateImage({ settings, prompt: "Teapot", codex: async () => photo });
+  assert.equal(result.width, 64);
+  assert.equal(result.provider, "codex");
+  await assert.rejects(
+    generateImage({ settings, prompt: "Teapot", codex: async () => Buffer.from("invalid") }),
+    /PNG, JPEG or WebP/,
+  );
+  await assert.rejects(generateImage({ settings, prompt: "Teapot" }), /sign in to Codex/);
 });

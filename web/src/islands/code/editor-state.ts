@@ -2,12 +2,21 @@
 import { useSyncExternalStore } from "react";
 import { desktop, errorMessage, setStatus, workspace } from "./api";
 
-export type OpenFile = { kind: "file" | "memory"; path: string; root: string | null; text: string; saved: string; loading?: boolean };
+export type OpenFile = {
+  kind: "file" | "memory";
+  path: string;
+  root: string | null;
+  text: string;
+  saved: string;
+  loading?: boolean;
+};
 let open: OpenFile | null = null;
 const listeners = new Set<() => void>();
 const set = (next: OpenFile | null) => {
   open = next;
-  workspace()?.setOpenFile?.(next && next.kind === "file" ? { path: next.path, text: next.text } : null);
+  workspace()?.setOpenFile?.(
+    next && next.kind === "file" ? { path: next.path, text: next.text } : null,
+  );
   listeners.forEach((fn) => fn());
 };
 

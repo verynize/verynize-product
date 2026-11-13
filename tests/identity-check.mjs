@@ -121,7 +121,7 @@ test("placeholders and allowed addresses are not hits", (t) => {
     "docs.md",
     [
       "you@studio.com user@example.com dev@example.org a@b.test git@github.com",
-      "noreply@anthropic.com " + OWNER + " icon@2x.png",
+      "noreply@anthropic.com noreply@openai.com " + OWNER + " icon@2x.png",
       "/Users/<name>/Library /home/runner/work ~/Library",
       "@scope/pkg @Component() npm i foo@1.2.3",
       "https://app.wonder.so https://app.wonder.so/assets/logo.svg app.wonder.so/<workspace>",

@@ -14,6 +14,7 @@ const path = require("node:path");
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.VERYNIZE_SKIP_ONBOARDING = "1";
+  env.VERYNIZE_LAUNCH_EDITOR = "1";
   const app = await _electron.launch({
     env,
     args: [".", `--user-data-dir=${dir}`],
@@ -133,7 +134,10 @@ const path = require("node:path");
     const page0 = await box("source");
     const outside = [page0.x + 20, page0.y + 20]; // inside the source, outside the target
     const YELLOW = await pixel(...outside);
-    assert.ok(YELLOW[2] < YELLOW[0] - 60, `the source paints before the conversion (${YELLOW})`);
+    assert.ok(
+      YELLOW[2] < YELLOW[0] - 60,
+      `the source paints before the conversion (${YELLOW.join(",")})`,
+    );
 
     // The item needs two or more siblings.
     for (const [ids, label] of [
@@ -144,7 +148,7 @@ const path = require("node:path");
       await select(ids);
       await rightClick(ids[0] === "kid" ? "kid" : "target");
       if ((await selection()).length !== ids.length) await select(ids);
-      assert.ok(!(await items()).includes("Use as mask"), `no Use as mask for ${label}`);
+      assert.ok(!(await items()).includes("Use as mask"), `no Use as mask for ${String(label)}`);
       await close();
     }
     await select(["source", "target"]);
@@ -319,7 +323,11 @@ const path = require("node:path");
     assert.equal(all[at].masks, undefined);
     assert.deepEqual(await selection(), [shape.id]);
     assert.equal(shape.radius, 0);
-    assert.equal(shape.clipContent, true, "the detached Frame clips its content (P5-detached-layer-inspector)");
+    assert.equal(
+      shape.clipContent,
+      true,
+      "the detached Frame clips its content (P5-detached-layer-inspector)",
+    );
     assert.equal(await page.getByRole("checkbox", { name: "Clip content" }).isChecked(), true);
     const detached = await box(shape.id);
     near(

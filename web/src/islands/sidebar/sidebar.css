@@ -9,16 +9,22 @@
 }
 #bd-sidebar-root {
   flex: 1 1 auto;
+  /* Keep the height chain bounded even when another shell layout changes the host display. */
+  height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-#bd-sidebar-root > [hidden] {
-  display: none !important;
+#bd-sidebar-root section[aria-label="Pages"] {
+  /* Pages should never push Components/Layers below the panel's bottom edge. */
+  max-height: 30%;
 }
+#bd-page-list,
+#bd-components-body,
 #bd-layer-tree {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) transparent;
+  overscroll-behavior-y: contain;
 }
 #bd-sidebar-root input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: none;
@@ -60,4 +66,9 @@ body[data-layer-drag] #bd-layer-tree * {
 body[data-page-drag] #bd-page-list,
 body[data-page-drag] #bd-page-list * {
   cursor: grabbing;
+}
+
+[data-layer-spacer] {
+  height: var(--spacer-height);
+  flex-shrink: 0;
 }

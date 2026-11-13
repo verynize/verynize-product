@@ -2,7 +2,13 @@
 // small floating chip with the page name). Pointer-driven like layer-drag.ts; React re-renders only when the insertion
 // point changes. The document change is one validated `setDocument` call, so it is a single undo step and reaches cloud
 // rooms as a `pageOrder` operation (web/cloud-ops.js).
-import { useCallback, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type RefObject,
+} from "react";
 import { design, portalContainer } from "@/lib/bridge";
 
 const DRAG_THRESHOLD = 4;
@@ -59,7 +65,8 @@ export function usePageDrag(listRef: RefObject<HTMLElement | null>) {
       let ghost: HTMLElement | null = null;
       current.current = null;
 
-      const rows = () => Array.from(listRef.current?.querySelectorAll<HTMLElement>("[data-page-id]") ?? []);
+      const rows = () =>
+        Array.from(listRef.current?.querySelectorAll<HTMLElement>("[data-page-id]") ?? []);
       const targetAt = (clientY: number): PageDrop | null => {
         const list = listRef.current;
         const all = rows();
@@ -76,7 +83,7 @@ export function usePageDrag(listRef: RefObject<HTMLElement | null>) {
           index < all.length
             ? all[index].getBoundingClientRect().top - base.top
             : all[all.length - 1].getBoundingClientRect().bottom - base.top;
-        return { index, top };
+        return { index, top: top + list.scrollTop };
       };
 
       const finish = (commit: boolean) => {

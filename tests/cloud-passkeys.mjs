@@ -36,7 +36,7 @@ const rawToDer = (raw) => {
   const int = (bytes) => {
     let i = 0;
     while (i < bytes.length - 1 && bytes[i] === 0) i++;
-    let v = [...bytes.slice(i)];
+    let v = bytes.slice(i);
     if (v[0] & 0x80) v = [0, ...v];
     return [0x02, v.length, ...v];
   };
@@ -177,7 +177,8 @@ try {
     (await local(origin + "/passkey.js")).headers.get("content-type"),
     "text/javascript; charset=utf-8",
   );
-  new Function(await (await local(origin + "/passkey.js")).text()); // the ceremony script parses
+  // oxlint-disable-next-line typescript/no-implied-eval -- compiles (never runs) the served script to prove it parses
+  new Function(await (await local(origin + "/passkey.js")).text());
 
   // Registration needs a ticket minted by a signed-in session.
   await call("/api/auth/passkeys/ticket", {}, { status: 401 });

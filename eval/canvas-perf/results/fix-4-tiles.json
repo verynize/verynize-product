@@ -1,0 +1,365 @@
+{
+  "at": "2026-11-04T23:17:53.648Z",
+  "cpu": "Apple M1",
+  "notes": "Concurrent work may affect load. rAF intervals are not presentation timestamps. DOM completeness is unmeasured.",
+  "samples": [
+    {
+      "n": 1000,
+      "flag": false,
+      "loadAverage": [7.31787109375, 3.92822265625, 5.22216796875],
+      "freeBytes": 1095041024,
+      "error": "Error: electron.launch: Electron failed to install correctly. Please delete `node_modules/electron` and run \"npx install-electron --no\" manually."
+    },
+    {
+      "n": 1000,
+      "flag": true,
+      "loadAverage": [21.0849609375, 9.76220703125, 7.31884765625],
+      "freeBytes": 206815232,
+      "loadMs": 641.8000000000466,
+      "motion": {
+        "handlers": [
+          368.30000000004657, 380.89999999990687, 406, 411.70000000018626, 422.10000000009313, 402,
+          388, 425.69999999995343, 387.60000000009313, 368.70000000018626, 307.9000000001397,
+          395.5999999998603, 472.19999999995343, 489.69999999995343, 398.80000000004657,
+          654.7999999998137, 357.5999999998603, 327.89999999990687, 332.4000000001397,
+          350.5999999998603, 320.30000000004657, 354.10000000009313, 404.29999999981374,
+          392.30000000004657
+        ],
+        "intervals": [
+          500.00000000000045, 466.59999999999945, 466.6999999999998, 433.3000000000002, 450,
+          433.3000000000002, 449.89999999999964, 450, 416.60000000000036, 400, 316.7000000000007,
+          416.59999999999854, 516.5, 516.8000000000011, 433.2999999999993, 682.3999999999996,
+          383.2000000000007, 367.5, 350.10000000000036, 382.5, 350.7999999999993,
+          366.10000000000036, 433.7999999999993
+        ],
+        "completeness": [
+          {
+            "blank": 1,
+            "scaled": 0,
+            "exact": 0,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 9,
+            "bytes": 9585216
+          },
+          {
+            "blank": 0.9383176441529215,
+            "scaled": 0,
+            "exact": 0.06168235584707853,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 18,
+            "bytes": 19170432
+          },
+          {
+            "blank": 0.9390670655286295,
+            "scaled": 0,
+            "exact": 0.06093293447137067,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 18,
+            "bytes": 19170432
+          },
+          {
+            "blank": 0.9398164869043371,
+            "scaled": 0,
+            "exact": 0.060183513095662826,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 9,
+            "bytes": 9585216
+          },
+          {
+            "blank": 0.7103436616625957,
+            "scaled": 0,
+            "exact": 0.2896563383374043,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 12,
+            "bytes": 12780288
+          },
+          {
+            "blank": 0.48072095214571264,
+            "scaled": 0,
+            "exact": 0.5192790478542872,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0.09641767068273092,
+            "scaled": 0,
+            "exact": 0.9035823293172692,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999996,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 16,
+            "bytes": 17040384
+          },
+          {
+            "blank": 0.04419134396355353,
+            "scaled": 0,
+            "exact": 0.9558086560364465,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 20,
+            "bytes": 21300480
+          },
+          {
+            "blank": 0.9383176441529215,
+            "scaled": 0,
+            "exact": 0.06168235584707853,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 29,
+            "bytes": 30885696
+          },
+          {
+            "blank": 0.6778747307529283,
+            "scaled": 0,
+            "exact": 0.3221252692470718,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 29,
+            "bytes": 30885696
+          },
+          {
+            "blank": 0.7407661726023304,
+            "scaled": 0,
+            "exact": 0.2592338273976696,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0.4006767538491095,
+            "scaled": 0,
+            "exact": 0.5993232461508904,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999998,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999999,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999996,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1.0000000000000002,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999998,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 1,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          },
+          {
+            "blank": 0,
+            "scaled": 0,
+            "exact": 0.9999999999999999,
+            "refinedMs": null,
+            "active": true,
+            "revision": 4,
+            "invalidated": 0,
+            "tiles": 36,
+            "bytes": 38340864
+          }
+        ],
+        "final": {
+          "blank": 0,
+          "scaled": 0,
+          "exact": 1,
+          "refinedMs": 10751.800000000047,
+          "active": false,
+          "revision": 4,
+          "invalidated": 0,
+          "tiles": 36,
+          "bytes": 38340864
+        },
+        "settleMs": 48.89999999990687
+      },
+      "summary": {
+        "handlerP50": 388,
+        "handlerP95": 489.69999999995343,
+        "over16_7Pct": 100
+      }
+    },
+    {
+      "n": 5000,
+      "flag": false,
+      "loadAverage": [20.7734375, 10.90234375, 7.82958984375],
+      "freeBytes": 546684928,
+      "loadMs": 13752.899999999907,
+      "error": "Error: Ceiling 60000ms: zoom"
+    },
+    {
+      "n": 5000,
+      "flag": true,
+      "loadAverage": [34.150390625, 18.6015625, 11.1455078125],
+      "freeBytes": 180912128,
+      "loadMs": 12964.40000000014,
+      "error": "Error: Ceiling 60000ms: zoom"
+    },
+    {
+      "n": 13000,
+      "flag": false,
+      "loadAverage": [27.71533203125, 20.52099609375, 12.59521484375],
+      "freeBytes": 168083456,
+      "error": "Error: page.evaluate: Error: Maximum 10000 nodes\n    at validateDocument (app://verynize/document-core.js:501:15)\n    at Object.prepareDocument (app://verynize/document-core.js:632:20)\n    at Object.load (app://verynize/document-safety.js:235:23)\n    at Object.loadDocument (app://verynize/app.js:85:3307)\n    at eval (eval at evaluate (:370:30), <anonymous>:2:85)\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    },
+    {
+      "n": 13000,
+      "flag": true,
+      "loadAverage": [27.4736328125, 20.71533203125, 12.7568359375],
+      "freeBytes": 509116416,
+      "error": "Error: page.evaluate: Error: Maximum 10000 nodes\n    at validateDocument (app://verynize/document-core.js:501:15)\n    at Object.prepareDocument (app://verynize/document-core.js:632:20)\n    at Object.load (app://verynize/document-safety.js:235:23)\n    at Object.loadDocument (app://verynize/app.js:85:3307)\n    at eval (eval at evaluate (:370:30), <anonymous>:2:85)\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    },
+    {
+      "n": 50000,
+      "flag": false,
+      "loadAverage": [27.51904296875, 20.93994140625, 12.9287109375],
+      "freeBytes": 550846464,
+      "error": "Error: page.evaluate: Error: Maximum 10000 nodes\n    at validateDocument (app://verynize/document-core.js:501:15)\n    at Object.prepareDocument (app://verynize/document-core.js:632:20)\n    at Object.load (app://verynize/document-safety.js:235:23)\n    at Object.loadDocument (app://verynize/app.js:85:3307)\n    at eval (eval at evaluate (:370:30), <anonymous>:2:85)\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    },
+    {
+      "n": 50000,
+      "flag": true,
+      "loadAverage": [29.27197265625, 22.005859375, 13.55126953125],
+      "freeBytes": 270598144,
+      "error": "Error: page.evaluate: Error: Maximum 10000 nodes\n    at validateDocument (app://verynize/document-core.js:501:15)\n    at Object.prepareDocument (app://verynize/document-core.js:632:20)\n    at Object.load (app://verynize/document-safety.js:235:23)\n    at Object.loadDocument (app://verynize/app.js:85:3307)\n    at eval (eval at evaluate (:370:30), <anonymous>:2:85)\n    at UtilityScript.evaluate (<anonymous>:372:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)"
+    }
+  ]
+}

@@ -42,7 +42,7 @@ try {
     ["dark", "system"].map((value) => send(ana, "preference:theme", value, 1)),
   );
   assert.deepEqual(
-    writes.map((r) => r.status).sort(),
+    writes.map((r) => r.status).sort((a, b) => a - b),
     [200, 409],
     "concurrent edits use atomic revision checks",
   );
@@ -85,7 +85,8 @@ try {
   );
   assert.equal(
     (await send(ana, "chat:large", { ...large, title: "must roll back" }, 1)).status,
-    400,
+    500,
+    "database write failures are server errors",
   );
   await db.exec("DROP TRIGGER reject_test_chunk");
   assert.deepEqual(
@@ -98,7 +99,10 @@ try {
     send(ana, "chat:large", { ...large, title: "A" }, 1),
     send(ana, "chat:large", { ...large, title: "B" }, 1),
   ]);
-  assert.deepEqual(competing.map((r) => r.status).sort(), [200, 409]);
+  assert.deepEqual(
+    competing.map((r) => r.status).sort((a, b) => a - b),
+    [200, 409],
+  );
   const winner = JSON.parse((await readLarge()).value);
   assert.ok(["A", "B"].includes(winner.title));
   assert.equal(winner.text, large.text, "a stale writer cannot delete the winner's chunks");
@@ -118,6 +122,90 @@ try {
   assert.equal((await send(ana, "chat:large", null, 4)).status, 200);
   assert.equal((await readLarge()).value, null);
   assert.equal(await chunkCount(), 0, "deletion reclaims all chunks");
+  const batch = (writes, session = ana) =>
+    fetch(server + "/api/me/state/batch", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(session ? { "x-verynize-session": session } : {}),
+      },
+      body: JSON.stringify({ writes }),
+    });
+  const write = (key, value = "saved", revision = 0) => ({
+    key,
+    value: JSON.stringify(value),
+    revision,
+  });
+  assert.equal((await batch([write("preference:batch-auth")], null)).status, 401);
+  const first = await batch([write("preference:batch-a"), write("preference:batch-b")]);
+  assert.equal(first.status, 200);
+  assert.deepEqual((await first.json()).results, [
+    { key: "preference:batch-a", ok: true, revision: 1 },
+    { key: "preference:batch-b", ok: true, revision: 1 },
+  ]);
+  const partial = await batch([
+    write("preference:batch-a", "stale"),
+    write("preference:batch-b", "new", 1),
+  ]);
+  const partialResults = (await partial.json()).results;
+  assert.equal(partialResults[0].conflict, true);
+  assert.equal(partialResults[0].current.value, '"saved"');
+  assert.equal(partialResults[0].current.revision, 1);
+  assert.deepEqual(partialResults[1], { key: "preference:batch-b", ok: true, revision: 2 });
+  assert.equal((await batch([write("preference:batch-a")], budi)).status, 200, "account isolation");
+  assert.equal((await send(ana, "preference:batch-b", "old client", 2)).status, 200);
+  for (const invalid of [
+    [],
+    Array.from({ length: 65 }, (_, i) => write(`preference:limit-${i}`)),
+    [write("preference:duplicate"), write("preference:duplicate")],
+    [write("preference:must-not-write"), write("session:invalid")],
+    [write("preference:must-not-write"), { ...write("preference:bad"), value: "not JSON" }],
+    [write("preference:must-not-write"), write("preference:bad", "value", -1)],
+    [null],
+  ]) {
+    assert.equal((await batch(invalid)).status, 400);
+  }
+  assert.equal(
+    (await batch([write("preference:oversize", "x".repeat(20 * 1024 * 1024))])).status,
+    413,
+  );
+  assert.equal(
+    (
+      await batch([
+        write("preference:aggregate-a", "x".repeat(11 * 1024 * 1024)),
+        write("preference:aggregate-b", "x".repeat(11 * 1024 * 1024)),
+      ])
+    ).status,
+    413,
+  );
+  const rejected = (await (await send(ana)).json()).items;
+  assert.ok(
+    !rejected.some((item) => /must-not-write|aggregate|oversize|duplicate|limit-/.test(item.key)),
+  );
+  await db.exec(
+    "CREATE TRIGGER reject_batch_test BEFORE INSERT ON account_state WHEN NEW.key = 'preference:rollback-b' BEGIN SELECT RAISE(ABORT, 'test batch failure'); END",
+  );
+  assert.equal(
+    (await batch([write("preference:rollback-a"), write("preference:rollback-b")])).status,
+    500,
+  );
+  await db.exec("DROP TRIGGER reject_batch_test");
+  assert.ok(
+    !(await (await send(ana)).json()).items.some((item) => item.key === "preference:rollback-a"),
+  );
+  const largeBatch = await batch([
+    write("chat:batch-large", { chat: { id: "batch-large", messages: [large] } }),
+    write("preference:with-chat"),
+  ]);
+  assert.equal(largeBatch.status, 200);
+  const largeConflict = (await (await batch([write("chat:batch-large", "stale")])).json())
+    .results[0];
+  assert.deepEqual(JSON.parse(largeConflict.current.value).chat.messages, [large]);
+  assert.equal((await batch([{ key: "chat:batch-large", value: null, revision: 1 }])).status, 200);
+  assert.equal(await chunkCount(), 0);
+  console.log(
+    "PASS batch success, partial conflict, auth, isolation, validation, limits, rollback and chunks",
+  );
   console.log(
     "PASS private account state, independent records, atomic conflicts and deletion tombstones",
   );

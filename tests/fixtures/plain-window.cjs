@@ -2,13 +2,13 @@
 // (contextIsolation, no node integration), so the page sees a plain browser without window.desktop.
 const { app, BrowserWindow } = require("electron");
 
-app.whenReady().then(() => {
+void app.whenReady().then(() => {
   const win = new BrowserWindow({
     width: 1440,
     height: 870,
     show: false,
     webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
   });
-  win.loadURL(process.env.VERYNIZE_PLAIN_URL);
+  void win.loadURL(process.env.VERYNIZE_PLAIN_URL);
 });
 app.on("window-all-closed", () => app.quit());

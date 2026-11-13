@@ -69,12 +69,12 @@ async function connect(roomId, session) {
   const waiters = [];
   socket.addEventListener("message", (event) => {
     const message = JSON.parse(event.data);
-    seen.push(message);
-    for (const waiter of waiters.slice())
-      if (waiter.predicate(message)) {
-        waiters.splice(waiters.indexOf(waiter), 1);
-        waiter.resolve(message);
-      }
+    // A message goes to one waiter or into `seen`, never both: otherwise a later next() could
+    // return a message an earlier next() already consumed (only when it arrived after the wait).
+    const waiter = waiters.find((w) => w.predicate(message));
+    if (!waiter) return void seen.push(message);
+    waiters.splice(waiters.indexOf(waiter), 1);
+    waiter.resolve(message);
   });
   socket.accept();
   return {

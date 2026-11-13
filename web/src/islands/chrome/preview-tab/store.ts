@@ -26,13 +26,19 @@ export type PreviewTab = {
 };
 type State = { tabs: PreviewTab[]; active: string | null };
 
-type PreviewNode = LayerNode & { preview?: { root?: string; name?: string; chatId?: string; url?: string } };
+type PreviewNode = LayerNode & {
+  preview?: { root?: string; name?: string; chatId?: string; url?: string };
+};
 type LivePreview = {
   nodeElement?(id: string): HTMLElement | undefined;
   getNodeId?(): string | null;
   getURL?(): string;
 };
-type FileLibrary = { currentId?: string | null; open?(id: string): Promise<unknown>; showEditor?(): void };
+type FileLibrary = {
+  currentId?: string | null;
+  open?(id: string): Promise<unknown>;
+  showEditor?(): void;
+};
 
 const desktop = () => platform.desktop;
 const livePreview = () => (window as unknown as { livePreview?: LivePreview }).livePreview;
@@ -78,7 +84,9 @@ export function localURL(value: string): string {
 function findNode(frameId: string): PreviewNode | null {
   const doc = window.design?.getDocument();
   for (const page of doc?.pages ?? []) {
-    const node = page.nodes.find((candidate) => candidate.id === frameId) as PreviewNode | undefined;
+    const node = page.nodes.find((candidate) => candidate.id === frameId) as
+      | PreviewNode
+      | undefined;
     if (node?.preview) return node;
   }
   return null;
@@ -184,7 +192,12 @@ function leaveOtherViews() {
 }
 
 /** Preview frames of the open design file, with the tab title and status (the file switcher's Previews). */
-export function previewFrames(): { frameId: string; title: string; name: string; status: PreviewTabStatus }[] {
+export function previewFrames(): {
+  frameId: string;
+  title: string;
+  name: string;
+  status: PreviewTabStatus;
+}[] {
   const doc = window.design?.getDocument();
   const frames: { frameId: string; title: string; name: string; status: PreviewTabStatus }[] = [];
   for (const page of doc?.pages ?? [])
@@ -272,7 +285,10 @@ export async function showOnCanvas(frameId: string) {
   const node = page.nodes.find((candidate) => candidate.id === frameId)!;
   const wrap = document.getElementById("canvas-wrap")?.getBoundingClientRect();
   if (wrap) {
-    const zoom = Math.max(0.05, Math.min((wrap.width - 100) / node.w, (wrap.height - 140) / node.h, 1));
+    const zoom = Math.max(
+      0.02,
+      Math.min((wrap.width - 100) / node.w, (wrap.height - 140) / node.h, 1),
+    );
     window.design.setCamera(50 - node.x * zoom, 60 - node.y * zoom, zoom);
   }
 }
@@ -323,11 +339,17 @@ export function installPreviewTabs() {
   window.addEventListener(
     "keydown",
     (event) => {
-      if (!state.active || document.body.classList.contains("code-mode") || event.key === "Escape") return;
+      if (!state.active || document.body.classList.contains("code-mode") || event.key === "Escape")
+        return;
       const target = event.target as HTMLElement | null;
       const page = !target || target === document.body || target === document.documentElement;
       if (!page && !target?.closest("#preview-tab-view")) return;
-      if (target?.closest("input, textarea, select, [contenteditable=true], [role=menu], [role=dialog]")) return;
+      if (
+        target?.closest(
+          "input, textarea, select, [contenteditable=true], [role=menu], [role=dialog]",
+        )
+      )
+        return;
       if (canvasShortcut(event)) event.stopImmediatePropagation();
     },
     true,
@@ -345,7 +367,13 @@ function canvasShortcut(event: KeyboardEvent): boolean {
     : /^(Digit|Numpad)\d$/.test(event.code)
       ? event.code.at(-1)!
       : event.key.toLowerCase();
-  const combo = [mod && "mod", mac && event.ctrlKey && "ctrl", event.altKey && "alt", event.shiftKey && "shift", key]
+  const combo = [
+    mod && "mod",
+    mac && event.ctrlKey && "ctrl",
+    event.altKey && "alt",
+    event.shiftKey && "shift",
+    key,
+  ]
     .filter(Boolean)
     .join("+");
   const commands = (window.design?.commands?.() ?? []) as { keys?: string[] }[];

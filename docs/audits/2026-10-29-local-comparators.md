@@ -1,6 +1,7 @@
 # Local comparator audit — 2026-10-29
 
 Observed installed identities from Info.plist:
+
 - /Applications/Wonder.app: so.wonder.desktop, 0.2.185, build 261028yjkmn1euz. Existing repo research is against 0.2.183; do not present it as current-version runtime verification.
 - /Applications/Pen.app: dev.pencil.desktop, 1.2.20. This is Pen/Pencil, not OpenPencil.
 - /Applications/OpenPencil.app: net.dannote.open-pencil 0.16.0; separate application, not primary comparator.

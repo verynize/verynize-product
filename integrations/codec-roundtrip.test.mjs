@@ -184,7 +184,14 @@ function buildSink() {
     // Text Background Fill (properties-audit A10, WP-6).
     backgroundFills: [
       { type: "solid", color: "#4f46e5", token: "brand", opacity: 80 },
-      { type: "linear", angle: 45, stops: [{ position: 0, color: "#000000" }, { position: 100, color: "#ffffff" }] },
+      {
+        type: "linear",
+        angle: 45,
+        stops: [
+          { position: 0, color: "#000000" },
+          { position: 100, color: "#ffffff" },
+        ],
+      },
     ],
   });
   Object.assign(by("Cell A"), {
@@ -229,7 +236,13 @@ function buildSink() {
     shaderColors: { center: { color: "#ff0000" }, edge: { color: "#00ff00", token: "glow" } },
     shaderParams: { size: 40, grain: 10 },
   });
-  Object.assign(by("Free"), { columns: 4, direction: "column", gap: 12, clipContent: true, columnSizes: [2, 1, 1, 1] });
+  Object.assign(by("Free"), {
+    columns: 4,
+    direction: "column",
+    gap: 12,
+    clipContent: true,
+    columnSizes: [2, 1, 1, 1],
+  });
   // Grid settings: fr-weighted Fill tracks and Automatic positioning off (G5 / H7).
   Object.assign(by("Grid"), { columnSizes: [1, 2, 1], rowSizes: [1, 3], autoPosition: false });
   Object.assign(by("Grow"), {
@@ -318,7 +331,8 @@ function normalize(node) {
     if (Array.isArray(value) && !value.length && key !== "textRuns") continue;
     out[key] = typeof value === "number" ? Math.round(value * 100) / 100 : canon(value);
   }
-  if (Array.isArray(out.styleOwn)) out.styleOwn = [...out.styleOwn].sort();
+  if (Array.isArray(out.styleOwn))
+    out.styleOwn = [...out.styleOwn].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   return out;
 }
 export function diffPages(a, b) {
@@ -361,7 +375,9 @@ test("every schema property is exercised by the round-trip kitchen sink", () => 
   for (const n of getPage(sink, "p").nodes)
     for (const [key, value] of Object.entries(n))
       if (JSON.stringify(value) !== JSON.stringify(DEFAULTS[key])) used.add(key);
-  const missing = [...schemaKeys()].filter((key) => !EXEMPT.has(key) && !used.has(key)).sort();
+  const missing = [...schemaKeys()]
+    .filter((key) => !EXEMPT.has(key) && !used.has(key))
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
   assert.deepEqual(
     missing,
     [],

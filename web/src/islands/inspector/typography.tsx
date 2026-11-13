@@ -34,7 +34,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
+import { cn, textOf } from "@/lib/utils";
 import {
   Affix,
   Caption,
@@ -55,6 +56,7 @@ import {
   loadLocalFonts,
   nearestWeight,
   previewFont,
+  previewFonts,
   weightsFor,
   type FontEntry,
 } from "./fonts";
@@ -77,7 +79,8 @@ function FontName({ family, className }: { family: string; className?: string })
   );
 }
 
-const LIMIT = 150;
+/** Fonts revealed per infinite-scroll page (also the most families one `fontFaces` call loads). */
+const PAGE = 40;
 const KIND_LABEL: Record<FontEntry["kind"], string> = {
   bundled: "Bundled",
   system: "System",
@@ -108,20 +111,26 @@ export function FontFamilyPicker({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
-  const [source, setSource] = useState<"all" | FontEntry["kind"]>("all");
+  // All = Google + system fonts, Custom = fonts installed on this Mac, Variable = fontFamily variables.
+  const [source, setSource] = useState<"all" | "custom" | "variable">("all");
+  const [limit, setLimit] = useState(PAGE);
+  const [loading, setLoading] = useState(false);
   const list = useRef<HTMLDivElement>(null);
+  // A state ref: the popover content mounts after the picker renders, so the observer waits for the row itself.
+  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
   const q = query.trim().toLowerCase();
   const familyVars = onChoose
     ? []
     : Object.entries(variablesOf(doc)).filter(([, v]) => v.type === "fontFamily");
   const bound = bindingsOf(node).fontFamily;
-  const used = [
+  // Joined so the memo below only recomputes when the set of families on the page changes.
+  const usedKey = [
     ...new Set(
       pageNodes(doc)
         .map((n) => n.fontFamily)
         .filter(Boolean),
     ),
-  ];
+  ].join("\u0000");
   const matches = useMemo(() => {
     const seen = new Set<string>();
     const out: FontEntry[] = [];
@@ -130,14 +139,14 @@ export function FontFamilyPicker({
       if (
         seen.has(key) ||
         (q && !key.includes(q)) ||
-        (source !== "all" && f.kind !== source && !(source === "system" && f.kind === "generic"))
+        (f.kind === "local") !== (source === "custom")
       )
         return;
       seen.add(key);
       out.push(f);
     };
     if (source === "all")
-      for (const family of [value, ...used])
+      for (const family of [value, ...(usedKey ? usedKey.split("\u0000") : [])])
         add(
           fonts.find((f) => f.family.toLowerCase() === family.toLowerCase()) ?? {
             family,
@@ -154,9 +163,57 @@ export function FontFamilyPicker({
             Number(!b.family.toLowerCase().startsWith(q)),
         )
       : out;
-  }, [fonts, q, source, value, used.join("\u0000")]);
-  const shown = matches.slice(0, LIMIT);
+  }, [fonts, q, source, value, usedKey]);
+  const varMatches = familyVars.filter(
+    ([name, v]) =>
+      !q || name.toLowerCase().includes(q) || String(v.value).toLowerCase().includes(q),
+  );
+  const shown = source === "variable" ? [] : matches.slice(0, limit);
+  const more = source !== "variable" && matches.length > limit;
+  const count = source === "variable" ? varMatches.length : shown.length;
   const current = shown[Math.min(active, shown.length - 1)];
+  const currentVar = source === "variable" ? varMatches[Math.min(active, count - 1)] : undefined;
+  const applyVariable = (name: string | null) => {
+    setOpen(false);
+    setQuery("");
+    setActive(0);
+    bindVariable(doc, selection, "fontFamily", name);
+  };
+  // A new search or tab starts again at the first page, with its previews loaded.
+  const pageKey = `${open}\u0000${source}\u0000${q}`;
+  const pageKeyRef = useRef(pageKey);
+  useLayoutEffect(() => {
+    pageKeyRef.current = pageKey;
+  });
+  useEffect(() => {
+    setLimit(PAGE);
+    setLoading(false);
+    if (open && source !== "variable") void previewFonts(matches.slice(0, PAGE));
+  }, [pageKey, fonts]);
+  // Infinite scroll: when the bottom row comes into view, fetch the next page's previews, then show it.
+  useEffect(() => {
+    if (!sentinel || !more || loading) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        setLoading(true);
+        const key = pageKey;
+        const next = matches.slice(limit, limit + PAGE);
+        void Promise.race([
+          previewFonts(next),
+          new Promise((resolve) => setTimeout(resolve, 4000)),
+        ]).then(() => {
+          if (pageKeyRef.current !== key) return;
+          setLimit((n) => n + PAGE);
+          setLoading(false);
+        });
+      },
+      { root: list.current, rootMargin: "0px 0px 120px 0px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [sentinel, more, loading, limit, matches, pageKey]);
   useEffect(() => {
     if (current) void previewFont(current);
     list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
@@ -185,7 +242,11 @@ export function FontFamilyPicker({
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (next) onLocalFonts();
+        if (next) {
+          onLocalFonts();
+          setSource(bound && !onChoose ? "variable" : "all");
+          setActive(0);
+        }
       }}
     >
       <PopoverTrigger asChild>
@@ -229,7 +290,7 @@ export function FontFamilyPicker({
               role="combobox"
               aria-expanded
               aria-controls="font-family-list"
-              aria-activedescendant={current ? `font-option-${active}` : undefined}
+              aria-activedescendant={current || currentVar ? `font-option-${active}` : undefined}
               className="h-7 min-w-0 flex-1 rounded-md bg-input px-2 text-xs text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring"
               onChange={(event) => {
                 setQuery(event.target.value);
@@ -239,14 +300,12 @@ export function FontFamilyPicker({
                 if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                   event.preventDefault();
                   setActive((i) =>
-                    Math.max(
-                      0,
-                      Math.min(shown.length - 1, i + (event.key === "ArrowDown" ? 1 : -1)),
-                    ),
+                    Math.max(0, Math.min(count - 1, i + (event.key === "ArrowDown" ? 1 : -1))),
                   );
                 } else if (event.key === "Enter") {
                   event.preventDefault();
-                  choose(current?.family ?? query);
+                  if (source !== "variable") choose(current?.family ?? query);
+                  else if (currentVar) applyVariable(currentVar[0]);
                 }
               }}
             />
@@ -257,7 +316,10 @@ export function FontFamilyPicker({
             aria-label="Font source"
             className="flex h-6 gap-0.5 rounded-md bg-muted p-0.5"
           >
-            {(["all", "web", "local", "system"] as const).map((k) => (
+            {(onChoose
+              ? (["all", "custom"] as const)
+              : (["all", "custom", "variable"] as const)
+            ).map((k) => (
               <button
                 key={k}
                 type="button"
@@ -269,54 +331,10 @@ export function FontFamilyPicker({
                   setActive(0);
                 }}
               >
-                {k === "all"
-                  ? "All"
-                  : k === "web"
-                    ? "Google"
-                    : k === "local"
-                      ? "Installed"
-                      : "System"}
+                {k === "all" ? "All" : k === "custom" ? "Custom" : "Variable"}
               </button>
             ))}
           </div>
-          {familyVars.length ? (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="flex h-7 items-center gap-2 rounded-md px-2 text-left text-xs text-foreground-2 hover:bg-accent"
-                >
-                  <Diamond className="size-3.5" aria-hidden />
-                  <span className="flex-1">Apply variable</span>
-                  {bound ? <span className="truncate text-muted-foreground">{bound}</span> : null}
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="left" align="start" sideOffset={8} className="w-48">
-                {familyVars.map(([name, v]) => (
-                  <DropdownMenuItem
-                    key={name}
-                    onSelect={() => {
-                      bindVariable(doc, selection, "fontFamily", name);
-                      setOpen(false);
-                    }}
-                  >
-                    <span className="flex-1 truncate">{name}</span>
-                    <span className="truncate text-muted-foreground">{String(v.value)}</span>
-                  </DropdownMenuItem>
-                ))}
-                {bound ? (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onSelect={() => bindVariable(doc, selection, "fontFamily", null)}
-                    >
-                      Detach variable
-                    </DropdownMenuItem>
-                  </>
-                ) : null}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : null}
           <div
             ref={list}
             id="font-family-list"
@@ -324,6 +342,53 @@ export function FontFamilyPicker({
             aria-label="Fonts"
             className="max-h-80 min-h-40 overflow-y-auto"
           >
+            {source === "variable"
+              ? varMatches.map(([name, v], i) => (
+                  <button
+                    key={name}
+                    id={`font-option-${i}`}
+                    data-index={i}
+                    data-variable={name}
+                    type="button"
+                    role="option"
+                    aria-selected={name === bound}
+                    data-active={i === active || undefined}
+                    className="flex h-7 w-full items-center justify-between gap-2 rounded-md px-2 text-left text-xs text-foreground-2 hover:bg-accent data-active:bg-accent"
+                    onPointerEnter={() => setActive(i)}
+                    onClick={() => applyVariable(name)}
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
+                      <Diamond className="size-3.5 shrink-0" aria-hidden />
+                      <span className="truncate">{name}</span>
+                    </span>
+                    <span className="flex min-w-0 items-center gap-1 text-2xs text-subtle-foreground">
+                      <FontName family={String(v.value)} />
+                      {name === bound ? (
+                        <Check className="size-3.5 shrink-0 text-foreground-3" aria-hidden />
+                      ) : null}
+                    </span>
+                  </button>
+                ))
+              : null}
+            {source === "variable" && bound ? (
+              <button
+                type="button"
+                className="flex h-7 w-full items-center rounded-md px-2 text-left text-xs text-foreground-2 hover:bg-accent"
+                onClick={() => applyVariable(null)}
+              >
+                Detach variable
+              </button>
+            ) : null}
+            {source === "variable" && !varMatches.length ? (
+              <p className="px-2 py-1.5 text-2xs text-subtle-foreground">
+                {q ? "No matching font variables" : "No font family variables in this document"}
+              </p>
+            ) : null}
+            {source === "custom" && !matches.length && !q ? (
+              <p className="px-2 py-1.5 text-2xs text-subtle-foreground">
+                No fonts installed on this device were found
+              </p>
+            ) : null}
             {shown.map((font, i) => (
               <button
                 key={font.family}
@@ -347,7 +412,7 @@ export function FontFamilyPicker({
                 </span>
               </button>
             ))}
-            {!shown.length && q ? (
+            {source !== "variable" && !shown.length && q ? (
               <button
                 type="button"
                 className="flex h-7 w-full items-center rounded-md px-2 text-left text-xs text-foreground-2 hover:bg-accent"
@@ -356,10 +421,14 @@ export function FontFamilyPicker({
                 Use “{query.trim()}”
               </button>
             ) : null}
-            {matches.length > LIMIT ? (
-              <p className="px-2 py-1.5 text-2xs text-subtle-foreground">
-                {matches.length - LIMIT} more — type to narrow the list
-              </p>
+            {more ? (
+              <div
+                ref={setSentinel}
+                data-font-list-more
+                className="flex h-8 items-center justify-center text-muted-foreground"
+              >
+                <Spinner className="size-3.5" />
+              </div>
             ) : null}
           </div>
           {current ? (
@@ -845,7 +914,7 @@ function TypePreview({ node }: { node: TypeNode }) {
     if (!el) return;
     const s = el.style;
     s.fontFamily = `"${String(node.fontFamily).replace(/"/g, "")}", var(--font-sans)`;
-    s.fontWeight = String(node.fontWeight || "400");
+    s.fontWeight = textOf(node.fontWeight || "400");
     s.textTransform = node.textTransform || "";
     s.textDecorationLine = node.textDecoration || "";
     s.textIndent = node.textIndent ? `${node.textIndent}px` : "";

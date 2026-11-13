@@ -10,6 +10,7 @@ Semua perilaku hanya diuji secara lokal: workerd lewat Miniflare, Electron sungg
 ## Yang dibangun
 
 ### Worker (`cloud/`)
+
 - `worker.js` sekarang hanya berisi router. Kodenya dipecah ke `rooms.js` (DO `DesignRoom`), `accounts.js` (DO `AccountDirectory`), `apps.js` (DO `PublishedApp`), `mail.js` (batas penyedia email), `pages.js` (halaman profil publik) dan `http.js` (utilitas bersama).
 - **Akun**: sign-in lewat magic link. Tautannya sekali pakai, berlaku 15 menit, dan hanya hash-nya yang disimpan. Sesi `vs_…` berlaku 30 hari dan disimpan sebagai hash SHA-256. Tersedia sign out (sesi ini) dan sign out everywhere, serta rate limit `AUTH_LIMIT`.
 - **Email**: penyedia `outbox` khusus dev/test, dibaca lewat `GET /api/dev/outbox`, dan `webhook` (relay HTTP dengan secret). Nilai lain menonaktifkan sign-in (503). Pengiriman nyata **perlu kredensial live** dan belum diuji. Passkey/WebAuthn (opsional) **tidak** diimplementasikan.
@@ -32,6 +33,7 @@ Semua perilaku hanya diuji secara lokal: workerd lewat Miniflare, Electron sungg
 - `cloudflare.config.ts`: tiga kelas DO SQLite, `AUTH_LIMIT`, `EMAIL_PROVIDER` (`webhook`) beserta dua secret, dan worker-first untuk `/api/*`, `/u/*`, `/apps/*`.
 
 ### Desktop
+
 - `desktop/app-publish.cjs` (baru):
   - Mendeteksi package manager dan skrip `build`. Build Vite/Vite+ diberi `--base=./`.
   - Menjalankan build proyek tanpa shell (timeout 10 menit, cuplikan log), lalu mencari output (`dist/build/out/public` atau `verynize.outputDir`).
@@ -47,23 +49,25 @@ Semua perilaku hanya diuji secara lokal: workerd lewat Miniflare, Electron sungg
 
 ## Pengujian (semua lulus pada mesin ini)
 
-| Perintah | Isi |
-|---|---|
-| `npm run test:cloud` | `cloud-rooms` (asersi lama tidak diubah), `cloud-merge` (baru), `cloud-accounts` (baru), `cloud-apps` (baru) |
-| `node tests/cloud-desktop.mjs` | Dua klien Electron. Lihat catatan di bawah. |
+| Perintah                                                                  | Isi                                                                                                                                                                                     |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run test:cloud`                                                      | `cloud-rooms` (asersi lama tidak diubah), `cloud-merge` (baru), `cloud-accounts` (baru), `cloud-apps` (baru)                                                                            |
+| `node tests/cloud-desktop.mjs`                                            | Dua klien Electron. Lihat catatan di bawah.                                                                                                                                             |
 | `node tests/cloud-accounts-desktop.mjs` (baru, ditambahkan ke `npm test`) | Alur UI lengkap: sign-in, profil, undangan berperan, viewer dibatasi, promosi live, tautan, rotasi, komentar, pemulihan, build/publish/rollback/unpublish aplikasi, sign out everywhere |
-| `node tests/cloud-async.cjs` | Lulus tanpa perubahan |
-| `node tests/desktop-ipc.cjs` | Lulus |
-| `npm run build:ui`, `lint:ui`, `typecheck:ui`, `check` | Bersih |
-| `npm run deploy:check` | Build berhasil dan dry run `cf deploy` menampilkan semua binding. **Tidak ada deploy.** |
+| `node tests/cloud-async.cjs`                                              | Lulus tanpa perubahan                                                                                                                                                                   |
+| `node tests/desktop-ipc.cjs`                                              | Lulus                                                                                                                                                                                   |
+| `npm run build:ui`, `lint:ui`, `typecheck:ui`, `check`                    | Bersih                                                                                                                                                                                  |
+| `npm run deploy:check`                                                    | Build berhasil dan dry run `cf deploy` menampilkan semua binding. **Tidak ada deploy.**                                                                                                 |
 
 Catatan tentang `cloud-desktop.mjs`:
+
 - Bagian "simultaneous edits retain the losing client's work" kini menguji perilaku baru yang diminta: suntingan bersamaan bergabung tanpa konflik (layer, properti berbeda pada satu layer, rentang teks berbeda), dan kedua dokumen identik.
 - Asersi prompt konflik dan resolusi lama **tidak dihapus**. Asersi itu dipindahkan ke server lama sungguhan (`tests/fixtures/cloud-worker-v1.js`, salinan Worker sebelum perubahan ini) supaya jalur kompatibilitas tetap teruji.
 
 `tests/cloud-harness.mjs` berisi konfigurasi Miniflare multi-modul bersama dan helper sign-in lewat outbox. Pengaturan dua tes lama diubah untuk memakainya, sedangkan asersinya tetap.
 
 ## Batasan yang jujur
+
 - Penggabungan ini diurutkan oleh server (server-sequenced), bukan CRDT peer-to-peer. Suntingan offline digabung saat socket tersambung kembali.
 - Undo lokal memulihkan seluruh dokumen. Jika di antaranya ada perubahan remote, undo bisa menghasilkan operasi yang membalik perubahan remote tersebut. Perubahan remote juga masuk ke tumpukan undo (sama seperti sebelumnya, karena `setDocument` membuat checkpoint).
 - Aplikasi disajikan dengan sandbox CSP, sehingga `localStorage` dan cookie tidak tersedia bagi aplikasi. Isolasi origin penuh memerlukan domain aplikasi terpisah (**perlu domain live**). Build non-Vite yang memakai URL absolut `/` perlu dikonfigurasi dengan base relatif.
@@ -71,19 +75,21 @@ Catatan tentang `cloud-desktop.mjs`:
 - Belum ada kuota akun selain 50 aplikasi per akun, penghapusan ruangan, maupun pelaporan penyalahgunaan profil/aplikasi.
 
 ## Untuk koordinator
+
 - `CLAUDE.md` (bagian Cloud) masih menyebut "whole-document snapshots … no CRDT". Bagian itu perlu diperbarui ke "operation-based merging + accounts/roles/apps" (lihat `cloud/README.md`). File ini tidak saya ubah karena merupakan file bersama.
 - Dua celah di `docs/implementation-status.md` dapat diperbarui sesuai batasan di atas. File itu sengaja tidak saya sunting.
 
 ## Tindak lanjut: passkey dan undo lokal (30 Oktober 2026)
 
 ### Passkey/WebAuthn
+
 - `cloud/webauthn.js` adalah verifikasi orisinal dengan WebCrypto dan pembaca CBOR/COSE minimal, tanpa dependensi baru. Algoritma yang didukung: ES256, Ed25519 dan RS256. Attestation diminta `none` dan tidak dievaluasi.
 - Pengecekan yang dilakukan:
   - tipe ceremony, challenge sekali pakai, origin, hash RP ID, user presence dan credential ID;
   - tanda tangan atas `authData‖SHA-256(clientData)`;
   - user handle;
   - counter yang harus naik (indikasi authenticator yang di-clone).
-- Ceremony berjalan di halaman `/passkey` pada origin server (`script-src 'self'`), karena renderer `file://` tidak bisa menjadi relying party. Registrasi memakai tiket dari sesi. Sign-in memakai *handoff*: desktop menyimpan secret, lalu mengklaim sesi lewat polling (202 selama menunggu, sekali pakai).
+- Ceremony berjalan di halaman `/passkey` pada origin server (`script-src 'self'`), karena renderer `file://` tidak bisa menjadi relying party. Registrasi memakai tiket dari sesi. Sign-in memakai _handoff_: desktop menyimpan secret, lalu mengklaim sesi lewat polling (202 selama menunggu, sekali pakai).
 - Tersedia `GET/DELETE /api/me/passkeys`. Tabel passkey, challenge, tiket dan handoff ada di `AccountDirectory`.
 - `desktop/cloud-passkey.cjs` membuka jendela ceremony: tanpa preload, sesi in-memory, sandbox, navigasi terkunci ke origin server, popup ditolak. IPC `cloudPasskeyOpen`/`cloudPasskeyClose` masing-masing ditambahkan dengan satu baris di `main.cjs` dan `preload.cjs`.
 - UI di Share › Account: tombol **Sign in with a passkey**, daftar **Passkeys** dengan tombol Remove, dan **Add a passkey**.
@@ -94,9 +100,10 @@ Catatan tentang `cloud-desktop.mjs`:
 - Batasan: Touch ID/iCloud passkey di jendela Electron belum diverifikasi (perlu entitlement atau perangkat nyata). Hanya authenticator virtual yang diuji.
 
 ### Undo tidak membalik suntingan kolaborator
+
 - `web/cloud-panel.js` menyediakan `window.cloudHistory`. `web/app.js` (empat substitusi kecil) memakainya untuk `#undo`, `#redo`, status tombol, `canUndo` dan `canRedo` selama kolaborasi berbasis operasi aktif.
 - Setiap langkah lokal menyimpan dokumen sebelum dan sesudah perubahan. Perubahan beruntun dalam 600 ms tanpa suntingan remote di antaranya digabung menjadi satu langkah.
-- Undo memutar operasi invers yang di-*rebase* atas operasi remote yang datang setelah langkah itu:
+- Undo memutar operasi invers yang di-_rebase_ atas operasi remote yang datang setelah langkah itu:
   - properti, urutan dan node yang kemudian diubah kolaborator tidak disentuh;
   - penambahan node tidak dibatalkan jika node itu diedit kolaborator;
   - invers teks digabung per rentang dan dilewati jika rentangnya tumpang tindih.
@@ -108,8 +115,10 @@ Catatan tentang `cloud-desktop.mjs`:
   - Di akhir, dokumen kedua klien identik.
 
 ### Perbaikan lain
+
 - Panel kini menampilkan "Published version N" setelah URL dan daftar versi diperbarui. Ini memperbaiki race yang terlihat saat tes dijalankan berurutan di mesin yang sibuk.
 - Pada satu run, `cloud-desktop.mjs` sekali gagal karena timeout visibilitas elemen. Gagal itu tidak terulang dalam beberapa run berikutnya.
 
 ### Validasi
+
 `npm run build:ui`, `lint:ui`, `typecheck:ui` dan `check` bersih. `npm run test:cloud` (rooms, merge, accounts, passkeys, apps), `tests/cloud-desktop.mjs`, `tests/cloud-accounts-desktop.mjs`, `tests/cloud-passkeys-desktop.mjs`, `tests/cloud-async.cjs` dan `tests/desktop-ipc.cjs` semuanya lulus. `npm run deploy:check` hanya dry run; **tidak ada deploy**.

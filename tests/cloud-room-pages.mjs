@@ -4,10 +4,12 @@
 // page / document limits of cloud/limits.js, the frozen public copy, and the one-time migration of
 // rooms that stored the whole document in one row (tests/fixtures/design-room-whole-document.js).
 import assert from "node:assert/strict";
+import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import "../web/cloud-ops.js";
+import { NODE_LIMITS, nodeLimitMessage } from "../integrations/document-core.mjs";
 import { DOCUMENT_BYTES, PAGE_BYTES } from "../cloud/limits.js";
 import { digestHex } from "../cloud/http.js";
 import { Miniflare, cloudOptions } from "./cloud-harness.mjs";
@@ -229,10 +231,111 @@ try {
   editor.ws.close();
   lazyClient.ws.close();
 
+  // Neither unloaded pages nor replayed IDs consume the target page budget twice.
+  // Cover both a document below 10k and a document above 10k whose individual pages fit.
+  for (const size of [4500, 6000]) {
+    const counted = {
+      version: 2,
+      name: "Counted",
+      activePage: "left",
+      pages: ["left", "right"].map((id) => ({
+        id,
+        name: id,
+        nodes: Array.from({ length: size }, (_, i) => node(`${id}-${i}`)),
+      })),
+    };
+    const room = await data(
+      await call("/api/rooms", { method: "POST", body: { document: counted } }),
+      201,
+    );
+    const route = `/api/rooms/${room.id}`;
+    const lazy = await data(await call(route + "?lazy=1", { token: room.token }));
+    assert.deepEqual(lazy.unloaded, ["right"]);
+    const ops = [{ t: "add", page: "left", id: "new", value: node("new") }];
+    // Same batch replay and same ID in a fresh batch both leave exactly one new node.
+    for (const batch of [1, 1, 2])
+      await data(
+        await call(route + "/ops", {
+          method: "POST",
+          token: room.token,
+          body: { client: "count-test", batch, ops },
+        }),
+      );
+    const saved = (await data(await call(route, { token: room.token }))).document;
+    assert.deepEqual(
+      saved.pages.map((p) => p.nodes.length),
+      [size + 1, size],
+    );
+  }
+  console.log("PASS node counts below/above 10k, unloaded pages, and resent IDs");
+
+  // Node limits include unloaded pages, and failed operations leave stored content intact.
+  const capped = { version: 2, name: "Capped", activePage: "cap0", pages: [] };
+  for (let offset = 0; offset < NODE_LIMITS.perDocument; offset += NODE_LIMITS.perPage)
+    capped.pages.push({
+      id: `cap${capped.pages.length}`,
+      name: "Capacity",
+      nodes: Array.from(
+        { length: Math.min(NODE_LIMITS.perPage, NODE_LIMITS.perDocument - offset) },
+        (_, i) => node(`limit${offset + i}`),
+      ),
+    });
+  const capRoom = await data(
+    await call("/api/rooms", { method: "POST", body: { document: capped } }),
+    201,
+  );
+  const capUrl = `/api/rooms/${capRoom.id}`;
+  const overflow = await data(
+    await call(capUrl + "/ops", {
+      method: "POST",
+      token: capRoom.token,
+      body: {
+        client: "limits",
+        batch: 1,
+        ops: [
+          {
+            t: "addPage",
+            id: "extra",
+            value: { id: "extra", name: "Extra", nodes: [node("extraNode")] },
+          },
+        ],
+      },
+    }),
+    413,
+  );
+  assert.equal(
+    overflow.error,
+    nodeLimitMessage(NODE_LIMITS.perDocument + 1, NODE_LIMITS.perDocument),
+  );
+  assert.equal(overflow.rejected, 1);
+  const retained = await data(await call(capUrl, { token: capRoom.token }));
+  assert.equal(
+    retained.document.pages.reduce((n, p) => n + p.nodes.length, 0),
+    NODE_LIMITS.perDocument,
+  );
+  const fullPage = {
+    ...board(),
+    pages: [
+      {
+        id: "p2",
+        name: "Capacity",
+        nodes: Array.from({ length: NODE_LIMITS.perPage + 1 }, (_, i) => node(`over${i}`)),
+      },
+    ],
+  };
+  const pageOverflow = await data(
+    await call("/api/rooms", { method: "POST", body: { document: fullPage } }),
+    413,
+  );
+  assert.equal(
+    pageOverflow.error,
+    nodeLimitMessage(NODE_LIMITS.perPage + 1, NODE_LIMITS.perPage, "Capacity"),
+  );
+
   // ---- limits: per page and per document, instead of one 2 MB room -------------------------
   const filler = (bytes) => "x".repeat(bytes);
   const big = board();
-  big.pages[0].nodes[1].text = filler(1_500_000);
+  big.pages[0].nodes[1].text = "界😀".repeat(500_000);
   big.pages[1].nodes[0].name = filler(1_500_000);
   const bigRoom = await data(
     await call("/api/rooms", { method: "POST", body: { document: big } }),
@@ -242,7 +345,7 @@ try {
     (await data(await call(`/api/rooms/${bigRoom.id}?lazy=1&page=p3`, { token: bigRoom.token })))
       .document.pages[0].nodes.length,
     0,
-    "a 3 MB room joins with only the requested page",
+    "a 5 MB room joins with only the requested page",
   );
   const oversized = board();
   oversized.pages[0].nodes[1].text = filler(PAGE_BYTES);
@@ -264,9 +367,19 @@ try {
     413,
   );
   assert.equal(tooBig.rejected, 1);
+  const receiptClient = await socket(
+    bigUrl + "/socket?token=" + bigRoom.token + "&client=filler&lazy=1",
+  );
+  await receiptClient.next((m) => m.type === "welcome");
+  receiptClient.send({ type: "sync", pages: ["p1"] });
+  const receipt = await receiptClient.next((m) => m.type === "snapshot");
+  assert.deepEqual(receipt.rejectedBatches, [1]);
+  assert.equal(receipt.acked, 1);
+  assert.equal(receipt.document.pages[0].nodes[1].text, big.pages[0].nodes[1].text);
+  receiptClient.ws.close();
   assert.match(tooBig.error, /page limit/);
-  // Fill to the document limit with pages just under the page limit.
-  const pageBody = Math.floor(PAGE_BYTES * 0.9);
+  // Fill to the document limit with bounded pages.
+  const pageBody = 1_800_000;
   let added = 0,
     total = null;
   for (let i = 0; i < 20; i++) {
@@ -290,7 +403,7 @@ try {
   }
   assert.ok(total, "the document limit stops growth");
   assert.match(total.error, /room limit/);
-  assert.equal(added, Math.floor((DOCUMENT_BYTES - 3_000_000) / pageBody));
+  assert.equal(added, Math.floor((DOCUMENT_BYTES - 5_000_000) / pageBody));
   const sizes = (await data(await call(bigUrl + "?lazy=1", { token: bigRoom.token }))).pages;
   assert.ok(sizes.reduce((sum, p) => sum + p.bytes, 0) <= DOCUMENT_BYTES);
   // The stored page records survive a refused batch untouched.
@@ -320,6 +433,33 @@ try {
   assert.deepEqual(
     (await data(await call(`/api/public/${publication.publicId}`))).document,
     expected,
+  );
+  await mf.dispose();
+
+  // Physical rows stay below SQLite's 2 MB limit, including multibyte/surrogate text.
+  let largestPart = 0;
+  for (const file of await fs.readdir(state, { recursive: true })) {
+    if (!file.endsWith(".sqlite")) continue;
+    const db = new DatabaseSync(path.join(state, file), { readOnly: true });
+    try {
+      if (db.prepare("SELECT name FROM sqlite_master WHERE name='parts'").get()) {
+        largestPart = Math.max(
+          largestPart,
+          db.prepare("SELECT max(length(cast(data AS blob))) AS bytes FROM parts").get().bytes || 0,
+        );
+      }
+    } finally {
+      db.close();
+    }
+  }
+  assert.ok(largestPart > 256 * 1024, "Unicode occupies more bytes than UTF-16 units");
+  assert.ok(largestPart < 2_000_000, "every physical parts row is below 2 MB");
+  mf = new Miniflare(await cloudOptions(state));
+  const restartedLarge = await data(await call(bigUrl + "/pages?id=p1", { token: bigRoom.token }));
+  assert.equal(
+    restartedLarge.pages[0].nodes[1].text,
+    big.pages[0].nodes[1].text,
+    "large Unicode page survives actor restart",
   );
   await mf.dispose();
 

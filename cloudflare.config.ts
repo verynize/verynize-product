@@ -9,8 +9,11 @@ export default defineConfig({
     compatibilityDate: "2026-10-28",
     // Better Auth imports node:async_hooks and node:crypto.
     compatibilityFlags: ["nodejs_compat"],
-    // Workers Paid: room for scrypt password hashing (Better Auth's default) on sign-up and sign-in.
-    limits: { cpuMs: 30_000 },
+    // Workers Paid: room for scrypt password hashing (Better Auth's default) on sign-up and sign-in,
+    // and for large room imports in the DesignRoom Durable Object (300 000 is the Paid maximum). Every
+    // `npm run deploy` sends this value, so a limit changed in the dashboard is reset on the next deploy:
+    // change it here.
+    limits: { cpuMs: 300_000 },
     assets: {
       // Start renders every page that is not a static file, so there is no SPA fallback.
       notFoundHandling: "none",

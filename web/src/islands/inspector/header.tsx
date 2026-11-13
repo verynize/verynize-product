@@ -26,7 +26,13 @@ function setCollapsed(collapsed: boolean, fromKeyboardFocus: boolean) {
   requestAnimationFrame(() => window.dispatchEvent(new Event("resize")));
 }
 
-function Controls({ collapsed, tipSide }: { collapsed: boolean; tipSide: "top" | "bottom" | "left" | "right" }) {
+function Controls({
+  collapsed,
+  tipSide,
+}: {
+  collapsed: boolean;
+  tipSide: "top" | "bottom" | "left" | "right";
+}) {
   const label = collapsed ? "Show properties" : "Hide properties";
   const withTip = (text: string, child: ReactElement) => (
     <Tip label={text} side={tipSide}>
@@ -43,7 +49,9 @@ function Controls({ collapsed, tipSide }: { collapsed: boolean; tipSide: "top" |
           aria-label={label}
           aria-pressed={!collapsed}
           className="inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-foreground-3 outline-none hover:bg-muted hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
-          onClick={(event) => setCollapsed(!collapsed, event.currentTarget.matches(":focus-visible"))}
+          onClick={(event) =>
+            setCollapsed(!collapsed, event.currentTarget.matches(":focus-visible"))
+          }
         >
           <PanelRightIcon className="size-4" />
         </button>,

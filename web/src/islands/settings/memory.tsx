@@ -112,7 +112,7 @@ export function MemoryView({ api }: { api: SettingsApi }) {
   const { connected: codexConnected } = useCodexConnection();
   const ipc = memoryIpc();
   const [overview, setOverview] = useState<Overview | null>(null);
-  const [text, setText] = useState(agentWorkspace()?.getDefaults?.().instructions ?? "");
+  const [text, setText] = useState(() => agentWorkspace()?.getDefaults?.().instructions ?? "");
 
   const reload = useCallback(async () => {
     if (!ipc) return;
@@ -228,42 +228,47 @@ export function MemoryView({ api }: { api: SettingsApi }) {
               description="What your agents remember about you in every repository."
             >
               <div className="flex flex-col gap-4">
-                {codexConnected && <Card data-memory-card="about-codex">
-                  <div className="py-3 text-sm text-foreground-3">
-                    <AgentLabel agent="codex">Codex</AgentLabel>
-                  </div>
-                  <MemoryBlock
-                    status={
-                      codex
-                        ? codex.enabled
-                          ? "On"
-                          : "Off until you turn on features.memories"
-                        : "…"
-                    }
-                    action={finder({ kind: "codexMemories" })}
-                  >
+                {codexConnected && (
+                  <Card data-memory-card="about-codex">
+                    <div className="py-3 text-sm text-foreground-3">
+                      <AgentLabel agent="codex">Codex</AgentLabel>
+                    </div>
+                    <MemoryBlock
+                      status={
+                        codex
+                          ? codex.enabled
+                            ? "On"
+                            : "Off until you turn on features.memories"
+                          : "…"
+                      }
+                      action={finder({ kind: "codexMemories" })}
+                    >
+                      {codex && (
+                        <PathLine
+                          path={codex.displayDir}
+                          note={
+                            <>
+                              Codex’s own folder
+                              <br />
+                              {codex.enabled
+                                ? "Codex writes summaries of past conversations and reusable skills here, and reads them when a chat starts."
+                                : `Turn memories on in Codex with /memories, or set features.memories = true in ${codex.configPath}. In the EEA, the UK and Switzerland, Codex offers memories only after you opt in.`}
+                            </>
+                          }
+                        />
+                      )}
+                    </MemoryBlock>
                     {codex && (
-                      <PathLine
-                        path={codex.displayDir}
-                        note={
-                          <>
-                            Codex’s own folder
-                            <br />
-                            {codex.enabled
-                              ? "Codex writes summaries of past conversations and reusable skills here, and reads them when a chat starts."
-                              : `Turn memories on in Codex with /memories, or set features.memories = true in ${codex.configPath}. In the EEA, the UK and Switzerland, Codex offers memories only after you opt in.`}
-                          </>
-                        }
-                      />
+                      <p
+                        data-memory-counts="codex"
+                        className="py-3.5 text-sm text-muted-foreground"
+                      >
+                        {plural(codex.summaries, "conversation summary", "conversation summaries")}{" "}
+                        · {plural(codex.skills, "skill")}
+                      </p>
                     )}
-                  </MemoryBlock>
-                  {codex && (
-                    <p data-memory-counts="codex" className="py-3.5 text-sm text-muted-foreground">
-                      {plural(codex.summaries, "conversation summary", "conversation summaries")} ·{" "}
-                      {plural(codex.skills, "skill")}
-                    </p>
-                  )}
-                </Card>}
+                  </Card>
+                )}
 
                 <Card data-memory-card="about-claude">
                   <div className="py-3 text-sm text-foreground-3">
@@ -339,37 +344,41 @@ export function MemoryView({ api }: { api: SettingsApi }) {
               description="Files in your home folder that agents read when a chat starts. Edit them in your editor."
             >
               <Card>
-                {(overview?.instructions ?? []).filter((file) => file.agent !== "codex" || codexConnected).map((file) => (
-                  <Row
-                    key={file.id}
-                    icon={
-                      <IconTile>
-                        {file.agent === "claude" ? (
-                          <ClaudeMark className="size-4" />
-                        ) : (
-                          <CodexMark className="size-4" />
-                        )}
-                      </IconTile>
-                    }
-                    title={
-                      <code data-instructions-file={file.id} className="font-mono text-xs">
-                        {file.displayPath}
-                      </code>
-                    }
-                    description={[
-                      `Read by ${file.readBy}`,
-                      file.sharedWith && (codexConnected || !file.sharedWith.includes("Codex")) && `Verynize gives it to ${file.sharedWith} chats`,
-                      !file.exists && "Not created yet",
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  >
-                    <SettingsButton data-memory-open={file.id} onClick={open({ kind: file.id })}>
-                      {file.exists ? "Open in editor" : "Create"}
-                      <ExternalLinkIcon />
-                    </SettingsButton>
-                  </Row>
-                ))}
+                {(overview?.instructions ?? [])
+                  .filter((file) => file.agent !== "codex" || codexConnected)
+                  .map((file) => (
+                    <Row
+                      key={file.id}
+                      icon={
+                        <IconTile>
+                          {file.agent === "claude" ? (
+                            <ClaudeMark className="size-4" />
+                          ) : (
+                            <CodexMark className="size-4" />
+                          )}
+                        </IconTile>
+                      }
+                      title={
+                        <code data-instructions-file={file.id} className="font-mono text-xs">
+                          {file.displayPath}
+                        </code>
+                      }
+                      description={[
+                        `Read by ${file.readBy}`,
+                        file.sharedWith &&
+                          (codexConnected || !file.sharedWith.includes("Codex")) &&
+                          `Verynize gives it to ${file.sharedWith} chats`,
+                        !file.exists && "Not created yet",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    >
+                      <SettingsButton data-memory-open={file.id} onClick={open({ kind: file.id })}>
+                        {file.exists ? "Open in editor" : "Create"}
+                        <ExternalLinkIcon />
+                      </SettingsButton>
+                    </Row>
+                  ))}
               </Card>
             </Section>
           </>

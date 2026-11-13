@@ -42,10 +42,22 @@ import {
   type CommitAuthor,
   type OutputStyle,
 } from "./behavior-store";
-import { Card, CommitField, IconTile, NativeSelect, Row, Section, SettingsButton, Toggle } from "./controls";
+import {
+  Card,
+  CommitField,
+  IconTile,
+  NativeSelect,
+  Row,
+  Section,
+  SettingsButton,
+  Toggle,
+} from "./controls";
 import { platform } from "@/lib/platform";
 
-const message = (error: unknown) => (error instanceof Error ? error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, "") : String(error));
+const message = (error: unknown) =>
+  error instanceof Error
+    ? error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, "")
+    : String(error);
 const save = (patch: BehaviorPatch) => setBehavior(patch).catch((error) => toast(message(error)));
 
 /* ---------- Segmented control (Steer | Queue, Default | None) ---------- */
@@ -59,7 +71,7 @@ function Segmented<T extends string>({
   label: string;
   value: T;
   options: { value: T; label: string }[];
-  onChange(value: T): void;
+  onChange: (value: T) => void;
   name: string;
 }) {
   return (
@@ -106,7 +118,10 @@ function ChatSection({ behavior }: { behavior: AgentBehavior }) {
             />
           </div>
         </Row>
-        <Row title="Expand agent work by default" description="Thinking and tool calls open unfolded instead of collapsed.">
+        <Row
+          title="Expand agent work by default"
+          description="Thinking and tool calls open unfolded instead of collapsed."
+        >
           <Toggle
             id="settings-expand-work"
             aria-label="Expand agent work by default"
@@ -122,7 +137,9 @@ function ChatSection({ behavior }: { behavior: AgentBehavior }) {
 /* ---------- Response preferences ---------- */
 function ResponseSection({ behavior }: { behavior: AgentBehavior }) {
   const { connected: codexConnected } = useCodexConnection();
-  const [styles, setStyles] = useState<{ styles: OutputStyle[]; current: string | null } | null>(null);
+  const [styles, setStyles] = useState<{ styles: OutputStyle[]; current: string | null } | null>(
+    null,
+  );
   useEffect(() => {
     let live = true;
     behaviorIpc()
@@ -138,36 +155,49 @@ function ResponseSection({ behavior }: { behavior: AgentBehavior }) {
   return (
     <Section id="settings-response-preferences" title="Response preferences">
       <Card>
-        <Row title="Claude response style" description="Applies from the next message." htmlFor="settings-claude-style">
+        <Row
+          title="Claude response style"
+          description="Applies from the next message."
+          htmlFor="settings-claude-style"
+        >
           <NativeSelect
             id="settings-claude-style"
             className="w-56"
             value={chosen}
             onChange={(event) => void save({ claudeOutputStyle: event.target.value })}
           >
-            <option value="">Use my Claude Code setting{styles?.current ? ` (${styles.current})` : ""}</option>
+            <option value="">
+              Use my Claude Code setting{styles?.current ? ` (${styles.current})` : ""}
+            </option>
             {list.map((style) => (
               <option key={style.id} value={style.id} title={style.description}>
                 {style.name}
               </option>
             ))}
-            {chosen && !list.some((style) => style.id === chosen) && <option value={chosen}>{chosen}</option>}
+            {chosen && !list.some((style) => style.id === chosen) && (
+              <option value={chosen}>{chosen}</option>
+            )}
           </NativeSelect>
         </Row>
-        {codexConnected && <Row title="Codex personality" description="None turns personality off. Applies to new chats.">
-          <div id="settings-codex-personality">
-            <Segmented
-              label="Codex personality"
-              name="personality"
-              value={behavior.codexPersonality}
-              options={[
-                { value: "default", label: "Default" },
-                { value: "none", label: "None" },
-              ]}
-              onChange={(codexPersonality) => void save({ codexPersonality })}
-            />
-          </div>
-        </Row>}
+        {codexConnected && (
+          <Row
+            title="Codex personality"
+            description="None turns personality off. Applies to new chats."
+          >
+            <div id="settings-codex-personality">
+              <Segmented
+                label="Codex personality"
+                name="personality"
+                value={behavior.codexPersonality}
+                options={[
+                  { value: "default", label: "Default" },
+                  { value: "none", label: "None" },
+                ]}
+                onChange={(codexPersonality) => void save({ codexPersonality })}
+              />
+            </div>
+          </Row>
+        )}
       </Card>
     </Section>
   );
@@ -182,7 +212,13 @@ const initials = (name: string) =>
     .map((word) => word[0]?.toUpperCase())
     .join("") || "?";
 
-function AttributionSection({ behavior, author }: { behavior: AgentBehavior; author: CommitAuthor | null }) {
+function AttributionSection({
+  behavior,
+  author,
+}: {
+  behavior: AgentBehavior;
+  author: CommitAuthor | null;
+}) {
   const { connected: codexConnected } = useCodexConnection();
   const missing = author !== null && !author.name && !author.email;
   const warn = author?.linked === false && author.login;
@@ -205,12 +241,16 @@ function AttributionSection({ behavior, author }: { behavior: AgentBehavior; aut
                       <TriangleAlertIcon className="size-3.5" />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>Add this email to @{author.login} on GitHub to link these commits.</TooltipContent>
+                  <TooltipContent>
+                    Add this email to @{author.login} on GitHub to link these commits.
+                  </TooltipContent>
                 </Tooltip>
               )}
             </div>
             <span className="text-sm text-muted-foreground">
-              {missing ? "No Git identity yet. Set user.name and user.email with git config --global." : "From your Git settings."}
+              {missing
+                ? "No Git identity yet. Set user.name and user.email with git config --global."
+                : "From your Git settings."}
             </span>
           </div>
           {author && !missing && (
@@ -232,7 +272,14 @@ function AttributionSection({ behavior, author }: { behavior: AgentBehavior; aut
             </div>
           )}
         </div>
-        <Row title="Credit the agent on commits and pull requests" description={codexConnected ? "Adds Claude credit. Codex follows your ChatGPT setting." : "Adds Claude credit."}>
+        <Row
+          title="Credit the agent on commits and pull requests"
+          description={
+            codexConnected
+              ? "Adds Claude credit. Codex follows your ChatGPT setting."
+              : "Adds Claude credit."
+          }
+        >
           <Toggle
             id="settings-credit-agent"
             aria-label="Credit the agent on commits and pull requests"
@@ -258,11 +305,16 @@ function ProjectsSection({ behavior, login }: { behavior: AgentBehavior; login: 
               <span id="settings-verynize-folder" className="block break-all">
                 {behavior.displayFolder || behavior.defaultFolder || "~/Verynize"}
               </span>
-              <span className="mt-3 block">New projects and worktrees go here. Existing ones stay where they are.</span>
+              <span className="mt-3 block">
+                New projects and worktrees go here. Existing ones stay where they are.
+              </span>
             </>
           }
         >
-          <SettingsButton id="settings-change-folder" onClick={() => void chooseBehaviorFolder().catch((error) => toast(message(error)))}>
+          <SettingsButton
+            id="settings-change-folder"
+            onClick={() => void chooseBehaviorFolder().catch((error) => toast(message(error)))}
+          >
             Change…
           </SettingsButton>
         </Row>
@@ -293,13 +345,26 @@ const MODES: { value: Access; label: string; Icon: LucideIcon }[] = [
   { value: "auto", label: "Auto", Icon: NavigationIcon },
   { value: "full", label: "Full access", Icon: LockOpenIcon },
 ];
-type Workspace = { getDefaults?(): { access?: string }; setDefaults?(value: { access: string }): void };
+type Workspace = {
+  getDefaults?(): { access?: string };
+  setDefaults?(value: { access: string }): void;
+};
 const chatWorkspace = () => (window as unknown as { agentWorkspace?: Workspace }).agentWorkspace;
 const LEGACY: Record<string, Access> = { "read-only": "ask", "workspace-write": "edit" };
 const asAccess = (value: unknown): Access =>
   LEGACY[String(value)] ?? (MODES.some((m) => m.value === value) ? (value as Access) : "edit");
 
-function ModeMenu({ id, value, inherited, onChange }: { id: string; value: Access; inherited?: boolean; onChange(value: Access | "default"): void }) {
+function ModeMenu({
+  id,
+  value,
+  inherited,
+  onChange,
+}: {
+  id: string;
+  value: Access;
+  inherited?: boolean;
+  onChange: (value: Access | "default") => void;
+}) {
   const mode = MODES.find((m) => m.value === value) ?? MODES[1];
   return (
     <DropdownMenu modal={false}>
@@ -316,7 +381,10 @@ function ModeMenu({ id, value, inherited, onChange }: { id: string; value: Acces
         </SettingsButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onEscapeKeyDown={(event) => event.stopPropagation()}>
-        <DropdownMenuRadioGroup value={inherited ? "default" : value} onValueChange={(next) => onChange(next as Access | "default")}>
+        <DropdownMenuRadioGroup
+          value={inherited ? "default" : value}
+          onValueChange={(next) => onChange(next as Access | "default")}
+        >
           {id !== "default" && (
             <>
               <DropdownMenuRadioItem value="default">Use default</DropdownMenuRadioItem>
@@ -338,7 +406,9 @@ function ModeMenu({ id, value, inherited, onChange }: { id: string; value: Acces
 type Repository = { id: string; name: string; root: string };
 function ModesSection({ behavior }: { behavior: AgentBehavior }) {
   const [repositories, setRepositories] = useState<Repository[] | null>(null);
-  const [fallback, setFallback] = useState<Access>(() => asAccess(chatWorkspace()?.getDefaults?.().access));
+  const [fallback, setFallback] = useState<Access>(() =>
+    asAccess(chatWorkspace()?.getDefaults?.().access),
+  );
   useEffect(() => {
     const repositories = platform.desktop?.repositories;
     if (!repositories) return setRepositories([]);
@@ -360,7 +430,11 @@ function ModesSection({ behavior }: { behavior: AgentBehavior }) {
   };
   const tile = (children: ReactNode) => <IconTile>{children}</IconTile>;
   return (
-    <Section id="settings-chat-modes" title="Mode for new chats" description="Repositories without a pick of their own follow the default.">
+    <Section
+      id="settings-chat-modes"
+      title="Mode for new chats"
+      description="Repositories without a pick of their own follow the default."
+    >
       <Card>
         <Row icon={tile(<SettingsIcon className="size-4" />)} title="Default">
           <ModeMenu id="default" value={fallback} onChange={setDefault} />
@@ -368,12 +442,18 @@ function ModesSection({ behavior }: { behavior: AgentBehavior }) {
         {(repositories ?? []).map((repo) => {
           const own = behavior.repoModes[repo.id];
           return (
-            <Row key={repo.id} icon={tile(<FolderIcon className="size-4" />)} title={<span title={repo.root}>{repo.name}</span>}>
+            <Row
+              key={repo.id}
+              icon={tile(<FolderIcon className="size-4" />)}
+              title={<span title={repo.root}>{repo.name}</span>}
+            >
               <ModeMenu
                 id={repo.id}
                 value={own ?? fallback}
                 inherited={!own}
-                onChange={(value) => void save({ repoModes: { [repo.id]: value === "default" ? null : value } })}
+                onChange={(value) =>
+                  void save({ repoModes: { [repo.id]: value === "default" ? null : value } })
+                }
               />
             </Row>
           );
@@ -384,7 +464,11 @@ function ModesSection({ behavior }: { behavior: AgentBehavior }) {
 }
 
 /* ---------- Allowed without asking ---------- */
-const AGENT_LABEL: Record<AllowGroup["agent"], string> = { verynize: "Verynize", claude: "Claude Code", codex: "Codex" };
+const AGENT_LABEL: Record<AllowGroup["agent"], string> = {
+  verynize: "Verynize",
+  claude: "Claude Code",
+  codex: "Codex",
+};
 function AgentGlyph({ agent, className }: { agent: AllowGroup["agent"]; className: string }) {
   if (agent === "claude") return <ClaudeMark className={className} />;
   if (agent === "codex") return <CodexMark className={className} />;
@@ -430,56 +514,83 @@ function AllowedSection() {
       <div id="settings-allow-groups" className="flex flex-col gap-4">
         {!ipc && (
           <Card>
-            <Row title="Available in the desktop app" description="Saved rules are read from this computer." />
+            <Row
+              title="Available in the desktop app"
+              description="Saved rules are read from this computer."
+            />
           </Card>
         )}
-        {ipc && groups?.filter((group) => group.agent !== "codex" || codexConnected).length === 0 && (
-          <Card>
-            <Row title="No saved rules" description="When an agent asks for permission, choose “don’t ask again” to skip the question next time." />
-          </Card>
-        )}
-        {(groups ?? []).filter((group) => group.agent !== "codex" || codexConnected).map((group) => (
-          <Card key={group.id} data-allow-group={group.agent} data-allow-scope={group.scope} className="px-0">
-            <div className="flex items-center gap-3 rounded-t-2xl bg-background px-4 py-3">
-              <IconTile>
-                <AgentGlyph agent={group.agent} className="size-4" />
-              </IconTile>
-              <div className="flex min-w-0 flex-1 flex-col gap-px">
-                <span className="truncate text-sm text-foreground">{group.global ? "Every repository" : group.scope}</span>
-                <span className="flex items-center gap-1.5 text-sm text-muted-foreground" title={group.file}>
-                  <AgentGlyph agent={group.agent} className="size-3.5" />
-                  {AGENT_LABEL[group.agent]}
-                </span>
-              </div>
-              <SettingsButton
-                variant="ghost"
-                data-allow-open
-                onClick={() => void ipc?.allowOpen(group.id).catch((error) => toast(message(error)))}
-              >
-                <ExternalLinkIcon />
-                Open in editor
-              </SettingsButton>
-            </div>
-            {group.rules.map((rule) => (
-              <div key={rule.id} data-allow-rule={rule.raw} className="mx-4 flex items-center gap-3 py-3.5">
-                <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <span className="text-sm break-words text-foreground">{rule.title}</span>
-                  <code className="font-mono text-xs break-all text-muted-foreground">{rule.raw}</code>
+        {ipc &&
+          groups?.filter((group) => group.agent !== "codex" || codexConnected).length === 0 && (
+            <Card>
+              <Row
+                title="No saved rules"
+                description="When an agent asks for permission, choose “don’t ask again” to skip the question next time."
+              />
+            </Card>
+          )}
+        {(groups ?? [])
+          .filter((group) => group.agent !== "codex" || codexConnected)
+          .map((group) => (
+            <Card
+              key={group.id}
+              data-allow-group={group.agent}
+              data-allow-scope={group.scope}
+              className="px-0"
+            >
+              <div className="flex items-center gap-3 rounded-t-2xl bg-background px-4 py-3">
+                <IconTile>
+                  <AgentGlyph agent={group.agent} className="size-4" />
+                </IconTile>
+                <div className="flex min-w-0 flex-1 flex-col gap-px">
+                  <span className="truncate text-sm text-foreground">
+                    {group.global ? "Every repository" : group.scope}
+                  </span>
+                  <span
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground"
+                    title={group.file}
+                  >
+                    <AgentGlyph agent={group.agent} className="size-3.5" />
+                    {AGENT_LABEL[group.agent]}
+                  </span>
                 </div>
                 <SettingsButton
                   variant="ghost"
-                  className="w-7 px-0"
-                  data-allow-remove
-                  disabled={busy === rule.id}
-                  aria-label={`Remove “${rule.title}”`}
-                  onClick={() => void remove(rule.id)}
+                  data-allow-open
+                  onClick={() =>
+                    void ipc?.allowOpen(group.id).catch((error) => toast(message(error)))
+                  }
                 >
-                  <Trash2Icon />
+                  <ExternalLinkIcon />
+                  Open in editor
                 </SettingsButton>
               </div>
-            ))}
-          </Card>
-        ))}
+              {group.rules.map((rule) => (
+                <div
+                  key={rule.id}
+                  data-allow-rule={rule.raw}
+                  className="mx-4 flex items-center gap-3 py-3.5"
+                >
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="text-sm break-words text-foreground">{rule.title}</span>
+                    <code className="font-mono text-xs break-all text-muted-foreground">
+                      {rule.raw}
+                    </code>
+                  </div>
+                  <SettingsButton
+                    variant="ghost"
+                    className="w-7 px-0"
+                    data-allow-remove
+                    disabled={busy === rule.id}
+                    aria-label={`Remove “${rule.title}”`}
+                    onClick={() => void remove(rule.id)}
+                  >
+                    <Trash2Icon />
+                  </SettingsButton>
+                </div>
+              ))}
+            </Card>
+          ))}
       </div>
     </Section>
   );
@@ -505,7 +616,10 @@ export function AgentBehaviorSections() {
       {!desktop && (
         <Section id="settings-agent-behavior" title="Chat">
           <Card>
-            <Row title="Available in the desktop app" description="These settings apply to the agents installed on this computer." />
+            <Row
+              title="Available in the desktop app"
+              description="These settings apply to the agents installed on this computer."
+            />
           </Card>
         </Section>
       )}

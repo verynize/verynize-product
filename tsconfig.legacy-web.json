@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "types": [],
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./web/src/*"]
+    }
+  },
+  "include": ["web/*.js", "web/types/**/*.d.ts"]
+}

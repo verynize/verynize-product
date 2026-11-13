@@ -23,12 +23,13 @@ Implemented in `web/canvas-interactions.js` (installed by `web/app.js` through `
 
 - **Infinite canvas and camera.** `#canvas` is now a world-space layer with a `translate + scale` camera, replacing the fixed 1000×700 scroll box. Existing documents load with their frames at their stored coordinates. Documents without a top-level frame keep the legacy 1000×700 board as a backdrop at the world origin. Controls:
   - Cursor-anchored wheel and pinch zoom: ⌘/Ctrl-wheel, plus trackpad pinch, which arrives as ctrl-wheel. The factor is `1.002^(−Δ·k)`, with k = 8 for small trackpad deltas.
-  - Zoom stops 5–3200%, stepped by ⌘+ and ⌘−. ⌘0 or ⇧0 sets 100%, ⇧1 fits to content, ⇧2 zooms to the selection.
+  - Zoom stops 2–3200%, stepped by ⌘+ and ⌘−. ⌘0 or ⇧0 sets 100%, ⇧1 fits to content, ⇧2 zooms to the selection.
   - Pan with trackpad or wheel scroll (Shift+wheel scrolls horizontally), Space-drag, middle mouse, or the H tool.
   - The camera is remembered per page for the session. The initial view fits to content and is capped at 100%.
   - `scrollIntoView` on a layer becomes a camera pan.
 
   Zoom is capped at 3200% (not Wonder's 20000%) because rendering is DOM-based. Selection outlines and handles stay a constant size in screen space.
+
 - **Tools and shortcut registry.** A single registry of `{id,label,section,keys,run}` drives keyboard handling, the right-click context menu, and `window.design.commands()` / `runCommand(id)`. Tools:
   - V move, K scale (resize scales content, fonts, radius, gap and padding), H hand.
   - F frame, R rectangle, T text and S shader: drag to draw, or click to create at a default size. A new layer is parented to the frame under the cursor, and the tool then returns to Move.
@@ -37,6 +38,7 @@ Implemented in `web/canvas-interactions.js` (installed by `web/app.js` through `
   - Esc returns to Move first, then deselects.
 
   Toolbar insert buttons keep their one-click insert behavior. Inserts now land in the visible viewport.
+
 - **Selection.**
   - Marquee from empty canvas; Shift adds.
   - Shift-click toggles.
@@ -72,14 +74,17 @@ Implemented in `web/canvas-interactions.js` (installed by `web/app.js` through `
   - Typing a W/H value returns that axis to Fixed.
 
 ### Schema notes
+
 The document is still version 2. The changes are optional node fields plus wider saved-view limits:
+
 - New optional node fields: `locked`, `hidden` (booleans), and `wMode`, `hMode` (`fixed | hug | fill`).
 - Saved views gain optional exact camera offsets `x` and `y`. `scrollLeft` and `scrollTop` remain non-negative for older readers.
-- Saved-view zoom accepts 0.05–32.
+- Saved-view zoom accepts 0.02–32.
 
 `integrations/design-store.mjs` was updated only for the saved-view zoom range and the optional `x`/`y`. Node fields need no store change because unknown node fields pass through. The headless HTML exporter (`integrations/export-html.mjs`) does not yet apply `hidden` or the sizing modes. Because `w` and `h` are kept in sync, Hug and Fill layers still export at their measured size.
 
 ### Not yet done
+
 - Per-corner radius and per-side padding.
 - Constraints.
 - Animated zoom transitions.

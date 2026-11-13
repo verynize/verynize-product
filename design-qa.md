@@ -5,6 +5,7 @@ Reference: `desain/wonder/03-home.png`, `11-welcome-loaded.png`, `22-design-pane
 Implemented a 40px dark native app bar, compact pages/layers sidebar, 280px property panel, purple selection accents, floating bottom canvas toolbar, docked chat replacing layers, local Inter typography, and licensed Phosphor icons. Home supports actual file thumbnails, folders, search, grid/list, archive/restore and real publication filters. Local documents remain editable and persistent.
 
 Inspected actual Electron screenshots after loading local fonts:
+
 - `/tmp/better-shell-selection.png` — selected frame, inspector, toolbar at 1440px.
 - `/tmp/better-shell-home.png` — real document thumbnail and home actions.
 - `/tmp/better-shell-chat.png` — chat dock and canvas refit.

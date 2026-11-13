@@ -1,0 +1,170 @@
+{
+  "commit": "53ebf1f39c51361282ca55e18c83fbffed2f9a34",
+  "cargo": null,
+  "rustc": null,
+  "mode": "environment only",
+  "runs": [
+    {
+      "requested_layers": null,
+      "trial": 1,
+      "before": {
+        "utc": "2026-11-03T21:54:10.769885+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      },
+      "after": {
+        "utc": "2026-11-03T21:54:10.776388+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      }
+    },
+    {
+      "requested_layers": null,
+      "trial": 2,
+      "before": {
+        "utc": "2026-11-03T21:54:10.781120+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      },
+      "after": {
+        "utc": "2026-11-03T21:54:10.785341+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      }
+    },
+    {
+      "requested_layers": null,
+      "trial": 3,
+      "before": {
+        "utc": "2026-11-03T21:54:10.790547+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      },
+      "after": {
+        "utc": "2026-11-03T21:54:10.795608+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      }
+    },
+    {
+      "requested_layers": null,
+      "trial": 4,
+      "before": {
+        "utc": "2026-11-03T21:54:10.800091+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      },
+      "after": {
+        "utc": "2026-11-03T21:54:10.804371+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      }
+    },
+    {
+      "requested_layers": null,
+      "trial": 5,
+      "before": {
+        "utc": "2026-11-03T21:54:10.810247+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      },
+      "after": {
+        "utc": "2026-11-03T21:54:10.814597+00:00",
+        "cpu": {
+          "code": 0,
+          "stdout": "Apple M1",
+          "stderr": ""
+        },
+        "ram_bytes": {
+          "code": 0,
+          "stdout": "8589934592",
+          "stderr": ""
+        },
+        "loadavg": [6.61279296875, 4.9443359375, 4.5048828125]
+      }
+    }
+  ],
+  "median_start_loadavg": [6.61279296875, 4.9443359375, 4.5048828125],
+  "median_of_upstream_means": {}
+}

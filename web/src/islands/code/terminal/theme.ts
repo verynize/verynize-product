@@ -26,7 +26,8 @@ const COLOR_KEYS = [
   "brightWhite",
 ] as const satisfies readonly (keyof ITheme)[];
 
-const tokenName = (key: string) => "--terminal-" + key.replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase());
+const tokenName = (key: string) =>
+  "--terminal-" + key.replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase());
 
 let context: CanvasRenderingContext2D | null = null;
 function normalizeColor(value: string): string | undefined {
@@ -43,7 +44,12 @@ function normalizeColor(value: string): string | undefined {
   return "#" + hex(r) + hex(g) + hex(b) + (a < 255 ? hex(a) : "");
 }
 
-export type TerminalAppearance = { theme: ITheme; fontFamily: string; fontSize: number; lineHeight: number };
+export type TerminalAppearance = {
+  theme: ITheme;
+  fontFamily: string;
+  fontSize: number;
+  lineHeight: number;
+};
 
 /** Reads the terminal tokens as they apply to `element` (so the light theme on <html> is honoured). */
 export function readTerminalAppearance(element: Element): TerminalAppearance {
@@ -55,8 +61,10 @@ export function readTerminalAppearance(element: Element): TerminalAppearance {
   }
   const fontSize = parseFloat(style.getPropertyValue("--terminal-font-size")) || 12;
   const lineHeight = parseFloat(style.getPropertyValue("--terminal-line-height")) || 1;
-  const fontFamily = style.getPropertyValue("--terminal-font-family").trim() || "ui-monospace, Menlo, monospace";
+  const fontFamily =
+    style.getPropertyValue("--terminal-font-family").trim() || "ui-monospace, Menlo, monospace";
   return { theme, fontFamily, fontSize, lineHeight };
 }
 
-export const sameAppearance = (a: TerminalAppearance, b: TerminalAppearance) => JSON.stringify(a) === JSON.stringify(b);
+export const sameAppearance = (a: TerminalAppearance, b: TerminalAppearance) =>
+  JSON.stringify(a) === JSON.stringify(b);

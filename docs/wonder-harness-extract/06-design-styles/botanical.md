@@ -11,7 +11,7 @@ A botanical garden, a ceramics studio and an editorial spread in one: soft, tact
 - Sage `#4F5C49` is the interactive color (secondary buttons, icons, highlights); terracotta `#C27B66` is the occasional emphasis.
 - Tokens the examples bind: `--card` #F2F0EB, `--forest` #2D3A31, `--forest-shadow` rgba(45,58,49,0.05), `--sage` #4F5C49, `--white` #FFFFFF.
 
-**Type.** Headings `Playfair Display` 600/700 at `text-5xl`–`text-8xl`, with single words set in italic for a personal, handwritten touch ("Grown with *care*"). Body `Source Sans 3` 400/500 at `text-lg leading-relaxed`. Button text `uppercase tracking-widest text-sm`.
+**Type.** Headings `Playfair Display` 600/700 at `text-5xl`–`text-8xl`, with single words set in italic for a personal, handwritten touch ("Grown with _care_"). Body `Source Sans 3` 400/500 at `text-lg leading-relaxed`. Button text `uppercase tracking-widest text-sm`.
 
 **Shape and depth.** Cards `rounded-3xl`, buttons `rounded-full`, images arched (`rounded-t-full` or `rounded-[200px_200px_0_0]`) or `rounded-[40px]`. Shadows are forest-tinted and faint: `shadow-[0_4px_6px_-1px_var(--forest-shadow)]`, up to `shadow-[0_20px_40px_-10px_var(--forest-shadow)]` for lifted cards. `backdrop-blur-sm` on overlay cards such as a quote over the hero image.
 
