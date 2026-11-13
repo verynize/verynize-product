@@ -857,6 +857,11 @@ const manual = [
 ];
 
 export const tests = [
+  unit("tests/ai-provider-gateways.mjs", "cloud", [
+    "cloud/ai-providers/cloudflare.js",
+    "cloud/ai-providers/sumopod.js",
+    "tests/helpers/fake-gateway-upstream.mjs",
+  ]),
   {
     file: "tests/renderer-commit-performance.cjs",
     group: "canvas",
