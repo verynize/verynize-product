@@ -200,19 +200,40 @@ const fs = require("node:fs/promises"),
     };
     await openFiles();
     await page.waitForFunction((id) => {
-      const image = document.querySelector(`.file-card[data-file-id="${id}"] img[data-file-thumbnail-image]`);
+      const image = document.querySelector(
+        `.file-card[data-file-id="${id}"] img[data-file-thumbnail-image]`,
+      );
       return image?.complete && image.naturalWidth > 0;
     }, fileId);
     const shot = await cardThumb().evaluate(async (el) => {
-      const box = el.querySelector("[data-thumbnail-node]"), image = box?.querySelector("img");
-      const canvas = document.createElement("canvas"); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
-      const context = canvas.getContext("2d"); context.drawImage(image, 0, 0);
-      return { node: box.dataset.thumbnailNode, width: image.naturalWidth, height: image.naturalHeight,
-        fit: getComputedStyle(image).objectFit, pixel: [...context.getImageData(10, 10, 1, 1).data],
-        miniature: !!el.querySelector(".thumbnail-artboard") };
+      const box = el.querySelector("[data-thumbnail-node]"),
+        image = box?.querySelector("img");
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      return {
+        node: box.dataset.thumbnailNode,
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+        fit: getComputedStyle(image).objectFit,
+        pixel: [...context.getImageData(10, 10, 1, 1).data],
+        miniature: !!el.querySelector(".thumbnail-artboard"),
+      };
     });
-    assert.deepEqual(shot, { node: "card", width: 420, height: 392, fit: "cover",
-      pixel: [255, 255, 255, 255], miniature: false }, "local cover is a full raster image");
+    assert.deepEqual(
+      shot,
+      {
+        node: "card",
+        width: 420,
+        height: 392,
+        fit: "cover",
+        pixel: [255, 255, 255, 255],
+        miniature: false,
+      },
+      "local cover is a full raster image",
+    );
 
     // Deleting the frame falls back to the first page.
     await page.locator(`.file-card[data-file-id="${fileId}"] .file-open`).click();
@@ -229,19 +250,44 @@ const fs = require("node:fs/promises"),
     await page.waitForFunction((id) => {
       const box = document.querySelector(`.file-card[data-file-id="${id}"] [data-thumbnail-page]`);
       const image = box?.querySelector("img");
-      return box?.dataset.thumbnailPage === "p1" && !box.dataset.thumbnailNode && image?.complete && image.naturalWidth > 0;
+      return (
+        box?.dataset.thumbnailPage === "p1" &&
+        !box.dataset.thumbnailNode &&
+        image?.complete &&
+        image.naturalWidth > 0
+      );
     }, fileId);
     const fallback = await cardThumb().evaluate((el) => {
-      const box = el.querySelector("[data-thumbnail-page]"), image = box.querySelector("img");
-      const canvas = document.createElement("canvas"); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
-      const context = canvas.getContext("2d"); context.drawImage(image, 0, 0);
-      return { node: box.dataset.thumbnailNode || null, page: box.dataset.thumbnailPage,
-        width: image.naturalWidth, height: image.naturalHeight, fit: getComputedStyle(image).objectFit,
-        pixel: [...context.getImageData(10, 10, 1, 1).data], miniature: !!el.querySelector(".thumbnail-artboard") };
+      const box = el.querySelector("[data-thumbnail-page]"),
+        image = box.querySelector("img");
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      return {
+        node: box.dataset.thumbnailNode || null,
+        page: box.dataset.thumbnailPage,
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+        fit: getComputedStyle(image).objectFit,
+        pixel: [...context.getImageData(10, 10, 1, 1).data],
+        miniature: !!el.querySelector(".thumbnail-artboard"),
+      };
     });
-    assert.deepEqual(fallback, { node: null, page: "p1", width: 600, height: 300, fit: "contain",
-      pixel: [30, 58, 138, 255], miniature: false },
-      "deleted cover renders the complete first page while page 2 is active");
+    assert.deepEqual(
+      fallback,
+      {
+        node: null,
+        page: "p1",
+        width: 600,
+        height: 300,
+        fit: "contain",
+        pixel: [30, 58, 138, 255],
+        miniature: false,
+      },
+      "deleted cover renders the complete first page while page 2 is active",
+    );
 
     assert.deepEqual(errors, []);
     console.log(

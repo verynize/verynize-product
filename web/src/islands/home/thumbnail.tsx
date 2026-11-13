@@ -19,15 +19,23 @@ export function Thumbnail({
     if (!box) return;
     const covers = window.fileThumbnails;
     let disposed = false,
-      serial = 0;
+      serial = 0,
+      shown = "";
     const show = (cover: FileCover | null) => {
-      const version = ++serial;
       if (disposed) return;
+      // Every card repaints on each `file-thumbnail-changed`: keep an image that is already
+      // shown or loading, and never blank a painted card because a cache entry was evicted.
       if (!cover) {
+        if (shown) return;
+        ++serial;
         box.replaceChildren();
         setEmpty(true);
         return;
       }
+      const key = `${cover.url}|${cover.nodeId || ""}`;
+      if (key === shown) return;
+      shown = key;
+      const version = ++serial;
       const image = new Image();
       image.dataset.fileThumbnailImage = "";
       image.alt = "";
@@ -42,6 +50,7 @@ export function Thumbnail({
       };
       image.onerror = () => {
         if (disposed || serial !== version) return;
+        shown = "";
         box.replaceChildren();
         setEmpty(true);
         if (!cover.url.startsWith("data:"))
@@ -54,7 +63,9 @@ export function Thumbnail({
     const paint = () => {
       const cover = covers.cached(file);
       show(cover);
-      if (!cover)
+      // Only an unpainted card asks for a local render, so more than 64 local files (the
+      // local cache size) cannot evict each other into an endless re-render loop.
+      if (!cover && !shown)
         void covers.local(file).then((fallback) => {
           if (!disposed) show(fallback);
         });

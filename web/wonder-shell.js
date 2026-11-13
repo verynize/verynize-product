@@ -516,7 +516,9 @@
     window.fileThumbnails?.load(file).then((cover) => {
       if (!cover) return;
       const image = document.createElement("img");
-      image.src = cover.url; image.alt = ""; image.dataset.fileThumbnailImage = "";
+      image.src = cover.url;
+      image.alt = "";
+      image.dataset.fileThumbnailImage = "";
       image.style.cssText = "width:100%;height:100%;object-fit:contain";
       if (cover.nodeId) thumb.dataset.thumbnailNode = cover.nodeId;
       thumb.append(image);

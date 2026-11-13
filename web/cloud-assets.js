@@ -411,7 +411,6 @@
     sweep,
     createRoom,
     inlineHtml,
-    uploadTo,
     status: () => ({
       uploading: count("uploading"),
       uploaded: count("done"),

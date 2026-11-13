@@ -132,10 +132,11 @@
     const ratio = Math.min(1, 1920 / artwork.width, 1080 / artwork.height);
     const width = Math.max(1, Math.round(artwork.width * ratio));
     const height = Math.max(1, Math.round(artwork.height * ratio));
-    const markup = artwork.html.replace(
-      "<body>",
-      `<body style="transform:scale(${ratio});transform-origin:0 0">`,
-    );
+    // Scale a wrapper, not <body>: the desktop renderer checks its zoom with a probe appended
+    // to body, and a transformed body makes it refuse every scaled-down cover.
+    const markup = artwork.html
+      .replace("<body>", `<body><div style="transform:scale(${ratio});transform-origin:0 0">`)
+      .replace("</body>", "</div></body>");
     const inlined = await window.cloudAssets.inlineHtml(markup);
     const html = window.assetStore ? await window.assetStore.inlineMarkup(inlined) : inlined;
     if (window.verynizePlatform.can("rasterExport")) {
@@ -163,16 +164,31 @@
     canvas.getContext("2d").drawImage(image, 0, 0);
     return canvas.toDataURL("image/png");
   }
-  // The only upload API adapter: PNG data URL -> raw PNG bytes + cover selection.
-  async function putCover(request, roomId, png, nodeId, pageId) {
-    const response = await fetch(png);
-    if (!response.ok) throw Error("Could not read the rendered cover");
-    const body = await response.blob();
+  // The server keeps covers up to 2 MiB. Photographic pages can exceed that as PNG, so
+  // re-encode them as WebP (JPEG where WebP encoding is unavailable) at falling quality.
+  const MAX_COVER = 2 * 1024 * 1024;
+  async function fitCover(blob) {
+    if (blob.size <= MAX_COVER) return blob;
+    const bitmap = await createImageBitmap(blob);
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+    canvas.getContext("2d").drawImage(bitmap, 0, 0);
+    bitmap.close();
+    for (const type of ["image/webp", "image/jpeg"])
+      for (const quality of [0.86, 0.7, 0.5]) {
+        const encoded = await new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+        if (encoded?.type === type && encoded.size <= MAX_COVER) return encoded;
+      }
+    throw Error("The file cover is too large to upload");
+  }
+  // The only upload API adapter: encoded cover bytes + cover selection.
+  function putCover(request, roomId, body, nodeId, pageId) {
     const query = new URLSearchParams({ pageId });
     if (nodeId) query.set("nodeId", nodeId);
     return request(`/api/rooms/${roomId}/thumbnail?${query}`, {
       method: "PUT",
-      headers: { "Content-Type": "image/png" },
+      headers: { "Content-Type": body.type },
       body,
     });
   }
@@ -186,11 +202,12 @@
       !["editor", "owner"].includes(workspace.role())
     )
       return null;
-    const doc = window.design.getSnapshot();
-    return { room, doc, mark: fingerprint(doc), request: workspace.requestForRoom(room) };
+    // Fingerprint when a job runs, never per editor notification: drags commit every move.
+    return { room, doc: window.design.getSnapshot(), request: workspace.requestForRoom(room) };
   }
   async function sync(job) {
-    let { doc, mark } = job;
+    let { doc } = job,
+      mark = fingerprint(doc);
     const { room, request } = job,
       key = roomKey(room);
     if (completed.get(key) === mark) return;
@@ -216,8 +233,8 @@
     // The server digest also deduplicates reopening a file after a reload.
     const response = await fetch(src);
     if (!response.ok) throw Error("Could not read the rendered cover");
-    const bytes = await response.arrayBuffer();
-    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    const body = await fitCover(await response.blob());
+    const digest = await crypto.subtle.digest("SHA-256", await body.arrayBuffer());
     const sha256 = Array.from(new Uint8Array(digest), (n) => n.toString(16).padStart(2, "0")).join(
       "",
     );
@@ -228,7 +245,7 @@
       existing.thumbnail.pageId === pick.page.id;
     const result = matches
       ? existing
-      : await putCover(request, room.id, src, pick.node?.id || null, pick.page.id);
+      : await putCover(request, room.id, body, pick.node?.id || null, pick.page.id);
     completed.set(key, mark);
     uploads.set(key, Date.now());
     cache.set(key, result.thumbnail);
@@ -242,7 +259,7 @@
     deadline = null;
     if (!job) return Promise.resolve();
     const key = roomKey(job.room);
-    if (completed.get(key) !== job.mark) uploads.set(key, Date.now());
+    if (completed.get(key) !== fingerprint(job.doc)) uploads.set(key, Date.now());
     const previous = jobs.get(key) || Promise.resolve();
     const work = previous
       .then(() => sync(job))
@@ -259,7 +276,7 @@
     const next = capture();
     if (!next) return;
     if (pending && roomKey(pending.room) !== roomKey(next.room)) void flush(pending);
-    if (pending?.mark === next.mark && roomKey(pending.room) === roomKey(next.room)) return;
+    if (pending?.doc === next.doc && roomKey(pending.room) === roomKey(next.room)) return;
     pending = next;
     clearTimeout(timer);
     timer = setTimeout(() => flush(), 10000);

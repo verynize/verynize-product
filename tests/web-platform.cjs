@@ -192,26 +192,59 @@ async function openBrowser(url) {
       const before = JSON.stringify(window.design.getDocument());
       const doc = window.design.getDocument();
       doc.tokens = { coverInk: "#ff0000" };
-      doc.pages = [{ id: "cover-first", name: "First", nodes: Array.from({ length: 40 }, (_, index) => ({
-        id: `root-${index}`, type: "rectangle", name: `Root ${index}`, parentId: null,
-        x: index * 10 - 100, y: -50, w: 10, h: 10, radius: 0, opacity: 100,
-        token: index === 39 ? undefined : "coverInk", color: index === 39 ? "#00ff00" : "#0000ff",
-      })) }, { id: "cover-second", name: "Second", nodes: [] }];
+      doc.pages = [
+        {
+          id: "cover-first",
+          name: "First",
+          nodes: Array.from({ length: 40 }, (_, index) => ({
+            id: `root-${index}`,
+            type: "rectangle",
+            name: `Root ${index}`,
+            parentId: null,
+            x: index * 10 - 100,
+            y: -50,
+            w: 10,
+            h: 10,
+            radius: 0,
+            opacity: 100,
+            token: index === 39 ? undefined : "coverInk",
+            color: index === 39 ? "#00ff00" : "#0000ff",
+          })),
+        },
+        { id: "cover-second", name: "Second", nodes: [] },
+      ];
       doc.activePage = "cover-second";
       delete doc.thumbnailNodeId;
       const markup = window.design.thumbnailMarkup(null, doc);
       const src = await window.fileThumbnails.render(null, doc);
       const image = new Image();
-      await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = src; });
-      const canvas = document.createElement("canvas"); canvas.width = image.width; canvas.height = image.height;
-      const context = canvas.getContext("2d"); context.drawImage(image, 0, 0);
-      return { width: image.width, height: image.height,
-        first: [...context.getImageData(5, 5, 1, 1).data], last: [...context.getImageData(395, 5, 1, 1).data],
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = reject;
+        image.src = src;
+      });
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d");
+      context.drawImage(image, 0, 0);
+      return {
+        width: image.width,
+        height: image.height,
+        first: [...context.getImageData(5, 5, 1, 1).data],
+        last: [...context.getImageData(395, 5, 1, 1).data],
         roots: (markup.html.match(/data-id=/g) || []).length,
-        unchanged: before === JSON.stringify(window.design.getDocument()) };
+        unchanged: before === JSON.stringify(window.design.getDocument()),
+      };
     });
-    assert.deepEqual(fullPage, { width: 400, height: 10, first: [255, 0, 0, 255],
-      last: [0, 255, 0, 255], roots: 40, unchanged: true });
+    assert.deepEqual(fullPage, {
+      width: 400,
+      height: 10,
+      first: [255, 0, 0, 255],
+      last: [0, 255, 0, 255],
+      roots: 40,
+      unchanged: true,
+    });
 
     // Desktop-only entry points keep their web behaviour.
     assert.equal(

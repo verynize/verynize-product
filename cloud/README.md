@@ -350,17 +350,22 @@ Restoring the default in the editor generates a new automatic cover; DELETE clea
 validation, restart persistence, and 50 replacements without consuming any asset slots.
 
 The renderer service `window.fileThumbnails` (`web/file-thumbnails.js`) regenerates covers after
-frame, page-content, token or embedded-font changes settle. It renders a detached layer tree
-without changing the current page or selection, bounds PNGs to 1920×1080, and uploads through
-one raw PNG PUT to the thumbnail endpoint. Desktop uses its offscreen Chromium renderer; the web uses an SVG
-foreignObject raster fallback. In-flight work rechecks the room and document before uploading
-the rendered cover. Failed/offline uploads keep the local miniature and can retry on reconnect
-or `fileThumbnails.refresh()`; `status()` exposes upload/error state. Home cards prefer the
-uploaded image and fall back when it cannot load. **Restore default thumbnail** clears the
-selection in one undo step and regenerates the cloud cover from the full first page; deleting
-its frame also restores that default. Default rendering uses the first page, independent of the
-currently active page, and includes every visible root rather than the legacy miniature's cap.
-Missing frames on unloaded lazy pages preserve the cloud cover until those pages load.
+frame, page-content, token or embedded-font changes settle: 10 seconds after the last edit, at
+most every 45 seconds while editing continues, and at once on set/restore, leaving the file,
+hiding the window or switching documents. It renders a detached layer tree without changing the
+current page or selection and bounds the raster to 1920×1080. Desktop uses its offscreen Chromium
+renderer; the web uses an SVG foreignObject raster fallback. The PNG is uploaded raw, re-encoded
+as WebP (or JPEG) when it exceeds 2 MiB, and skipped when the server already holds the same
+SHA-256 and selection. Each job keeps the room, its request credentials and the document
+snapshot it was captured with, and jobs run one at a time per room, so a switch mid-upload
+writes the old room's cover to the old room and an older job never finishes after a newer one.
+Failed or offline uploads show the local render and retry on the next edit, on reconnect or on
+`fileThumbnails.refresh()`; `status()` exposes upload/error state. Home cards prefer the
+uploaded image and fall back to a local render when it cannot load. **Restore default thumbnail**
+clears the selection in one undo step and regenerates the cloud cover from the full first page;
+deleting its frame also restores that default. Default rendering uses the first page,
+independent of the currently active page, and includes every visible root. A chosen frame that
+is missing from the loaded pages makes the job load the unloaded lazy pages before choosing.
 
 ## Room assets (`cloud/assets.js`, `cloud/inline-binaries.js`, `web/cloud-assets.js`)
 
@@ -387,7 +392,7 @@ Published apps (`cloud/apps.js`) store the bytes of every file in the same bucke
 
 **Size limits in the editor.** `web/storage-limits.js` measures the open document after edits settle (debounced, never per pointer move) with binaries that will become assets counted as their URL. The storage island (`web/src/islands/storage*`) shows the size in the Share panel (`#storage-meter[data-level=ok|warn|over]`: file size against 20 MB, the largest page against the shared 20 MB budget, embedded files that will be stored separately, upload progress), a warning from 80 % of a limit naming the page (with a toast), and a blocking error when a share, sync or save is stopped by a limit (`#storage-limit-error` inside the Share panel, `#storage-limit-dialog` elsewhere, titled after the action). Server refusals for size (`exceeds`, `too large`, inline data, 413) reach the same error through the panel's status line, and a native save refused by the 20 MiB file limit of `integrations/design-store.mjs` through `web/desktop-panel.js`.
 
-**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export and fallback DOM file miniatures show only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
+**Exports and offline use.** Raster and PDF exports (`exportArtwork` PNG/JPG/WebP, and the Export panel's raster and PDF formats in `web/src/islands/inspector/export.ts`) call `cloudAssets.inlineHtml`, which replaces asset URLs (images and fonts) with data URIs, because the offscreen renderer loads no network URLs. HTML exports keep the signed URLs, which load wherever the server is reachable. Raster exports reuse the original data URI of images this client uploaded, so they work offline. The editor renders asset URLs from Chromium's HTTP cache when offline (immutable responses). An image that was never loaded on this machine cannot render offline. The main window has no CSP that blocks remote images. The MCP `take_screenshot` path does not inline room images yet, the SVG export shows only embedded images, and HTML exports opened outside Chromium do not apply the opacity of half-transparent asset image fills (`-webkit-cross-fade`).
 
 ## Email delivery (`cloud/mail.js`)
 
