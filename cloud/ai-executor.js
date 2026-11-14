@@ -200,7 +200,7 @@ async function runTool(backend, name, args) {
  * @param {object} options
  * @param {object} options.env bindings (DB)
  * @param {object} options.backend createRoomBackend(..., {roomId})
- * @param {object} options.run the ai_run row ({id, accountId, access})
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {(type: string, fields?: object) => Promise<void>} [options.emit] the run's event log
  * @param {(status: string) => unknown} [options.setStatus]
  * @param {() => boolean | Promise<boolean>} [options.isCancelled]
@@ -408,7 +408,7 @@ export function buildSystemPrompt({ room, role, designStyle, writes, access = "a
  * Run one chat turn to completion. Never throws: failures end the run with `error` + `done`.
  * @param {object} options
  * @param {object} options.env bindings (DB for state)
- * @param {object} options.run the ai_run row
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {object} options.backend createRoomBackend(..., {roomId: run.roomId})
  * @param {{id: string, title: string|null}} options.room
  * @param {string} options.role the caller's role at the start
@@ -416,7 +416,7 @@ export function buildSystemPrompt({ room, role, designStyle, writes, access = "a
  * @param {Array<{role: "user"|"assistant", text: string}>} [options.history]
  * @param {string} [options.designStyle]
  * @param {{maxTurns: number, maxToolCalls: number}} options.limits
- * @param {{apiKey: string, baseUrl?: string, origin?: string}} options.provider
+ * @param {{id?: string, apiKey?: string, baseUrl?: string, origin?: string}} options.provider
  * @param {ReturnType<typeof createEventLog>} options.log
  * @param {boolean} [options.plan] refuse write calls (plan first)
  * @param {boolean} [options.helper] read-only helper run (no write tools)

@@ -390,7 +390,7 @@ export function runAccount({ accountId, authUserId }) {
  * request-scoped path, so both resolve the room role and the provider the same way.
  * @param {object} env
  * @param {object} options
- * @param {object} options.run the ai_run row
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {object} options.account runAccount(...) or the router's account
  * @param {Request} options.request the starting request, or a synthetic one with its origin
  * @param {{prompt: string, history: Array<object>, designStyle?: string, plan: boolean, helper: boolean}} options.input

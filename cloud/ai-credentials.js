@@ -132,7 +132,13 @@ export async function readCredential(env, accountId, provider = OPENROUTER) {
   }
 }
 
-/** Store (insert or replace) the account's key, encrypted. */
+/**
+ * Store (insert or replace) the account's key, encrypted.
+ * @param {any} env
+ * @param {string} accountId
+ * @param {{apiKey?: string, source: string, label?: string|null, provider?: string, credential?: object, last4?: string}} input
+ * @param {number} [now]
+ */
 export async function saveCredential(
   env,
   accountId,
