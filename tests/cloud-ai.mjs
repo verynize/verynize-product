@@ -1,3 +1,4 @@
+import { PROVIDERS } from "../cloud/ai-providers/index.js";
 // Model API runtime (/api/ai/*, cloud/ai.js, docs/ai-runtime.md) on the real backend: config
 // enabled and disabled, authentication, room access, streamed text, a read tool call against a
 // real room, room scoping, cancel, reconnect with events?after=, idempotent replay, budgets, an
@@ -263,6 +264,25 @@ try {
     defaultModel: "fake/model-a",
     limits: { maxTurns: 3, maxToolCalls: 4 },
     credentials: { openrouter },
+    defaultProvider: "openrouter",
+    providers: PROVIDERS.map((provider) => {
+      const models =
+        provider.id === "openrouter"
+          ? [
+              { id: "fake/model-a", label: "Model A", tools: true },
+              { id: "fake/model-b", label: "fake/model-b", tools: true },
+            ]
+          : provider.curatedModels;
+      return {
+        id: provider.id,
+        label: provider.label,
+        oauth: provider.oauth === true,
+        fields: provider.fields,
+        connected: provider.id === "openrouter" ? openrouter : "missing",
+        models,
+        defaultModel: models[0].id,
+      };
+    }),
   });
   assert.deepEqual(
     await data(await request("/api/ai/config", { token: ana }), 200),
@@ -288,9 +308,21 @@ try {
     (await request("/api/ai/credentials/openrouter/oauth/start", { method: "POST" })).status,
     401,
   );
-  assert.deepEqual(await data(await request("/api/ai/credentials", { token: ana }), 200), {
-    openrouter: { connected: false },
-  });
+  assert.deepEqual(
+    await data(await request("/api/ai/credentials", { token: ana }), 200),
+    Object.fromEntries(
+      PROVIDERS.map(({ id }) => [
+        id,
+        {
+          connected: false,
+          source: null,
+          last4: null,
+          label: null,
+          updatedAt: null,
+        },
+      ]),
+    ),
+  );
   const putKey = (token, apiKey, headers) =>
     request("/api/ai/credentials/openrouter", {
       method: "PUT",
@@ -303,6 +335,7 @@ try {
   assert.equal((await putKey(ana, "has spaces in it")).status, 400);
   const unknownKey = await data(await putKey(ana, "sk-or-v1-not-a-real-key-0000"), 400);
   assert.equal(unknownKey.code, "invalid_key");
+  assert.equal(unknownKey.error, "OpenRouter rejected this key. Check it and try again.");
   assert.equal(await credentialOf(anaId), null, "a rejected key is not stored");
   assert.equal(
     (await putKey(ana, "sk-or-v1-x", { origin: "https://evil.example" })).status,

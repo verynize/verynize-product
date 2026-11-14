@@ -111,7 +111,11 @@ export function OpenRouterConnect({ idPrefix = "chat-web" }: { idPrefix?: string
 }
 
 export function WebChatGate({ transport }: { transport: AgentTransport }) {
-  const detail = DETAIL[transport.state];
+  const multiple = !!transport.config?.providers;
+  const detail =
+    multiple && transport.state === "needs-credentials"
+      ? "Connect a provider in Settings › Agents to use its models and credits."
+      : DETAIL[transport.state];
   return (
     <div
       id="chat-web-gate"
@@ -119,14 +123,31 @@ export function WebChatGate({ transport }: { transport: AgentTransport }) {
       role="status"
       className="mx-4 mb-4 flex shrink-0 flex-col items-start gap-1.5 rounded-2xl border border-card-border bg-card px-4 py-3"
     >
-      <p className="m-0 text-base leading-5.25 font-medium text-foreground">{transport.message}</p>
+      <p className="m-0 text-base leading-5.25 font-medium text-foreground">
+        {multiple && transport.state === "needs-credentials"
+          ? "Connect an AI provider"
+          : transport.message}
+      </p>
       {detail && <p className="m-0 text-sm leading-5 text-muted-foreground">{detail}</p>}
       {transport.state === "signed-out" && (
         <ChatActionButton id="chat-web-sign-in" className="mt-1.5" onClick={openSignIn}>
           Sign in
         </ChatActionButton>
       )}
-      {transport.state === "needs-credentials" && <OpenRouterConnect />}
+      {transport.state === "needs-credentials" && (
+        <>
+          <OpenRouterConnect />
+          {multiple && (
+            <ChatActionButton
+              id="chat-web-provider-settings"
+              variant="ghost"
+              onClick={() => window.appSettings?.open("agents")}
+            >
+              Choose another provider
+            </ChatActionButton>
+          )}
+        </>
+      )}
       {transport.state === "no-room" && (
         <ChatActionButton
           id="chat-web-share"

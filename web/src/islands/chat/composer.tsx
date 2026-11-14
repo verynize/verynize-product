@@ -17,6 +17,7 @@ import { ClaudeMark, CodexMark, PlusIcon } from "@/components/icons";
 import { legacySet } from "@/lib/bridge";
 import { platform } from "@/lib/platform";
 import { cn } from "@/lib/utils";
+import { WebModelMenu } from "./web-model-menu";
 import { useAdopt } from "./adopt";
 import { useChatBehavior } from "./behavior";
 import { ChatChipButton, ChatIconButton } from "./controls";
@@ -105,7 +106,14 @@ const AGENTS = [
 ];
 
 /* ---------- Model picker (30). Trigger is `.agent-config summary` (test contract). ---------- */
-function ModelMenu({
+function ModelMenu(props: {
+  state: ChatState;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return WEB ? <WebModelMenu {...props} /> : <DesktopModelMenu {...props} />;
+}
+function DesktopModelMenu({
   state,
   open,
   onOpenChange,

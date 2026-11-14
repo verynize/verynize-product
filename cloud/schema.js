@@ -255,6 +255,7 @@ export const aiRun = sqliteTable(
     roomId: text("roomId").notNull(),
     chatId: text("chatId").notNull(),
     model: text("model").notNull(),
+    provider: text("provider").notNull().default("openrouter"),
     access: text("access").notNull(),
     status: text("status").notNull(),
     code: text("code"),

@@ -57,11 +57,12 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  *   rejected: Set<string>, noCredits: Set<string>, authRequests: object[], exchanges: object[],
  *   close(): Promise<void>}>}
  */
-export async function startFakeOpenRouter(scenarios) {
+export async function startFakeOpenRouter(scenarios, { models = [] } = {}) {
   const requests = [];
   const keys = new Set();
   const rejected = new Set();
   const noCredits = new Set();
+  const rateLimited = new Set();
   const codes = new Map();
   const authRequests = [];
   const exchanges = [];
@@ -105,6 +106,14 @@ export async function startFakeOpenRouter(scenarios) {
         return sendJson(res, 403, { error: "Invalid code or code_verifier" });
       return sendJson(res, 200, { key: entry.key, user_id: "fake-user" });
     }
+    // Gateway's catalog is public: it must not be used to verify a credential.
+    if (req.method === "GET" && url.pathname === "/api/v1/models")
+      return sendJson(res, 200, { data: models.map((id) => ({ id })) });
+    if (req.method === "GET" && url.pathname === "/api/v1/credits") {
+      if (!keys.has(bearer(req)) || rejected.has(bearer(req)))
+        return sendJson(res, 401, { error: "Invalid key" });
+      return sendJson(res, 200, { balance: "10.00", total_used: "1.25" });
+    }
     if (req.method === "GET" && url.pathname === "/api/v1/key") {
       const key = bearer(req);
       if (!keys.has(key) || rejected.has(key))
@@ -121,7 +130,13 @@ export async function startFakeOpenRouter(scenarios) {
     }
     if (req.method === "POST" && req.url.endsWith("/chat/completions")) {
       const key = bearer(req);
-      const refused = rejected.has(key) ? 401 : noCredits.has(key) ? 402 : 0;
+      const refused = rejected.has(key)
+        ? 401
+        : noCredits.has(key)
+          ? 402
+          : rateLimited.has(key)
+            ? 429
+            : 0;
       if (refused) {
         requests.push({ headers: req.headers, body: JSON.parse(raw || "{}"), refused });
         return sendJson(res, refused, {
@@ -222,6 +237,7 @@ export async function startFakeOpenRouter(scenarios) {
     keys,
     rejected,
     noCredits,
+    rateLimited,
     authRequests,
     exchanges,
     close: () =>

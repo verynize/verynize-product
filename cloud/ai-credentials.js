@@ -109,31 +109,50 @@ export const credentialRow = (env, accountId, provider = OPENROUTER) =>
     .get();
 
 /**
- * The account's plaintext key, or null when none is stored or it cannot be decrypted (for
+ * The account's raw OpenRouter key or parsed provider fields, or null when missing/unreadable (for
  * example after BETTER_AUTH_SECRET changed: the user reconnects).
  */
 export async function readCredential(env, accountId, provider = OPENROUTER) {
   const row = await credentialRow(env, accountId, provider);
   if (!row) return null;
   try {
-    return await openSecret(env.BETTER_AUTH_SECRET, row, credentialContext(accountId, provider));
+    const plaintext = await openSecret(
+      env.BETTER_AUTH_SECRET,
+      row,
+      credentialContext(accountId, provider),
+    );
+    if (provider === OPENROUTER) return plaintext;
+    const parsed = JSON.parse(plaintext);
+    if (parsed.v !== 1) return null;
+    const { v: _version, ...credential } = parsed;
+    return credential;
   } catch {
     console.error("ai credential could not be decrypted", provider);
     return null;
   }
 }
 
-/** Store (insert or replace) the account's key, encrypted. */
-export async function saveCredential(env, accountId, { apiKey, source, label }, now = Date.now()) {
-  const provider = OPENROUTER;
+/**
+ * Store (insert or replace) the account's key, encrypted.
+ * @param {any} env
+ * @param {string} accountId
+ * @param {{apiKey?: string, source: string, label?: string|null, provider?: string, credential?: object, last4?: string}} input
+ * @param {number} [now]
+ */
+export async function saveCredential(
+  env,
+  accountId,
+  { apiKey, source, label, provider = OPENROUTER, credential, last4 },
+  now = Date.now(),
+) {
   const sealed = await sealSecret(
     env.BETTER_AUTH_SECRET,
-    apiKey,
+    provider === OPENROUTER ? apiKey : JSON.stringify({ v: 1, ...credential }),
     credentialContext(accountId, provider),
   );
   const fields = {
     ...sealed,
-    last4: apiKey.slice(-4),
+    last4: last4 ?? apiKey.slice(-4),
     label: label ? String(label).slice(0, 120) : null,
     source,
     updatedAt: now,

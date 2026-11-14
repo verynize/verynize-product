@@ -9,6 +9,8 @@
 // helper rules), `recorded(call)` returns a write's stored result instead of reapplying it,
 // `approve(call)` waits for an `ask` approval once the arguments are checked, and
 // `execute(call, run)` re-checks the role and runs the call at most once.
+import { getProvider } from "./ai-providers/index.js";
+import { createChatCompletionsAdapter } from "./ai-providers/openai-compatible.js";
 import { chat, maxIterations, toolDefinition } from "@tanstack/ai";
 import { createOpenRouterText } from "@tanstack/ai-openrouter";
 import { z } from "zod";
@@ -141,9 +143,16 @@ export function openRouterAdapter(model, provider, signal, onCredentialProblem =
           }
         }
         const response = await fetch(request, init);
-        if ([401, 402, 403].includes(response.status))
+        if ([401, 402, 403, 429].includes(response.status))
           onCredentialProblem(
-            credentialMessage(provider, response.status === 402 ? "credits" : "rejected"),
+            credentialMessage(
+              provider,
+              response.status === 429
+                ? "rate_limited"
+                : response.status === 402
+                  ? "credits"
+                  : "rejected",
+            ),
           );
         return response;
       },
@@ -153,15 +162,13 @@ export function openRouterAdapter(model, provider, signal, onCredentialProblem =
 
 /** What the user is told when the provider credential stops working during a run. */
 export function credentialMessage(provider, problem) {
+  if (problem === "rate_limited")
+    return getProvider(provider?.id || "openrouter").errorMessage(problem);
   if (provider?.source === "server")
     return problem === "credits"
       ? "The server's OpenRouter key is out of credits. Connect your own OpenRouter account in Settings."
       : "The server's OpenRouter key was rejected. Connect your own OpenRouter account in Settings.";
-  if (problem === "disconnected")
-    return "Your OpenRouter account was disconnected during this run. Reconnect it in Settings to continue.";
-  if (problem === "credits")
-    return "Your OpenRouter account is out of credits. Add credits on openrouter.ai, or reconnect another account in Settings.";
-  return "Your OpenRouter key was rejected. Reconnect your OpenRouter account in Settings.";
+  return getProvider(provider?.id || "openrouter").errorMessage(problem);
 }
 
 /** A short label for an approval card. */
@@ -193,7 +200,7 @@ async function runTool(backend, name, args) {
  * @param {object} options
  * @param {object} options.env bindings (DB)
  * @param {object} options.backend createRoomBackend(..., {roomId})
- * @param {object} options.run the ai_run row ({id, accountId, access})
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {(type: string, fields?: object) => Promise<void>} [options.emit] the run's event log
  * @param {(status: string) => unknown} [options.setStatus]
  * @param {() => boolean | Promise<boolean>} [options.isCancelled]
@@ -401,7 +408,7 @@ export function buildSystemPrompt({ room, role, designStyle, writes, access = "a
  * Run one chat turn to completion. Never throws: failures end the run with `error` + `done`.
  * @param {object} options
  * @param {object} options.env bindings (DB for state)
- * @param {object} options.run the ai_run row
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {object} options.backend createRoomBackend(..., {roomId: run.roomId})
  * @param {{id: string, title: string|null}} options.room
  * @param {string} options.role the caller's role at the start
@@ -409,7 +416,7 @@ export function buildSystemPrompt({ room, role, designStyle, writes, access = "a
  * @param {Array<{role: "user"|"assistant", text: string}>} [options.history]
  * @param {string} [options.designStyle]
  * @param {{maxTurns: number, maxToolCalls: number}} options.limits
- * @param {{apiKey: string, baseUrl?: string, origin?: string}} options.provider
+ * @param {{id?: string, apiKey?: string, baseUrl?: string, origin?: string}} options.provider
  * @param {ReturnType<typeof createEventLog>} options.log
  * @param {boolean} [options.plan] refuse write calls (plan first)
  * @param {boolean} [options.helper] read-only helper run (no write tools)
@@ -511,7 +518,11 @@ export async function executeRun(options) {
 
   let code = "ok";
   try {
-    await emit("session", { sessionId: run.id, agent: "openrouter", model: run.model });
+    await emit("session", {
+      sessionId: run.id,
+      agent: run.provider || "openrouter",
+      model: run.model,
+    });
     await setStatus("running");
 
     const definitions = Object.entries(hostedToolDefinitions()).filter(([name, definition]) =>
@@ -615,7 +626,9 @@ export async function executeRun(options) {
       { role: "user", content: prompt },
     ];
     const stream = chat({
-      adapter: openRouterAdapter(run.model, provider, abortController.signal, (message) => {
+      adapter: (provider.id && provider.id !== "openrouter"
+        ? createChatCompletionsAdapter
+        : openRouterAdapter)(run.model, provider, abortController.signal, (message) => {
         state.credentialProblem ||= message;
       }),
       threadId: run.chatId,

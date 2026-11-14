@@ -681,6 +681,7 @@ export const CLOUD_SCENARIOS = [
   "tests/cloud-email.mjs",
   "tests/cloud-mcp.mjs",
   "tests/cloud-ai.mjs",
+  "tests/cloud-ai-providers.mjs",
   "tests/cloud-ai-cancel.mjs",
   "tests/cloud-ai-durable.mjs",
   "tests/cloud-assets.mjs",
@@ -731,7 +732,14 @@ const webBuild = (file, covers, extra = {}) => ({
   timeoutMs: 15 * 60_000,
   ...extra,
 });
-const AI = ["cloud/ai*.js", "web-start/**", "server/node.mjs", "tests/helpers/fake-openrouter.mjs"];
+const AI = [
+  "cloud/ai*.js",
+  "cloud/ai-providers/**",
+  "web-start/**",
+  "server/node.mjs",
+  "tests/helpers/fake-openrouter.mjs",
+  "tests/helpers/fake-chat-completions.mjs",
+];
 const web = [
   webBuild("tests/web-legacy-assets.mjs", []),
   webBuild("tests/web-cloudflare.mjs", ["tests/helpers/web-home-boot.mjs"]),
@@ -748,7 +756,14 @@ const web = [
     "web/src/lib/telemetry/**",
   ]),
   webBuild("tests/ai-routing.mjs", [...AI, "api/**", "vercel.json", "cloud/platform/**"]),
-  webBuild("tests/web-ai-chat.mjs", [...AI, "web/src/lib/agent-service.ts", ...isl("chat")]),
+  webBuild("tests/web-ai-chat.mjs", [
+    ...AI,
+    "web/src/lib/agent-service.ts",
+    "web/src/lib/agent-transport.ts",
+    "web/src/lib/ai-*.ts",
+    ...isl("chat"),
+    ...isl("settings"),
+  ]),
   webBuild("tests/web-nitro.mjs", ["vite.nitro.config.ts", "web-start/nitro/**"], {
     group: "web-nitro",
     manual: "opt-in Nitro build; run with --group web-nitro (npm run test:web:nitro)",
@@ -849,6 +864,11 @@ const manual = [
 ];
 
 export const tests = [
+  unit("tests/ai-provider-gateways.mjs", "cloud", [
+    "cloud/ai-providers/cloudflare.js",
+    "cloud/ai-providers/sumopod.js",
+    "tests/helpers/fake-gateway-upstream.mjs",
+  ]),
   {
     file: "tests/renderer-commit-performance.cjs",
     group: "canvas",

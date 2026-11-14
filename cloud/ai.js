@@ -24,6 +24,7 @@
 // Every endpoint needs a signed-in account (the router's accountOf); the account never comes from
 // the request body or the model. The OAuth callback is the exception: it is a top-level navigation
 // back from openrouter.ai and authenticates through its pending state (cloud/ai-credentials.js).
+import { PROVIDERS, getProvider } from "./ai-providers/index.js";
 import { corsHeaders, readJson, json, fail } from "./http.js";
 import { createRoomBackend, ROOM_ID } from "./design-backend.js";
 import {
@@ -48,7 +49,6 @@ import {
   OAUTH_COOKIE,
   OAUTH_PATH,
   OAUTH_TTL_MS,
-  OPENROUTER,
   checkOpenRouterKey,
   claimOAuth,
   credentialRow,
@@ -96,7 +96,13 @@ export function aiConfig(env) {
     .filter((model) => /^[\w.:/-]{1,120}$/.test(model.id));
   return {
     // Available unless the operator turned it off (`VERYNIZE_AI=off`); each account brings its key.
-    enabled: env.VERYNIZE_AI !== "off" && models.length > 0,
+    enabled:
+      env.VERYNIZE_AI !== "off" &&
+      (models.length > 0 ||
+        PROVIDERS.some(
+          (provider) =>
+            provider.id !== "openrouter" && provider.curatedModels.some((model) => model.tools),
+        )),
     provider: "openrouter",
     models,
     defaultModel: models[0]?.id || null,
@@ -263,7 +269,7 @@ export function followStream(env, runId, after) {
   });
 }
 
-function validRunRequest(body, config) {
+function validRunRequest(body, config, env) {
   if (!body || typeof body !== "object" || Array.isArray(body)) fail(400, "Body must be an object");
   const { chatId, roomId, prompt, model, access, history, designStyle, idempotencyKey } = body;
   for (const flag of ["plan", "helper"])
@@ -276,6 +282,9 @@ function validRunRequest(body, config) {
     fail(400, `prompt must be text of at most ${MAX_PROMPT} characters`);
   if (typeof idempotencyKey !== "string" || !/^[\w.:-]{8,128}$/.test(idempotencyKey))
     fail(400, "idempotencyKey must be 8-128 letters, digits, _ . : or -");
+  const provider = requireProvider(body.provider === undefined ? "openrouter" : body.provider);
+  const models = providerModels(env, provider).filter((model) => model.tools);
+  config = { ...config, models, defaultModel: models[0]?.id || null };
   const chosen = model === undefined || model === null ? config.defaultModel : model;
   if (!config.models.some((entry) => entry.id === chosen))
     fail(400, `model must be one of: ${config.models.map((entry) => entry.id).join(", ")}`);
@@ -294,6 +303,7 @@ function validRunRequest(body, config) {
     roomId,
     prompt,
     model: chosen,
+    provider: provider.id,
     access: access || "ask",
     history: turns.filter((item) => item.text.trim()),
     designStyle: designStyle || undefined,
@@ -329,9 +339,10 @@ const serverKey = (env) =>
  * Whether the account can start a run: `connected` (its own key), `server` (no key of its own, the
  * operator's opted-in fallback) or `missing`. Reads the row only; nothing is decrypted.
  */
-export async function credentialState(env, account) {
-  if (account?.id && (await credentialRow(env, account.id))) return "connected";
-  return serverKey(env) ? "server" : "missing";
+export async function credentialState(env, account, providerId = "openrouter") {
+  requireProvider(providerId);
+  if (account?.id && (await credentialRow(env, account.id, providerId))) return "connected";
+  return providerId === "openrouter" && serverKey(env) ? "server" : "missing";
 }
 
 /**
@@ -341,24 +352,28 @@ export async function credentialState(env, account) {
  * when the operator opted in (`VERYNIZE_AI_SERVER_KEY=1`). Nothing it returns is stored.
  * `current()` re-reads the credential before every model request, so a key deleted mid-run fails
  * the next call and a reconnected key is used from then on.
- * @returns {Promise<{apiKey: string, baseUrl?: string, origin?: string, source: "account"|"server",
- *   current: () => Promise<string|null>} | null>}
+ * OpenRouter current() keeps its legacy raw key; other providers return parsed field objects.
+ * endpointFor is an internal helper to retain env overrides when credentials rotate.
  */
-export async function resolveProvider(env, account, origin) {
+export async function resolveProvider(env, account, origin, providerId = "openrouter") {
+  const definition = requireProvider(providerId);
   if (!account?.id) return null;
-  const baseUrl = env.OPENROUTER_BASE_URL ? openRouterBase(env) : undefined;
-  const own = await readCredential(env, account.id);
-  if (own)
-    return {
-      apiKey: own,
-      baseUrl,
-      origin,
-      source: "account",
-      current: () => readCredential(env, account.id),
-    };
-  const shared = serverKey(env);
-  if (!shared) return null;
-  return { apiKey: shared, baseUrl, origin, source: "server", current: async () => serverKey(env) };
+  const own = await readCredential(env, account.id, providerId);
+  const shared = providerId === "openrouter" ? serverKey(env) : null;
+  if (!own && !shared) return null;
+  const credential = providerId === "openrouter" ? { apiKey: own || shared } : own;
+  return {
+    id: providerId,
+    credential,
+    apiKey: credential.apiKey,
+    endpoint: definition.endpoint(credential, env),
+    endpointFor: (value) => definition.endpoint(value, env),
+    ...(providerId === "openrouter"
+      ? { baseUrl: env.OPENROUTER_BASE_URL ? openRouterBase(env) : undefined, origin }
+      : {}),
+    source: own ? "account" : "server",
+    current: own ? () => readCredential(env, account.id, providerId) : async () => serverKey(env),
+  };
 }
 
 /** The account a run acts for, rebuilt from ids (all the room backend reads of it). */
@@ -375,7 +390,7 @@ export function runAccount({ accountId, authUserId }) {
  * request-scoped path, so both resolve the room role and the provider the same way.
  * @param {object} env
  * @param {object} options
- * @param {object} options.run the ai_run row
+ * @param {Record<string, any>} options.run the ai_run row
  * @param {object} options.account runAccount(...) or the router's account
  * @param {Request} options.request the starting request, or a synthetic one with its origin
  * @param {{prompt: string, history: Array<object>, designStyle?: string, plan: boolean, helper: boolean}} options.input
@@ -392,10 +407,14 @@ export async function launchRun(env, options) {
   try {
     const backend = createRoomBackend(env, request, url, account, { roomId: run.roomId });
     const { role, title } = options.room || (await backend.role(run.roomId));
-    const provider = role ? await resolveProvider(env, account, url.origin) : null;
+    const provider = role
+      ? await resolveProvider(env, account, url.origin, run.provider || "openrouter")
+      : null;
     if (!role || !provider) {
       await log.emit("error", {
-        message: role ? CREDENTIALS_MESSAGE : "You have no access to this room",
+        message: role
+          ? credentialsMessage(run.provider || "openrouter")
+          : "You have no access to this room",
       });
       await log.emit("done", { code: "error", stopped: false, sessionId: run.id });
       await finishRun(env, run.id, "error");
@@ -460,7 +479,27 @@ async function notifyRun(env, runId) {
   }
 }
 
-const CREDENTIALS_MESSAGE = "Connect your OpenRouter account in Settings to use the model API.";
+const requireProvider = (id) => {
+  const provider = getProvider(id);
+  if (!provider) fail(404, "Unknown AI provider");
+  return provider;
+};
+const credentialsMessage = (id) =>
+  `Connect your ${requireProvider(id).label} account in Settings to use the model API.`;
+const providerModels = (env, provider) =>
+  provider.id === "openrouter"
+    ? aiConfig(env).models.map((model) => ({ ...model, tools: true }))
+    : provider.curatedModels;
+async function credentialsMap(env, account) {
+  return Object.fromEntries(
+    await Promise.all(
+      PROVIDERS.map(async (provider) => [
+        provider.id,
+        await credentialStatus(env, account, provider.id),
+      ]),
+    ),
+  );
+}
 const MAX_KEY = 512;
 
 const tooMany = () =>
@@ -483,12 +522,16 @@ const cookieValue = (request, name) => {
 };
 
 /** What GET /api/ai/credentials reports for the account (never the key). */
-async function credentialStatus(env, account) {
-  const row = await credentialRow(env, account.id);
+async function credentialStatus(env, account, providerId = "openrouter") {
+  const row = await credentialRow(env, account.id, providerId);
   if (!row)
     return {
       connected: false,
-      ...(serverKey(env) ? { serverFallback: true } : {}),
+      source: providerId === "openrouter" && serverKey(env) ? "server" : null,
+      last4: null,
+      label: null,
+      updatedAt: null,
+      ...(providerId === "openrouter" && serverKey(env) ? { serverFallback: true } : {}),
     };
   const status = {
     connected: true,
@@ -499,8 +542,9 @@ async function credentialStatus(env, account) {
     updatedAt: row.updatedAt,
   };
   // Live key details from OpenRouter (limit and usage), best effort.
-  const apiKey = await readCredential(env, account.id);
+  const apiKey = await readCredential(env, account.id, providerId);
   if (!apiKey) return { ...status, state: "unreadable" };
+  if (providerId !== "openrouter") return { ...status, state: "ok" };
   try {
     const check = await checkOpenRouterKey(env, apiKey, AbortSignal.timeout(4000));
     if (!check.ok) return { ...status, state: "rejected" };
@@ -527,40 +571,46 @@ async function handleCredentials(request, env, url, account, limited) {
   const path = url.pathname;
   if (path === "/api/ai/credentials") {
     if (request.method !== "GET") fail(405, "Use GET");
-    return json({ [OPENROUTER]: await credentialStatus(env, account) });
+    return json(await credentialsMap(env, account));
   }
-  if (path === "/api/ai/credentials/openrouter") {
+  const credentialRoute = /^\/api\/ai\/credentials\/([^/]+)$/.exec(path);
+  if (credentialRoute) {
+    const provider = requireProvider(credentialRoute[1]);
     if (request.method === "DELETE")
-      return json({ ok: true, removed: await deleteCredential(env, account.id) });
+      return json({ ok: true, removed: await deleteCredential(env, account.id, provider.id) });
     if (request.method !== "PUT") fail(405, "Use PUT or DELETE");
     if (await limited(env.AI_LIMIT, `credentials:${account.id}`)) return tooMany();
     const body = await readJson(request, 4 * 1024);
-    const apiKey = typeof body?.apiKey === "string" ? body.apiKey.trim() : "";
-    if (!apiKey || apiKey.length > MAX_KEY || !/^[\x21-\x7e]+$/.test(apiKey))
-      fail(400, "apiKey must be an OpenRouter API key");
-    let check;
+    let credential;
     try {
-      check = await checkOpenRouterKey(env, apiKey, AbortSignal.timeout(10_000));
-    } catch {
-      fail(502, "OpenRouter could not be reached to check this key. Try again.");
+      credential = provider.parseCredential(body);
+    } catch (error) {
+      if (error.status !== 400) throw error;
+      return json({ error: error.message, ...(error.field ? { field: error.field } : {}) }, 400);
     }
-    if (!check.ok)
+    const check = await provider.verify(credential, { fetch, env });
+    if (!check.ok) {
+      if (check.reason === "unreachable")
+        fail(502, `${provider.label} could not be reached to check this key. Try again.`);
       return json(
         {
           error:
-            check.status === 402
-              ? "This OpenRouter key has no credits left."
-              : "OpenRouter rejected this key. Check it and try again.",
+            check.message || `${provider.label} rejected this credential. Check it and try again.`,
           code: "invalid_key",
         },
         400,
       );
+    }
+    const description = provider.describe(credential);
     await saveCredential(env, account.id, {
-      apiKey,
+      provider: provider.id,
+      credential,
+      apiKey: credential.apiKey,
       source: "manual",
-      label: check.info?.label,
+      ...description,
+      label: check.info?.label || description.label,
     });
-    return json({ [OPENROUTER]: await credentialStatus(env, account) });
+    return json(await credentialsMap(env, account));
   }
   if (path === `${OAUTH_PATH}/start`) {
     if (request.method !== "POST") fail(405, "Use POST");
@@ -651,22 +701,52 @@ export async function handleAi(request, env, url, { accountOf, limited, ctx }) {
 
   if (path === "/api/ai/config") {
     if (request.method !== "GET") fail(405, "Use GET");
-    return json({ ...config, credentials: { openrouter: await credentialState(env, account) } });
+    const providers = await Promise.all(
+      PROVIDERS.map(async (provider) => {
+        const models = providerModels(env, provider);
+        return {
+          id: provider.id,
+          label: provider.label,
+          oauth: provider.oauth === true,
+          fields: provider.fields,
+          ...(provider.capabilities ? { capabilities: provider.capabilities } : {}),
+          connected: await credentialState(env, account, provider.id),
+          models,
+          defaultModel: models.find((model) => model.tools)?.id || null,
+        };
+      }),
+    );
+    return json({
+      ...config,
+      credentials: { openrouter: providers[0].connected },
+      providers,
+      defaultProvider: "openrouter",
+    });
   }
 
   if (path === "/api/ai/credentials" || path.startsWith("/api/ai/credentials/"))
     return handleCredentials(request, env, url, account, limited);
 
+  if (path === "/api/ai/models") {
+    if (request.method !== "GET") fail(405, "Use GET");
+    const definition = requireProvider(url.searchParams.get("provider") ?? "openrouter");
+    const resolved = await resolveProvider(env, account, url.origin, definition.id);
+    const live = resolved
+      ? await definition.listModels(resolved.credential, { fetch, env }).catch(() => null)
+      : null;
+    return json({ provider: definition.id, models: live || providerModels(env, definition) });
+  }
+
   if (path === "/api/ai/runs") {
     if (request.method !== "POST") fail(405, "Use POST");
     if (!config.enabled) fail(503, "The model API runtime is not configured on this server");
     if (await limited(env.AI_LIMIT, `account:${account.id}`)) return tooMany();
-    const input = validRunRequest(await readJson(request, MAX_BODY), config);
+    const input = validRunRequest(await readJson(request, MAX_BODY), config, env);
     // A retried request: replay the existing run's events, then follow it.
     const existing = await runByKey(env, account.id, input.idempotencyKey);
     if (existing) return sse(await runStream(env, existing, 0));
-    if ((await credentialState(env, account)) === "missing")
-      return json({ error: CREDENTIALS_MESSAGE, code: "credentials_required" }, 409);
+    if ((await credentialState(env, account, input.provider)) === "missing")
+      return json({ error: credentialsMessage(input.provider), code: "credentials_required" }, 409);
 
     const backend = createRoomBackend(env, request, url, account, { roomId: input.roomId });
     const { role, title } = await backend.role(input.roomId);
@@ -681,6 +761,7 @@ export async function handleAi(request, env, url, { accountOf, limited, ctx }) {
       roomId: input.roomId,
       chatId: input.chatId,
       model: input.model,
+      provider: input.provider,
       access: input.access,
       idempotencyKey: input.idempotencyKey,
     });
